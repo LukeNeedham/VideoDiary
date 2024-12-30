@@ -9,6 +9,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.lukeneedham.videodiary.domain.model.Day
+import com.lukeneedham.videodiary.domain.model.ShareRequest
 import com.lukeneedham.videodiary.ui.feature.calendar.MockDataCalendar
 import com.lukeneedham.videodiary.ui.feature.calendar.component.day.actionbar.CalendarDayActionBar
 import com.lukeneedham.videodiary.ui.feature.calendar.component.day.card.CalendarDayCard
@@ -22,6 +23,7 @@ fun CalendarDay(
     videoPlayerController: VideoPlayerController,
     onRecordTodayVideoClick: () -> Unit,
     onDeleteTodayVideoClick: () -> Unit,
+    share: (ShareRequest) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -42,6 +44,7 @@ fun CalendarDay(
             onRecordTodayVideoClick = onRecordTodayVideoClick,
             onDeleteTodayVideoClick = onDeleteTodayVideoClick,
             videoPlayerController = videoPlayerController,
+            share = share,
             modifier = Modifier
                 .fillMaxWidth()
                 .height(150.dp)
@@ -58,5 +61,6 @@ internal fun PreviewCalendarDay() {
         videoAspectRatio = 1f,
         videoPlayerController = rememberVideoPlayerController(),
         onDeleteTodayVideoClick = {},
+        share = {},
     )
 }

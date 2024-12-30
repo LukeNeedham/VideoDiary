@@ -1,5 +1,6 @@
 package com.lukeneedham.videodiary.ui.feature.calendar.component.day.actionbar
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -12,10 +13,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.lukeneedham.videodiary.domain.model.Day
+import com.lukeneedham.videodiary.domain.model.ShareRequest
 import com.lukeneedham.videodiary.ui.feature.calendar.MockDataCalendar
 import com.lukeneedham.videodiary.ui.feature.common.Button
 import com.lukeneedham.videodiary.ui.feature.common.videoplayer.VideoPlayerController
 import com.lukeneedham.videodiary.ui.feature.common.videoplayer.rememberVideoPlayerController
+import java.time.format.DateTimeFormatter
 
 @Composable
 fun CalendarDayActionBar(
@@ -23,8 +26,10 @@ fun CalendarDayActionBar(
     videoPlayerController: VideoPlayerController,
     onRecordTodayVideoClick: () -> Unit,
     onDeleteTodayVideoClick: () -> Unit,
+    share: (ShareRequest) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val date = day.date
     val video = day.video
     val isToday = day.isToday
 
@@ -70,6 +75,7 @@ fun CalendarDayActionBar(
 
         // Row 2 - for video editing
         Row(
+            horizontalArrangement = Arrangement.spacedBy(10.dp),
             modifier = Modifier
                 .weight(1f)
                 .fillMaxWidth()
@@ -94,8 +100,6 @@ fun CalendarDayActionBar(
                             .fillMaxHeight()
                     )
 
-                    Spacer(modifier = Modifier.width(10.dp))
-
                     Button(
                         text = "Delete",
                         onClick = onDeleteTodayVideoClick,
@@ -104,6 +108,23 @@ fun CalendarDayActionBar(
                             .fillMaxHeight()
                     )
                 }
+
+                Button(
+                    text = "Share",
+                    onClick = {
+                        val dateText = date.format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))
+                        val text = "Video Diary: $dateText"
+                        val request = ShareRequest(
+                            title = text,
+                            text = text,
+                            video = video,
+                        )
+                        share(request)
+                    },
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxHeight()
+                )
             }
         }
     }
@@ -117,5 +138,6 @@ internal fun PreviewCalendarDayActionBar() {
         onRecordTodayVideoClick = {},
         videoPlayerController = rememberVideoPlayerController(),
         onDeleteTodayVideoClick = {},
+        share = {},
     )
 }

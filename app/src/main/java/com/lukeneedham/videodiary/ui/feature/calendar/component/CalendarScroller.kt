@@ -13,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.lukeneedham.videodiary.domain.model.Day
+import com.lukeneedham.videodiary.domain.model.ShareRequest
 import com.lukeneedham.videodiary.ui.feature.calendar.MockDataCalendar
 import com.lukeneedham.videodiary.ui.feature.common.Button
 import com.lukeneedham.videodiary.ui.feature.common.videoplayer.rememberVideoPlayerController
@@ -28,6 +29,7 @@ fun CalendarScroller(
     openDayPicker: () -> Unit,
     exportFullVideo: () -> Unit,
     setCurrentDayIndex: (Int) -> Unit,
+    share: (ShareRequest) -> Unit,
 ) {
     val currentDay = days[currentDayIndex]
 
@@ -73,6 +75,7 @@ fun CalendarScroller(
                     onRecordTodayVideoClick = onRecordTodayVideoClick,
                     onDeleteTodayVideoClick = onDeleteTodayVideoClick,
                     videoPlayerController = videoPlayerController,
+                    share = share,
                 )
             }
         }
@@ -81,7 +84,9 @@ fun CalendarScroller(
         Button(
             text = "Export full video",
             onClick = exportFullVideo,
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp)
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 10.dp)
         )
         Spacer(modifier = Modifier.height(10.dp))
     }
@@ -99,5 +104,6 @@ internal fun PreviewCalendarScroller() {
         setCurrentDayIndex = {},
         exportFullVideo = {},
         currentDayIndex = 0,
+        share = {},
     )
 }

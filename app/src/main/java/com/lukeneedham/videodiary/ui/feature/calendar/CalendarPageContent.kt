@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.lukeneedham.videodiary.domain.model.Day
+import com.lukeneedham.videodiary.domain.model.ShareRequest
 import com.lukeneedham.videodiary.ui.feature.calendar.component.CalendarDayPickerDialog
 import com.lukeneedham.videodiary.ui.feature.calendar.component.CalendarScroller
 import java.time.LocalDate
@@ -29,6 +30,7 @@ fun CalendarPageContent(
     goToDate: (date: LocalDate) -> Unit,
     setCurrentDayIndex: (Int) -> Unit,
     exportFullVideo: () -> Unit,
+    share: (ShareRequest) -> Unit,
 ) {
     val currentDay = days.getOrNull(currentDayIndex)
 
@@ -49,6 +51,7 @@ fun CalendarPageContent(
                 currentDayIndex = currentDayIndex,
                 setCurrentDayIndex = setCurrentDayIndex,
                 exportFullVideo = exportFullVideo,
+                share = share,
             )
         } else {
             Box(
@@ -91,5 +94,6 @@ internal fun PreviewCalendarPageContent() {
         currentDayIndex = 0,
         setCurrentDayIndex = {},
         exportFullVideo = {},
+        share = {},
     )
 }

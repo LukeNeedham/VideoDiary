@@ -60,6 +60,7 @@ fun Router(
                 exportFullVideo = {
                     navigate(Page.ExportDiary)
                 },
+                share = share,
             )
 
             is Page.RecordVideo -> RecordVideoPage(
