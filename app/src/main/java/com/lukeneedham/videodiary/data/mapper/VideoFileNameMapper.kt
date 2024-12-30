@@ -1,0 +1,27 @@
+package com.lukeneedham.videodiary.data.mapper
+
+import java.time.LocalDate
+
+class VideoFileNameMapper {
+    fun dateToName(date: LocalDate): String {
+        val components = listOf(
+            date.year,
+            date.monthValue,
+            date.dayOfMonth,
+        )
+        return components.joinToString(separator)
+    }
+
+    fun nameToDate(name: String): LocalDate {
+        val components = name.split(separator)
+        fun get(index: Int) = components[index].toInt()
+        val year = get(0)
+        val month = get(1)
+        val day = get(2)
+        return LocalDate.of(year, month, day)
+    }
+
+    companion object {
+        private const val separator = "-"
+    }
+}
