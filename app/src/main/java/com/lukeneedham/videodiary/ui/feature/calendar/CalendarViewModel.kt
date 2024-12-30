@@ -19,6 +19,7 @@ class CalendarViewModel(
     private val videosDao: VideosDao,
 ) : ViewModel() {
     var videoAspectRatio: Float? by mutableStateOf(null)
+        private set
 
     var days by mutableStateOf<List<Day>>(emptyList())
         private set

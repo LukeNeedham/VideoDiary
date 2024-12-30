@@ -2,13 +2,15 @@ package com.lukeneedham.videodiary.di
 
 import android.net.Uri
 import com.lukeneedham.videodiary.data.mapper.VideoFileNameMapper
-import com.lukeneedham.videodiary.data.persistence.VideosDao
 import com.lukeneedham.videodiary.data.persistence.SettingsDao
+import com.lukeneedham.videodiary.data.persistence.VideoExportDao
+import com.lukeneedham.videodiary.data.persistence.VideosDao
 import com.lukeneedham.videodiary.data.repository.CalendarRepository
 import com.lukeneedham.videodiary.data.repository.VideoResolutionRepository
 import com.lukeneedham.videodiary.ui.RootViewModel
 import com.lukeneedham.videodiary.ui.feature.calendar.CalendarViewModel
 import com.lukeneedham.videodiary.ui.feature.checkvideo.CheckVideoViewModel
+import com.lukeneedham.videodiary.ui.feature.exportdiary.ExportDiaryViewModel
 import com.lukeneedham.videodiary.ui.feature.setup.SetupViewModel
 import com.lukeneedham.videodiary.ui.feature.videorecorder.RecordVideoViewModel
 import kotlinx.coroutines.CoroutineDispatcher
@@ -37,6 +39,11 @@ object KoinModule {
             VideosDao(
                 context = androidContext(),
                 videoFileNameMapper = get(),
+            )
+        }
+        factory {
+            VideoExportDao(
+                context = androidContext(),
             )
         }
     }
@@ -85,6 +92,13 @@ object KoinModule {
                 calendarRepository = get(),
                 videoResolutionRepository = get(),
                 videosDao = get(),
+            )
+        }
+        viewModel {
+            ExportDiaryViewModel(
+                videosDao = get(),
+                videoExportDao = get(),
+                videoResolutionRepository = get(),
             )
         }
     }

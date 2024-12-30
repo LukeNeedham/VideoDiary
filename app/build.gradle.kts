@@ -78,6 +78,10 @@ dependencies {
     // Datastore
     implementation(deps.libs.androidx.datastore)
 
+    // Video editing
+    implementation("org.mp4parser:isoparser:1.9.56")
+    implementation("org.mp4parser:muxer:1.9.56")
+
     // Testing
     testImplementation(deps.libs.testing.junit)
     androidTestImplementation(deps.libs.testing.androidxJunit)

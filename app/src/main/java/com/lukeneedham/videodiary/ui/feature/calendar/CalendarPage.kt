@@ -6,6 +6,7 @@ import androidx.compose.runtime.Composable
 fun CalendarPage(
     viewModel: CalendarViewModel,
     onRecordTodayVideoClick: () -> Unit,
+    exportFullVideo: () -> Unit,
 ) {
     CalendarPageContent(
         days = viewModel.days,
@@ -16,5 +17,6 @@ fun CalendarPage(
         currentDayIndex = viewModel.currentDayIndex,
         setCurrentDayIndex = viewModel::setCurrentDay,
         goToDate = viewModel::goToDate,
+        exportFullVideo = exportFullVideo,
     )
 }

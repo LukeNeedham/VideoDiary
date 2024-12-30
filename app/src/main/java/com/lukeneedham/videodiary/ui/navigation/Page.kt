@@ -10,6 +10,7 @@ sealed class Page : Parcelable {
     data object Setup : Page()
     data object Calendar : Page()
     data object RecordVideo : Page()
+    data object ExportDiary : Page()
     data class CheckVideo(
         val date: LocalDate,
         val videoContentUri: Uri,

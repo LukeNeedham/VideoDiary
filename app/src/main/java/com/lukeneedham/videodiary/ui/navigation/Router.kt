@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import com.lukeneedham.videodiary.domain.util.logger.Logger
 import com.lukeneedham.videodiary.ui.feature.calendar.CalendarPage
 import com.lukeneedham.videodiary.ui.feature.checkvideo.CheckVideoPage
+import com.lukeneedham.videodiary.ui.feature.exportdiary.ExportDiaryPage
 import com.lukeneedham.videodiary.ui.feature.setup.SetupPage
 import com.lukeneedham.videodiary.ui.feature.videorecorder.RecordVideoPage
 import dev.olshevski.navigation.reimagined.NavBackHandler
@@ -53,7 +54,10 @@ fun Router(
                 viewModel = koinInject(),
                 onRecordTodayVideoClick = {
                     navigate(Page.RecordVideo)
-                }
+                },
+                exportFullVideo = {
+                    navigate(Page.ExportDiary)
+                },
             )
 
             is Page.RecordVideo -> RecordVideoPage(
@@ -78,6 +82,10 @@ fun Router(
                 onAccepted = {
                     navController.popUpTo { it is Page.Calendar }
                 }
+            )
+
+            is Page.ExportDiary -> ExportDiaryPage(
+                viewModel = koinInject(),
             )
         }
     }

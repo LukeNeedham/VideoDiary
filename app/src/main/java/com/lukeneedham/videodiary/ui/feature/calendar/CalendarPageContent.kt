@@ -28,6 +28,7 @@ fun CalendarPageContent(
     onDeleteTodayVideoClick: () -> Unit,
     goToDate: (date: LocalDate) -> Unit,
     setCurrentDayIndex: (Int) -> Unit,
+    exportFullVideo: () -> Unit,
 ) {
     val currentDay = days.getOrNull(currentDayIndex)
 
@@ -47,6 +48,7 @@ fun CalendarPageContent(
                 },
                 currentDayIndex = currentDayIndex,
                 setCurrentDayIndex = setCurrentDayIndex,
+                exportFullVideo = exportFullVideo,
             )
         } else {
             Box(
@@ -88,5 +90,6 @@ internal fun PreviewCalendarPageContent() {
         startDate = MockDataCalendar.startDate,
         currentDayIndex = 0,
         setCurrentDayIndex = {},
+        exportFullVideo = {},
     )
 }

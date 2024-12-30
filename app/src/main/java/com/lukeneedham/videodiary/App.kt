@@ -11,6 +11,8 @@ class App : Application() {
     override fun onCreate() {
         super.onCreate()
 
+        AppContext.value = this
+
         // Set logger as soon as possible
         Logger.setLoggerEngine(AndroidLoggerEngine())
 
