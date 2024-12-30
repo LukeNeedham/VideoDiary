@@ -1,11 +1,9 @@
 package com.lukeneedham.videodiary.data.repository
 
-import com.lukeneedham.videodiary.data.persistence.VideosDao
 import com.lukeneedham.videodiary.data.persistence.SettingsDao
+import com.lukeneedham.videodiary.data.persistence.VideosDao
 import com.lukeneedham.videodiary.domain.model.Day
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.launch
 import java.time.LocalDate
 
 class CalendarRepository(
@@ -28,6 +26,7 @@ class CalendarRepository(
         }
     }
 
+    /** @return an ordered list of all dates between the start date and today (both inclusive) */
     private suspend fun getAllDates(): List<LocalDate> {
         val cached = allDatesCached
         if (cached != null) return cached

@@ -6,15 +6,15 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.lukeneedham.videodiary.data.persistence.VideoExportDao
-import com.lukeneedham.videodiary.data.persistence.VideosDao
+import com.lukeneedham.videodiary.data.repository.CalendarRepository
 import com.lukeneedham.videodiary.data.repository.VideoResolutionRepository
 import kotlinx.coroutines.launch
 import java.io.File
 
 class ExportDiaryViewModel(
-    private val videosDao: VideosDao,
     private val videoExportDao: VideoExportDao,
     private val videoResolutionRepository: VideoResolutionRepository,
+    private val calendarRepository: CalendarRepository,
 ) : ViewModel() {
 
     private var allVideos: List<File> = emptyList()
@@ -30,9 +30,10 @@ class ExportDiaryViewModel(
 
     init {
         viewModelScope.launch {
-            videosDao.allVideos.collect {
-                allVideos = it
-                videoCount = it.size
+            calendarRepository.allDays.collect { days ->
+                val videos = days.mapNotNull { it.video }
+                allVideos = videos
+                videoCount = videos.size
             }
         }
         viewModelScope.launch {

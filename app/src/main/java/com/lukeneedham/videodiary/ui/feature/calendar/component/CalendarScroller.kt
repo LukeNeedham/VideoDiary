@@ -81,6 +81,7 @@ fun CalendarScroller(
         Button(
             text = "Export full video",
             onClick = exportFullVideo,
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp)
         )
         Spacer(modifier = Modifier.height(10.dp))
     }

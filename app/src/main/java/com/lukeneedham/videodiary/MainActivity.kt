@@ -8,8 +8,11 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import com.lukeneedham.videodiary.domain.model.ShareRequest
 import com.lukeneedham.videodiary.ui.Root
 import com.lukeneedham.videodiary.ui.media.VideoPlayerPool
+import com.lukeneedham.videodiary.ui.share.Sharer
+import org.koin.android.ext.android.inject
 
 class MainActivity : ComponentActivity() {
     private val requiredPermissions = listOf(
@@ -18,11 +21,15 @@ class MainActivity : ComponentActivity() {
         Manifest.permission.WRITE_EXTERNAL_STORAGE,
     )
 
+    private val sharer: Sharer by inject()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            Root()
+            Root(
+                share = ::share,
+            )
         }
 
         requestRequiredPermissions()
@@ -38,26 +45,16 @@ class MainActivity : ComponentActivity() {
         VideoPlayerPool.onAppResume()
     }
 
+    private fun share(request: ShareRequest) {
+        val intent = sharer.createShareIntent(request)
+        startActivity(intent)
+    }
+
     private fun requestRequiredPermissions() {
         ActivityCompat.requestPermissions(
             this,
             requiredPermissions.toTypedArray(),
             101
         )
-    }
-
-    private fun requestPermission(permission: String) {
-        val hasPermission = ContextCompat.checkSelfPermission(
-            this,
-            permission
-        ) == PackageManager.PERMISSION_GRANTED
-
-        if (!hasPermission) {
-            ActivityCompat.requestPermissions(
-                this,
-                arrayOf(permission),
-                101
-            )
-        }
     }
 }

@@ -6,12 +6,15 @@ import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import com.lukeneedham.videodiary.domain.model.ShareRequest
 import com.lukeneedham.videodiary.ui.navigation.Router
 import com.lukeneedham.videodiary.ui.theme.VideoDiaryTheme
 import org.koin.compose.koinInject
 
 @Composable
-fun Root() {
+fun Root(
+    share: (ShareRequest) -> Unit,
+) {
     val viewModel: RootViewModel = koinInject()
 
     val hasSetupCompleted = viewModel.hasSetupCompleted
@@ -24,7 +27,7 @@ fun Root() {
         VideoDiaryTheme {
             if (hasSetupCompleted != null) {
                 Router(
-                    hasSetupCompleted = hasSetupCompleted,
+                    hasSetupCompleted = hasSetupCompleted, share = share,
                 )
             }
         }

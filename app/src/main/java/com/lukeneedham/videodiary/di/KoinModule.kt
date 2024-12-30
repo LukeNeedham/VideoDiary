@@ -13,6 +13,7 @@ import com.lukeneedham.videodiary.ui.feature.checkvideo.CheckVideoViewModel
 import com.lukeneedham.videodiary.ui.feature.exportdiary.ExportDiaryViewModel
 import com.lukeneedham.videodiary.ui.feature.setup.SetupViewModel
 import com.lukeneedham.videodiary.ui.feature.videorecorder.RecordVideoViewModel
+import com.lukeneedham.videodiary.ui.share.Sharer
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import org.koin.android.ext.koin.androidContext
@@ -31,6 +32,11 @@ object KoinModule {
 
     private fun getUtil() = module {
         factory<CoroutineDispatcher>(KoinQualifier.Dispatcher.io) { Dispatchers.IO }
+        factory {
+            Sharer(
+                context = androidContext(),
+            )
+        }
     }
 
     private fun getUi() = module {
@@ -96,9 +102,9 @@ object KoinModule {
         }
         viewModel {
             ExportDiaryViewModel(
-                videosDao = get(),
                 videoExportDao = get(),
                 videoResolutionRepository = get(),
+                calendarRepository = get(),
             )
         }
     }

@@ -19,6 +19,7 @@ class VideosDao(
     }
 
     private val allVideosMutable = MutableStateFlow(loadAllVideos())
+    /** A Flow of all video files in the diary, unordered */
     val allVideos = allVideosMutable.asStateFlow()
 
     fun deleteVideo(date: LocalDate) {

@@ -1,6 +1,7 @@
 package com.lukeneedham.videodiary.ui.navigation
 
 import androidx.compose.runtime.Composable
+import com.lukeneedham.videodiary.domain.model.ShareRequest
 import com.lukeneedham.videodiary.domain.util.logger.Logger
 import com.lukeneedham.videodiary.ui.feature.calendar.CalendarPage
 import com.lukeneedham.videodiary.ui.feature.checkvideo.CheckVideoPage
@@ -21,6 +22,7 @@ import java.time.LocalDate
 @Composable
 fun Router(
     hasSetupCompleted: Boolean,
+    share: (ShareRequest) -> Unit,
 ) {
     val startDestination = if (hasSetupCompleted) Page.Calendar else Page.Setup
     val navController = rememberNavController<Page>(startDestination = startDestination)
@@ -85,7 +87,7 @@ fun Router(
             )
 
             is Page.ExportDiary -> ExportDiaryPage(
-                viewModel = koinInject(),
+                viewModel = koinInject(), share = share,
             )
         }
     }
