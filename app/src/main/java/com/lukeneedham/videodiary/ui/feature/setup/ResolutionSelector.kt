@@ -49,7 +49,7 @@ fun ResolutionSelector(
         }
 
         Button(
-            iconRes = R.drawable.ic_chevron_left,
+            iconRes = R.drawable.chevron_left,
             contentDescription = "Previous",
         ) {
             setCurrentResolutionIndex(currentResolutionIndex - 1)
@@ -68,7 +68,7 @@ fun ResolutionSelector(
         }
 
         Button(
-            iconRes = R.drawable.ic_chevron_right,
+            iconRes = R.drawable.chevron_right,
             contentDescription = "Next",
         ) {
             setCurrentResolutionIndex(currentResolutionIndex + 1)

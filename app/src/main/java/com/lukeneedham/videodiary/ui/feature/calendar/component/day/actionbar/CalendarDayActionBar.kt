@@ -1,13 +1,10 @@
 package com.lukeneedham.videodiary.ui.feature.calendar.component.day.actionbar
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -16,116 +13,73 @@ import com.lukeneedham.videodiary.domain.model.Day
 import com.lukeneedham.videodiary.domain.model.ShareRequest
 import com.lukeneedham.videodiary.ui.feature.calendar.MockDataCalendar
 import com.lukeneedham.videodiary.ui.feature.common.Button
-import com.lukeneedham.videodiary.ui.feature.common.videoplayer.VideoPlayerController
-import com.lukeneedham.videodiary.ui.feature.common.videoplayer.rememberVideoPlayerController
 import java.time.format.DateTimeFormatter
 
 @Composable
 fun CalendarDayActionBar(
     day: Day,
-    videoPlayerController: VideoPlayerController,
     onRecordTodayVideoClick: () -> Unit,
     onDeleteTodayVideoClick: () -> Unit,
-    share: (ShareRequest) -> Unit,
-    modifier: Modifier = Modifier
+    share: (ShareRequest) -> Unit
 ) {
     val date = day.date
     val video = day.video
     val isToday = day.isToday
 
-    Column(
-        modifier = modifier
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(10.dp),
+        modifier = Modifier
+            // Fixed height, so bar will always render regardless of whether any buttons render
+            .height(60.dp)
+            .fillMaxWidth()
     ) {
-        // Row 1 - for video playback controls
-        Row(
-            modifier = Modifier
-                .weight(1f)
-                .fillMaxWidth()
+        @Composable
+        fun ActionButton(
+            text: String,
+            onClick: () -> Unit,
         ) {
-            if (video != null) {
-                // Mute button
-                val muteButtonText = if (videoPlayerController.isVolumeOn) "Mute" else "Unmute"
-                Button(
-                    text = muteButtonText,
-                    onClick = {
-                        videoPlayerController.toggleVolumeOn()
-                    },
-                    modifier = Modifier
-                        .fillMaxHeight()
-                        .weight(1f)
-                )
-
-                Spacer(modifier = Modifier.width(10.dp))
-
-                // Play button
-                val playButtonText = if (videoPlayerController.isPlaying) "Pause" else "Play"
-                Button(
-                    text = playButtonText,
-                    onClick = {
-                        videoPlayerController.toggleIsPlaying()
-                    },
-                    modifier = Modifier
-                        .fillMaxHeight()
-                        .weight(1f)
-                )
-            }
+            Button(
+                text = text,
+                onClick = onClick,
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .weight(1f)
+            )
         }
 
-        Spacer(modifier = Modifier.height(5.dp))
-
-        // Row 2 - for video editing
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(10.dp),
-            modifier = Modifier
-                .weight(1f)
-                .fillMaxWidth()
-        ) {
-            if (video == null) {
-                if (isToday) {
-                    Button(
-                        text = "Record",
-                        onClick = onRecordTodayVideoClick,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .fillMaxHeight()
-                    )
-                }
-            } else {
-                if (isToday) {
-                    Button(
-                        text = "Retake",
-                        onClick = onRecordTodayVideoClick,
-                        modifier = Modifier
-                            .weight(1f)
-                            .fillMaxHeight()
-                    )
-
-                    Button(
-                        text = "Delete",
-                        onClick = onDeleteTodayVideoClick,
-                        modifier = Modifier
-                            .weight(1f)
-                            .fillMaxHeight()
-                    )
-                }
-
-                Button(
-                    text = "Share",
-                    onClick = {
-                        val dateText = date.format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))
-                        val text = "Video Diary: $dateText"
-                        val request = ShareRequest(
-                            title = text,
-                            text = text,
-                            video = video,
-                        )
-                        share(request)
-                    },
-                    modifier = Modifier
-                        .weight(1f)
-                        .fillMaxHeight()
+        if (video == null) {
+            if (isToday) {
+                ActionButton(
+                    text = "Record",
+                    onClick = onRecordTodayVideoClick,
                 )
             }
+        } else {
+            if (isToday) {
+                ActionButton(
+                    text = "Retake",
+                    onClick = onRecordTodayVideoClick,
+                )
+
+                ActionButton(
+                    text = "Delete",
+                    onClick = onDeleteTodayVideoClick,
+                )
+            }
+
+            ActionButton(
+                text = "Share",
+                onClick = {
+                    val dateText = date.format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))
+                    val text = "Video Diary: $dateText"
+                    val request = ShareRequest(
+                        title = text,
+                        text = text,
+                        video = video,
+                    )
+                    share(request)
+                },
+            )
         }
     }
 }
@@ -136,7 +90,6 @@ internal fun PreviewCalendarDayActionBar() {
     CalendarDayActionBar(
         day = MockDataCalendar.day,
         onRecordTodayVideoClick = {},
-        videoPlayerController = rememberVideoPlayerController(),
         onDeleteTodayVideoClick = {},
         share = {},
     )

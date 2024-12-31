@@ -12,6 +12,7 @@ import com.lukeneedham.videodiary.domain.model.Day
 import com.lukeneedham.videodiary.domain.model.ShareRequest
 import com.lukeneedham.videodiary.ui.feature.calendar.MockDataCalendar
 import com.lukeneedham.videodiary.ui.feature.calendar.component.day.actionbar.CalendarDayActionBar
+import com.lukeneedham.videodiary.ui.feature.calendar.component.day.actionbar.CalendarDayVideoControlBar
 import com.lukeneedham.videodiary.ui.feature.calendar.component.day.card.CalendarDayCard
 import com.lukeneedham.videodiary.ui.feature.common.videoplayer.VideoPlayerController
 import com.lukeneedham.videodiary.ui.feature.common.videoplayer.rememberVideoPlayerController
@@ -38,16 +39,17 @@ fun CalendarDay(
                 .weight(1f)
                 .fillMaxWidth()
         )
+        Spacer(modifier = Modifier.height(5.dp))
+        CalendarDayVideoControlBar(
+            hasVideo = day.video != null,
+            videoPlayerController = videoPlayerController,
+        )
         Spacer(modifier = Modifier.height(10.dp))
         CalendarDayActionBar(
             day = day,
             onRecordTodayVideoClick = onRecordTodayVideoClick,
             onDeleteTodayVideoClick = onDeleteTodayVideoClick,
-            videoPlayerController = videoPlayerController,
-            share = share,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(150.dp)
+            share = share
         )
     }
 }

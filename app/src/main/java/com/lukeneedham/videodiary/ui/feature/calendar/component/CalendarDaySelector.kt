@@ -56,7 +56,7 @@ fun CalendarDaySelector(
         }
 
         Button(
-            iconRes = R.drawable.ic_chevron_left,
+            iconRes = R.drawable.chevron_left,
             contentDescription = "Previous",
         ) {
             onPrevious()
@@ -79,7 +79,7 @@ fun CalendarDaySelector(
         }
 
         Button(
-            iconRes = R.drawable.ic_chevron_right,
+            iconRes = R.drawable.chevron_right,
             contentDescription = "Next",
         ) {
             onNext()

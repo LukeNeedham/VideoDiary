@@ -40,7 +40,7 @@ fun CalendarDayCardTodayMissing(
                     .padding(10.dp)
             ) {
                 Image(
-                    painterResource(R.drawable.ic_add),
+                    painterResource(R.drawable.add),
                     contentDescription = "Record now!",
                     colorFilter = ColorFilter.tint(color = Color.White),
                     modifier = Modifier.size(30.dp)
