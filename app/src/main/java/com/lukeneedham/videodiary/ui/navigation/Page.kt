@@ -7,7 +7,13 @@ import java.time.LocalDate
 
 @Parcelize
 sealed class Page : Parcelable {
-    data object Setup : Page()
+    @Parcelize
+    sealed class Setup : Page() {
+        data object SelectOrientation : Setup()
+        data object SelectResolution : Setup()
+        data object SelectVideoDuration : Setup()
+    }
+
     data object Calendar : Page()
     data object RecordVideo : Page()
     data object ExportDiary : Page()

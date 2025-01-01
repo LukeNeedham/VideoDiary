@@ -74,6 +74,7 @@ dependencies {
     implementation(deps.libs.koin.core)
     implementation(deps.libs.koin.android)
     implementation(deps.libs.koin.compose)
+    implementation(deps.libs.koin.viewModel)
 
     // Datastore
     implementation(deps.libs.androidx.datastore)

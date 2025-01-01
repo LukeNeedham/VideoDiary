@@ -61,7 +61,7 @@ class VideosDao(
 
     private fun getVideoFile(name: String) = File(videosDir, name)
 
-    private fun getVideoFileName(date: LocalDate) = videoFileNameMapper.dateToName(date) + ".mp4"
+    private fun getVideoFileName(date: LocalDate) = videoFileNameMapper.dateToName(date)
 
     /** Should be invoked whenever the persisted video files change in any way */
     private fun refreshVideosState() {

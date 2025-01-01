@@ -7,12 +7,14 @@ import com.lukeneedham.videodiary.data.persistence.VideoExportDao
 import com.lukeneedham.videodiary.data.persistence.VideosDao
 import com.lukeneedham.videodiary.data.repository.CalendarRepository
 import com.lukeneedham.videodiary.data.repository.VideoResolutionRepository
-import com.lukeneedham.videodiary.ui.RootViewModel
+import com.lukeneedham.videodiary.ui.root.RootViewModel
 import com.lukeneedham.videodiary.ui.feature.calendar.CalendarViewModel
-import com.lukeneedham.videodiary.ui.feature.checkvideo.CheckVideoViewModel
+import com.lukeneedham.videodiary.ui.feature.record.check.CheckVideoViewModel
 import com.lukeneedham.videodiary.ui.feature.exportdiary.ExportDiaryViewModel
-import com.lukeneedham.videodiary.ui.feature.setup.SetupViewModel
-import com.lukeneedham.videodiary.ui.feature.videorecorder.RecordVideoViewModel
+import com.lukeneedham.videodiary.ui.feature.setup.duration.SelectVideoDurationViewModel
+import com.lukeneedham.videodiary.ui.feature.setup.orientation.SetupSelectOrientationViewModel
+import com.lukeneedham.videodiary.ui.feature.setup.resolution.SetupSelectResolutionViewModel
+import com.lukeneedham.videodiary.ui.feature.record.film.RecordVideoViewModel
 import com.lukeneedham.videodiary.ui.share.Sharer
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
@@ -58,7 +60,7 @@ object KoinModule {
         single {
             CalendarRepository(
                 videosDao = get(),
-                settingsDao = get(),
+                videoFileNameMapper = get(),
             )
         }
         factory {
@@ -75,7 +77,19 @@ object KoinModule {
             )
         }
         viewModel {
-            SetupViewModel(
+            SetupSelectResolutionViewModel(
+                settingsDao = get(),
+                ioDispatcher = get(KoinQualifier.Dispatcher.io),
+            )
+        }
+        viewModel {
+            SetupSelectOrientationViewModel(
+                settingsDao = get(),
+                ioDispatcher = get(KoinQualifier.Dispatcher.io),
+            )
+        }
+        viewModel {
+            SelectVideoDurationViewModel(
                 settingsDao = get(),
                 ioDispatcher = get(KoinQualifier.Dispatcher.io),
             )

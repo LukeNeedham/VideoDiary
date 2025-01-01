@@ -63,6 +63,7 @@ object deps {
             val core = "io.insert-koin:koin-core"
             val android = "io.insert-koin:koin-android"
             val compose = "io.insert-koin:koin-compose"
+            val viewModel = "io.insert-koin:koin-compose-viewmodel"
         }
     }
 }

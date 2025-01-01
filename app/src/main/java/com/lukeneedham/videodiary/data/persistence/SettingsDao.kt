@@ -6,11 +6,17 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.MutablePreferences
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.intPreferencesKey
+import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
+import com.lukeneedham.videodiary.data.persistence.model.OrientationPersistence
 import com.lukeneedham.videodiary.domain.model.CameraResolutionRotation
+import com.lukeneedham.videodiary.domain.model.Orientation
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
-import java.time.LocalDate
+import kotlinx.coroutines.flow.map
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
 
 /** Persists the settings configured by the user when first setting up the diary */
 class SettingsDao(
@@ -24,8 +30,11 @@ class SettingsDao(
     /** The selected camera rotation degrees, which is one of: 0, 90, 180, 270 */
     private val resolutionRotationKey = intPreferencesKey("resolutionRotation")
 
-    /** The date on which the diary was started */
-    private val startDateKey = stringPreferencesKey("startDate")
+    /** The selected video orientation, which also drives the app orientation */
+    private val videoOrientationKey = stringPreferencesKey("videoOrientation")
+
+    /** The selected duration of each video in seconds */
+    private val videoDurationMillisKey = longPreferencesKey("videoDurationMillis")
 
     suspend fun setResolution(resolution: Size) {
         val components = listOf(resolution.width, resolution.height)
@@ -53,19 +62,38 @@ class SettingsDao(
         return CameraResolutionRotation.fromDegrees(degrees)
     }
 
-    suspend fun setStartDate(startDate: LocalDate) {
-        val components = listOf(startDate.year, startDate.monthValue, startDate.dayOfMonth)
-        val string = components.joinToString(startDateSeparator)
+    suspend fun setOrientation(orientation: Orientation) {
+        val persistence = when (orientation) {
+            Orientation.Portrait -> OrientationPersistence.Portrait
+            Orientation.Landscape -> OrientationPersistence.Landscape
+        }
+        val id = persistence.persistenceId
         updatePrefs {
-            set(startDateKey, string)
+            set(videoOrientationKey, id)
         }
     }
 
-    suspend fun getStartDate(): LocalDate? {
-        val startDateString = getPrefs()[startDateKey] ?: return null
-        val components = startDateString.split(startDateSeparator)
-        fun get(index: Int) = components[index].toInt()
-        return LocalDate.of(get(0), get(1), get(2))
+    fun getOrientationFlow(): Flow<Orientation?> {
+        return context.dataStore.data.map { prefs ->
+            val id = prefs[videoOrientationKey] ?: return@map null
+            val persistence = OrientationPersistence.fromId(id)
+            when (persistence) {
+                OrientationPersistence.Portrait -> Orientation.Portrait
+                OrientationPersistence.Landscape -> Orientation.Landscape
+            }
+        }
+    }
+
+    suspend fun setVideoDuration(duration: Duration) {
+        val millis = duration.inWholeMilliseconds
+        updatePrefs {
+            set(videoDurationMillisKey, millis)
+        }
+    }
+
+    suspend fun getVideoDuration(): Duration? {
+        val millis = getPrefs()[videoDurationMillisKey] ?: return null
+        return millis.milliseconds
     }
 
     private suspend fun getPrefs() = context.dataStore.data.first()
@@ -80,6 +108,5 @@ class SettingsDao(
 
     companion object {
         private val resolutionSeparator = "x"
-        private val startDateSeparator = "-"
     }
 }

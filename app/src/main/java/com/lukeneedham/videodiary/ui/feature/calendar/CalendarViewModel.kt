@@ -1,5 +1,6 @@
 package com.lukeneedham.videodiary.ui.feature.calendar
 
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -24,8 +25,9 @@ class CalendarViewModel(
     var days by mutableStateOf<List<Day>>(emptyList())
         private set
 
-    var startDate by mutableStateOf<LocalDate?>(null)
-        private set
+    val startDate by derivedStateOf {
+        days.firstOrNull()?.date ?: LocalDate.now()
+    }
 
     var currentDayIndex by mutableIntStateOf(0)
         private set
@@ -43,9 +45,6 @@ class CalendarViewModel(
         }
         viewModelScope.launch {
             videoAspectRatio = videoResolutionRepository.getAspectRatio()
-        }
-        viewModelScope.launch {
-            startDate = calendarRepository.getStartDate()
         }
     }
 

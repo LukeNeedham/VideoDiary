@@ -9,11 +9,13 @@ class VideoFileNameMapper {
             date.monthValue,
             date.dayOfMonth,
         )
-        return components.joinToString(separator)
+        val name = components.joinToString(separator)
+        return name + extension
     }
 
     fun nameToDate(name: String): LocalDate {
-        val components = name.split(separator)
+        val nameWithoutExtension = name.removeSuffix(extension)
+        val components = nameWithoutExtension.split(separator)
         fun get(index: Int) = components[index].toInt()
         val year = get(0)
         val month = get(1)
@@ -23,5 +25,6 @@ class VideoFileNameMapper {
 
     companion object {
         private const val separator = "-"
+        private const val extension = ".mp4"
     }
 }

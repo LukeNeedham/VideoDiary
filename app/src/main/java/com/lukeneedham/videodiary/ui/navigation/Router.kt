@@ -1,13 +1,16 @@
 package com.lukeneedham.videodiary.ui.navigation
 
 import androidx.compose.runtime.Composable
+import com.lukeneedham.videodiary.domain.model.Orientation
 import com.lukeneedham.videodiary.domain.model.ShareRequest
 import com.lukeneedham.videodiary.domain.util.logger.Logger
 import com.lukeneedham.videodiary.ui.feature.calendar.CalendarPage
-import com.lukeneedham.videodiary.ui.feature.checkvideo.CheckVideoPage
 import com.lukeneedham.videodiary.ui.feature.exportdiary.ExportDiaryPage
-import com.lukeneedham.videodiary.ui.feature.setup.SetupPage
-import com.lukeneedham.videodiary.ui.feature.videorecorder.RecordVideoPage
+import com.lukeneedham.videodiary.ui.feature.record.check.CheckVideoPage
+import com.lukeneedham.videodiary.ui.feature.record.film.RecordVideoPage
+import com.lukeneedham.videodiary.ui.feature.setup.duration.SelectVideoDurationPage
+import com.lukeneedham.videodiary.ui.feature.setup.orientation.SetupSelectOrientationPage
+import com.lukeneedham.videodiary.ui.feature.setup.resolution.SetupSelectResolutionPage
 import dev.olshevski.navigation.reimagined.NavBackHandler
 import dev.olshevski.navigation.reimagined.NavHost
 import dev.olshevski.navigation.reimagined.navigate
@@ -15,16 +18,17 @@ import dev.olshevski.navigation.reimagined.pop
 import dev.olshevski.navigation.reimagined.popAll
 import dev.olshevski.navigation.reimagined.popUpTo
 import dev.olshevski.navigation.reimagined.rememberNavController
-import org.koin.compose.koinInject
+import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 import java.time.LocalDate
 
 @Composable
 fun Router(
-    hasSetupCompleted: Boolean,
+    needsSetup: Boolean,
     share: (ShareRequest) -> Unit,
+    setOrientation: (Orientation) -> Unit,
 ) {
-    val startDestination = if (hasSetupCompleted) Page.Calendar else Page.Setup
+    val startDestination = if (needsSetup) Page.Setup.SelectOrientation else Page.Calendar
     val navController = rememberNavController<Page>(startDestination = startDestination)
 
     fun navigate(to: Page) {
@@ -44,16 +48,31 @@ fun Router(
         controller = navController,
     ) { page ->
         when (page) {
-            is Page.Setup -> SetupPage(
-                viewModel = koinInject(),
-                finishSetup = {
+            Page.Setup.SelectOrientation -> SetupSelectOrientationPage(
+                viewModel = koinViewModel(),
+                onContinue = {
+                    navigate(Page.Setup.SelectResolution)
+                },
+                setOrientation = setOrientation,
+            )
+
+            is Page.Setup.SelectResolution -> SetupSelectResolutionPage(
+                viewModel = koinViewModel(),
+                onContinue = {
+                    navigate(Page.Setup.SelectVideoDuration)
+                }
+            )
+
+            Page.Setup.SelectVideoDuration -> SelectVideoDurationPage(
+                viewModel = koinViewModel(),
+                onContinue = {
                     navController.popAll()
                     navigate(Page.Calendar)
                 }
             )
 
             is Page.Calendar -> CalendarPage(
-                viewModel = koinInject(),
+                viewModel = koinViewModel(),
                 onRecordTodayVideoClick = {
                     navigate(Page.RecordVideo)
                 },
@@ -64,7 +83,7 @@ fun Router(
             )
 
             is Page.RecordVideo -> RecordVideoPage(
-                viewModel = koinInject(),
+                viewModel = koinViewModel(),
                 onRecordingFinished = { videoContentUri ->
                     navigate(
                         Page.CheckVideo(
@@ -75,20 +94,24 @@ fun Router(
                 }
             )
 
-            is Page.CheckVideo -> CheckVideoPage(
-                viewModel = koinInject {
-                    parametersOf(page.date, page.videoContentUri)
-                },
-                onRetakeClick = {
-                    pop()
-                },
-                onAccepted = {
+            is Page.CheckVideo -> {
+                val returnToCalendar: () -> Unit = {
                     navController.popUpTo { it is Page.Calendar }
                 }
-            )
+                CheckVideoPage(
+                    viewModel = koinViewModel {
+                        parametersOf(page.date, page.videoContentUri)
+                    },
+                    onRetakeClick = {
+                        pop()
+                    },
+                    onAccepted = returnToCalendar,
+                    onCancelClick = returnToCalendar,
+                )
+            }
 
             is Page.ExportDiary -> ExportDiaryPage(
-                viewModel = koinInject(), share = share,
+                viewModel = koinViewModel(), share = share,
             )
         }
     }
