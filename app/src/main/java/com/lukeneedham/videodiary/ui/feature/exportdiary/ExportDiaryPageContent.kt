@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -19,7 +20,7 @@ import com.lukeneedham.videodiary.domain.model.Video
 import com.lukeneedham.videodiary.ui.feature.common.Button
 import com.lukeneedham.videodiary.ui.feature.common.toolbar.GenericToolbar
 import com.lukeneedham.videodiary.ui.feature.common.videoplayer.VideoPlayer
-import com.lukeneedham.videodiary.ui.feature.common.videoplayer.rememberVideoPlayerController
+import com.lukeneedham.videodiary.ui.feature.common.videoplayer.VideoPlayerController
 
 @Composable
 fun ExportDiaryPageContent(
@@ -87,10 +88,15 @@ fun ExportDiaryPageContent(
                                 .fillMaxWidth()
                                 .weight(1f)
                         ) {
+                            val controller = remember {
+                                VideoPlayerController().apply {
+                                    isVolumeOn = true
+                                }
+                            }
                             VideoPlayer(
                                 video = Video.PersistedFile(videoFile),
                                 aspectRatio = videoAspectRatio,
-                                controller = rememberVideoPlayerController(),
+                                controller = controller,
                             )
                         }
                     }

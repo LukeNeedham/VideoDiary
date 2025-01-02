@@ -5,7 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 
 class VideoPlayerController {
-    var isVolumeOn by mutableStateOf(true)
+    var isVolumeOn by mutableStateOf(false)
     var isPlaying by mutableStateOf(true)
 
     fun toggleVolumeOn() {
