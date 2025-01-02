@@ -6,6 +6,8 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -37,6 +39,9 @@ fun RequestPermissionsPageContent(
 
         Column(
             verticalArrangement = Arrangement.spacedBy(30.dp),
+            modifier = Modifier
+                .weight(1f)
+                .verticalScroll(rememberScrollState())
         ) {
             requiredPermissions.forEach { permission ->
                 RequestPermission(
@@ -45,9 +50,8 @@ fun RequestPermissionsPageContent(
                     onRequest = requestPermission,
                 )
             }
+            Spacer(modifier = Modifier.weight(1f))
         }
-
-        Spacer(modifier = Modifier.weight(1f))
 
         val canContinue = requiredPermissions.all {
             it.permission in acquiredPermissions
