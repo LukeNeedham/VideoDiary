@@ -3,13 +3,17 @@ package com.lukeneedham.videodiary.ui.root
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.systemBarsPadding
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import com.lukeneedham.videodiary.domain.model.Orientation
 import com.lukeneedham.videodiary.domain.model.ShareRequest
-import com.lukeneedham.videodiary.ui.navigation.Router
+import com.lukeneedham.videodiary.ui.feature.permissions.RequestPermissionsPage
+import com.lukeneedham.videodiary.ui.navigation.normal.NormalRouter
+import com.lukeneedham.videodiary.ui.navigation.setup.SetupRouter
+import com.lukeneedham.videodiary.ui.permissions.PermissionResultListenerHolder
 import com.lukeneedham.videodiary.ui.theme.VideoDiaryTheme
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -17,10 +21,11 @@ import org.koin.compose.viewmodel.koinViewModel
 fun Root(
     share: (ShareRequest) -> Unit,
     setOrientation: (Orientation) -> Unit,
+    requestPermission: (permissions: String) -> Unit,
+    permissionResultListenerHolder: PermissionResultListenerHolder,
 ) {
     val viewModel: RootViewModel = koinViewModel()
 
-    val hasSetupCompleted = viewModel.hasSetupCompleted
     val orientationState = viewModel.orientationState
 
     LaunchedEffect(orientationState) {
@@ -42,15 +47,32 @@ fun Root(
             .systemBarsPadding()
     ) {
         VideoDiaryTheme {
-            if (hasSetupCompleted != null && orientationState !is RootOrientationState.Loading) {
-                val needsSetup =
-                    !hasSetupCompleted || orientationState is RootOrientationState.NeedsSetup
+            when (viewModel.state) {
+                RootState.Loading -> {
+                    CircularProgressIndicator()
+                }
 
-                Router(
-                    needsSetup = needsSetup,
-                    share = share,
-                    setOrientation = setOrientation,
-                )
+                RootState.NeedsPermissions -> {
+                    RequestPermissionsPage(
+                        viewModel = koinViewModel(),
+                        requestPermission = requestPermission,
+                        onContinue = viewModel::onPermissionsAcquired,
+                        permissionResultListenerHolder = permissionResultListenerHolder,
+                    )
+                }
+
+                RootState.NeedsSetup -> {
+                    SetupRouter(
+                        onSetupComplete = viewModel::onSetupComplete,
+                        setOrientation = setOrientation,
+                    )
+                }
+
+                RootState.Ready -> {
+                    NormalRouter(
+                        share = share,
+                    )
+                }
             }
         }
     }

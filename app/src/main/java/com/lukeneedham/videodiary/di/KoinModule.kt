@@ -1,20 +1,22 @@
 package com.lukeneedham.videodiary.di
 
 import android.net.Uri
+import com.lukeneedham.videodiary.data.android.PermissionChecker
 import com.lukeneedham.videodiary.data.mapper.VideoFileNameMapper
 import com.lukeneedham.videodiary.data.persistence.SettingsDao
 import com.lukeneedham.videodiary.data.persistence.VideoExportDao
 import com.lukeneedham.videodiary.data.persistence.VideosDao
 import com.lukeneedham.videodiary.data.repository.CalendarRepository
 import com.lukeneedham.videodiary.data.repository.VideoResolutionRepository
-import com.lukeneedham.videodiary.ui.root.RootViewModel
 import com.lukeneedham.videodiary.ui.feature.calendar.CalendarViewModel
-import com.lukeneedham.videodiary.ui.feature.record.check.CheckVideoViewModel
 import com.lukeneedham.videodiary.ui.feature.exportdiary.ExportDiaryViewModel
+import com.lukeneedham.videodiary.ui.feature.permissions.RequestPermissionsViewModel
+import com.lukeneedham.videodiary.ui.feature.record.check.CheckVideoViewModel
+import com.lukeneedham.videodiary.ui.feature.record.film.RecordVideoViewModel
 import com.lukeneedham.videodiary.ui.feature.setup.duration.SelectVideoDurationViewModel
 import com.lukeneedham.videodiary.ui.feature.setup.orientation.SetupSelectOrientationViewModel
 import com.lukeneedham.videodiary.ui.feature.setup.resolution.SetupSelectResolutionViewModel
-import com.lukeneedham.videodiary.ui.feature.record.film.RecordVideoViewModel
+import com.lukeneedham.videodiary.ui.root.RootViewModel
 import com.lukeneedham.videodiary.ui.share.Sharer
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
@@ -26,7 +28,7 @@ import java.time.LocalDate
 object KoinModule {
     val modules = listOf(
         getUtil(),
-        getUi(),
+        getData(),
         getRepositories(),
         getViewModel(),
         getPersistence(),
@@ -41,8 +43,13 @@ object KoinModule {
         }
     }
 
-    private fun getUi() = module {
+    private fun getData() = module {
         factory { VideoFileNameMapper() }
+        factory {
+            PermissionChecker(
+                context = androidContext(),
+            )
+        }
         single {
             VideosDao(
                 context = androidContext(),
@@ -74,6 +81,12 @@ object KoinModule {
         viewModel {
             RootViewModel(
                 settingsDao = get(),
+                permissionChecker = get(),
+            )
+        }
+        viewModel {
+            RequestPermissionsViewModel(
+                permissionChecker = get(),
             )
         }
         viewModel {

@@ -1,7 +1,7 @@
 package com.lukeneedham.videodiary
 
-import android.Manifest
 import android.content.pm.ActivityInfo
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -9,19 +9,16 @@ import androidx.activity.enableEdgeToEdge
 import androidx.core.app.ActivityCompat
 import com.lukeneedham.videodiary.domain.model.Orientation
 import com.lukeneedham.videodiary.domain.model.ShareRequest
-import com.lukeneedham.videodiary.ui.root.Root
 import com.lukeneedham.videodiary.ui.media.VideoPlayerPool
+import com.lukeneedham.videodiary.ui.permissions.PermissionResultListenerHolder
+import com.lukeneedham.videodiary.ui.root.Root
 import com.lukeneedham.videodiary.ui.share.Sharer
 import org.koin.android.ext.android.inject
 
 class MainActivity : ComponentActivity() {
-    private val requiredPermissions = listOf(
-        Manifest.permission.CAMERA,
-        Manifest.permission.RECORD_AUDIO,
-        Manifest.permission.WRITE_EXTERNAL_STORAGE,
-    )
-
     private val sharer: Sharer by inject()
+
+    private val permissionResultListenerHolder = PermissionResultListenerHolder()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,10 +27,10 @@ class MainActivity : ComponentActivity() {
             Root(
                 share = ::share,
                 setOrientation = ::setOrientation,
+                requestPermission = ::requestPermission,
+                permissionResultListenerHolder = permissionResultListenerHolder,
             )
         }
-
-        requestRequiredPermissions()
     }
 
     override fun onPause() {
@@ -44,6 +41,17 @@ class MainActivity : ComponentActivity() {
     override fun onResume() {
         super.onResume()
         VideoPlayerPool.onAppResume()
+    }
+
+    @Suppress("OVERRIDE_DEPRECATION")
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<String>,
+        grantResults: IntArray
+    ) {
+        @Suppress("DEPRECATION")
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        permissionResultListenerHolder.onPermissionResult()
     }
 
     private fun setOrientation(orientation: Orientation) {
@@ -59,11 +67,13 @@ class MainActivity : ComponentActivity() {
         startActivity(intent)
     }
 
-    private fun requestRequiredPermissions() {
+    private fun requestPermission(
+        permission: String,
+    ) {
         ActivityCompat.requestPermissions(
             this,
-            requiredPermissions.toTypedArray(),
-            101
+            arrayOf(permission),
+            101,
         )
     }
 }
