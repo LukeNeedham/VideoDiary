@@ -11,6 +11,7 @@ import com.lukeneedham.videodiary.data.persistence.VideosDao
 import com.lukeneedham.videodiary.data.repository.CalendarRepository
 import com.lukeneedham.videodiary.data.repository.VideoResolutionRepository
 import com.lukeneedham.videodiary.domain.model.Day
+import com.lukeneedham.videodiary.ui.feature.common.videoplayer.VideoPlayerController
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 
@@ -19,6 +20,13 @@ class CalendarViewModel(
     private val videoResolutionRepository: VideoResolutionRepository,
     private val videosDao: VideosDao,
 ) : ViewModel() {
+
+    /**
+     * Video Player Controller, shared across the whole calendar.
+     * This allows playback settings (like muted state) to persist across days.
+     */
+    val videoPlayerController = VideoPlayerController()
+
     var videoAspectRatio: Float? by mutableStateOf(null)
         private set
 

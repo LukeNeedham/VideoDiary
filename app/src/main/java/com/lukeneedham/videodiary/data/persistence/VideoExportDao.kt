@@ -15,8 +15,13 @@ class VideoExportDao(
     private val outputDir = File(context.filesDir, "export").apply {
         mkdirs()
     }
+    private val outputFile = File(outputDir, outputFileName)
 
     fun export(videos: List<File>): File {
+        // Delete existing export if it exists -
+        // there should be at most 1 export file at any time, to avoid clutter
+        outputFile.delete()
+
         val movies = videos.map { video ->
             MovieCreator.build(video.path)
         }
@@ -43,13 +48,14 @@ class VideoExportDao(
 
         val mp4file = DefaultMp4Builder().build(movie)
 
-        val outputFileName = System.currentTimeMillis().toString() + ".mp4"
-        val outputFile = File(outputDir, outputFileName)
-
         outputFile.outputStream().use {
             mp4file.writeContainer(it.channel)
         }
 
         return outputFile
+    }
+
+    companion object {
+        const val outputFileName = "export.mp4"
     }
 }

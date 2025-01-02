@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -17,17 +18,20 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.lukeneedham.videodiary.R
+import com.lukeneedham.videodiary.ui.feature.common.toolbar.ToolbarSize
 
 @Composable
-fun ToolbarLandscape(
+fun CalendarToolbarLandscape(
     exportFullVideo: () -> Unit,
 ) {
     Column(
         modifier = Modifier
             .fillMaxHeight()
+            .width(ToolbarSize.landscapeToolbarWidth)
             .background(color = Color.Black)
             .padding(vertical = 10.dp)
             .padding(start = 5.dp, end = 15.dp)
@@ -35,11 +39,15 @@ fun ToolbarLandscape(
         Text(
             text = "Video Diary",
             color = Color.White,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.fillMaxWidth()
         )
         Spacer(modifier = Modifier.weight(1f))
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.clickable { exportFullVideo() }
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable { exportFullVideo() }
         ) {
             Image(
                 painter = painterResource(R.drawable.movie),
@@ -59,7 +67,7 @@ fun ToolbarLandscape(
 @Preview
 @Composable
 internal fun PreviewToolbarLandscape() {
-    ToolbarLandscape(
+    CalendarToolbarLandscape(
         exportFullVideo = {},
     )
 }

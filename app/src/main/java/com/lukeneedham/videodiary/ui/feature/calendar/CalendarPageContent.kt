@@ -19,6 +19,8 @@ import com.lukeneedham.videodiary.domain.model.ShareRequest
 import com.lukeneedham.videodiary.ui.feature.calendar.component.CalendarDayPickerDialog
 import com.lukeneedham.videodiary.ui.feature.calendar.component.CalendarDeleteConfirmDialog
 import com.lukeneedham.videodiary.ui.feature.calendar.component.CalendarScroller
+import com.lukeneedham.videodiary.ui.feature.common.videoplayer.VideoPlayerController
+import com.lukeneedham.videodiary.ui.feature.common.videoplayer.rememberVideoPlayerController
 import java.time.LocalDate
 
 @Composable
@@ -33,6 +35,7 @@ fun CalendarPageContent(
     setCurrentDayIndex: (Int) -> Unit,
     exportFullVideo: () -> Unit,
     share: (ShareRequest) -> Unit,
+    videoPlayerController: VideoPlayerController,
 ) {
     val currentDay = days.getOrNull(currentDayIndex)
 
@@ -59,6 +62,7 @@ fun CalendarPageContent(
                 setCurrentDayIndex = setCurrentDayIndex,
                 exportFullVideo = exportFullVideo,
                 share = share,
+                videoPlayerController = videoPlayerController,
             )
         } else {
             Box(
@@ -111,5 +115,6 @@ internal fun PreviewCalendarPageContent() {
         setCurrentDayIndex = {},
         exportFullVideo = {},
         share = {},
+        videoPlayerController = rememberVideoPlayerController(),
     )
 }

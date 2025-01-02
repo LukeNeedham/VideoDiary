@@ -31,16 +31,19 @@ fun Router(
     val startDestination = if (needsSetup) Page.Setup.SelectOrientation else Page.Calendar
     val navController = rememberNavController<Page>(startDestination = startDestination)
 
+    val canGoBack = navController.backstack.entries.size > 1
+
     fun navigate(to: Page) {
         Logger.debug("Navigating to: $to")
         navController.navigate(to)
     }
 
     fun pop() {
-        val canPop = navController.backstack.entries.size > 1
-        if (!canPop) return
+        if (!canGoBack) return
         navController.pop()
     }
+
+    val onBack = ::pop
 
     NavBackHandler(navController)
 
@@ -53,14 +56,15 @@ fun Router(
                 onContinue = {
                     navigate(Page.Setup.SelectResolution)
                 },
-                setOrientation = setOrientation,
+                setOrientation = setOrientation, canGoBack = canGoBack, onBack = onBack,
             )
 
             is Page.Setup.SelectResolution -> SetupSelectResolutionPage(
                 viewModel = koinViewModel(),
                 onContinue = {
                     navigate(Page.Setup.SelectVideoDuration)
-                }
+                },
+                canGoBack = canGoBack, onBack = onBack,
             )
 
             Page.Setup.SelectVideoDuration -> SelectVideoDurationPage(
@@ -68,7 +72,8 @@ fun Router(
                 onContinue = {
                     navController.popAll()
                     navigate(Page.Calendar)
-                }
+                },
+                canGoBack = canGoBack, onBack = onBack,
             )
 
             is Page.Calendar -> CalendarPage(
@@ -91,7 +96,8 @@ fun Router(
                             videoContentUri = videoContentUri,
                         )
                     )
-                }
+                },
+                onBack = onBack,
             )
 
             is Page.CheckVideo -> {
@@ -111,7 +117,10 @@ fun Router(
             }
 
             is Page.ExportDiary -> ExportDiaryPage(
-                viewModel = koinViewModel(), share = share,
+                viewModel = koinViewModel(),
+                share = share,
+                canGoBack = canGoBack,
+                onBack = onBack,
             )
         }
     }

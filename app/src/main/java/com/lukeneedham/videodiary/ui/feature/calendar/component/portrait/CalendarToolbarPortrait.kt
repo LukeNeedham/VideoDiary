@@ -6,6 +6,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Text
@@ -18,15 +19,17 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.lukeneedham.videodiary.R
+import com.lukeneedham.videodiary.ui.feature.common.toolbar.ToolbarSize
 
 @Composable
-fun ToolbarPortrait(
+fun CalendarToolbarPortrait(
     exportFullVideo: () -> Unit,
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
             .fillMaxWidth()
+            .height(ToolbarSize.portraitToolbarHeight)
             .background(color = Color.Black)
             .padding(vertical = 5.dp, horizontal = 10.dp)
     ) {
@@ -52,7 +55,7 @@ fun ToolbarPortrait(
 @Preview
 @Composable
 internal fun PreviewToolbarPortrait() {
-    ToolbarPortrait(
+    CalendarToolbarPortrait(
         exportFullVideo = {},
     )
 }

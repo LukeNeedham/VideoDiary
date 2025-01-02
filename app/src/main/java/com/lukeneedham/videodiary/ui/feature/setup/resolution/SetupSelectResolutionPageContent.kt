@@ -14,10 +14,10 @@ import androidx.camera.video.VideoCapture
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -29,20 +29,22 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import com.lukeneedham.videodiary.domain.model.CameraResolutionRotation
 import com.lukeneedham.videodiary.ui.feature.common.Button
-import com.lukeneedham.videodiary.ui.feature.common.pageindicator.PageIndicator
 import com.lukeneedham.videodiary.ui.feature.common.camera.CameraInput
 import com.lukeneedham.videodiary.ui.feature.common.camera.CameraQualityEffect
+import com.lukeneedham.videodiary.ui.feature.common.pageindicator.PageIndicator
+import com.lukeneedham.videodiary.ui.feature.common.toolbar.GenericToolbar
 
 @OptIn(ExperimentalCamera2Interop::class)
 @Composable
 fun SetupPageContent(
     onContinueClick: (resolution: Size, rotation: CameraResolutionRotation) -> Unit,
+    canGoBack: Boolean,
+    onBack: () -> Unit,
 ) {
     val context = LocalContext.current
 
@@ -93,15 +95,14 @@ fun SetupPageContent(
         }
     }
 
-    Column {
-        Spacer(modifier = Modifier.height(20.dp))
-
-        Text(
-            text = "Setup Your Diary",
-            textAlign = TextAlign.Center,
-            modifier = Modifier.fillMaxWidth()
+    Column(
+        modifier = Modifier.fillMaxSize()
+    ) {
+        GenericToolbar(
+            canGoBack = canGoBack, onBack = onBack,
         )
-        Spacer(modifier = Modifier.height(10.dp))
+
+        Spacer(modifier = Modifier.height(2.dp))
         Column(
             modifier = Modifier
                 .weight(1f)
@@ -179,6 +180,6 @@ fun SetupPageContent(
 @Composable
 internal fun PreviewSetupPageContent() {
     SetupPageContent(
-        onContinueClick = { _, _ -> },
+        onContinueClick = { _, _ -> }, canGoBack = true, onBack = {},
     )
 }

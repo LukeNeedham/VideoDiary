@@ -21,5 +21,6 @@ fun CalendarPage(
         goToDate = viewModel::goToDate,
         exportFullVideo = exportFullVideo,
         share = share,
+        videoPlayerController = viewModel.videoPlayerController,
     )
 }

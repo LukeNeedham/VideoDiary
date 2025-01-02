@@ -50,7 +50,6 @@ fun CheckVideoPageContent(
             onAccepted = onAccepted,
             modifier = Modifier
                 .fillMaxWidth()
-                .height(RecordVideoActionBarSize.height)
         )
     }
 }

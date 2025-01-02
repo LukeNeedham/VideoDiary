@@ -13,6 +13,7 @@ import com.lukeneedham.videodiary.ui.feature.common.camera.CameraQualityEffect
 fun RecordVideoPage(
     viewModel: RecordVideoViewModel,
     onRecordingFinished: (videoContentUri: Uri) -> Unit,
+    onBack: () -> Unit,
 ) {
     var quality: Quality? by remember { mutableStateOf(null) }
 
@@ -30,6 +31,7 @@ fun RecordVideoPage(
             quality = qualityLocal,
             resolution = resolution,
             onRecordingFinished = onRecordingFinished,
+            onBack = onBack,
         )
     }
 }

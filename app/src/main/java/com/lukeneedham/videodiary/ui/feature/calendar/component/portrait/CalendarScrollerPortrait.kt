@@ -21,7 +21,7 @@ fun CalendarScrollerPortrait(
     dayContent: @Composable () -> Unit
 ) {
     Column {
-        ToolbarPortrait(
+        CalendarToolbarPortrait(
             exportFullVideo = exportFullVideo,
         )
 

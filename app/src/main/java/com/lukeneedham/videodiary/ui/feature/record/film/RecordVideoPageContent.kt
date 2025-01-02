@@ -34,6 +34,7 @@ fun RecordVideoPageContent(
     resolution: Size,
     quality: Quality,
     onRecordingFinished: (videoContentUri: Uri) -> Unit,
+    onBack: () -> Unit,
 ) {
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
@@ -109,10 +110,9 @@ fun RecordVideoPageContent(
             onRecordClick = {
                 record()
             },
+            onCloseClick = onBack,
             modifier = Modifier
                 .fillMaxWidth()
-                .height(RecordVideoActionBarSize.height)
-                .background(color = Color.Black)
         )
     }
 }
@@ -125,5 +125,6 @@ internal fun PreviewRecordVideoPage() {
         resolution = Size(100, 300),
         onRecordingFinished = {},
         videoDurationMillis = 3000,
+        onBack = {},
     )
 }

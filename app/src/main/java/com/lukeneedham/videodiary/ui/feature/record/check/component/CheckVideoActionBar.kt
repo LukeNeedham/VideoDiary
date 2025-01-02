@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -11,6 +12,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.lukeneedham.videodiary.ui.feature.common.Button
+import com.lukeneedham.videodiary.ui.feature.record.common.RecordVideoActionBarSize
 
 @Composable
 fun CheckVideoActionBar(
@@ -23,7 +25,8 @@ fun CheckVideoActionBar(
         horizontalArrangement = Arrangement.spacedBy(10.dp),
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 20.dp)
+            .height(RecordVideoActionBarSize.height)
+            .padding(horizontal = 10.dp)
             .padding(bottom = 5.dp, top = 5.dp)
     ) {
         @Composable

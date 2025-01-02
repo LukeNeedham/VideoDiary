@@ -7,6 +7,8 @@ import androidx.compose.runtime.LaunchedEffect
 fun SelectVideoDurationPage(
     viewModel: SelectVideoDurationViewModel,
     onContinue: () -> Unit,
+    canGoBack: Boolean,
+    onBack: () -> Unit,
 ) {
     LaunchedEffect(Unit) {
         viewModel.onSavedEventFlow.collect {
@@ -17,6 +19,6 @@ fun SelectVideoDurationPage(
     SelectVideoDurationPageContent(
         seconds = viewModel.durationSeconds,
         setSeconds = viewModel::setDuration,
-        onContinue = viewModel::saveSettings,
+        onContinue = viewModel::saveSettings, canGoBack = canGoBack, onBack = onBack,
     )
 }

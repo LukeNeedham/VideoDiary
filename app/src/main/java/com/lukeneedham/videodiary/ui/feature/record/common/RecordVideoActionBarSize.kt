@@ -6,5 +6,5 @@ object RecordVideoActionBarSize {
     /** Holds the height in one place,
      * so the action bar (and therefore also the camera / video) is the same size across pages
      */
-    val height = 60.dp
+    val height = 70.dp
 }

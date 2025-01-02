@@ -7,6 +7,8 @@ import androidx.compose.runtime.LaunchedEffect
 fun SetupSelectResolutionPage(
     viewModel: SetupSelectResolutionViewModel,
     onContinue: () -> Unit,
+    canGoBack: Boolean,
+    onBack: () -> Unit,
 ) {
     LaunchedEffect(Unit) {
         viewModel.onSavedEventFlow.collect {
@@ -17,6 +19,7 @@ fun SetupSelectResolutionPage(
     SetupPageContent(
         onContinueClick = { resolution, rotation ->
             viewModel.saveSettings(resolution, rotation)
-        }
+        },
+        canGoBack = canGoBack, onBack = onBack,
     )
 }

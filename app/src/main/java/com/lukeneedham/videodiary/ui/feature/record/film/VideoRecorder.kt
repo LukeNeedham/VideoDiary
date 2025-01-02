@@ -8,6 +8,7 @@ import android.provider.MediaStore
 import android.util.Log
 import androidx.camera.video.MediaStoreOutputOptions
 import androidx.camera.video.Recorder
+import androidx.camera.video.Recording
 import androidx.camera.video.VideoCapture
 import androidx.camera.video.VideoRecordEvent
 import com.lukeneedham.videodiary.domain.util.Timer
@@ -27,10 +28,14 @@ class VideoRecorder(
 
     private val timestampFormat = "yyyy-MM-dd-HH-mm-ss-SSS"
 
+    private var recordingInProgress: Recording? = null
+
     fun startRecording(
         videoDurationMillis: Long,
         onStateUpdate: (RecordingState) -> Unit,
     ) {
+        disposeRunningRecording()
+
         val timestamp = SimpleDateFormat(timestampFormat, Locale.US)
             .format(System.currentTimeMillis())
         val name = "VideoDiary-$timestamp"
@@ -73,6 +78,8 @@ class VideoRecorder(
             }
         }
 
+        recordingInProgress = recording
+
         timer.start(
             tickMillis = 100,
             endAtMillis = videoDurationMillis,
@@ -92,6 +99,13 @@ class VideoRecorder(
     }
 
     fun dispose() {
+        disposeRunningRecording()
         cameraExecutor.shutdown()
+    }
+
+    private fun disposeRunningRecording() {
+        timer.stop()
+        recordingInProgress?.stop()
+        recordingInProgress = null
     }
 }

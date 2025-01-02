@@ -22,7 +22,7 @@ fun CalendarScrollerLandscape(
     dayContent: @Composable () -> Unit
 ) {
     Row {
-        ToolbarLandscape(
+        CalendarToolbarLandscape(
             exportFullVideo = exportFullVideo,
         )
 
