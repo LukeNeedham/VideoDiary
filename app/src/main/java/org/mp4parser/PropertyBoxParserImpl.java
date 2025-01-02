@@ -30,7 +30,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * A Property file based BoxFactory
+ * This class is a drop-in replacement for the class of the same name in the mp4parser library.
+ * I had to do this to get this class to work on Android,
+ * so that it would read the properties file from the app assets,
+ * rather than from the classpath (which was failing).
  */
 public class PropertyBoxParserImpl extends AbstractBoxParser {
     public static Properties BOX_MAP_CACHE = null;

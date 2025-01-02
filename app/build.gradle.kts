@@ -79,9 +79,15 @@ dependencies {
     // Datastore
     implementation(deps.libs.androidx.datastore)
 
-    // Video editing
-    implementation("org.mp4parser:isoparser:1.9.56")
-    implementation("org.mp4parser:muxer:1.9.56")
+    // Video editing -
+    // These are local jar files because I had to tweak them to get them working on Android.
+    // Namely, I had to remove the `PropertyBoxParserImpl` class from the jar,
+    // so that we can build the project using a custom implementation of that class
+    // (which works properly on Android)
+    // without getting errors about having duplicate classes at build time.
+    // The custom class of the same name is located within this Android project.
+    implementation(files("libs/mp4parser/isoparser-1.9.56.jar"))
+    implementation(files("libs/mp4parser/muxer-1.9.56.jar"))
 
     // Testing
     testImplementation(deps.libs.testing.junit)
