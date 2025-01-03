@@ -10,6 +10,7 @@ import com.lukeneedham.videodiary.ui.feature.calendar.MockDataCalendar
 import com.lukeneedham.videodiary.ui.feature.common.Button
 import java.time.format.DateTimeFormatter
 
+/** The content of the action bar, which gets splatted into a layout that the parent decides */
 @Composable
 fun CalendarDayActionBarContent(
     day: Day,

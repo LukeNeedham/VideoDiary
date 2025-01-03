@@ -104,9 +104,10 @@ fun ExportDiaryPageContent(
                     Button(
                         text = "Share",
                         onClick = {
+                            val text = "Full Video Diary"
                             val request = ShareRequest(
-                                title = "Full diary video",
-                                text = "This is my complete video diary",
+                                title = text,
+                                text = text,
                                 video = videoFile,
                             )
                             share(request)
