@@ -1,6 +1,8 @@
 package com.lukeneedham.videodiary.ui.fileprovider
 
+import com.lukeneedham.videodiary.BuildConfig
+
 object FileProviderName {
     /** Must match the value defined for `FileProvider` the Manifest */
-    const val authority = "com.lukeneedham.videodiary.provider"
+    const val authority = BuildConfig.APPLICATION_ID
 }

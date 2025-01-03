@@ -10,7 +10,7 @@ import java.io.File
 
 
 class VideoExportDao(
-    private val context: Context,
+    context: Context,
 ) {
     private val outputDir = File(context.filesDir, "export").apply {
         mkdirs()

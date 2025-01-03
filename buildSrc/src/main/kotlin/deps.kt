@@ -65,5 +65,11 @@ object deps {
             val compose = "io.insert-koin:koin-compose"
             val viewModel = "io.insert-koin:koin-compose-viewmodel"
         }
+
+        object videoedit {
+            private val version = "1.9.60"
+            val muxer = "com.github.LukeNeedham.mp4parser:muxer:$version"
+            val isoparser = "com.github.LukeNeedham.mp4parser:isoparser:$version"
+        }
     }
 }
