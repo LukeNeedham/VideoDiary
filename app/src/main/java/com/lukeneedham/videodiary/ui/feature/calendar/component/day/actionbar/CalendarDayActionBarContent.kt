@@ -48,11 +48,6 @@ fun CalendarDayActionBarContent(
                 text = "Retake",
                 onClick = onRecordTodayVideoClick,
             )
-
-            ActionButton(
-                text = "Delete",
-                onClick = onDeleteTodayVideoClick,
-            )
         }
 
         ActionButton(
@@ -68,6 +63,13 @@ fun CalendarDayActionBarContent(
                 share(request)
             },
         )
+
+        if (isToday) {
+            ActionButton(
+                text = "Delete",
+                onClick = onDeleteTodayVideoClick,
+            )
+        }
     }
 }
 

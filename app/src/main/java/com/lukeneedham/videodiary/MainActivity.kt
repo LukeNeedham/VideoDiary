@@ -1,7 +1,6 @@
 package com.lukeneedham.videodiary
 
 import android.content.pm.ActivityInfo
-import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -56,8 +55,8 @@ class MainActivity : ComponentActivity() {
 
     private fun setOrientation(orientation: Orientation) {
         val info = when (orientation) {
-            Orientation.Portrait -> ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-            Orientation.Landscape -> ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+            Orientation.Portrait -> ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT
+            Orientation.Landscape -> ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
         }
         requestedOrientation = info
     }

@@ -5,17 +5,16 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import com.lukeneedham.videodiary.domain.model.Video
 import com.lukeneedham.videodiary.ui.feature.common.videoplayer.VideoPlayer
-import com.lukeneedham.videodiary.ui.feature.common.videoplayer.rememberVideoPlayerController
+import com.lukeneedham.videodiary.ui.feature.common.videoplayer.VideoPlayerController
 import com.lukeneedham.videodiary.ui.feature.record.check.component.CheckVideoActionBar
-import com.lukeneedham.videodiary.ui.feature.record.common.RecordVideoActionBarSize
 
 @Composable
 fun CheckVideoPageContent(
@@ -37,10 +36,16 @@ fun CheckVideoPageContent(
                 .weight(1f)
         ) {
             if (videoAspectRatio != null) {
+                val controller = remember {
+                    VideoPlayerController()
+                        .apply {
+                            isVolumeOn = true
+                        }
+                }
                 VideoPlayer(
                     video = video,
                     aspectRatio = videoAspectRatio,
-                    controller = rememberVideoPlayerController(),
+                    controller = controller,
                 )
             }
         }
