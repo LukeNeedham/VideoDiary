@@ -2,6 +2,7 @@ package com.lukeneedham.videodiary.ui.feature.common.camera
 
 import android.util.Log
 import android.util.Size
+import androidx.camera.core.Camera
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.Preview
 import androidx.camera.core.resolutionselector.ResolutionSelector
@@ -10,6 +11,7 @@ import androidx.camera.video.Recorder
 import androidx.camera.video.VideoCapture
 import androidx.camera.view.PreviewView
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Text
@@ -18,10 +20,12 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.viewinterop.AndroidView
@@ -32,6 +36,7 @@ import com.lukeneedham.videodiary.domain.model.CameraResolutionRotation
 fun CameraInput(
     currentResolution: Size,
     videoCapture: VideoCapture<Recorder>,
+    canZoom: Boolean,
     onResolutionLoaded: (resolution: Size, isMissing: Boolean, rotation: CameraResolutionRotation) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -43,7 +48,10 @@ fun CameraInput(
         }
     }
 
+    val canZoomUpdated by rememberUpdatedState(canZoom)
+
     var resolutionMissing by remember(currentResolution) { mutableStateOf(false) }
+    var camera: Camera? by remember { mutableStateOf(null) }
 
     val previewUseCase = remember(previewView, currentResolution) {
         val resolutionSelector = ResolutionSelector.Builder()
@@ -75,7 +83,7 @@ fun CameraInput(
                 val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
                 try {
                     cameraProvider.unbindAll()
-                    cameraProvider.bindToLifecycle(
+                    camera = cameraProvider.bindToLifecycle(
                         lifecycleOwner,
                         cameraSelector,
                         previewUseCase,
@@ -98,6 +106,19 @@ fun CameraInput(
         modifier = modifier
             .fillMaxSize()
             .background(color = Color.Black)
+            .pointerInput(Unit) {
+                detectTransformGestures { _, _, zoomChange, _ ->
+                    if (!canZoomUpdated) return@detectTransformGestures
+                    val cam = camera ?: return@detectTransformGestures
+                    val zoomState = cam.cameraInfo.zoomState.value ?: return@detectTransformGestures
+                    val newZoom = zoomState.zoomRatio * zoomChange
+                    val boundedNewZoom = newZoom.coerceIn(
+                        zoomState.minZoomRatio,
+                        zoomState.maxZoomRatio,
+                    )
+                    camera?.cameraControl?.setZoomRatio(boundedNewZoom)
+                }
+            }
     ) {
         if (resolutionMissing) {
             Text(

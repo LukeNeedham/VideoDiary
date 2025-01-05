@@ -153,6 +153,7 @@ fun SetupPageContent(
                         currentResolutionMissing = isMissing
                         rotation = loadedRotation
                     },
+                    canZoom = false,
                     modifier = Modifier
                         .weight(1f)
                         .fillMaxWidth()
