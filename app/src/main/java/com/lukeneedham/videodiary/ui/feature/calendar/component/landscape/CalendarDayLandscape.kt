@@ -16,7 +16,7 @@ import com.lukeneedham.videodiary.domain.model.Day
 import com.lukeneedham.videodiary.domain.model.ShareRequest
 import com.lukeneedham.videodiary.ui.feature.calendar.MockDataCalendar
 import com.lukeneedham.videodiary.ui.feature.calendar.component.day.actionbar.CalendarDayActionBarContent
-import com.lukeneedham.videodiary.ui.feature.calendar.component.day.actionbar.CalendarDayVideoControlBar
+import com.lukeneedham.videodiary.ui.feature.common.videoplayer.VideoControlActionBar
 import com.lukeneedham.videodiary.ui.feature.calendar.component.day.card.CalendarDayCard
 import com.lukeneedham.videodiary.ui.feature.common.videoplayer.VideoPlayerController
 import com.lukeneedham.videodiary.ui.feature.common.videoplayer.rememberVideoPlayerController
@@ -59,7 +59,7 @@ fun CalendarDayLandscape(
                 .width(120.dp)
                 .fillMaxHeight()
         ) {
-            CalendarDayVideoControlBar(
+            VideoControlActionBar(
                 hasVideo = day.video != null,
                 videoPlayerController = videoPlayerController,
             )

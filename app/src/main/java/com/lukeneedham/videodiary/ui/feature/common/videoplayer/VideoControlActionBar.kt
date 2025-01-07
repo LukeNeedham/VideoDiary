@@ -1,4 +1,4 @@
-package com.lukeneedham.videodiary.ui.feature.calendar.component.day.actionbar
+package com.lukeneedham.videodiary.ui.feature.common.videoplayer
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -23,11 +23,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.lukeneedham.videodiary.R
-import com.lukeneedham.videodiary.ui.feature.common.videoplayer.VideoPlayerController
-import com.lukeneedham.videodiary.ui.feature.common.videoplayer.rememberVideoPlayerController
 
 @Composable
-fun CalendarDayVideoControlBar(
+fun VideoControlActionBar(
     hasVideo: Boolean,
     videoPlayerController: VideoPlayerController,
 ) {
@@ -100,7 +98,7 @@ fun CalendarDayVideoControlBar(
 @Preview
 @Composable
 internal fun PreviewCalendarDayVideoControlBar() {
-    CalendarDayVideoControlBar(
+    VideoControlActionBar(
         hasVideo = true,
         videoPlayerController = rememberVideoPlayerController(),
     )

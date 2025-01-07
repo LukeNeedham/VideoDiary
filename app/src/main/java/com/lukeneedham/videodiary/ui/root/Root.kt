@@ -43,8 +43,10 @@ fun Root(
 
     Box(
         modifier = Modifier
-            .background(Color.White)
+            // Black system bars
+            .background(Color.Black)
             .systemBarsPadding()
+            .background(Color.White)
     ) {
         VideoDiaryTheme {
             when (viewModel.state) {

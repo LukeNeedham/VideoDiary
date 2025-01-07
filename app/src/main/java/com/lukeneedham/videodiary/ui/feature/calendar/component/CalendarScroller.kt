@@ -12,6 +12,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.lukeneedham.videodiary.domain.model.Day
 import com.lukeneedham.videodiary.domain.model.ShareRequest
+import com.lukeneedham.videodiary.domain.util.date.StandardDateFormatter
 import com.lukeneedham.videodiary.ui.feature.calendar.MockDataCalendar
 import com.lukeneedham.videodiary.ui.feature.calendar.component.landscape.CalendarDayLandscape
 import com.lukeneedham.videodiary.ui.feature.calendar.component.landscape.CalendarScrollerLandscape
@@ -41,8 +42,7 @@ fun CalendarScroller(
         setCurrentDayIndex(index)
     }
 
-    val currentDateFormatter = DateTimeFormatter.ofPattern("dd MMMM yyyy")
-    val currentDateFormatted = currentDay.date.format(currentDateFormatter)
+    val currentDateFormatted = currentDay.date.format(StandardDateFormatter.formatter)
 
     val onPrevious = {
         goToPage(currentDayIndex - 1)

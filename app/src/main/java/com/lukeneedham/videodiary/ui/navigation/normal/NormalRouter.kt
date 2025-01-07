@@ -4,7 +4,8 @@ import androidx.compose.runtime.Composable
 import com.lukeneedham.videodiary.domain.model.ShareRequest
 import com.lukeneedham.videodiary.domain.util.logger.Logger
 import com.lukeneedham.videodiary.ui.feature.calendar.CalendarPage
-import com.lukeneedham.videodiary.ui.feature.exportdiary.ExportDiaryPage
+import com.lukeneedham.videodiary.ui.feature.exportdiary.create.ExportDiaryCreatePage
+import com.lukeneedham.videodiary.ui.feature.exportdiary.view.ExportDiaryViewPage
 import com.lukeneedham.videodiary.ui.feature.record.check.CheckVideoPage
 import com.lukeneedham.videodiary.ui.feature.record.film.RecordVideoPage
 import dev.olshevski.navigation.reimagined.NavBackHandler
@@ -49,7 +50,7 @@ fun NormalRouter(
                     navigate(NormalPage.RecordVideo)
                 },
                 exportFullVideo = {
-                    navigate(NormalPage.ExportDiary)
+                    navigate(NormalPage.ExportDiaryCreate)
                 },
                 share = share,
             )
@@ -83,11 +84,21 @@ fun NormalRouter(
                 )
             }
 
-            is NormalPage.ExportDiary -> ExportDiaryPage(
+            is NormalPage.ExportDiaryCreate -> ExportDiaryCreatePage(
+                viewModel = koinViewModel(),
+                canGoBack = canGoBack,
+                onBack = onBack,
+                onExported = {
+                    navigate(NormalPage.ExportDiaryView(it))
+                }
+            )
+
+            is NormalPage.ExportDiaryView -> ExportDiaryViewPage(
                 viewModel = koinViewModel(),
                 share = share,
                 canGoBack = canGoBack,
                 onBack = onBack,
+                exportedVideo = page.exportedVideo,
             )
         }
     }

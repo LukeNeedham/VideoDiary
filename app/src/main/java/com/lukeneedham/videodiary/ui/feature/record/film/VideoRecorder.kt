@@ -11,8 +11,8 @@ import androidx.camera.video.Recorder
 import androidx.camera.video.Recording
 import androidx.camera.video.VideoCapture
 import androidx.camera.video.VideoRecordEvent
-import com.lukeneedham.videodiary.domain.util.Timer
-import com.lukeneedham.videodiary.domain.util.TimerTick
+import com.lukeneedham.videodiary.domain.util.timer.Timer
+import com.lukeneedham.videodiary.domain.util.timer.TimerTick
 import kotlinx.coroutines.CoroutineScope
 import java.text.SimpleDateFormat
 import java.util.Locale

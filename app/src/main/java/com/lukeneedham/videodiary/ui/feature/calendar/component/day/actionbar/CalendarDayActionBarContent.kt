@@ -6,9 +6,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.lukeneedham.videodiary.domain.model.Day
 import com.lukeneedham.videodiary.domain.model.ShareRequest
+import com.lukeneedham.videodiary.domain.util.date.StandardDateFormatter
 import com.lukeneedham.videodiary.ui.feature.calendar.MockDataCalendar
 import com.lukeneedham.videodiary.ui.feature.common.Button
-import java.time.format.DateTimeFormatter
 
 /** The content of the action bar, which gets splatted into a layout that the parent decides */
 @Composable
@@ -53,7 +53,7 @@ fun CalendarDayActionBarContent(
         ActionButton(
             text = "Share",
             onClick = {
-                val dateText = date.format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))
+                val dateText = date.format(StandardDateFormatter.formatter)
                 val text = "Video Diary: $dateText"
                 val request = ShareRequest(
                     title = text,

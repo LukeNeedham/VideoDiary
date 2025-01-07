@@ -16,7 +16,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.lukeneedham.videodiary.domain.model.Day
 import com.lukeneedham.videodiary.domain.model.ShareRequest
-import com.lukeneedham.videodiary.ui.feature.calendar.component.CalendarDayPickerDialog
+import com.lukeneedham.videodiary.ui.feature.common.datepicker.DiaryDatePickerDialog
 import com.lukeneedham.videodiary.ui.feature.calendar.component.CalendarDeleteConfirmDialog
 import com.lukeneedham.videodiary.ui.feature.calendar.component.CalendarScroller
 import com.lukeneedham.videodiary.ui.feature.common.videoplayer.VideoPlayerController
@@ -76,8 +76,8 @@ fun CalendarPageContent(
         }
 
         if (startDate != null && showDayPickerDialog) {
-            CalendarDayPickerDialog(
-                startDate = startDate,
+            DiaryDatePickerDialog(
+                firstPossibleDate = startDate,
                 selectedDate = currentDay?.date,
                 onDateSelected = { date ->
                     if (date != null) {

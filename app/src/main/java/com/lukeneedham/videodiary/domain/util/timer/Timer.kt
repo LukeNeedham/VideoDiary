@@ -1,4 +1,4 @@
-package com.lukeneedham.videodiary.domain.util
+package com.lukeneedham.videodiary.domain.util.timer
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job

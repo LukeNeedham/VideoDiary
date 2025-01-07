@@ -9,7 +9,8 @@ import com.lukeneedham.videodiary.data.persistence.VideosDao
 import com.lukeneedham.videodiary.data.repository.CalendarRepository
 import com.lukeneedham.videodiary.data.repository.VideoResolutionRepository
 import com.lukeneedham.videodiary.ui.feature.calendar.CalendarViewModel
-import com.lukeneedham.videodiary.ui.feature.exportdiary.ExportDiaryViewModel
+import com.lukeneedham.videodiary.ui.feature.exportdiary.create.ExportDiaryCreateViewModel
+import com.lukeneedham.videodiary.ui.feature.exportdiary.view.ExportDiaryViewViewModel
 import com.lukeneedham.videodiary.ui.feature.permissions.RequestPermissionsViewModel
 import com.lukeneedham.videodiary.ui.feature.record.check.CheckVideoViewModel
 import com.lukeneedham.videodiary.ui.feature.record.film.RecordVideoViewModel
@@ -128,10 +129,14 @@ object KoinModule {
             )
         }
         viewModel {
-            ExportDiaryViewModel(
+            ExportDiaryCreateViewModel(
                 videoExportDao = get(),
-                videoResolutionRepository = get(),
                 calendarRepository = get(),
+            )
+        }
+        viewModel {
+            ExportDiaryViewViewModel(
+                videoResolutionRepository = get(),
             )
         }
     }
