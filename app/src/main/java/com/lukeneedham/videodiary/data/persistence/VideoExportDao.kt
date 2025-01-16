@@ -1,6 +1,8 @@
 package com.lukeneedham.videodiary.data.persistence
 
 import android.content.Context
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.withContext
 import org.mp4parser.muxer.Movie
 import org.mp4parser.muxer.Track
 import org.mp4parser.muxer.builder.DefaultMp4Builder
@@ -11,13 +13,22 @@ import java.io.File
 
 class VideoExportDao(
     context: Context,
+    private val defaultDispatcher: CoroutineDispatcher,
 ) {
     private val outputDir = File(context.filesDir, "export").apply {
         mkdirs()
     }
     private val outputFile = File(outputDir, outputFileName)
 
-    fun export(videos: List<File>): File {
+    // Even though the export is synchronous,
+    // we force it to be run as a coroutine since it can take considerable time.
+    // We run it on the default dispatcher, which is best suited for CPU intensive work,
+    // video encoding is a perfect use-case for this.
+    suspend fun export(videos: List<File>): File = withContext(defaultDispatcher) {
+        exportSync(videos)
+    }
+
+    private fun exportSync(videos: List<File>): File {
         // Delete existing export if it exists -
         // there should be at most 1 export file at any time, to avoid clutter
         outputFile.delete()

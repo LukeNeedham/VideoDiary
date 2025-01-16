@@ -37,6 +37,7 @@ object KoinModule {
 
     private fun getUtil() = module {
         factory<CoroutineDispatcher>(KoinQualifier.Dispatcher.io) { Dispatchers.IO }
+        factory<CoroutineDispatcher>(KoinQualifier.Dispatcher.default) { Dispatchers.Default }
         factory {
             Sharer(
                 context = androidContext(),
@@ -60,6 +61,7 @@ object KoinModule {
         factory {
             VideoExportDao(
                 context = androidContext(),
+                defaultDispatcher = get(KoinQualifier.Dispatcher.default),
             )
         }
     }

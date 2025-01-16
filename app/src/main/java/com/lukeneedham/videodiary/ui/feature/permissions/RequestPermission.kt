@@ -17,11 +17,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.lukeneedham.videodiary.R
 import com.lukeneedham.videodiary.ui.feature.common.Button
 import com.lukeneedham.videodiary.ui.permissions.RequiredPermission
 import com.lukeneedham.videodiary.ui.permissions.RequiredPermissions
+import com.lukeneedham.videodiary.ui.theme.Typography
 
 @Composable
 fun RequestPermission(
@@ -35,7 +35,7 @@ fun RequestPermission(
                 Text(
                     text = permission.displayName,
                     color = Color.Black,
-                    fontSize = 20.sp,
+                    fontSize = Typography.Size.big,
                 )
                 Spacer(modifier = Modifier.height(5.dp))
                 Text(

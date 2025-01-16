@@ -2,10 +2,12 @@ package com.lukeneedham.videodiary.ui.root
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import com.lukeneedham.videodiary.domain.model.Orientation
@@ -43,6 +45,7 @@ fun Root(
 
     Box(
         modifier = Modifier
+            .fillMaxSize()
             // Black system bars
             .background(Color.Black)
             .systemBarsPadding()
@@ -51,7 +54,12 @@ fun Root(
         VideoDiaryTheme {
             when (viewModel.state) {
                 RootState.Loading -> {
-                    CircularProgressIndicator()
+                    Box(
+                        contentAlignment = Alignment.Center,
+                        modifier = Modifier.fillMaxSize()
+                    ) {
+                        CircularProgressIndicator()
+                    }
                 }
 
                 RootState.NeedsPermissions -> {

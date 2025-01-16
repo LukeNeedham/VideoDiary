@@ -26,7 +26,6 @@ fun VideoDiaryTheme(
 ) {
     MaterialTheme(
         colorScheme = LightColorScheme,
-        typography = Typography,
         content = content
     )
 }

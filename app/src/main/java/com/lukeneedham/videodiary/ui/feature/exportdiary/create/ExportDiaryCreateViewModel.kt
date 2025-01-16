@@ -21,8 +21,6 @@ class ExportDiaryCreateViewModel(
     private val videoExportDao: VideoExportDao,
     private val calendarRepository: CalendarRepository,
 ) : ViewModel() {
-    private val today = LocalDate.now()
-
     private var allDays: List<Day> by mutableStateOf(emptyList())
 
     val totalVideoCount: Int? by derivedStateOf {
@@ -32,18 +30,13 @@ class ExportDiaryCreateViewModel(
     var exportState: ExportState by mutableStateOf(ExportState.Ready)
         private set
 
-    var exportStartDate: LocalDate by mutableStateOf(today)
-
+    var exportStartDate: LocalDate? by mutableStateOf(null)
     var exportEndDate: LocalDate? by mutableStateOf(null)
-
-    val exportEndDateOrDefault by derivedStateOf {
-        exportEndDate ?: today
-    }
 
     private val selectedVideos: List<File>? by derivedStateOf {
         val allDays = allDays
         if (allDays.isEmpty()) return@derivedStateOf null
-        val startDate = exportStartDate
+        val startDate = exportStartDate ?: return@derivedStateOf null
         val endDate = exportEndDate ?: return@derivedStateOf null
 
         val selectedDays = allDays.filter {
@@ -73,6 +66,9 @@ class ExportDiaryCreateViewModel(
                 allDays = days
                 // Update end date to the date of the last video
                 // only when the user hasn't already selected another explicit end date
+                if (exportStartDate == null) {
+                    exportStartDate = days.firstOrNull()?.date
+                }
                 if (exportEndDate == null) {
                     exportEndDate = days.lastOrNull()?.date
                 }
@@ -91,16 +87,22 @@ class ExportDiaryCreateViewModel(
             exportState = ExportState.Failed("End date is not set")
             return
         }
+        val startDate = exportStartDate
+        if (startDate == null) {
+            exportState = ExportState.Failed("Start date is not set")
+            return
+        }
 
         exportState = ExportState.InProgress
-        val outputFile = videoExportDao.export(selectedVideos)
-        val exportedVideo = ExportedVideo(
-            videoFile = outputFile,
-            startDate = exportStartDate,
-            endDate = endDate,
-            dayVideoCount = selectedVideos.size,
-        )
+
         viewModelScope.launch {
+            val outputFile = videoExportDao.export(selectedVideos)
+            val exportedVideo = ExportedVideo(
+                videoFile = outputFile,
+                startDate = startDate,
+                endDate = endDate,
+                dayVideoCount = selectedVideos.size,
+            )
             exportState = ExportState.Ready
             onExportedMutable.emit(exportedVideo)
         }

@@ -23,8 +23,8 @@ fun ExportDiaryCreatePage(
         totalVideoCount = viewModel.totalVideoCount,
         exportState = viewModel.exportState,
         export = viewModel::export,
-        startDate = viewModel.exportStartDate,
-        endDate = viewModel.exportEndDateOrDefault,
+        exportStartDate = viewModel.exportStartDate,
+        exportEndDate = viewModel.exportEndDate,
         selectedVideoCount = viewModel.selectedVideoCount,
         diaryStartDate = viewModel.diaryStartDate,
         onStartDateSelected = {

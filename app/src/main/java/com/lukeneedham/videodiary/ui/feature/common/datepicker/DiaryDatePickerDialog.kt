@@ -10,7 +10,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.lukeneedham.videodiary.ui.feature.calendar.MockDataCalendar
 import java.time.Instant
 import java.time.LocalDate
-import java.time.ZoneId
+import java.time.ZoneOffset
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -20,30 +20,31 @@ fun DiaryDatePickerDialog(
     onDateSelected: (LocalDate?) -> Unit,
     onDismiss: () -> Unit,
 ) {
-    val zone = ZoneId.systemDefault()
-    fun toMillis(date: LocalDate) =
-        date.atStartOfDay(zone).toInstant().toEpochMilli()
+    /** The date picker API treats dates as timestamps in UTC */
+    val zone = ZoneOffset.UTC
+    fun toMillisUtc(date: LocalDate) =
+        date.atStartOfDay().toInstant(zone).toEpochMilli()
 
     fun toDate(millis: Long) =
         LocalDate.ofInstant(Instant.ofEpochMilli(millis), zone)
 
     val today = LocalDate.now()
     val selectableDates = remember(firstPossibleDate, today) {
-        val todayMillis = toMillis(today)
-        val diaryStartDateMillis = toMillis(firstPossibleDate)
+        val todayMillisUtc = toMillisUtc(today)
+        val diaryStartDateMillisUtc = toMillisUtc(firstPossibleDate)
 
         object : SelectableDates {
             override fun isSelectableDate(utcTimeMillis: Long) =
-                utcTimeMillis in diaryStartDateMillis..todayMillis
+                utcTimeMillis in diaryStartDateMillisUtc..todayMillisUtc
         }
     }
-    val selectedDateMillis = if (selectedDate == null) {
+    val selectedDateMillisUtc = if (selectedDate == null) {
         null
     } else {
-        toMillis(selectedDate)
+        toMillisUtc(selectedDate)
     }
     val datePickerState = rememberDatePickerState(
-        initialSelectedDateMillis = selectedDateMillis,
+        initialSelectedDateMillis = selectedDateMillisUtc,
         selectableDates = selectableDates,
     )
 

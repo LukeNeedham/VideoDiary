@@ -10,10 +10,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.lukeneedham.videodiary.domain.util.date.StandardDateFormatter
 import com.lukeneedham.videodiary.ui.feature.common.Button
 import com.lukeneedham.videodiary.ui.feature.exportdiary.create.MockDataExportDiaryCreate
+import com.lukeneedham.videodiary.ui.theme.Typography
 import java.time.LocalDate
 
 @Composable
@@ -30,13 +30,13 @@ fun ExportDiaryCreateDatePicker(
         ) {
             Text(
                 text = "$label:",
-                fontSize = 18.sp,
+                fontSize = Typography.Size.big,
             )
             Spacer(modifier = Modifier.height(2.dp))
             val dateText = date.format(StandardDateFormatter.formatter)
             Text(
                 text = dateText,
-                fontSize = 16.sp,
+                fontSize = Typography.Size.small,
             )
         }
 

@@ -25,6 +25,7 @@ import com.lukeneedham.videodiary.ui.feature.common.toolbar.GenericToolbar
 import com.lukeneedham.videodiary.ui.feature.common.videoplayer.VideoControlActionBar
 import com.lukeneedham.videodiary.ui.feature.common.videoplayer.VideoPlayer
 import com.lukeneedham.videodiary.ui.feature.common.videoplayer.VideoPlayerController
+import com.lukeneedham.videodiary.ui.theme.Typography
 
 @Composable
 fun ExportDiaryViewPageContent(
@@ -52,9 +53,24 @@ fun ExportDiaryViewPageContent(
             val start = exportedVideo.startDate.format(StandardDateFormatter.formatter)
             val end = exportedVideo.endDate.format(StandardDateFormatter.formatter)
             Text(
-                "Video Diary Export from $start to $end (${exportedVideo.dayVideoCount} videos)",
+                "Video Diary Export",
                 color = Color.Black,
                 textAlign = TextAlign.Center,
+                fontSize = Typography.Size.big,
+                modifier = Modifier.fillMaxWidth()
+            )
+            Text(
+                "$start to $end",
+                color = Color.Black,
+                textAlign = TextAlign.Center,
+                fontSize = Typography.Size.small,
+                modifier = Modifier.fillMaxWidth()
+            )
+            Text(
+                "${exportedVideo.dayVideoCount} videos",
+                color = Color.Black,
+                textAlign = TextAlign.Center,
+                fontSize = Typography.Size.small,
                 modifier = Modifier.fillMaxWidth()
             )
 

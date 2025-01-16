@@ -81,9 +81,9 @@ fun VideoControlActionBar(
             )
 
             // Play button
-            val playButtonIcon =
-                if (videoPlayerController.isPlaying) R.drawable.pause else R.drawable.play
-            val playButtonText = if (videoPlayerController.isPlaying) "Pause" else "Play"
+            val isPlaying = !videoPlayerController.isTogglePaused
+            val playButtonIcon = if (isPlaying) R.drawable.pause else R.drawable.play
+            val playButtonText = if (isPlaying) "Pause" else "Play"
             Button(
                 iconRes = playButtonIcon,
                 contentDescription = playButtonText,
