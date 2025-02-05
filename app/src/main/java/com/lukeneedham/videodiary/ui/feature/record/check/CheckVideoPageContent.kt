@@ -24,6 +24,7 @@ fun CheckVideoPageContent(
     onRetakeClick: () -> Unit,
     onAccepted: () -> Unit,
 ) {
+    val videoPlayerController = remember { VideoPlayerController() }
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -36,20 +37,15 @@ fun CheckVideoPageContent(
                 .weight(1f)
         ) {
             if (videoAspectRatio != null) {
-                val controller = remember {
-                    VideoPlayerController()
-                        .apply {
-                            isVolumeOn = true
-                        }
-                }
                 VideoPlayer(
                     video = video,
                     aspectRatio = videoAspectRatio,
-                    controller = controller,
+                    controller = videoPlayerController,
                 )
             }
         }
         CheckVideoActionBar(
+            videoPlayerController = videoPlayerController,
             onCancelClick = onCancelClick,
             onRetakeClick = onRetakeClick,
             onAccepted = onAccepted,
