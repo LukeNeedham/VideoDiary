@@ -70,6 +70,6 @@ internal fun PreviewCalendarDayPicker() {
         firstPossibleDate = MockDataCalendar.startDate,
         onDateSelected = {},
         onDismiss = {},
-        selectedDate = MockDataCalendar.day.date,
+        selectedDate = MockDataCalendar.dayWithVideo.date,
     )
 }

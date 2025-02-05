@@ -8,11 +8,15 @@ object MockDataCalendar {
     val startDate = LocalDate.of(2024, 3, 27)
 
     val file = File("")
-    val day = Day(
+    val dayWithVideo = Day(
         date = LocalDate.of(2024, 12, 27), video = file,
     )
+    val dayWithoutVideo = Day(
+        date = LocalDate.now(), video = null,
+    )
     val days = listOf(
-        day
+        dayWithVideo,
+        dayWithoutVideo,
     )
 
     val videoAspectRatio = 1f

@@ -49,7 +49,7 @@ fun CalendarDayCard(
 @Composable
 internal fun PreviewCalendarDayCard() {
     CalendarDayCard(
-        day = MockDataCalendar.day,
+        day = MockDataCalendar.dayWithVideo,
         videoAspectRatio = 1f,
         onRecordTodayVideoClick = {},
         videoPlayerController = rememberVideoPlayerController(),
