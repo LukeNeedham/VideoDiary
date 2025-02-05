@@ -73,7 +73,7 @@ fun CalendarDayPortrait(
 @Composable
 internal fun PreviewCalendarDayPortrait() {
     CalendarDayPortrait(
-        day = MockDataCalendar.day,
+        day = MockDataCalendar.dayWithVideo,
         onRecordTodayVideoClick = {},
         videoAspectRatio = 1f,
         videoPlayerController = rememberVideoPlayerController(),

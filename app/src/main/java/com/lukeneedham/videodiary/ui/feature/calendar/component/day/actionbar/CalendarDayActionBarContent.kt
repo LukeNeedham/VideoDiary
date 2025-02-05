@@ -78,7 +78,7 @@ fun CalendarDayActionBarContent(
 internal fun PreviewCalendarDayActionBar() {
     Row {
         CalendarDayActionBarContent(
-            day = MockDataCalendar.day,
+            day = MockDataCalendar.dayWithVideo,
             onRecordTodayVideoClick = {},
             onDeleteTodayVideoClick = {},
             share = {},

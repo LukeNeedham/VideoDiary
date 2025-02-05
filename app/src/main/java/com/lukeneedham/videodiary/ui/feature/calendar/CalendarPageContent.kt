@@ -1,5 +1,6 @@
 package com.lukeneedham.videodiary.ui.feature.calendar
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
@@ -12,13 +13,14 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.lukeneedham.videodiary.domain.model.Day
 import com.lukeneedham.videodiary.domain.model.ShareRequest
-import com.lukeneedham.videodiary.ui.feature.common.datepicker.DiaryDatePickerDialog
 import com.lukeneedham.videodiary.ui.feature.calendar.component.CalendarDeleteConfirmDialog
 import com.lukeneedham.videodiary.ui.feature.calendar.component.CalendarScroller
+import com.lukeneedham.videodiary.ui.feature.common.datepicker.DiaryDatePickerDialog
 import com.lukeneedham.videodiary.ui.feature.common.videoplayer.VideoPlayerController
 import com.lukeneedham.videodiary.ui.feature.common.videoplayer.rememberVideoPlayerController
 import java.time.LocalDate
@@ -101,20 +103,37 @@ fun CalendarPageContent(
     }
 }
 
+@Composable
+private fun Preview(
+    currentDayIndex: Int,
+) {
+    Box(
+        modifier = Modifier.background(Color.White)
+    ) {
+        CalendarPageContent(
+            days = MockDataCalendar.days,
+            videoAspectRatio = MockDataCalendar.videoAspectRatio,
+            onRecordTodayVideoClick = {},
+            onDeleteTodayVideoClick = {},
+            goToDate = {},
+            startDate = MockDataCalendar.startDate,
+            currentDayIndex = currentDayIndex,
+            setCurrentDayIndex = {},
+            exportFullVideo = {},
+            share = {},
+            videoPlayerController = rememberVideoPlayerController(),
+        )
+    }
+}
+
 @Preview
 @Composable
-internal fun PreviewCalendarPageContent() {
-    CalendarPageContent(
-        days = MockDataCalendar.days,
-        videoAspectRatio = MockDataCalendar.videoAspectRatio,
-        onRecordTodayVideoClick = {},
-        onDeleteTodayVideoClick = {},
-        goToDate = {},
-        startDate = MockDataCalendar.startDate,
-        currentDayIndex = 0,
-        setCurrentDayIndex = {},
-        exportFullVideo = {},
-        share = {},
-        videoPlayerController = rememberVideoPlayerController(),
-    )
+private fun PreviewDay1() {
+    Preview(currentDayIndex = 0)
+}
+
+@Preview
+@Composable
+private fun PreviewDay2() {
+    Preview(currentDayIndex = 1)
 }

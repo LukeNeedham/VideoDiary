@@ -80,7 +80,7 @@ fun CalendarDayLandscape(
 @Composable
 internal fun PreviewCalendarDayLandscape() {
     CalendarDayLandscape(
-        day = MockDataCalendar.day,
+        day = MockDataCalendar.dayWithVideo,
         onRecordTodayVideoClick = {},
         videoAspectRatio = 1f,
         videoPlayerController = rememberVideoPlayerController(),
