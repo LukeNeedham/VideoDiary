@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -24,6 +25,7 @@ import com.lukeneedham.videodiary.R
 import com.lukeneedham.videodiary.ui.feature.record.common.RecordVideoActionBarSize
 import com.lukeneedham.videodiary.ui.feature.record.film.MockDataRecordVideo
 import com.lukeneedham.videodiary.ui.feature.record.film.RecordingState
+import com.lukeneedham.videodiary.ui.theme.Typography
 
 @Composable
 fun RecordVideoActionBar(
@@ -36,14 +38,17 @@ fun RecordVideoActionBar(
         verticalAlignment = Alignment.CenterVertically,
         modifier = modifier
             .height(RecordVideoActionBarSize.height)
+            .fillMaxWidth()
             .background(Color.Black)
             .padding(horizontal = 10.dp)
     ) {
+        val sideButtonSize = 50.dp
+
         // Close button
         Box(
             contentAlignment = Alignment.Center,
             modifier = Modifier
-                .size(50.dp)
+                .size(sideButtonSize)
                 .clickable { onCloseClick() }
         ) {
             Image(
@@ -70,7 +75,7 @@ fun RecordVideoActionBar(
                 RecordingState.Ready -> {
                     Box(
                         modifier = Modifier
-                            .size(50.dp)
+                            .size(60.dp)
                             .background(
                                 color = Color.White,
                                 shape = CircleShape,
@@ -94,6 +99,7 @@ fun RecordVideoActionBar(
                     Text(
                         text = text,
                         color = Color.White,
+                        fontSize = Typography.Size.big,
                     )
                 }
 
@@ -108,8 +114,7 @@ fun RecordVideoActionBar(
         // Mirror for close button - to keep the other content centered
         Box(
             modifier = Modifier
-                .fillMaxHeight()
-                .aspectRatio(1f)
+                .size(sideButtonSize)
         )
     }
 }

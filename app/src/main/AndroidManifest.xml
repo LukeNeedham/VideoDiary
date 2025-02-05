@@ -10,6 +10,12 @@
         android:name="android.permission.WRITE_EXTERNAL_STORAGE"
         android:maxSdkVersion="28" />
 
+    <!--
+    This permission is transitively pulled in from media3-exoplayer:1.3.0
+    We don't use it, since we only read local media files, so we force remove it.
+    -->
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" tools:node="remove"/>
+
     <uses-feature android:name="android.hardware.camera" />
     <uses-feature
         android:name="android.hardware.camera.autofocus"
