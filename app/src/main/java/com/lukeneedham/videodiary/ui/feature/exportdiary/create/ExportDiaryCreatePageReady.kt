@@ -7,7 +7,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -22,6 +22,7 @@ import com.lukeneedham.videodiary.ui.feature.common.Button
 import com.lukeneedham.videodiary.ui.feature.common.datepicker.DiaryDatePickerDialog
 import com.lukeneedham.videodiary.ui.feature.exportdiary.create.component.ExportDiaryCreateDatePicker
 import com.lukeneedham.videodiary.ui.feature.exportdiary.create.component.ExportDiaryEmptyCreate
+import com.lukeneedham.videodiary.ui.feature.exportdiary.create.model.ExportState
 import java.time.LocalDate
 
 @Composable
@@ -89,12 +90,19 @@ fun ExportDiaryCreatePageReady(
                     Spacer(modifier = Modifier.height(15.dp))
 
                     when (exportState) {
-                        ExportState.InProgress -> {
-                            Box(
-                                contentAlignment = Alignment.Center,
+                        is ExportState.InProgress -> {
+                            Column(
+                                horizontalAlignment = Alignment.CenterHorizontally,
                                 modifier = Modifier.fillMaxWidth()
                             ) {
-                                CircularProgressIndicator()
+                                Text(
+                                    text = "Export in progress..."
+                                )
+                                Spacer(modifier = Modifier.height(10.dp))
+                                
+                                LinearProgressIndicator(
+                                    progress = { exportState.progressFraction },
+                                )
                             }
                         }
 

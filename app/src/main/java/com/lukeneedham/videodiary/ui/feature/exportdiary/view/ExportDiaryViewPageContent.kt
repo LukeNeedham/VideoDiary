@@ -19,7 +19,7 @@ import androidx.compose.ui.unit.dp
 import com.lukeneedham.videodiary.domain.model.ExportedVideo
 import com.lukeneedham.videodiary.domain.model.ShareRequest
 import com.lukeneedham.videodiary.domain.model.Video
-import com.lukeneedham.videodiary.domain.util.date.StandardDateFormatter
+import com.lukeneedham.videodiary.domain.util.date.StandardDateTimeFormatter
 import com.lukeneedham.videodiary.ui.feature.common.Button
 import com.lukeneedham.videodiary.ui.feature.common.toolbar.GenericToolbar
 import com.lukeneedham.videodiary.ui.feature.common.videoplayer.VideoControlActionBar
@@ -48,10 +48,10 @@ fun ExportDiaryViewPageContent(
             modifier = Modifier
                 .fillMaxWidth()
                 .weight(1f)
-                .padding(20.dp)
+                .padding(15.dp)
         ) {
-            val start = exportedVideo.startDate.format(StandardDateFormatter.formatter)
-            val end = exportedVideo.endDate.format(StandardDateFormatter.formatter)
+            val start = exportedVideo.startDate.format(StandardDateTimeFormatter.date)
+            val end = exportedVideo.endDate.format(StandardDateTimeFormatter.date)
             Text(
                 "Video Diary Export",
                 color = Color.Black,
@@ -63,14 +63,14 @@ fun ExportDiaryViewPageContent(
                 "$start to $end",
                 color = Color.Black,
                 textAlign = TextAlign.Center,
-                fontSize = Typography.Size.small,
+                fontSize = Typography.Size.extraSmall,
                 modifier = Modifier.fillMaxWidth()
             )
             Text(
                 "${exportedVideo.dayVideoCount} videos",
                 color = Color.Black,
                 textAlign = TextAlign.Center,
-                fontSize = Typography.Size.small,
+                fontSize = Typography.Size.extraSmall,
                 modifier = Modifier.fillMaxWidth()
             )
 

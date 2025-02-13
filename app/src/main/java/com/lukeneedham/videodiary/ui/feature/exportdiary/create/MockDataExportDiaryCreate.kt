@@ -1,5 +1,6 @@
 package com.lukeneedham.videodiary.ui.feature.exportdiary.create
 
+import com.lukeneedham.videodiary.ui.feature.exportdiary.create.model.ExportState
 import java.time.LocalDate
 
 object MockDataExportDiaryCreate {

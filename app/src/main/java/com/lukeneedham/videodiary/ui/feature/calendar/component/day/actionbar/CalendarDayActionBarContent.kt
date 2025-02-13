@@ -6,7 +6,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.lukeneedham.videodiary.domain.model.Day
 import com.lukeneedham.videodiary.domain.model.ShareRequest
-import com.lukeneedham.videodiary.domain.util.date.StandardDateFormatter
+import com.lukeneedham.videodiary.domain.util.date.StandardDateTimeFormatter
 import com.lukeneedham.videodiary.ui.feature.calendar.MockDataCalendar
 import com.lukeneedham.videodiary.ui.feature.common.Button
 
@@ -53,7 +53,7 @@ fun CalendarDayActionBarContent(
         ActionButton(
             text = "Share",
             onClick = {
-                val dateText = date.format(StandardDateFormatter.formatter)
+                val dateText = date.format(StandardDateTimeFormatter.date)
                 val text = "Video Diary: $dateText"
                 val request = ShareRequest(
                     title = text,

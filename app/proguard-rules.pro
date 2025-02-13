@@ -19,6 +19,3 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
-
-# We have to manually keep this package, other R8 removes it and we get runtime crashes
--keep class org.mp4parser.boxes.** { *; }

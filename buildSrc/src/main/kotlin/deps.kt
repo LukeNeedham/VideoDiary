@@ -15,9 +15,14 @@ object deps {
         object androidx {
             val coreKtx = "androidx.core:core-ktx:1.15.0"
             val lifecycle = "androidx.lifecycle:lifecycle-runtime-ktx:2.8.7"
-            val media3 = "androidx.media3:media3-exoplayer:1.3.0"
-
             val datastore = "androidx.datastore:datastore-preferences:1.1.1"
+        }
+
+        object media3 {
+            private val version = "1.5.1"
+            val player = "androidx.media3:media3-exoplayer:$version"
+            val transformer = "androidx.media3:media3-transformer:$version"
+            val effect = "androidx.media3:media3-effect:$version"
         }
 
         object camera {
@@ -64,12 +69,6 @@ object deps {
             val android = "io.insert-koin:koin-android"
             val compose = "io.insert-koin:koin-compose"
             val viewModel = "io.insert-koin:koin-compose-viewmodel"
-        }
-
-        object videoedit {
-            private val version = "1.9.60"
-            val muxer = "com.github.LukeNeedham.mp4parser:muxer:$version"
-            val isoparser = "com.github.LukeNeedham.mp4parser:isoparser:$version"
         }
     }
 }

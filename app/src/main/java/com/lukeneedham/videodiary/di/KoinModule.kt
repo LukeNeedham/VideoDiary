@@ -6,6 +6,7 @@ import com.lukeneedham.videodiary.data.mapper.VideoFileNameMapper
 import com.lukeneedham.videodiary.data.persistence.SettingsDao
 import com.lukeneedham.videodiary.data.persistence.VideoExportDao
 import com.lukeneedham.videodiary.data.persistence.VideosDao
+import com.lukeneedham.videodiary.data.persistence.export.VideoExporter
 import com.lukeneedham.videodiary.data.repository.CalendarRepository
 import com.lukeneedham.videodiary.data.repository.VideoResolutionRepository
 import com.lukeneedham.videodiary.ui.feature.calendar.CalendarViewModel
@@ -59,9 +60,14 @@ object KoinModule {
             )
         }
         factory {
+            VideoExporter(
+                context = androidContext(),
+            )
+        }
+        factory {
             VideoExportDao(
                 context = androidContext(),
-                defaultDispatcher = get(KoinQualifier.Dispatcher.default),
+                videoExporter = get(),
             )
         }
     }
