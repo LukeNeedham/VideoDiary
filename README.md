@@ -19,6 +19,12 @@
 - Private: No internet permission! Your videos remain only on your own device
 - Optimised landscape mode: works perfectly with landscape videos
 
-# Development
+## Download
+
+[<img src="https://f-droid.org/badge/get-it-on.png"
+    alt="Get it on F-Droid"
+    height="80">](https://f-droid.org/packages/com.lukeneedham.videodiary)
+
+## Development
 
 See [docs](docs)
