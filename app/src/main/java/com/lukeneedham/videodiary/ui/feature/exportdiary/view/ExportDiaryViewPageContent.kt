@@ -190,11 +190,11 @@ fun ExportDiaryViewPageContent(
 
 @Preview
 @Composable
-internal fun PreviewExportDiaryViewPageContentPortrait() {
+private fun PreviewPortrait() {
     Box(
         modifier = Modifier
-            .width(3000.dp)
-            .height(1000.dp)
+            .height(3000.dp)
+            .width(1000.dp)
     ) {
         ExportDiaryViewPageContent(
             exportedVideo = MockDataExportDiaryView.exportedVideo,
@@ -208,11 +208,11 @@ internal fun PreviewExportDiaryViewPageContentPortrait() {
 
 @Preview
 @Composable
-internal fun PreviewExportDiaryViewPageContentLandscape() {
+private fun PreviewLandscape() {
     Box(
         modifier = Modifier
-            .height(3000.dp)
-            .width(1000.dp)
+            .width(3000.dp)
+            .height(1000.dp)
     ) {
         ExportDiaryViewPageContent(
             exportedVideo = MockDataExportDiaryView.exportedVideo,

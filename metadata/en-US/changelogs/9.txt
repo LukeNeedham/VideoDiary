@@ -1,0 +1,1 @@
+Exported videos can now contain date-stamps which show the date each video belongs to
