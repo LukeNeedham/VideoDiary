@@ -5,7 +5,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -27,6 +27,8 @@ fun ExportDiaryCreatePageContent(
     exportState: ExportState,
     onStartDateSelected: (LocalDate?) -> Unit,
     onEndDateSelected: (LocalDate?) -> Unit,
+    exportIncludeDateStamp: Boolean,
+    setExportIncludeDateStamp: (Boolean) -> Unit,
     export: () -> Unit,
 ) {
     Column(
@@ -50,12 +52,13 @@ fun ExportDiaryCreatePageContent(
                 ExportDiaryCreatePageReady(
                     totalVideoCount = totalVideoCount,
                     selectedVideoCount = selectedVideoCount,
-                    diaryStartDate = diaryStartDate,
                     exportStartDate = exportStartDate,
                     exportEndDate = exportEndDate,
                     exportState = exportState,
                     onStartDateSelected = onStartDateSelected,
                     onEndDateSelected = onEndDateSelected,
+                    exportIncludeDateStamp = exportIncludeDateStamp,
+                    setExportIncludeDateStamp = setExportIncludeDateStamp,
                     export = export,
                 )
             }
@@ -81,6 +84,8 @@ internal fun PreviewExportDiaryPageContent() {
             diaryStartDate = MockDataExportDiaryCreate.diaryStartDate,
             onStartDateSelected = {},
             onEndDateSelected = {},
+            exportIncludeDateStamp = true,
+            setExportIncludeDateStamp = {},
         )
     }
 }

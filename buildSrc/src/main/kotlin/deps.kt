@@ -50,7 +50,7 @@ object deps {
             val bom = "androidx.compose:compose-bom:2024.04.01"
             val ui = "androidx.compose.ui:ui"
             val uiGraphics = "androidx.compose.ui:ui-graphics"
-            val material3 = "androidx.compose.material3:material3"
+            val material = "androidx.compose.material:material"
 
             object tooling {
                 val core = "androidx.compose.ui:ui-tooling"

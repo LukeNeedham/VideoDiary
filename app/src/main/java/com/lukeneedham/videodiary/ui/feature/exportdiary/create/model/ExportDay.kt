@@ -6,6 +6,5 @@ import java.time.LocalTime
 
 data class ExportDay(
     val date: LocalDate,
-    val time: LocalTime,
     val video: File,
 )

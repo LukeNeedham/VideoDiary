@@ -10,6 +10,7 @@ import com.lukeneedham.videodiary.data.persistence.export.VideoExporter
 import com.lukeneedham.videodiary.data.repository.CalendarRepository
 import com.lukeneedham.videodiary.data.repository.VideoResolutionRepository
 import com.lukeneedham.videodiary.ui.feature.calendar.CalendarViewModel
+import com.lukeneedham.videodiary.ui.feature.common.datepicker.DiaryDatePickerViewModel
 import com.lukeneedham.videodiary.ui.feature.exportdiary.create.ExportDiaryCreateViewModel
 import com.lukeneedham.videodiary.ui.feature.exportdiary.view.ExportDiaryViewViewModel
 import com.lukeneedham.videodiary.ui.feature.permissions.RequestPermissionsViewModel
@@ -32,6 +33,7 @@ object KoinModule {
         getUtil(),
         getData(),
         getRepositories(),
+        getNonAndroidViewModel(),
         getViewModel(),
         getPersistence(),
     )
@@ -39,6 +41,7 @@ object KoinModule {
     private fun getUtil() = module {
         factory<CoroutineDispatcher>(KoinQualifier.Dispatcher.io) { Dispatchers.IO }
         factory<CoroutineDispatcher>(KoinQualifier.Dispatcher.default) { Dispatchers.Default }
+        factory<CoroutineDispatcher>(KoinQualifier.Dispatcher.main) { Dispatchers.Main }
         factory {
             Sharer(
                 context = androidContext(),
@@ -145,6 +148,15 @@ object KoinModule {
         viewModel {
             ExportDiaryViewViewModel(
                 videoResolutionRepository = get(),
+            )
+        }
+    }
+
+    private fun getNonAndroidViewModel() = module {
+        factory {
+            DiaryDatePickerViewModel(
+                calendarRepository = get(),
+                mainDispatcher = get(KoinQualifier.Dispatcher.main)
             )
         }
     }

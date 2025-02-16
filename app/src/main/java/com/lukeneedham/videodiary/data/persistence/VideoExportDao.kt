@@ -16,8 +16,8 @@ class VideoExportDao(
     }
     private val outputFile = File(outputDir, outputFileName)
 
-    fun export(videos: List<ExportDay>): Flow<VideoExportState> =
-        videoExporter.export(videos, outputFile)
+    fun export(videos: List<ExportDay>, exportIncludeDateStamp: Boolean): Flow<VideoExportState> =
+        videoExporter.export(videos, outputFile, exportIncludeDateStamp)
 
     companion object {
         const val outputFileName = "export.mp4"

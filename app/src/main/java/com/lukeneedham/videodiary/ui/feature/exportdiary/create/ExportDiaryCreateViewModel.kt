@@ -37,6 +37,8 @@ class ExportDiaryCreateViewModel(
     var exportStartDate: LocalDate? by mutableStateOf(null)
     var exportEndDate: LocalDate? by mutableStateOf(null)
 
+    var exportIncludeDateStamp: Boolean by mutableStateOf(true)
+
     private val selectedDays: List<ExportDay>? by derivedStateOf {
         val allDays = allDays
         if (allDays.isEmpty()) return@derivedStateOf null
@@ -48,11 +50,8 @@ class ExportDiaryCreateViewModel(
             val isSelected = date in startDate..endDate
             if (!isSelected) return@mapNotNull null
             val video = day.video ?: return@mapNotNull null
-            val lastModified = Instant.ofEpochMilli(video.lastModified())
-            val time = lastModified.atZone(ZoneId.systemDefault()).toLocalTime()
             ExportDay(
                 date = day.date,
-                time = time,
                 video = video,
             )
         }
@@ -106,7 +105,7 @@ class ExportDiaryCreateViewModel(
         }
 
         viewModelScope.launch {
-            videoExportDao.export(selectedDays).collect { state ->
+            videoExportDao.export(selectedDays, exportIncludeDateStamp).collect { state ->
                 when (state) {
                     is VideoExportState.Failure -> {
                         val error = state.error

@@ -7,6 +7,7 @@ object KoinQualifier {
     object Dispatcher {
         val io = name("io")
         val default = name("default")
+        val main = name("main")
 
         private fun name(name: String) = named("Dispatcher.$name")
     }

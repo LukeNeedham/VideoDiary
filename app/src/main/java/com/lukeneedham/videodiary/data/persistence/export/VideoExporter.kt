@@ -1,18 +1,12 @@
 package com.lukeneedham.videodiary.data.persistence.export
 
 import android.content.Context
-import android.text.SpannableString
-import android.text.style.AbsoluteSizeSpan
-import android.text.style.BackgroundColorSpan
-import android.text.style.ForegroundColorSpan
 import androidx.annotation.OptIn
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.toArgb
 import androidx.core.net.toUri
 import androidx.media3.common.MediaItem
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.effect.OverlaySettings
-import androidx.media3.effect.TextOverlay
+import androidx.media3.effect.TextureOverlay
 import androidx.media3.transformer.Composition
 import androidx.media3.transformer.EditedMediaItem
 import androidx.media3.transformer.EditedMediaItemSequence
@@ -23,7 +17,6 @@ import androidx.media3.transformer.ProgressHolder
 import androidx.media3.transformer.Transformer
 import com.lukeneedham.videodiary.domain.util.date.StandardDateTimeFormatter
 import com.lukeneedham.videodiary.ui.feature.exportdiary.create.model.ExportDay
-import com.lukeneedham.videodiary.util.ext.setFullLengthSpan
 import com.lukeneedham.videodiary.util.ext.toOverlayEffect
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
@@ -61,6 +54,7 @@ class VideoExporter(
     fun export(
         inputVideos: List<ExportDay>,
         outputFile: File,
+        exportIncludeDateStamp: Boolean,
     ): Flow<VideoExportState> {
         // Delete existing export if it exists -
         // there should be at most 1 export file at any time, to avoid clutter
@@ -73,25 +67,13 @@ class VideoExporter(
             val mediaItem = MediaItem.fromUri(input.video.toUri())
 
             val date = input.date
-            val time = input.time
-            val dateOverlay = createTextOverlay(
-                text = date.format(StandardDateTimeFormatter.date),
-                foregroundColor = Color.White,
-                backgroundColor = Color.Black.copy(alpha = 0.5f),
-                textSize = 60,
-                x = 0f,
-                y = -0.8f,
-            )
-            val timeOverlay = createTextOverlay(
-                text = time.format(StandardDateTimeFormatter.time),
-                foregroundColor = Color.White,
-                backgroundColor = Color.Black.copy(alpha = 0.5f),
-                textSize = 40,
-                x = 0f,
-                y = 0.9f,
-            )
+            val dateOverlay = if (exportIncludeDateStamp) {
+                createTextOverlay(text = date.format(StandardDateTimeFormatter.date))
+            } else {
+                null
+            }
 
-            val effects = listOf(dateOverlay, timeOverlay)
+            val effects = listOfNotNull(dateOverlay)
                 .map { it.toOverlayEffect() }
 
             EditedMediaItem.Builder(mediaItem).apply {
@@ -138,25 +120,22 @@ class VideoExporter(
 
     private fun createTextOverlay(
         text: String,
-        foregroundColor: Color,
-        backgroundColor: Color,
-        textSize: Int,
-        x: Float,
-        y: Float,
-    ): TextOverlay {
-        val overlaySettings = OverlaySettings.Builder()
-        overlaySettings.setOverlayFrameAnchor(1f, -1f)
-        overlaySettings.setBackgroundFrameAnchor(x, -y)
+    ): TextureOverlay {
+        /**
+         * Let's say you have a small logo image as your overlay.
+         * You call setOverlayFrameAnchor(1, 1) - You've chosen the top-right corner of your logo as the anchor.
+         * You call setBackgroundFrameAnchor(-1, -1) - You want to place the logo in the bottom-left corner of the video.
+         * The result will be that the top-right corner of your logo will be positioned at the bottom-left corner of the video frame.
+         */
+        val overlaySettings = OverlaySettings.Builder().apply {
+            setOverlayFrameAnchor(0f, -1f)
+            setBackgroundFrameAnchor(0f, -1f)
+        }.build()
 
-        val spanString = SpannableString(text)
-        spanString.apply {
-            setFullLengthSpan(ForegroundColorSpan(foregroundColor.toArgb()))
-            setFullLengthSpan(BackgroundColorSpan(backgroundColor.toArgb()))
-            setFullLengthSpan(AbsoluteSizeSpan(textSize))
-        }
-        return TextOverlay.createStaticTextOverlay(
-            spanString,
-            overlaySettings.build()
+        return DateOverlay(
+            text = text,
+            paddingBottom = 30,
+            overlaySettings = overlaySettings,
         )
     }
 }

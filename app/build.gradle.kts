@@ -72,7 +72,7 @@ dependencies {
     implementation(deps.libs.compose.ui)
     implementation(deps.libs.compose.uiGraphics)
     implementation(deps.libs.compose.tooling.preview)
-    implementation(deps.libs.compose.material3)
+    implementation(deps.libs.compose.material)
 
     // Navigation
     implementation(deps.libs.navigation.compose)
