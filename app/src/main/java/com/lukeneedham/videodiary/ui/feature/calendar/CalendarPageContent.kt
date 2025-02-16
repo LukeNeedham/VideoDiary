@@ -4,7 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
-import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -29,7 +29,6 @@ import java.time.LocalDate
 fun CalendarPageContent(
     days: List<Day>,
     videoAspectRatio: Float?,
-    startDate: LocalDate?,
     currentDayIndex: Int,
     onRecordTodayVideoClick: () -> Unit,
     onDeleteTodayVideoClick: () -> Unit,
@@ -39,7 +38,7 @@ fun CalendarPageContent(
     share: (ShareRequest) -> Unit,
     videoPlayerController: VideoPlayerController,
 ) {
-    val currentDay = days.getOrNull(currentDayIndex)
+    val currentDay = days[currentDayIndex]
 
     var showDayPickerDialog by remember { mutableStateOf(false) }
     var showDeleteConfirmDialog by rememberSaveable { mutableStateOf(false) }
@@ -77,14 +76,11 @@ fun CalendarPageContent(
             }
         }
 
-        if (startDate != null && showDayPickerDialog) {
+        if (showDayPickerDialog) {
             DiaryDatePickerDialog(
-                firstPossibleDate = startDate,
-                selectedDate = currentDay?.date,
+                initialFocusedDate = currentDay.date,
                 onDateSelected = { date ->
-                    if (date != null) {
-                        goToDate(date)
-                    }
+                    goToDate(date)
                 },
                 onDismiss = {
                     showDayPickerDialog = false
@@ -113,11 +109,10 @@ private fun Preview(
         CalendarPageContent(
             days = MockDataCalendar.days,
             videoAspectRatio = MockDataCalendar.videoAspectRatio,
+            currentDayIndex = currentDayIndex,
             onRecordTodayVideoClick = {},
             onDeleteTodayVideoClick = {},
             goToDate = {},
-            startDate = MockDataCalendar.startDate,
-            currentDayIndex = currentDayIndex,
             setCurrentDayIndex = {},
             exportFullVideo = {},
             share = {},

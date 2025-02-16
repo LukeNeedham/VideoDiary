@@ -7,15 +7,19 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.lukeneedham.videodiary.data.persistence.VideoExportDao
+import com.lukeneedham.videodiary.data.persistence.export.VideoExportState
 import com.lukeneedham.videodiary.data.repository.CalendarRepository
 import com.lukeneedham.videodiary.domain.model.Day
 import com.lukeneedham.videodiary.domain.model.ExportedVideo
+import com.lukeneedham.videodiary.ui.feature.exportdiary.create.model.ExportDay
+import com.lukeneedham.videodiary.ui.feature.exportdiary.create.model.ExportState
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
-import java.io.File
+import java.time.Instant
 import java.time.LocalDate
+import java.time.ZoneId
 
 class ExportDiaryCreateViewModel(
     private val videoExportDao: VideoExportDao,
@@ -33,21 +37,28 @@ class ExportDiaryCreateViewModel(
     var exportStartDate: LocalDate? by mutableStateOf(null)
     var exportEndDate: LocalDate? by mutableStateOf(null)
 
-    private val selectedVideos: List<File>? by derivedStateOf {
+    var exportIncludeDateStamp: Boolean by mutableStateOf(true)
+
+    private val selectedDays: List<ExportDay>? by derivedStateOf {
         val allDays = allDays
         if (allDays.isEmpty()) return@derivedStateOf null
         val startDate = exportStartDate ?: return@derivedStateOf null
         val endDate = exportEndDate ?: return@derivedStateOf null
 
-        val selectedDays = allDays.filter {
-            val date = it.date
-            date in startDate..endDate
+        allDays.mapNotNull { day ->
+            val date = day.date
+            val isSelected = date in startDate..endDate
+            if (!isSelected) return@mapNotNull null
+            val video = day.video ?: return@mapNotNull null
+            ExportDay(
+                date = day.date,
+                video = video,
+            )
         }
-        selectedDays.mapNotNull { it.video }
     }
 
     val selectedVideoCount: Int? by derivedStateOf {
-        selectedVideos?.size
+        selectedDays?.size
     }
 
     val diaryStartDate by derivedStateOf {
@@ -77,8 +88,8 @@ class ExportDiaryCreateViewModel(
     }
 
     fun export() {
-        val selectedVideos = selectedVideos
-        if (selectedVideos == null) {
+        val selectedDays = selectedDays
+        if (selectedDays == null) {
             exportState = ExportState.Failed("Selected videos could not be computed")
             return
         }
@@ -93,18 +104,31 @@ class ExportDiaryCreateViewModel(
             return
         }
 
-        exportState = ExportState.InProgress
-
         viewModelScope.launch {
-            val outputFile = videoExportDao.export(selectedVideos)
-            val exportedVideo = ExportedVideo(
-                videoFile = outputFile,
-                startDate = startDate,
-                endDate = endDate,
-                dayVideoCount = selectedVideos.size,
-            )
-            exportState = ExportState.Ready
-            onExportedMutable.emit(exportedVideo)
+            videoExportDao.export(selectedDays, exportIncludeDateStamp).collect { state ->
+                when (state) {
+                    is VideoExportState.Failure -> {
+                        val error = state.error
+                        val errorMessage = error.message ?: error.toString()
+                        exportState = ExportState.Failed(errorMessage)
+                    }
+
+                    is VideoExportState.InProgress -> {
+                        exportState = ExportState.InProgress(state.progressFraction)
+                    }
+
+                    is VideoExportState.Success -> {
+                        val exportedVideo = ExportedVideo(
+                            videoFile = state.outputFile,
+                            startDate = startDate,
+                            endDate = endDate,
+                            dayVideoCount = selectedDays.size,
+                        )
+                        exportState = ExportState.Ready
+                        onExportedMutable.emit(exportedVideo)
+                    }
+                }
+            }
         }
     }
 }

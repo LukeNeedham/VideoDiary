@@ -72,13 +72,15 @@ dependencies {
     implementation(deps.libs.compose.ui)
     implementation(deps.libs.compose.uiGraphics)
     implementation(deps.libs.compose.tooling.preview)
-    implementation(deps.libs.compose.material3)
+    implementation(deps.libs.compose.material)
 
     // Navigation
     implementation(deps.libs.navigation.compose)
 
     // Media3
-    implementation(deps.libs.androidx.media3)
+    implementation(deps.libs.media3.player)
+    implementation(deps.libs.media3.transformer)
+    implementation(deps.libs.media3.effect)
 
     // Koin
     implementation(platform(deps.libs.koin.bom))
@@ -89,10 +91,6 @@ dependencies {
 
     // Datastore
     implementation(deps.libs.androidx.datastore)
-
-    // Video editing
-    implementation(deps.libs.videoedit.muxer)
-    implementation(deps.libs.videoedit.isoparser)
 
     // Testing
     testImplementation(deps.libs.testing.junit)

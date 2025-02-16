@@ -3,6 +3,7 @@ package com.lukeneedham.videodiary.data.repository
 import com.lukeneedham.videodiary.data.mapper.VideoFileNameMapper
 import com.lukeneedham.videodiary.data.persistence.VideosDao
 import com.lukeneedham.videodiary.domain.model.Day
+import com.lukeneedham.videodiary.domain.util.date.CalendarUtil
 import kotlinx.coroutines.flow.map
 import java.time.LocalDate
 
@@ -26,14 +27,6 @@ class CalendarRepository(
     }
 
     /** @return an ordered list of all dates between the start date and today (both inclusive) */
-    private fun getAllDates(startDate: LocalDate): List<LocalDate> {
-        val today = LocalDate.now()
-        var date = startDate
-        val allDates = mutableListOf<LocalDate>()
-        while (date <= today) {
-            allDates.add(date)
-            date = date.plusDays(1)
-        }
-        return allDates
-    }
+    private fun getAllDates(startDate: LocalDate) =
+        CalendarUtil.getAllDates(startDate, LocalDate.now())
 }
