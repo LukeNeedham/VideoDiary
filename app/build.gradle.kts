@@ -3,6 +3,7 @@ plugins {
     id(deps.plugins.kotlinAndroid)
     id(deps.plugins.kotlinCompose)
     id(deps.plugins.parcelize)
+    id(deps.plugins.ksp)
 }
 
 android {
@@ -91,6 +92,11 @@ dependencies {
 
     // Datastore
     implementation(deps.libs.androidx.datastore)
+
+    // Room
+    implementation(deps.libs.androidx.room.runtime)
+    implementation(deps.libs.androidx.room.ktx)
+    ksp(deps.libs.androidx.room.compiler)
 
     // Testing
     testImplementation(deps.libs.testing.junit)

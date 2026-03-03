@@ -1,21 +1,48 @@
 package com.lukeneedham.videodiary.data.persistence
 
 import android.content.Context
+import com.lukeneedham.videodiary.data.persistence.savedexport.SavedExportEntity
+import com.lukeneedham.videodiary.data.persistence.savedexport.SavedExportMetadata
+import com.lukeneedham.videodiary.data.persistence.savedexport.SavedExportRoomDao
 import com.lukeneedham.videodiary.domain.model.SavedExport
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import java.io.File
+import java.util.UUID
 import java.time.LocalDate
 
 class SavedExportsDao(
     private val context: Context,
+    private val roomDao: SavedExportRoomDao,
 ) {
+    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+
     private val savedExportsDir = File(context.filesDir, "saved_exports").apply {
         mkdirs()
     }
 
-    private val allSavedExportsMutable = MutableStateFlow(loadAllSavedExports())
-    val allSavedExports = allSavedExportsMutable.asStateFlow()
+    val allSavedExports: StateFlow<List<SavedExport>> = roomDao.getAll().map { entities ->
+        entities.map { entity ->
+            SavedExport(
+                id = entity.id,
+                name = entity.name,
+                file = File(savedExportsDir, "${entity.name}.mp4"),
+                startDate = LocalDate.ofEpochDay(entity.startDateEpochDay),
+                endDate = LocalDate.ofEpochDay(entity.endDateEpochDay),
+                dayVideoCount = entity.dayVideoCount,
+            )
+        }
+    }.stateIn(
+        scope = scope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = emptyList()
+    )
 
     fun saveExport(
         sourceFile: File,
@@ -24,38 +51,29 @@ class SavedExportsDao(
         endDate: LocalDate,
         dayVideoCount: Int,
     ) {
-        val destinationFile = File(savedExportsDir, "$name.mp4")
-        if (destinationFile.exists()) {
-            destinationFile.delete()
-        }
+        val id = UUID.randomUUID().toString()
+        val destinationFile = File(savedExportsDir, "$id.mp4")
         sourceFile.copyTo(destinationFile)
-        
-        // In a real app we'd save metadata to a DB or sidecar file. 
-        // For simplicity here, we'll just name the file.
-        // If we want more metadata, we can use a JSON file or similar.
-        refreshSavedExportsState()
+
+        scope.launch {
+            val entity = SavedExportEntity(
+                id = id,
+                name = name,
+                startDateEpochDay = startDate.toEpochDay(),
+                endDateEpochDay = endDate.toEpochDay(),
+                dayVideoCount = dayVideoCount,
+                lastModified = System.currentTimeMillis()
+            )
+            roomDao.insert(entity)
+        }
     }
 
     fun deleteExport(export: SavedExport) {
         export.file.delete()
-        refreshSavedExportsState()
+        scope.launch {
+            roomDao.deleteById(export.id)
+        }
     }
 
-    private fun refreshSavedExportsState() {
-        allSavedExportsMutable.value = loadAllSavedExports()
-    }
-
-    private fun loadAllSavedExports(): List<SavedExport> {
-        val files = savedExportsDir.listFiles { _, name -> name.endsWith(".mp4") } ?: return emptyList()
-        return files.map { file ->
-            SavedExport(
-                name = file.nameWithoutExtension,
-                file = file,
-                // We don't have these for now, so use placeholders or extract from some metadata file
-                startDate = LocalDate.MIN,
-                endDate = LocalDate.MAX,
-                dayVideoCount = 0,
-            )
-        }.sortedByDescending { it.file.lastModified() }
-    }
+    private fun getMetadataFile(name: String) = File(savedExportsDir, "$name.metadata")
 }

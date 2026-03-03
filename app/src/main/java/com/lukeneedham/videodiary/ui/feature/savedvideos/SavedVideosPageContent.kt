@@ -60,7 +60,7 @@ fun SavedVideosPageContent(
             LazyColumn(
                 modifier = Modifier.fillMaxSize()
             ) {
-                items(savedVideos) { video ->
+                items(savedVideos, key = { it.id }) { video ->
                     SavedVideoItem(
                         video = video,
                         onClick = { onClick(video) },
@@ -104,7 +104,8 @@ private fun SavedVideoItem(
             contentAlignment = Alignment.Center
         ) {
             Image(
-                painter = painterResource(R.drawable.delete),
+                // todo: should be delete icon
+                painter = painterResource(R.drawable.play),
                 contentDescription = "Delete",
                 colorFilter = ColorFilter.tint(Color.Black),
                 modifier = Modifier.size(24.dp)

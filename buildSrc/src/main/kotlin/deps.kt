@@ -3,12 +3,14 @@ object deps {
         object versions {
             val agp = "8.7.1"
             val kotlin = "2.0.0"
+            val ksp = "2.0.0-1.0.21" // Matching Kotlin 2.0.0
         }
 
         val application = "com.android.application"
         val kotlinAndroid = "org.jetbrains.kotlin.android"
         val kotlinCompose = "org.jetbrains.kotlin.plugin.compose"
         val parcelize = "kotlin-parcelize"
+        val ksp = "com.google.devtools.ksp"
     }
 
     object libs {
@@ -16,6 +18,13 @@ object deps {
             val coreKtx = "androidx.core:core-ktx:1.15.0"
             val lifecycle = "androidx.lifecycle:lifecycle-runtime-ktx:2.8.7"
             val datastore = "androidx.datastore:datastore-preferences:1.1.1"
+
+            object room {
+                private val version = "2.6.1"
+                val runtime = "androidx.room:room-runtime:$version"
+                val ktx = "androidx.room:room-ktx:$version"
+                val compiler = "androidx.room:room-compiler:$version"
+            }
         }
 
         object media3 {

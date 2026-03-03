@@ -1,8 +1,10 @@
 package com.lukeneedham.videodiary.di
 
 import android.net.Uri
+import androidx.room.Room
 import com.lukeneedham.videodiary.data.android.PermissionChecker
 import com.lukeneedham.videodiary.data.mapper.VideoFileNameMapper
+import com.lukeneedham.videodiary.data.persistence.AppDatabase
 import com.lukeneedham.videodiary.data.persistence.SettingsDao
 import com.lukeneedham.videodiary.data.persistence.VideoExportDao
 import com.lukeneedham.videodiary.data.persistence.VideosDao
@@ -171,8 +173,22 @@ object KoinModule {
 
     private fun getPersistence() = module {
         single {
+            Room.databaseBuilder(
+                androidContext(),
+                AppDatabase::class.java,
+                "video_diary_db"
+            ).fallbackToDestructiveMigration().build()
+        }
+
+        single {
+            val database: AppDatabase = get()
+            database.savedExportDao()
+        }
+
+        single {
             SavedExportsDao(
                 context = androidContext(),
+                roomDao = get(),
             )
         }
         /*
