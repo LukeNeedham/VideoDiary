@@ -8,6 +8,7 @@ fun CalendarPage(
     viewModel: CalendarViewModel,
     onRecordTodayVideoClick: () -> Unit,
     exportFullVideo: () -> Unit,
+    goToSavedVideos: () -> Unit,
     share: (ShareRequest) -> Unit,
 ) {
     CalendarPageContent(
@@ -19,6 +20,7 @@ fun CalendarPage(
         goToDate = viewModel::goToDate,
         setCurrentDayIndex = viewModel::setCurrentDay,
         exportFullVideo = exportFullVideo,
+        goToSavedVideos = goToSavedVideos,
         share = share,
         videoPlayerController = viewModel.videoPlayerController,
     )

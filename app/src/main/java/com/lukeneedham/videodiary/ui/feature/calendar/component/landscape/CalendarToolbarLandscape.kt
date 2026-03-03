@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -27,6 +28,7 @@ import com.lukeneedham.videodiary.ui.feature.common.toolbar.ToolbarSize
 @Composable
 fun CalendarToolbarLandscape(
     exportFullVideo: () -> Unit,
+    goToSavedVideos: () -> Unit,
 ) {
     Column(
         modifier = Modifier
@@ -61,6 +63,25 @@ fun CalendarToolbarLandscape(
                 color = Color.White,
             )
         }
+        Spacer(modifier = Modifier.height(20.dp))
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable { goToSavedVideos() }
+        ) {
+            Image(
+                painter = painterResource(R.drawable.preview_video),
+                contentDescription = null,
+                colorFilter = ColorFilter.tint(color = Color.White),
+                modifier = Modifier.size(30.dp)
+            )
+            Spacer(modifier = Modifier.width(10.dp))
+            Text(
+                text = "Library",
+                color = Color.White,
+            )
+        }
     }
 }
 
@@ -69,5 +90,6 @@ fun CalendarToolbarLandscape(
 internal fun PreviewToolbarLandscape() {
     CalendarToolbarLandscape(
         exportFullVideo = {},
+        goToSavedVideos = {},
     )
 }

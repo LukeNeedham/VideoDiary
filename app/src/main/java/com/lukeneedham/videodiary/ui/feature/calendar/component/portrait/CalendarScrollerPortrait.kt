@@ -14,6 +14,7 @@ import com.lukeneedham.videodiary.ui.feature.calendar.component.CalendarDaySelec
 @Composable
 fun CalendarScrollerPortrait(
     exportFullVideo: () -> Unit,
+    goToSavedVideos: () -> Unit,
     onPrevious: () -> Unit,
     onNext: () -> Unit,
     openDayPicker: () -> Unit,
@@ -23,6 +24,7 @@ fun CalendarScrollerPortrait(
     Column {
         CalendarToolbarPortrait(
             exportFullVideo = exportFullVideo,
+            goToSavedVideos = goToSavedVideos,
         )
 
         Spacer(modifier = Modifier.height(2.dp))
@@ -47,6 +49,7 @@ fun CalendarScrollerPortrait(
 internal fun PreviewCalendarScrollerPortrait() {
     CalendarScrollerPortrait(
         exportFullVideo = {},
+        goToSavedVideos = {},
         onPrevious = {},
         onNext = {},
         openDayPicker = {},

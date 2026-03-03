@@ -31,5 +31,7 @@ fun ExportDiaryCreatePage(
         onEndDateSelected = { viewModel.exportEndDate = it },
         exportIncludeDateStamp = viewModel.exportIncludeDateStamp,
         setExportIncludeDateStamp = { viewModel.exportIncludeDateStamp = it },
+        exportName = viewModel.exportName,
+        setExportName = { viewModel.exportName = it },
     )
 }

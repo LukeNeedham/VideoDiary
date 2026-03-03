@@ -6,6 +6,7 @@ import com.lukeneedham.videodiary.domain.util.logger.Logger
 import com.lukeneedham.videodiary.ui.feature.calendar.CalendarPage
 import com.lukeneedham.videodiary.ui.feature.exportdiary.create.ExportDiaryCreatePage
 import com.lukeneedham.videodiary.ui.feature.exportdiary.view.ExportDiaryViewPage
+import com.lukeneedham.videodiary.ui.feature.savedvideos.SavedVideosPage
 import com.lukeneedham.videodiary.ui.feature.record.check.CheckVideoPage
 import com.lukeneedham.videodiary.ui.feature.record.film.RecordVideoPage
 import dev.olshevski.navigation.reimagined.NavBackHandler
@@ -51,6 +52,9 @@ fun NormalRouter(
                 },
                 exportFullVideo = {
                     navigate(NormalPage.ExportDiaryCreate)
+                },
+                goToSavedVideos = {
+                    navigate(NormalPage.SavedVideos)
                 },
                 share = share,
             )
@@ -99,6 +103,14 @@ fun NormalRouter(
                 canGoBack = canGoBack,
                 onBack = onBack,
                 exportedVideo = page.exportedVideo,
+            )
+
+            is NormalPage.SavedVideos -> SavedVideosPage(
+                viewModel = koinViewModel(),
+                onBack = onBack,
+                onVideoSelected = {
+                    navigate(NormalPage.ExportDiaryView(it))
+                }
             )
         }
     }

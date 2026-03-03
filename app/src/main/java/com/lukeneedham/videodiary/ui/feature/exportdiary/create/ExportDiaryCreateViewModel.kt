@@ -7,6 +7,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.lukeneedham.videodiary.data.persistence.VideoExportDao
+import com.lukeneedham.videodiary.data.persistence.SavedExportsDao
 import com.lukeneedham.videodiary.data.persistence.export.VideoExportState
 import com.lukeneedham.videodiary.data.repository.CalendarRepository
 import com.lukeneedham.videodiary.domain.model.Day
@@ -24,6 +25,7 @@ import java.time.ZoneId
 class ExportDiaryCreateViewModel(
     private val videoExportDao: VideoExportDao,
     private val calendarRepository: CalendarRepository,
+    private val savedExportsDao: SavedExportsDao,
 ) : ViewModel() {
     private var allDays: List<Day> by mutableStateOf(emptyList())
 
@@ -33,6 +35,8 @@ class ExportDiaryCreateViewModel(
 
     var exportState: ExportState by mutableStateOf(ExportState.Ready)
         private set
+
+    var exportName: String by mutableStateOf("")
 
     var exportStartDate: LocalDate? by mutableStateOf(null)
     var exportEndDate: LocalDate? by mutableStateOf(null)
@@ -124,6 +128,16 @@ class ExportDiaryCreateViewModel(
                             endDate = endDate,
                             dayVideoCount = selectedDays.size,
                         )
+                        val name = exportName
+                        if (name.isNotBlank()) {
+                            savedExportsDao.saveExport(
+                                sourceFile = state.outputFile,
+                                name = name,
+                                startDate = startDate,
+                                endDate = endDate,
+                                dayVideoCount = selectedDays.size,
+                            )
+                        }
                         exportState = ExportState.Ready
                         onExportedMutable.emit(exportedVideo)
                     }

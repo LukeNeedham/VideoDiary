@@ -6,10 +6,12 @@ import com.lukeneedham.videodiary.data.mapper.VideoFileNameMapper
 import com.lukeneedham.videodiary.data.persistence.SettingsDao
 import com.lukeneedham.videodiary.data.persistence.VideoExportDao
 import com.lukeneedham.videodiary.data.persistence.VideosDao
+import com.lukeneedham.videodiary.data.persistence.SavedExportsDao
 import com.lukeneedham.videodiary.data.persistence.export.VideoExporter
 import com.lukeneedham.videodiary.data.repository.CalendarRepository
 import com.lukeneedham.videodiary.data.repository.VideoResolutionRepository
 import com.lukeneedham.videodiary.ui.feature.calendar.CalendarViewModel
+import com.lukeneedham.videodiary.ui.feature.savedvideos.SavedVideosViewModel
 import com.lukeneedham.videodiary.ui.feature.common.datepicker.DiaryDatePickerViewModel
 import com.lukeneedham.videodiary.ui.feature.exportdiary.create.ExportDiaryCreateViewModel
 import com.lukeneedham.videodiary.ui.feature.exportdiary.view.ExportDiaryViewViewModel
@@ -143,6 +145,12 @@ object KoinModule {
             ExportDiaryCreateViewModel(
                 videoExportDao = get(),
                 calendarRepository = get(),
+                savedExportsDao = get(),
+            )
+        }
+        viewModel {
+            SavedVideosViewModel(
+                savedExportsDao = get(),
             )
         }
         viewModel {
@@ -162,6 +170,11 @@ object KoinModule {
     }
 
     private fun getPersistence() = module {
+        single {
+            SavedExportsDao(
+                context = androidContext(),
+            )
+        }
         /*
         Daos based on Prefs data store need to be singletons,
         since only 1 DataStore can be active at a time for each underlying file.

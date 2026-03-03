@@ -24,6 +24,7 @@ import com.lukeneedham.videodiary.ui.feature.common.toolbar.ToolbarSize
 @Composable
 fun CalendarToolbarPortrait(
     exportFullVideo: () -> Unit,
+    goToSavedVideos: () -> Unit,
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -49,6 +50,17 @@ fun CalendarToolbarPortrait(
                 }
                 .padding(10.dp)
         )
+        Image(
+            painter = painterResource(R.drawable.preview_video),
+            contentDescription = "Saved videos",
+            colorFilter = ColorFilter.tint(color = Color.White),
+            modifier = Modifier
+                .size(50.dp)
+                .clickable {
+                    goToSavedVideos()
+                }
+                .padding(10.dp)
+        )
     }
 }
 
@@ -57,5 +69,6 @@ fun CalendarToolbarPortrait(
 internal fun PreviewToolbarPortrait() {
     CalendarToolbarPortrait(
         exportFullVideo = {},
+        goToSavedVideos = {},
     )
 }

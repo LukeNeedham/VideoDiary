@@ -15,6 +15,8 @@ import androidx.compose.material.Checkbox
 import androidx.compose.material.CheckboxDefaults
 import androidx.compose.material.LinearProgressIndicator
 import androidx.compose.material.Text
+import androidx.compose.material.TextField
+import androidx.compose.material.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -45,6 +47,8 @@ fun ExportDiaryCreatePageReady(
     onEndDateSelected: (LocalDate?) -> Unit,
     exportIncludeDateStamp: Boolean,
     setExportIncludeDateStamp: (Boolean) -> Unit,
+    exportName: String,
+    setExportName: (String) -> Unit,
     export: () -> Unit,
 ) {
     var showStartDatePicker by remember { mutableStateOf(false) }
@@ -127,6 +131,38 @@ fun ExportDiaryCreatePageReady(
                                     checkedColor = Color.Black,
                                     uncheckedColor = Color.Black,
                                     checkmarkColor = Color.White,
+                                )
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.height(30.dp))
+
+                        Column(
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text(
+                                text = "Export name (optional)",
+                                color = Color.Black,
+                                fontSize = Typography.Size.small,
+                            )
+                            Text(
+                                text = "Give your export a name to save it to your library",
+                                color = Color.Black,
+                                fontSize = Typography.Size.extraSmall,
+                            )
+                            Spacer(modifier = Modifier.height(5.dp))
+                            TextField(
+                                value = exportName,
+                                onValueChange = setExportName,
+                                modifier = Modifier.fillMaxWidth(),
+                                placeholder = {
+                                    Text("My Video Diary")
+                                },
+                                colors = TextFieldDefaults.textFieldColors(
+                                    backgroundColor = Color.Transparent,
+                                    focusedIndicatorColor = Color.Black,
+                                    unfocusedIndicatorColor = Color.Gray,
+                                    cursorColor = Color.Black,
                                 )
                             )
                         }
@@ -226,6 +262,8 @@ internal fun PreviewExportDiaryCreatePageReady() {
         onEndDateSelected = {},
         exportIncludeDateStamp = true,
         setExportIncludeDateStamp = {},
+        exportName = "",
+        setExportName = {},
         export = {},
     )
 }

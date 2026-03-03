@@ -30,6 +30,7 @@ fun CalendarScroller(
     onDeleteTodayVideoClick: () -> Unit,
     openDayPicker: () -> Unit,
     exportFullVideo: () -> Unit,
+    goToSavedVideos: () -> Unit,
     setCurrentDayIndex: (Int) -> Unit,
     share: (ShareRequest) -> Unit,
     videoPlayerController: VideoPlayerController,
@@ -74,6 +75,7 @@ fun CalendarScroller(
         if (isPortrait) {
             CalendarScrollerPortrait(
                 exportFullVideo = exportFullVideo,
+                goToSavedVideos = goToSavedVideos,
                 onPrevious = onPrevious,
                 onNext = onNext,
                 openDayPicker = openDayPicker,
@@ -93,6 +95,7 @@ fun CalendarScroller(
         } else {
             CalendarScrollerLandscape(
                 exportFullVideo = exportFullVideo,
+                goToSavedVideos = goToSavedVideos,
                 onPrevious = onPrevious,
                 onNext = onNext,
                 openDayPicker = openDayPicker,
@@ -124,6 +127,7 @@ internal fun PreviewCalendarScroller() {
         openDayPicker = {},
         setCurrentDayIndex = {},
         exportFullVideo = {},
+        goToSavedVideos = {},
         currentDayIndex = 0,
         share = {},
         videoPlayerController = rememberVideoPlayerController(),

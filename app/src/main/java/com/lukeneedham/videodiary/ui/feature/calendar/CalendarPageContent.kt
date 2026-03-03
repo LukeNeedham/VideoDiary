@@ -35,6 +35,7 @@ fun CalendarPageContent(
     goToDate: (date: LocalDate) -> Unit,
     setCurrentDayIndex: (Int) -> Unit,
     exportFullVideo: () -> Unit,
+    goToSavedVideos: () -> Unit,
     share: (ShareRequest) -> Unit,
     videoPlayerController: VideoPlayerController,
 ) {
@@ -62,6 +63,7 @@ fun CalendarPageContent(
                 currentDayIndex = currentDayIndex,
                 setCurrentDayIndex = setCurrentDayIndex,
                 exportFullVideo = exportFullVideo,
+                goToSavedVideos = goToSavedVideos,
                 share = share,
                 videoPlayerController = videoPlayerController,
             )
@@ -115,6 +117,7 @@ private fun Preview(
             goToDate = {},
             setCurrentDayIndex = {},
             exportFullVideo = {},
+            goToSavedVideos = {},
             share = {},
             videoPlayerController = rememberVideoPlayerController(),
         )
