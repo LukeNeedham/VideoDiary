@@ -42,7 +42,7 @@ fun CalendarScroller(
     videoPlayerController: VideoPlayerController,
 ) {
     val pagerState = rememberPagerState(
-        initialPage = currentDayIndex.coerceIn(days.indices),
+        initialPage = if (days.isNotEmpty()) currentDayIndex.coerceIn(days.indices) else 0,
         pageCount = { days.size },
     )
     val coroutineScope = rememberCoroutineScope()
@@ -81,15 +81,24 @@ fun CalendarScroller(
     val currentDay = days.getOrElse(pagerState.currentPage) { days.last() }
     val currentDateFormatted = currentDay.date.format(StandardDateTimeFormatter.date)
 
-    fun navigateByOffset(offset: Int) {
-        val target = pagerState.currentPage + offset
-        if (target in days.indices) {
-            coroutineScope.launch { pagerState.animateScrollToPage(target) }
+    // pagerState.pageCount mirrors days.size dynamically via the pageCount lambda, so
+    // these callbacks only need pagerState and coroutineScope as stable remember keys.
+    val onPrevious: () -> Unit = remember(pagerState, coroutineScope) {
+        {
+            val target = pagerState.currentPage - 1
+            if (target >= 0) {
+                coroutineScope.launch { pagerState.animateScrollToPage(target) }
+            }
         }
     }
-
-    val onPrevious: () -> Unit = { navigateByOffset(-1) }
-    val onNext: () -> Unit = { navigateByOffset(1) }
+    val onNext: () -> Unit = remember(pagerState, coroutineScope) {
+        {
+            val target = pagerState.currentPage + 1
+            if (target < pagerState.pageCount) {
+                coroutineScope.launch { pagerState.animateScrollToPage(target) }
+            }
+        }
+    }
 
     BoxWithConstraints {
         val width = constraints.maxWidth
