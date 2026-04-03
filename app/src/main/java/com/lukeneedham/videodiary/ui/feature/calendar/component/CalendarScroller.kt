@@ -10,6 +10,7 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -24,6 +25,7 @@ import com.lukeneedham.videodiary.ui.feature.calendar.component.portrait.Calenda
 import com.lukeneedham.videodiary.ui.feature.calendar.component.portrait.CalendarScrollerPortrait
 import com.lukeneedham.videodiary.ui.feature.common.videoplayer.VideoPlayerController
 import com.lukeneedham.videodiary.ui.feature.common.videoplayer.rememberVideoPlayerController
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 
 @Composable
@@ -46,11 +48,18 @@ fun CalendarScroller(
     val coroutineScope = rememberCoroutineScope()
 
     // Notify the ViewModel when the pager settles on a new page.
-    LaunchedEffect(pagerState.currentPage) {
-        setCurrentDayIndex(pagerState.currentPage)
+    // Uses snapshotFlow + distinctUntilChanged so setCurrentDayIndex is only called
+    // when the page actually changes, preventing spurious state updates.
+    LaunchedEffect(pagerState) {
+        snapshotFlow { pagerState.currentPage }
+            .distinctUntilChanged()
+            .collect { page -> setCurrentDayIndex(page) }
     }
 
     // Respond to external navigation (e.g. date picker) by scrolling the pager.
+    // The guard ensures this is a no-op when the change originated from the pager
+    // itself (in which case currentPage already equals currentDayIndex), breaking
+    // any potential cycle between the two sync effects.
     LaunchedEffect(currentDayIndex) {
         if (pagerState.currentPage != currentDayIndex) {
             pagerState.scrollToPage(currentDayIndex)
@@ -66,27 +75,19 @@ fun CalendarScroller(
         }
     }
 
-    val currentDay = days[pagerState.currentPage]
+    // Guard against stale pager state when the days list is updated externally.
+    val currentDay = days.getOrElse(pagerState.currentPage) { days.last() }
     val currentDateFormatted = currentDay.date.format(StandardDateTimeFormatter.date)
 
-    val onPrevious = {
-        coroutineScope.launch {
-            val target = pagerState.currentPage - 1
-            if (target in days.indices) {
-                pagerState.animateScrollToPage(target)
-            }
+    fun navigateByOffset(offset: Int) {
+        val target = pagerState.currentPage + offset
+        if (target in days.indices) {
+            coroutineScope.launch { pagerState.animateScrollToPage(target) }
         }
-        Unit
     }
-    val onNext = {
-        coroutineScope.launch {
-            val target = pagerState.currentPage + 1
-            if (target in days.indices) {
-                pagerState.animateScrollToPage(target)
-            }
-        }
-        Unit
-    }
+
+    val onPrevious: () -> Unit = { navigateByOffset(-1) }
+    val onNext: () -> Unit = { navigateByOffset(1) }
 
     BoxWithConstraints {
         val width = constraints.maxWidth
