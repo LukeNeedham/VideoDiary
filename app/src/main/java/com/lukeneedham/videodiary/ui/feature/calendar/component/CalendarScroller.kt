@@ -83,22 +83,16 @@ fun CalendarScroller(
 
     // pagerState.pageCount mirrors days.size dynamically via the pageCount lambda, so
     // these callbacks only need pagerState and coroutineScope as stable remember keys.
-    val onPrevious: () -> Unit = remember(pagerState, coroutineScope) {
-        {
-            val target = pagerState.currentPage - 1
-            if (target >= 0) {
+    val navigateByOffset: (Int) -> Unit = remember(pagerState, coroutineScope) {
+        { offset ->
+            val target = pagerState.currentPage + offset
+            if (target >= 0 && target < pagerState.pageCount) {
                 coroutineScope.launch { pagerState.animateScrollToPage(target) }
             }
         }
     }
-    val onNext: () -> Unit = remember(pagerState, coroutineScope) {
-        {
-            val target = pagerState.currentPage + 1
-            if (target < pagerState.pageCount) {
-                coroutineScope.launch { pagerState.animateScrollToPage(target) }
-            }
-        }
-    }
+    val onPrevious: () -> Unit = remember(navigateByOffset) { { navigateByOffset(-1) } }
+    val onNext: () -> Unit = remember(navigateByOffset) { { navigateByOffset(1) } }
 
     BoxWithConstraints {
         val width = constraints.maxWidth
