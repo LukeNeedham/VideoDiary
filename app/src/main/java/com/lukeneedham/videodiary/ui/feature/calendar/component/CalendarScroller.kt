@@ -42,7 +42,7 @@ fun CalendarScroller(
     videoPlayerController: VideoPlayerController,
 ) {
     val pagerState = rememberPagerState(
-        initialPage = currentDayIndex,
+        initialPage = currentDayIndex.coerceIn(days.indices),
         pageCount = { days.size },
     )
     val coroutineScope = rememberCoroutineScope()
@@ -76,6 +76,8 @@ fun CalendarScroller(
     }
 
     // Guard against stale pager state when the days list is updated externally.
+    // CalendarPageContent guarantees days is non-empty before CalendarScroller is called,
+    // so the fallback to days.last() is only a safety net against edge cases.
     val currentDay = days.getOrElse(pagerState.currentPage) { days.last() }
     val currentDateFormatted = currentDay.date.format(StandardDateTimeFormatter.date)
 
@@ -107,6 +109,7 @@ fun CalendarScroller(
                     beyondBoundsPageCount = 0,
                     modifier = Modifier.fillMaxSize(),
                 ) { pageIndex ->
+                    val day = days.getOrNull(pageIndex) ?: return@HorizontalPager
                     Box(
                         contentAlignment = Alignment.Center,
                         modifier = Modifier
@@ -114,7 +117,7 @@ fun CalendarScroller(
                             .padding(horizontal = 10.dp),
                     ) {
                         CalendarDayPortrait(
-                            day = days[pageIndex],
+                            day = day,
                             videoAspectRatio = videoAspectRatio,
                             onRecordTodayVideoClick = onRecordTodayVideoClick,
                             onDeleteTodayVideoClick = onDeleteTodayVideoClick,
@@ -137,6 +140,7 @@ fun CalendarScroller(
                     beyondBoundsPageCount = 0,
                     modifier = Modifier.fillMaxSize(),
                 ) { pageIndex ->
+                    val day = days.getOrNull(pageIndex) ?: return@HorizontalPager
                     Box(
                         contentAlignment = Alignment.Center,
                         modifier = Modifier
@@ -144,7 +148,7 @@ fun CalendarScroller(
                             .padding(horizontal = 10.dp),
                     ) {
                         CalendarDayLandscape(
-                            day = days[pageIndex],
+                            day = day,
                             videoAspectRatio = videoAspectRatio,
                             onRecordTodayVideoClick = onRecordTodayVideoClick,
                             onDeleteTodayVideoClick = onDeleteTodayVideoClick,
