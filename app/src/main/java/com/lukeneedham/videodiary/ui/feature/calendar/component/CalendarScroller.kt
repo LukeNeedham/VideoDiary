@@ -2,10 +2,14 @@ package com.lukeneedham.videodiary.ui.feature.calendar.component
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.key
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -20,6 +24,7 @@ import com.lukeneedham.videodiary.ui.feature.calendar.component.portrait.Calenda
 import com.lukeneedham.videodiary.ui.feature.calendar.component.portrait.CalendarScrollerPortrait
 import com.lukeneedham.videodiary.ui.feature.common.videoplayer.VideoPlayerController
 import com.lukeneedham.videodiary.ui.feature.common.videoplayer.rememberVideoPlayerController
+import kotlinx.coroutines.launch
 
 @Composable
 fun CalendarScroller(
@@ -34,36 +39,53 @@ fun CalendarScroller(
     share: (ShareRequest) -> Unit,
     videoPlayerController: VideoPlayerController,
 ) {
-    val currentDay = days[currentDayIndex]
+    val pagerState = rememberPagerState(
+        initialPage = currentDayIndex,
+        pageCount = { days.size },
+    )
+    val coroutineScope = rememberCoroutineScope()
 
-    fun goToPage(index: Int) {
-        if (index !in days.indices) return
-        setCurrentDayIndex(index)
+    // Notify the ViewModel when the pager settles on a new page.
+    LaunchedEffect(pagerState.currentPage) {
+        setCurrentDayIndex(pagerState.currentPage)
     }
 
+    // Respond to external navigation (e.g. date picker) by scrolling the pager.
+    LaunchedEffect(currentDayIndex) {
+        if (pagerState.currentPage != currentDayIndex) {
+            pagerState.scrollToPage(currentDayIndex)
+        }
+    }
+
+    // Pause all videos while the pager is being dragged; resume once it settles.
+    LaunchedEffect(pagerState.isScrollInProgress) {
+        if (pagerState.isScrollInProgress) {
+            videoPlayerController.temporaryPause()
+        } else {
+            videoPlayerController.temporaryResume()
+        }
+    }
+
+    val currentDay = days[pagerState.currentPage]
     val currentDateFormatted = currentDay.date.format(StandardDateTimeFormatter.date)
 
     val onPrevious = {
-        goToPage(currentDayIndex - 1)
-    }
-    val onNext = {
-        goToPage(currentDayIndex + 1)
-    }
-
-    @Composable
-    fun DayContentFrame(
-        content: @Composable () -> Unit
-    ) {
-        key(currentDay) {
-            Box(
-                contentAlignment = Alignment.Center,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 10.dp)
-            ) {
-                content()
+        coroutineScope.launch {
+            val target = pagerState.currentPage - 1
+            if (target in days.indices) {
+                pagerState.animateScrollToPage(target)
             }
         }
+        Unit
+    }
+    val onNext = {
+        coroutineScope.launch {
+            val target = pagerState.currentPage + 1
+            if (target in days.indices) {
+                pagerState.animateScrollToPage(target)
+            }
+        }
+        Unit
     }
 
     BoxWithConstraints {
@@ -79,15 +101,26 @@ fun CalendarScroller(
                 openDayPicker = openDayPicker,
                 currentDateFormatted = currentDateFormatted,
             ) {
-                DayContentFrame {
-                    CalendarDayPortrait(
-                        day = currentDay,
-                        videoAspectRatio = videoAspectRatio,
-                        onRecordTodayVideoClick = onRecordTodayVideoClick,
-                        onDeleteTodayVideoClick = onDeleteTodayVideoClick,
-                        videoPlayerController = videoPlayerController,
-                        share = share,
-                    )
+                HorizontalPager(
+                    state = pagerState,
+                    beyondBoundsPageCount = 0,
+                    modifier = Modifier.fillMaxSize(),
+                ) { pageIndex ->
+                    Box(
+                        contentAlignment = Alignment.Center,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 10.dp),
+                    ) {
+                        CalendarDayPortrait(
+                            day = days[pageIndex],
+                            videoAspectRatio = videoAspectRatio,
+                            onRecordTodayVideoClick = onRecordTodayVideoClick,
+                            onDeleteTodayVideoClick = onDeleteTodayVideoClick,
+                            videoPlayerController = videoPlayerController,
+                            share = share,
+                        )
+                    }
                 }
             }
         } else {
@@ -98,15 +131,26 @@ fun CalendarScroller(
                 openDayPicker = openDayPicker,
                 currentDateFormatted = currentDateFormatted,
             ) {
-                DayContentFrame {
-                    CalendarDayLandscape(
-                        day = currentDay,
-                        videoAspectRatio = videoAspectRatio,
-                        onRecordTodayVideoClick = onRecordTodayVideoClick,
-                        onDeleteTodayVideoClick = onDeleteTodayVideoClick,
-                        videoPlayerController = videoPlayerController,
-                        share = share,
-                    )
+                HorizontalPager(
+                    state = pagerState,
+                    beyondBoundsPageCount = 0,
+                    modifier = Modifier.fillMaxSize(),
+                ) { pageIndex ->
+                    Box(
+                        contentAlignment = Alignment.Center,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 10.dp),
+                    ) {
+                        CalendarDayLandscape(
+                            day = days[pageIndex],
+                            videoAspectRatio = videoAspectRatio,
+                            onRecordTodayVideoClick = onRecordTodayVideoClick,
+                            onDeleteTodayVideoClick = onDeleteTodayVideoClick,
+                            videoPlayerController = videoPlayerController,
+                            share = share,
+                        )
+                    }
                 }
             }
         }
