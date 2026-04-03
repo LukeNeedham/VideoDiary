@@ -41,8 +41,11 @@ fun CalendarScroller(
     share: (ShareRequest) -> Unit,
     videoPlayerController: VideoPlayerController,
 ) {
+    // CalendarPageContent ensures days is always non-empty before reaching this composable.
+    require(days.isNotEmpty()) { "CalendarScroller requires a non-empty days list" }
+
     val pagerState = rememberPagerState(
-        initialPage = if (days.isNotEmpty()) currentDayIndex.coerceIn(days.indices) else 0,
+        initialPage = currentDayIndex.coerceIn(days.indices),
         pageCount = { days.size },
     )
     val coroutineScope = rememberCoroutineScope()
@@ -67,17 +70,19 @@ fun CalendarScroller(
     }
 
     // Pause all videos while the pager is being dragged; resume once it settles.
-    LaunchedEffect(pagerState.isScrollInProgress) {
-        if (pagerState.isScrollInProgress) {
-            videoPlayerController.temporaryPause()
-        } else {
-            videoPlayerController.temporaryResume()
-        }
+    // Uses snapshotFlow so this only fires on scroll-state transitions, not on
+    // every recomposition or at initial composition.
+    LaunchedEffect(pagerState, videoPlayerController) {
+        snapshotFlow { pagerState.isScrollInProgress }
+            .distinctUntilChanged()
+            .collect { isScrolling ->
+                if (isScrolling) videoPlayerController.temporaryPause()
+                else videoPlayerController.temporaryResume()
+            }
     }
 
-    // Guard against stale pager state when the days list is updated externally.
-    // CalendarPageContent guarantees days is non-empty before CalendarScroller is called,
-    // so the fallback to days.last() is only a safety net against edge cases.
+    // Safe fallback: pagerState may briefly lag behind after days grows, but days is
+    // guaranteed non-empty (enforced by the require above), so days.last() is safe.
     val currentDay = days.getOrElse(pagerState.currentPage) { days.last() }
     val currentDateFormatted = currentDay.date.format(StandardDateTimeFormatter.date)
 
