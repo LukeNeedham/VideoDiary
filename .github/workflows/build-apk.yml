@@ -10,6 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       pull-requests: write
+      contents: write
 
     steps:
       - name: Checkout code
@@ -37,21 +38,46 @@ jobs:
       - name: Build debug APK
         run: ./gradlew assembleDebug
 
-      - name: Upload APK artifact
-        uses: actions/upload-artifact@v4
+      - name: Upload APK to PR release
+        uses: ncipollo/release-action@v1
         with:
-          name: app-debug-pr-${{ github.event.pull_request.number }}
-          path: app/build/outputs/apk/debug/app-debug.apk
-          retention-days: 7
+          tag: pr-${{ github.event.pull_request.number }}
+          name: PR #${{ github.event.pull_request.number }} Debug APK
+          artifacts: app/build/outputs/apk/debug/app-debug.apk
+          body: Automated debug APK for PR #${{ github.event.pull_request.number }}. Updated on each push.
+          allowUpdates: true
+          removeArtifacts: true
+          prerelease: true
+          token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Post APK link in PR comment
+      - name: Post sticky APK link comment
         uses: actions/github-script@v7
         with:
           script: |
-            const runUrl = `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
-            await github.rest.issues.createComment({
+            const marker = '<!-- apk-download-comment -->';
+            const apkUrl = `https://github.com/${context.repo.owner}/${context.repo.repo}/releases/download/pr-${context.issue.number}/app-debug.apk`;
+            const body = `${marker}\n✅ Debug APK build complete!\n\nDownload APK directly: [app-debug.apk](${apkUrl})`;
+
+            const comments = await github.rest.issues.listComments({
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: `✅ Debug APK build complete!\n\nDownload the APK from the [workflow run artifacts](${runUrl}).`,
             });
+
+            const existing = comments.data.find(c => c.body.includes(marker));
+
+            if (existing) {
+              await github.rest.issues.updateComment({
+                comment_id: existing.id,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body,
+              });
+            }
