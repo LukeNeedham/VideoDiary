@@ -1,5 +1,7 @@
 package com.lukeneedham.videodiary.ui.feature.calendar.component
 
+import androidx.annotation.OptIn
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.fillMaxSize
@@ -29,6 +31,7 @@ import com.lukeneedham.videodiary.ui.feature.common.videoplayer.rememberVideoPla
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun CalendarScroller(
     days: List<Day>,
@@ -171,6 +174,7 @@ fun CalendarScroller(
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Preview
 @Composable
 internal fun PreviewCalendarScroller() {
