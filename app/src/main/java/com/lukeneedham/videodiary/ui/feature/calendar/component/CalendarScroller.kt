@@ -1,6 +1,5 @@
 package com.lukeneedham.videodiary.ui.feature.calendar.component
 
-import androidx.annotation.OptIn
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
