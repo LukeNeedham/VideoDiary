@@ -22,7 +22,10 @@ class MockDataRepository(
             index == 0 || Random.nextBoolean()
         }
 
-        videosDao.fillWithMockVideos(datesWithVideo)
+        val realStartDate = startDate.minusDays(17)
+        val allDatesWithVideo = listOf(realStartDate) + datesWithVideo
+
+        videosDao.fillWithMockVideos(allDatesWithVideo)
     }
 
     companion object {
