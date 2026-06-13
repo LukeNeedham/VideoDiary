@@ -20,6 +20,15 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    signingConfigs {
+        create("debugConfig") {
+            storeFile = file("../debug.keystore")
+            storePassword = "android"
+            keyAlias = "androiddebugkey"
+            keyPassword = "android"
+        }
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = true
@@ -30,6 +39,7 @@ android {
         }
         debug {
             applicationIdSuffix = ".dbg"
+            signingConfig = signingConfigs.getByName("debugConfig")
         }
     }
     compileOptions {
