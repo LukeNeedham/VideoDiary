@@ -17,7 +17,6 @@ import dev.olshevski.navigation.reimagined.popUpTo
 import dev.olshevski.navigation.reimagined.rememberNavController
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
-import java.time.LocalDate
 
 @Composable
 fun NormalRouter(
@@ -47,8 +46,8 @@ fun NormalRouter(
         when (page) {
             is NormalPage.Calendar -> CalendarPage(
                 viewModel = koinViewModel(),
-                onRecordTodayVideoClick = {
-                    navigate(NormalPage.RecordVideo)
+                onRecordVideoClick = { date ->
+                    navigate(NormalPage.RecordVideo(date))
                 },
                 exportFullVideo = {
                     navigate(NormalPage.ExportDiaryCreate)
@@ -64,7 +63,7 @@ fun NormalRouter(
                 onRecordingFinished = { videoContentUri ->
                     navigate(
                         NormalPage.CheckVideo(
-                            date = LocalDate.now(),
+                            date = page.date,
                             videoContentUri = videoContentUri,
                         )
                     )

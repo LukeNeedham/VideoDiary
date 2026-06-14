@@ -20,13 +20,15 @@ import com.lukeneedham.videodiary.ui.feature.common.videoplayer.VideoControlActi
 import com.lukeneedham.videodiary.ui.feature.calendar.component.day.card.CalendarDayCard
 import com.lukeneedham.videodiary.ui.feature.common.videoplayer.VideoPlayerController
 import com.lukeneedham.videodiary.ui.feature.common.videoplayer.rememberVideoPlayerController
+import java.time.LocalDate
 
 @Composable
 fun CalendarDayLandscape(
     day: Day,
     videoAspectRatio: Float,
     videoPlayerController: VideoPlayerController,
-    onRecordTodayVideoClick: () -> Unit,
+    allowRetakeForPastDays: Boolean,
+    onRecordVideoClick: (date: LocalDate) -> Unit,
     onDeleteTodayVideoClick: () -> Unit,
     share: (ShareRequest) -> Unit,
     modifier: Modifier = Modifier
@@ -42,7 +44,7 @@ fun CalendarDayLandscape(
             CalendarDayCard(
                 day = day,
                 videoAspectRatio = videoAspectRatio,
-                onRecordTodayVideoClick = onRecordTodayVideoClick,
+                onRecordVideoClick = onRecordVideoClick,
                 videoPlayerController = videoPlayerController,
                 modifier = Modifier
                     .weight(1f)
@@ -66,7 +68,8 @@ fun CalendarDayLandscape(
 
             CalendarDayActionBarContent(
                 day = day,
-                onRecordTodayVideoClick = onRecordTodayVideoClick,
+                allowRetakeForPastDays = allowRetakeForPastDays,
+                onRecordVideoClick = onRecordVideoClick,
                 onDeleteTodayVideoClick = onDeleteTodayVideoClick,
                 share = share,
                 buttonModifier = Modifier
@@ -81,7 +84,8 @@ fun CalendarDayLandscape(
 internal fun PreviewCalendarDayLandscape() {
     CalendarDayLandscape(
         day = MockDataCalendar.dayWithVideo,
-        onRecordTodayVideoClick = {},
+        allowRetakeForPastDays = false,
+        onRecordVideoClick = {},
         videoAspectRatio = 1f,
         videoPlayerController = rememberVideoPlayerController(),
         onDeleteTodayVideoClick = {},

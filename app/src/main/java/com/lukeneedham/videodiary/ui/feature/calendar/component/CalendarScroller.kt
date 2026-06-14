@@ -20,13 +20,15 @@ import com.lukeneedham.videodiary.ui.feature.calendar.component.portrait.Calenda
 import com.lukeneedham.videodiary.ui.feature.calendar.component.portrait.CalendarScrollerPortrait
 import com.lukeneedham.videodiary.ui.feature.common.videoplayer.VideoPlayerController
 import com.lukeneedham.videodiary.ui.feature.common.videoplayer.rememberVideoPlayerController
+import java.time.LocalDate
 
 @Composable
 fun CalendarScroller(
     days: List<Day>,
     currentDayIndex: Int,
     videoAspectRatio: Float,
-    onRecordTodayVideoClick: () -> Unit,
+    allowRetakeForPastDays: Boolean,
+    onRecordVideoClick: (date: LocalDate) -> Unit,
     onDeleteTodayVideoClick: () -> Unit,
     openDayPicker: () -> Unit,
     exportFullVideo: () -> Unit,
@@ -85,7 +87,8 @@ fun CalendarScroller(
                     CalendarDayPortrait(
                         day = currentDay,
                         videoAspectRatio = videoAspectRatio,
-                        onRecordTodayVideoClick = onRecordTodayVideoClick,
+                        allowRetakeForPastDays = allowRetakeForPastDays,
+                        onRecordVideoClick = onRecordVideoClick,
                         onDeleteTodayVideoClick = onDeleteTodayVideoClick,
                         videoPlayerController = videoPlayerController,
                         share = share,
@@ -105,7 +108,8 @@ fun CalendarScroller(
                     CalendarDayLandscape(
                         day = currentDay,
                         videoAspectRatio = videoAspectRatio,
-                        onRecordTodayVideoClick = onRecordTodayVideoClick,
+                        allowRetakeForPastDays = allowRetakeForPastDays,
+                        onRecordVideoClick = onRecordVideoClick,
                         onDeleteTodayVideoClick = onDeleteTodayVideoClick,
                         videoPlayerController = videoPlayerController,
                         share = share,
@@ -122,7 +126,8 @@ internal fun PreviewCalendarScroller() {
     CalendarScroller(
         days = MockDataCalendar.days,
         videoAspectRatio = 1f,
-        onRecordTodayVideoClick = {},
+        allowRetakeForPastDays = false,
+        onRecordVideoClick = {},
         onDeleteTodayVideoClick = {},
         openDayPicker = {},
         setCurrentDayIndex = {},

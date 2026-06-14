@@ -7,6 +7,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.lukeneedham.videodiary.data.persistence.SettingsDao
 import com.lukeneedham.videodiary.data.persistence.VideosDao
 import com.lukeneedham.videodiary.data.repository.CalendarRepository
 import com.lukeneedham.videodiary.data.repository.VideoResolutionRepository
@@ -19,6 +20,7 @@ class CalendarViewModel(
     private val calendarRepository: CalendarRepository,
     private val videoResolutionRepository: VideoResolutionRepository,
     private val videosDao: VideosDao,
+    private val settingsDao: SettingsDao,
 ) : ViewModel() {
 
     /**
@@ -40,7 +42,15 @@ class CalendarViewModel(
     var currentDayIndex by mutableIntStateOf(0)
         private set
 
+    var allowRetakeForPastDays by mutableStateOf(false)
+        private set
+
     init {
+        viewModelScope.launch {
+            settingsDao.getDebugAllowRetakeForPastDaysFlow().collect { allow ->
+                allowRetakeForPastDays = allow
+            }
+        }
         viewModelScope.launch {
             calendarRepository.allDays.collect { newDays ->
                 val oldDays = days
