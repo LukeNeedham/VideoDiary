@@ -49,12 +49,6 @@ fun NormalRouter(
                 onRecordVideoClick = { date ->
                     navigate(NormalPage.RecordVideo(date))
                 },
-                exportFullVideo = {
-                    navigate(NormalPage.ExportDiaryCreate)
-                },
-                onDebugClick = {
-                    navigate(NormalPage.Debug)
-                },
                 share = share,
             )
 

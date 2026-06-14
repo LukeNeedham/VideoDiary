@@ -1,4 +1,4 @@
-package com.lukeneedham.videodiary.ui.feature.calendar.component.portrait
+package com.lukeneedham.videodiary.ui.feature.calendar.component.day
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -27,7 +27,7 @@ import com.lukeneedham.videodiary.ui.feature.common.videoplayer.rememberVideoPla
 import java.time.LocalDate
 
 @Composable
-fun CalendarDayPortrait(
+fun CalendarDayContent(
     day: Day,
     videoAspectRatio: Float,
     videoPlayerController: VideoPlayerController,
@@ -92,8 +92,8 @@ fun CalendarDayPortrait(
 
 @Preview
 @Composable
-internal fun PreviewCalendarDayPortrait() {
-    CalendarDayPortrait(
+internal fun PreviewCalendarDayContent() {
+    CalendarDayContent(
         day = MockDataCalendar.dayWithVideo,
         allowRetakeForPastDays = false,
         onRecordVideoClick = {},

@@ -35,8 +35,6 @@ fun CalendarPageContent(
     onDeleteTodayVideoClick: () -> Unit,
     goToDate: (date: LocalDate) -> Unit,
     setCurrentDayIndex: (Int) -> Unit,
-    exportFullVideo: () -> Unit,
-    onDebugClick: () -> Unit,
     share: (ShareRequest) -> Unit,
     videoPlayerController: VideoPlayerController,
 ) {
@@ -66,8 +64,7 @@ fun CalendarPageContent(
                 },
                 currentDayIndex = currentDayIndex,
                 setCurrentDayIndex = setCurrentDayIndex,
-                exportFullVideo = exportFullVideo,
-                onDebugClick = onDebugClick,
+                goToToday = { goToDate(LocalDate.now()) },
                 share = share,
                 videoPlayerController = videoPlayerController,
             )
@@ -121,8 +118,6 @@ private fun Preview(
             onDeleteTodayVideoClick = {},
             goToDate = {},
             setCurrentDayIndex = {},
-            exportFullVideo = {},
-            onDebugClick = {},
             share = {},
             videoPlayerController = rememberVideoPlayerController(),
         )

@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
@@ -161,20 +160,6 @@ fun BottomScrim(modifier: Modifier = Modifier) {
             .fillMaxWidth()
             .background(
                 Brush.verticalGradient(
-                    colors = listOf(Color.Transparent, Color.Black.copy(alpha = 0.7f)),
-                )
-            )
-    )
-}
-
-/** Gradient scrim fading to black at the trailing (end) edge, for floating side panels in landscape layouts. */
-@Composable
-fun EndScrim(modifier: Modifier = Modifier) {
-    Box(
-        modifier = modifier
-            .fillMaxHeight()
-            .background(
-                Brush.horizontalGradient(
                     colors = listOf(Color.Transparent, Color.Black.copy(alpha = 0.7f)),
                 )
             )

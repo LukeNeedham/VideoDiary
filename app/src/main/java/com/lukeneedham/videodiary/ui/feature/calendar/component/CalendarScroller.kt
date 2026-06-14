@@ -1,8 +1,12 @@
 package com.lukeneedham.videodiary.ui.feature.calendar.component
 
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.runtime.Composable
@@ -11,15 +15,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import com.lukeneedham.videodiary.domain.model.Day
 import com.lukeneedham.videodiary.domain.model.ShareRequest
 import com.lukeneedham.videodiary.domain.util.date.StandardDateTimeFormatter
 import com.lukeneedham.videodiary.ui.feature.calendar.MockDataCalendar
-import com.lukeneedham.videodiary.ui.feature.calendar.component.landscape.CalendarDayLandscape
-import com.lukeneedham.videodiary.ui.feature.calendar.component.landscape.CalendarScrollerLandscape
-import com.lukeneedham.videodiary.ui.feature.calendar.component.portrait.CalendarDayPortrait
-import com.lukeneedham.videodiary.ui.feature.calendar.component.portrait.CalendarScrollerPortrait
+import com.lukeneedham.videodiary.ui.feature.calendar.component.day.CalendarDayContent
 import com.lukeneedham.videodiary.ui.feature.common.videoplayer.VideoPlayerController
 import com.lukeneedham.videodiary.ui.feature.common.videoplayer.rememberVideoPlayerController
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -36,8 +38,7 @@ fun CalendarScroller(
     onRecordVideoClick: (date: LocalDate) -> Unit,
     onDeleteTodayVideoClick: () -> Unit,
     openDayPicker: () -> Unit,
-    exportFullVideo: () -> Unit,
-    onDebugClick: () -> Unit,
+    goToToday: () -> Unit,
     setCurrentDayIndex: (Int) -> Unit,
     share: (ShareRequest) -> Unit,
     videoPlayerController: VideoPlayerController,
@@ -100,63 +101,39 @@ fun CalendarScroller(
     val onPrevious: () -> Unit = remember(navigateByOffset) { { navigateByOffset(-1) } }
     val onNext: () -> Unit = remember(navigateByOffset) { { navigateByOffset(1) } }
 
-    BoxWithConstraints {
-        val width = constraints.maxWidth
-        val height = constraints.maxHeight
-        val isPortrait = height > width
+    Column(modifier = Modifier.fillMaxSize()) {
+        Box(
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxWidth()
+                .background(Color.Black)
+        ) {
+            CalendarTopBar(
+                currentDateFormatted = currentDateFormatted,
+                onPrevious = onPrevious,
+                onNext = onNext,
+                openDayPicker = openDayPicker,
+                goToToday = goToToday,
+            )
+        }
 
-        if (isPortrait) {
-            CalendarScrollerPortrait(
-                exportFullVideo = exportFullVideo,
-                onDebugClick = onDebugClick,
-                onPrevious = onPrevious,
-                onNext = onNext,
-                openDayPicker = openDayPicker,
-                currentDateFormatted = currentDateFormatted,
-            ) {
-                HorizontalPager(
-                    state = pagerState,
-                    beyondBoundsPageCount = 0,
-                    modifier = Modifier.fillMaxSize(),
-                ) { pageIndex ->
-                    val day = days.getOrNull(pageIndex) ?: return@HorizontalPager
-                    CalendarDayPortrait(
-                        day = day,
-                        videoAspectRatio = videoAspectRatio,
-                        allowRetakeForPastDays = allowRetakeForPastDays,
-                        onRecordVideoClick = onRecordVideoClick,
-                        onDeleteTodayVideoClick = onDeleteTodayVideoClick,
-                        videoPlayerController = videoPlayerController,
-                        share = share,
-                    )
-                }
-            }
-        } else {
-            CalendarScrollerLandscape(
-                exportFullVideo = exportFullVideo,
-                onDebugClick = onDebugClick,
-                onPrevious = onPrevious,
-                onNext = onNext,
-                openDayPicker = openDayPicker,
-                currentDateFormatted = currentDateFormatted,
-            ) {
-                HorizontalPager(
-                    state = pagerState,
-                    beyondBoundsPageCount = 0,
-                    modifier = Modifier.fillMaxSize(),
-                ) { pageIndex ->
-                    val day = days.getOrNull(pageIndex) ?: return@HorizontalPager
-                    CalendarDayLandscape(
-                        day = day,
-                        videoAspectRatio = videoAspectRatio,
-                        allowRetakeForPastDays = allowRetakeForPastDays,
-                        onRecordVideoClick = onRecordVideoClick,
-                        onDeleteTodayVideoClick = onDeleteTodayVideoClick,
-                        videoPlayerController = videoPlayerController,
-                        share = share,
-                    )
-                }
-            }
+        HorizontalPager(
+            state = pagerState,
+            beyondBoundsPageCount = 0,
+            modifier = Modifier
+                .fillMaxWidth()
+                .aspectRatio(videoAspectRatio),
+        ) { pageIndex ->
+            val day = days.getOrNull(pageIndex) ?: return@HorizontalPager
+            CalendarDayContent(
+                day = day,
+                videoAspectRatio = videoAspectRatio,
+                allowRetakeForPastDays = allowRetakeForPastDays,
+                onRecordVideoClick = onRecordVideoClick,
+                onDeleteTodayVideoClick = onDeleteTodayVideoClick,
+                videoPlayerController = videoPlayerController,
+                share = share,
+            )
         }
     }
 }
@@ -172,9 +149,8 @@ internal fun PreviewCalendarScroller() {
         onRecordVideoClick = {},
         onDeleteTodayVideoClick = {},
         openDayPicker = {},
+        goToToday = {},
         setCurrentDayIndex = {},
-        exportFullVideo = {},
-        onDebugClick = {},
         currentDayIndex = 0,
         share = {},
         videoPlayerController = rememberVideoPlayerController(),
