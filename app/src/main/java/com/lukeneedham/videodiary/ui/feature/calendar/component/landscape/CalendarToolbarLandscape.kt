@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -21,12 +22,14 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.lukeneedham.videodiary.BuildConfig
 import com.lukeneedham.videodiary.R
 import com.lukeneedham.videodiary.ui.feature.common.toolbar.ToolbarSize
 
 @Composable
 fun CalendarToolbarLandscape(
     exportFullVideo: () -> Unit,
+    onDebugClick: () -> Unit,
 ) {
     Column(
         modifier = Modifier
@@ -43,6 +46,27 @@ fun CalendarToolbarLandscape(
             modifier = Modifier.fillMaxWidth()
         )
         Spacer(modifier = Modifier.weight(1f))
+        if (BuildConfig.DEBUG) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { onDebugClick() }
+            ) {
+                Image(
+                    painter = painterResource(R.drawable.bug),
+                    contentDescription = null,
+                    colorFilter = ColorFilter.tint(color = Color.White),
+                    modifier = Modifier.size(30.dp)
+                )
+                Spacer(modifier = Modifier.width(10.dp))
+                Text(
+                    text = "Debug",
+                    color = Color.White,
+                )
+            }
+            Spacer(modifier = Modifier.height(10.dp))
+        }
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
@@ -69,5 +93,6 @@ fun CalendarToolbarLandscape(
 internal fun PreviewToolbarLandscape() {
     CalendarToolbarLandscape(
         exportFullVideo = {},
+        onDebugClick = {},
     )
 }

@@ -57,6 +57,18 @@ class VideosDao(
         }
     }
 
+    /**
+     * Deletes all existing videos and creates empty placeholder video files for [dates].
+     * Used to fill the diary with mock data for debugging.
+     */
+    fun fillWithMockVideos(dates: List<LocalDate>) {
+        videosDir.listFiles()?.forEach { it.delete() }
+        dates.forEach { date ->
+            getVideoFile(date).createNewFile()
+        }
+        refreshVideosState()
+    }
+
     fun getVideoFile(date: LocalDate) = getVideoFile(getVideoFileName(date))
 
     private fun getVideoFile(name: String) = File(videosDir, name)
