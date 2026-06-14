@@ -15,7 +15,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.lukeneedham.videodiary.domain.model.Day
-import com.lukeneedham.videodiary.ui.theme.Purple40
 import com.lukeneedham.videodiary.ui.theme.Typography
 import java.time.format.TextStyle
 import java.util.Locale
@@ -56,7 +55,7 @@ fun DiaryDatePickerDay(
         val isFirstDayOfYear = date.dayOfYear == 1
         Text(
             text = if (isFirstDayOfYear) date.year.toString() else "",
-            color = if (isFirstDayOfYear) Purple40.copy(alpha = alpha) else color,
+            color = color,
             fontWeight = if (isFirstDayOfYear) FontWeight.Bold else FontWeight.Normal,
             fontSize = 9.sp,
         )
