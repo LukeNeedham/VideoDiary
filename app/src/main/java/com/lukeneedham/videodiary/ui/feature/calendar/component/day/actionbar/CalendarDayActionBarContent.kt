@@ -1,14 +1,16 @@
 package com.lukeneedham.videodiary.ui.feature.calendar.component.day.actionbar
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import com.lukeneedham.videodiary.R
 import com.lukeneedham.videodiary.domain.model.Day
 import com.lukeneedham.videodiary.domain.model.ShareRequest
 import com.lukeneedham.videodiary.domain.util.date.StandardDateTimeFormatter
 import com.lukeneedham.videodiary.ui.feature.calendar.MockDataCalendar
-import com.lukeneedham.videodiary.ui.feature.common.glass.GlassButton
+import com.lukeneedham.videodiary.ui.feature.common.glass.GlassIconButton
 import java.time.LocalDate
 
 /** The content of the action bar, which gets splatted into a layout that the parent decides */
@@ -19,7 +21,6 @@ fun CalendarDayActionBarContent(
     onRecordVideoClick: (date: LocalDate) -> Unit,
     onDeleteTodayVideoClick: () -> Unit,
     share: (ShareRequest) -> Unit,
-    buttonModifier: Modifier,
 ) {
     val date = day.date
     val video = day.video
@@ -27,33 +28,37 @@ fun CalendarDayActionBarContent(
 
     @Composable
     fun ActionButton(
-        text: String,
+        iconRes: Int,
+        contentDescription: String,
         onClick: () -> Unit,
     ) {
-        GlassButton(
-            text = text,
+        GlassIconButton(
+            iconRes = iconRes,
+            contentDescription = contentDescription,
             onClick = onClick,
-            modifier = buttonModifier
         )
     }
 
     if (video == null) {
         if (isToday || allowRetakeForPastDays) {
             ActionButton(
-                text = "Record",
+                iconRes = R.drawable.add,
+                contentDescription = "Record",
                 onClick = { onRecordVideoClick(date) },
             )
         }
     } else {
         if (isToday || allowRetakeForPastDays) {
             ActionButton(
-                text = "Retake",
+                iconRes = R.drawable.retake,
+                contentDescription = "Retake",
                 onClick = { onRecordVideoClick(date) },
             )
         }
 
         ActionButton(
-            text = "Share",
+            iconRes = R.drawable.share,
+            contentDescription = "Share",
             onClick = {
                 val dateText = date.format(StandardDateTimeFormatter.date)
                 val text = "Video Diary: $dateText"
@@ -68,7 +73,8 @@ fun CalendarDayActionBarContent(
 
         if (isToday) {
             ActionButton(
-                text = "Delete",
+                iconRes = R.drawable.delete,
+                contentDescription = "Delete",
                 onClick = onDeleteTodayVideoClick,
             )
         }
@@ -78,14 +84,13 @@ fun CalendarDayActionBarContent(
 @Preview
 @Composable
 internal fun PreviewCalendarDayActionBar() {
-    Row {
+    Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
         CalendarDayActionBarContent(
             day = MockDataCalendar.dayWithVideo,
             allowRetakeForPastDays = false,
             onRecordVideoClick = {},
             onDeleteTodayVideoClick = {},
             share = {},
-            buttonModifier = Modifier.weight(1f),
         )
     }
 }

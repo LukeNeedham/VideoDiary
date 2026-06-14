@@ -2,7 +2,6 @@ package com.lukeneedham.videodiary.ui.feature.common.videoplayer
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -19,15 +18,11 @@ fun VideoControlActionBar(
     modifier: Modifier = Modifier,
 ) {
     Row(
-        horizontalArrangement = Arrangement.spacedBy(
-            space = 12.dp,
-            alignment = Alignment.CenterHorizontally
-        ),
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
         verticalAlignment = Alignment.CenterVertically,
         modifier = modifier
             // Fixed height, so bar will always render regardless of whether any buttons render
             .height(52.dp)
-            .fillMaxWidth()
     ) {
         if (hasVideo) {
             // Mute button

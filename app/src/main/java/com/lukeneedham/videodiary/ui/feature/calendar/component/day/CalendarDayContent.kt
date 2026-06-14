@@ -2,9 +2,7 @@ package com.lukeneedham.videodiary.ui.feature.calendar.component.day
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -55,8 +53,9 @@ fun CalendarDayContent(
                 .height(190.dp)
         )
 
-        Column(
-            verticalArrangement = Arrangement.spacedBy(10.dp),
+        Row(
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.Bottom,
             modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .fillMaxWidth()
@@ -70,10 +69,6 @@ fun CalendarDayContent(
 
             Row(
                 horizontalArrangement = Arrangement.spacedBy(10.dp),
-                modifier = Modifier
-                    // Fixed height, so bar will always render regardless of whether any buttons render
-                    .height(56.dp)
-                    .fillMaxWidth()
             ) {
                 CalendarDayActionBarContent(
                     day = day,
@@ -81,9 +76,6 @@ fun CalendarDayContent(
                     onRecordVideoClick = onRecordVideoClick,
                     onDeleteTodayVideoClick = onDeleteTodayVideoClick,
                     share = share,
-                    buttonModifier = Modifier
-                        .fillMaxHeight()
-                        .weight(1f)
                 )
             }
         }
