@@ -10,7 +10,7 @@ import java.time.LocalDate
 @Parcelize
 sealed class NormalPage : Parcelable {
     data object Calendar : NormalPage()
-    data object RecordVideo : NormalPage()
+    data class RecordVideo(val date: LocalDate) : NormalPage()
     data class CheckVideo(
         val date: LocalDate,
         val videoContentUri: Uri,

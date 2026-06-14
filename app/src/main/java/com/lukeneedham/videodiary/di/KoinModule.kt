@@ -144,6 +144,7 @@ object KoinModule {
                 calendarRepository = get(),
                 videoResolutionRepository = get(),
                 videosDao = get(),
+                settingsDao = get(),
             )
         }
         viewModel {
@@ -160,6 +161,7 @@ object KoinModule {
         viewModel {
             DebugViewModel(
                 mockDataRepository = get(),
+                settingsDao = get(),
             )
         }
     }

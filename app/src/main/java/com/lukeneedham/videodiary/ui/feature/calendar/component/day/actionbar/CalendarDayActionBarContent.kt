@@ -9,12 +9,14 @@ import com.lukeneedham.videodiary.domain.model.ShareRequest
 import com.lukeneedham.videodiary.domain.util.date.StandardDateTimeFormatter
 import com.lukeneedham.videodiary.ui.feature.calendar.MockDataCalendar
 import com.lukeneedham.videodiary.ui.feature.common.Button
+import java.time.LocalDate
 
 /** The content of the action bar, which gets splatted into a layout that the parent decides */
 @Composable
 fun CalendarDayActionBarContent(
     day: Day,
-    onRecordTodayVideoClick: () -> Unit,
+    allowRetakeForPastDays: Boolean,
+    onRecordVideoClick: (date: LocalDate) -> Unit,
     onDeleteTodayVideoClick: () -> Unit,
     share: (ShareRequest) -> Unit,
     buttonModifier: Modifier,
@@ -39,14 +41,14 @@ fun CalendarDayActionBarContent(
         if (isToday) {
             ActionButton(
                 text = "Record",
-                onClick = onRecordTodayVideoClick,
+                onClick = { onRecordVideoClick(date) },
             )
         }
     } else {
-        if (isToday) {
+        if (isToday || allowRetakeForPastDays) {
             ActionButton(
                 text = "Retake",
-                onClick = onRecordTodayVideoClick,
+                onClick = { onRecordVideoClick(date) },
             )
         }
 
@@ -79,7 +81,8 @@ internal fun PreviewCalendarDayActionBar() {
     Row {
         CalendarDayActionBarContent(
             day = MockDataCalendar.dayWithVideo,
-            onRecordTodayVideoClick = {},
+            allowRetakeForPastDays = false,
+            onRecordVideoClick = {},
             onDeleteTodayVideoClick = {},
             share = {},
             buttonModifier = Modifier.weight(1f),

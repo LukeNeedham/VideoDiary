@@ -30,7 +30,8 @@ fun CalendarPageContent(
     days: List<Day>,
     videoAspectRatio: Float?,
     currentDayIndex: Int,
-    onRecordTodayVideoClick: () -> Unit,
+    allowRetakeForPastDays: Boolean,
+    onRecordVideoClick: (date: LocalDate) -> Unit,
     onDeleteTodayVideoClick: () -> Unit,
     goToDate: (date: LocalDate) -> Unit,
     setCurrentDayIndex: (Int) -> Unit,
@@ -55,7 +56,8 @@ fun CalendarPageContent(
             CalendarScroller(
                 days = days,
                 videoAspectRatio = videoAspectRatio,
-                onRecordTodayVideoClick = onRecordTodayVideoClick,
+                allowRetakeForPastDays = allowRetakeForPastDays,
+                onRecordVideoClick = onRecordVideoClick,
                 onDeleteTodayVideoClick = onDeleteClick,
                 openDayPicker = {
                     showDayPickerDialog = true
@@ -112,7 +114,8 @@ private fun Preview(
             days = MockDataCalendar.days,
             videoAspectRatio = MockDataCalendar.videoAspectRatio,
             currentDayIndex = currentDayIndex,
-            onRecordTodayVideoClick = {},
+            allowRetakeForPastDays = false,
+            onRecordVideoClick = {},
             onDeleteTodayVideoClick = {},
             goToDate = {},
             setCurrentDayIndex = {},

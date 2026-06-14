@@ -5,6 +5,7 @@ import android.util.Size
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.MutablePreferences
 import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
@@ -35,6 +36,9 @@ class SettingsDao(
 
     /** The selected duration of each video in seconds */
     private val videoDurationMillisKey = longPreferencesKey("videoDurationMillis")
+
+    /** Debug setting: whether the user is allowed to retake the video for a past day */
+    private val debugAllowRetakeForPastDaysKey = booleanPreferencesKey("debugAllowRetakeForPastDays")
 
     suspend fun setResolution(resolution: Size) {
         val components = listOf(resolution.width, resolution.height)
@@ -94,6 +98,18 @@ class SettingsDao(
     suspend fun getVideoDuration(): Duration? {
         val millis = getPrefs()[videoDurationMillisKey] ?: return null
         return millis.milliseconds
+    }
+
+    suspend fun setDebugAllowRetakeForPastDays(allow: Boolean) {
+        updatePrefs {
+            set(debugAllowRetakeForPastDaysKey, allow)
+        }
+    }
+
+    fun getDebugAllowRetakeForPastDaysFlow(): Flow<Boolean> {
+        return context.dataStore.data.map { prefs ->
+            prefs[debugAllowRetakeForPastDaysKey] ?: false
+        }
     }
 
     private suspend fun getPrefs() = context.dataStore.data.first()
