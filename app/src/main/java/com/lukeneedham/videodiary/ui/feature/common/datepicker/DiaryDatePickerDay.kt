@@ -56,7 +56,7 @@ fun DiaryDatePickerDay(
         Text(
             text = if (isFirstDayOfYear) date.year.toString() else "",
             color = color,
-            fontWeight = if (isFirstDayOfYear) FontWeight.Bold else FontWeight.Normal,
+            fontWeight = FontWeight.Bold,
             fontSize = 9.sp,
         )
         Spacer(modifier = Modifier.height(20.dp))
