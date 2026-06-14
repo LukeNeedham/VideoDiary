@@ -1,5 +1,11 @@
 <resources>
     <string name="app_name">Video Diary</string>
-    <string name="date_picker_collapsed_weeks">…</string>
-    <string name="date_picker_collapsed_weeks_description">Empty weeks collapsed</string>
+    <plurals name="date_picker_collapsed_weeks_count">
+        <item quantity="one">%d week collapsed</item>
+        <item quantity="other">%d weeks collapsed</item>
+    </plurals>
+    <plurals name="date_picker_collapsed_weeks_description">
+        <item quantity="one">%d empty week collapsed</item>
+        <item quantity="other">%d empty weeks collapsed</item>
+    </plurals>
 </resources>
