@@ -2,23 +2,27 @@ package com.lukeneedham.videodiary.ui.feature.calendar
 
 import androidx.compose.runtime.Composable
 import com.lukeneedham.videodiary.domain.model.ShareRequest
+import java.time.LocalDate
 
 @Composable
 fun CalendarPage(
     viewModel: CalendarViewModel,
-    onRecordTodayVideoClick: () -> Unit,
+    onRecordVideoClick: (date: LocalDate) -> Unit,
     exportFullVideo: () -> Unit,
+    onDebugClick: () -> Unit,
     share: (ShareRequest) -> Unit,
 ) {
     CalendarPageContent(
         days = viewModel.days,
         videoAspectRatio = viewModel.videoAspectRatio,
         currentDayIndex = viewModel.currentDayIndex,
-        onRecordTodayVideoClick = onRecordTodayVideoClick,
+        allowRetakeForPastDays = viewModel.allowRetakeForPastDays,
+        onRecordVideoClick = onRecordVideoClick,
         onDeleteTodayVideoClick = viewModel::deleteTodayVideo,
         goToDate = viewModel::goToDate,
         setCurrentDayIndex = viewModel::setCurrentDay,
         exportFullVideo = exportFullVideo,
+        onDebugClick = onDebugClick,
         share = share,
         videoPlayerController = viewModel.videoPlayerController,
     )

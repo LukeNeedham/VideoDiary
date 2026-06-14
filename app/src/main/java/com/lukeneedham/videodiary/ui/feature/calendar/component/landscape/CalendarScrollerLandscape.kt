@@ -15,6 +15,7 @@ import com.lukeneedham.videodiary.ui.feature.calendar.component.CalendarDaySelec
 @Composable
 fun CalendarScrollerLandscape(
     exportFullVideo: () -> Unit,
+    onDebugClick: () -> Unit,
     onPrevious: () -> Unit,
     onNext: () -> Unit,
     openDayPicker: () -> Unit,
@@ -24,6 +25,7 @@ fun CalendarScrollerLandscape(
     Row {
         CalendarToolbarLandscape(
             exportFullVideo = exportFullVideo,
+            onDebugClick = onDebugClick,
         )
 
         Column {
@@ -50,6 +52,7 @@ fun CalendarScrollerLandscape(
 internal fun PreviewCalendarScrollerLandscape() {
     CalendarScrollerLandscape(
         exportFullVideo = {},
+        onDebugClick = {},
         onPrevious = {},
         onNext = {},
         openDayPicker = {},

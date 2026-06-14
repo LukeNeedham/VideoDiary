@@ -18,12 +18,14 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.lukeneedham.videodiary.BuildConfig
 import com.lukeneedham.videodiary.R
 import com.lukeneedham.videodiary.ui.feature.common.toolbar.ToolbarSize
 
 @Composable
 fun CalendarToolbarPortrait(
     exportFullVideo: () -> Unit,
+    onDebugClick: () -> Unit,
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -38,6 +40,19 @@ fun CalendarToolbarPortrait(
             color = Color.White,
         )
         Spacer(modifier = Modifier.weight(1f))
+        if (BuildConfig.DEBUG) {
+            Image(
+                painter = painterResource(R.drawable.bug),
+                contentDescription = "Debug options",
+                colorFilter = ColorFilter.tint(color = Color.White),
+                modifier = Modifier
+                    .size(50.dp)
+                    .clickable {
+                        onDebugClick()
+                    }
+                    .padding(10.dp)
+            )
+        }
         Image(
             painter = painterResource(R.drawable.movie),
             contentDescription = "Export full video",
@@ -57,5 +72,6 @@ fun CalendarToolbarPortrait(
 internal fun PreviewToolbarPortrait() {
     CalendarToolbarPortrait(
         exportFullVideo = {},
+        onDebugClick = {},
     )
 }

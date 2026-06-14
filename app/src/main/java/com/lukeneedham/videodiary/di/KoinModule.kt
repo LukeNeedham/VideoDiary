@@ -8,9 +8,11 @@ import com.lukeneedham.videodiary.data.persistence.VideoExportDao
 import com.lukeneedham.videodiary.data.persistence.VideosDao
 import com.lukeneedham.videodiary.data.persistence.export.VideoExporter
 import com.lukeneedham.videodiary.data.repository.CalendarRepository
+import com.lukeneedham.videodiary.data.repository.MockDataRepository
 import com.lukeneedham.videodiary.data.repository.VideoResolutionRepository
 import com.lukeneedham.videodiary.ui.feature.calendar.CalendarViewModel
 import com.lukeneedham.videodiary.ui.feature.common.datepicker.DiaryDatePickerViewModel
+import com.lukeneedham.videodiary.ui.feature.debug.DebugViewModel
 import com.lukeneedham.videodiary.ui.feature.exportdiary.create.ExportDiaryCreateViewModel
 import com.lukeneedham.videodiary.ui.feature.exportdiary.view.ExportDiaryViewViewModel
 import com.lukeneedham.videodiary.ui.feature.permissions.RequestPermissionsViewModel
@@ -87,6 +89,11 @@ object KoinModule {
                 settingsDao = get(),
             )
         }
+        factory {
+            MockDataRepository(
+                videosDao = get(),
+            )
+        }
     }
 
     private fun getViewModel() = module {
@@ -137,6 +144,7 @@ object KoinModule {
                 calendarRepository = get(),
                 videoResolutionRepository = get(),
                 videosDao = get(),
+                settingsDao = get(),
             )
         }
         viewModel {
@@ -148,6 +156,12 @@ object KoinModule {
         viewModel {
             ExportDiaryViewViewModel(
                 videoResolutionRepository = get(),
+            )
+        }
+        viewModel {
+            DebugViewModel(
+                mockDataRepository = get(),
+                settingsDao = get(),
             )
         }
     }

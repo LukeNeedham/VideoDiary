@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import com.lukeneedham.videodiary.domain.model.ShareRequest
 import com.lukeneedham.videodiary.domain.util.logger.Logger
 import com.lukeneedham.videodiary.ui.feature.calendar.CalendarPage
+import com.lukeneedham.videodiary.ui.feature.debug.DebugPage
 import com.lukeneedham.videodiary.ui.feature.exportdiary.create.ExportDiaryCreatePage
 import com.lukeneedham.videodiary.ui.feature.exportdiary.view.ExportDiaryViewPage
 import com.lukeneedham.videodiary.ui.feature.record.check.CheckVideoPage
@@ -16,7 +17,6 @@ import dev.olshevski.navigation.reimagined.popUpTo
 import dev.olshevski.navigation.reimagined.rememberNavController
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
-import java.time.LocalDate
 
 @Composable
 fun NormalRouter(
@@ -46,11 +46,14 @@ fun NormalRouter(
         when (page) {
             is NormalPage.Calendar -> CalendarPage(
                 viewModel = koinViewModel(),
-                onRecordTodayVideoClick = {
-                    navigate(NormalPage.RecordVideo)
+                onRecordVideoClick = { date ->
+                    navigate(NormalPage.RecordVideo(date))
                 },
                 exportFullVideo = {
                     navigate(NormalPage.ExportDiaryCreate)
+                },
+                onDebugClick = {
+                    navigate(NormalPage.Debug)
                 },
                 share = share,
             )
@@ -60,7 +63,7 @@ fun NormalRouter(
                 onRecordingFinished = { videoContentUri ->
                     navigate(
                         NormalPage.CheckVideo(
-                            date = LocalDate.now(),
+                            date = page.date,
                             videoContentUri = videoContentUri,
                         )
                     )
@@ -99,6 +102,12 @@ fun NormalRouter(
                 canGoBack = canGoBack,
                 onBack = onBack,
                 exportedVideo = page.exportedVideo,
+            )
+
+            is NormalPage.Debug -> DebugPage(
+                viewModel = koinViewModel(),
+                canGoBack = canGoBack,
+                onBack = onBack,
             )
         }
     }

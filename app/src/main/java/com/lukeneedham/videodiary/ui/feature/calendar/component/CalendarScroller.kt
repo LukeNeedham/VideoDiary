@@ -29,6 +29,7 @@ import com.lukeneedham.videodiary.ui.feature.common.videoplayer.VideoPlayerContr
 import com.lukeneedham.videodiary.ui.feature.common.videoplayer.rememberVideoPlayerController
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
+import java.time.LocalDate
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -36,10 +37,12 @@ fun CalendarScroller(
     days: List<Day>,
     currentDayIndex: Int,
     videoAspectRatio: Float,
-    onRecordTodayVideoClick: () -> Unit,
+    allowRetakeForPastDays: Boolean,
+    onRecordVideoClick: (date: LocalDate) -> Unit,
     onDeleteTodayVideoClick: () -> Unit,
     openDayPicker: () -> Unit,
     exportFullVideo: () -> Unit,
+    onDebugClick: () -> Unit,
     setCurrentDayIndex: (Int) -> Unit,
     share: (ShareRequest) -> Unit,
     videoPlayerController: VideoPlayerController,
@@ -110,6 +113,7 @@ fun CalendarScroller(
         if (isPortrait) {
             CalendarScrollerPortrait(
                 exportFullVideo = exportFullVideo,
+                onDebugClick = onDebugClick,
                 onPrevious = onPrevious,
                 onNext = onNext,
                 openDayPicker = openDayPicker,
@@ -130,7 +134,8 @@ fun CalendarScroller(
                         CalendarDayPortrait(
                             day = day,
                             videoAspectRatio = videoAspectRatio,
-                            onRecordTodayVideoClick = onRecordTodayVideoClick,
+                            allowRetakeForPastDays = allowRetakeForPastDays,
+                            onRecordVideoClick = onRecordVideoClick,
                             onDeleteTodayVideoClick = onDeleteTodayVideoClick,
                             videoPlayerController = videoPlayerController,
                             share = share,
@@ -141,6 +146,7 @@ fun CalendarScroller(
         } else {
             CalendarScrollerLandscape(
                 exportFullVideo = exportFullVideo,
+                onDebugClick = onDebugClick,
                 onPrevious = onPrevious,
                 onNext = onNext,
                 openDayPicker = openDayPicker,
@@ -161,7 +167,8 @@ fun CalendarScroller(
                         CalendarDayLandscape(
                             day = day,
                             videoAspectRatio = videoAspectRatio,
-                            onRecordTodayVideoClick = onRecordTodayVideoClick,
+                            allowRetakeForPastDays = allowRetakeForPastDays,
+                            onRecordVideoClick = onRecordVideoClick,
                             onDeleteTodayVideoClick = onDeleteTodayVideoClick,
                             videoPlayerController = videoPlayerController,
                             share = share,
@@ -180,11 +187,13 @@ internal fun PreviewCalendarScroller() {
     CalendarScroller(
         days = MockDataCalendar.days,
         videoAspectRatio = 1f,
-        onRecordTodayVideoClick = {},
+        allowRetakeForPastDays = false,
+        onRecordVideoClick = {},
         onDeleteTodayVideoClick = {},
         openDayPicker = {},
         setCurrentDayIndex = {},
         exportFullVideo = {},
+        onDebugClick = {},
         currentDayIndex = 0,
         share = {},
         videoPlayerController = rememberVideoPlayerController(),
