@@ -38,7 +38,7 @@ fun CalendarDayActionBarContent(
     }
 
     if (video == null) {
-        if (isToday) {
+        if (isToday || allowRetakeForPastDays) {
             ActionButton(
                 text = "Record",
                 onClick = { onRecordVideoClick(date) },
