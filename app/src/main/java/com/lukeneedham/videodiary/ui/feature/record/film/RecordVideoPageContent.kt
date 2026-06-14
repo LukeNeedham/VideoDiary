@@ -6,9 +6,13 @@ import androidx.camera.video.Quality
 import androidx.camera.video.QualitySelector
 import androidx.camera.video.Recorder
 import androidx.camera.video.VideoCapture
-import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawingPadding
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -17,12 +21,21 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import com.lukeneedham.videodiary.R
 import com.lukeneedham.videodiary.domain.util.logger.Logger
 import com.lukeneedham.videodiary.ui.feature.common.camera.CameraInput
-import com.lukeneedham.videodiary.ui.feature.record.film.component.RecordVideoActionBar
+import com.lukeneedham.videodiary.ui.feature.common.glass.BottomScrim
+import com.lukeneedham.videodiary.ui.feature.common.glass.GlassIconButton
+import com.lukeneedham.videodiary.ui.feature.common.glass.GlassRecordButton
+import com.lukeneedham.videodiary.ui.feature.common.glass.GlassSurface
+import com.lukeneedham.videodiary.ui.feature.common.glass.TopScrim
+import com.lukeneedham.videodiary.ui.theme.Typography
 
 @Composable
 fun RecordVideoPageContent(
@@ -85,7 +98,7 @@ fun RecordVideoPageContent(
         }
     }
 
-    Column(
+    Box(
         modifier = Modifier.fillMaxSize()
     ) {
         CameraInput(
@@ -97,19 +110,67 @@ fun RecordVideoPageContent(
                 }
             },
             canZoom = true,
-            modifier = Modifier
-                .weight(1f)
-                .fillMaxWidth()
+            modifier = Modifier.fillMaxSize()
         )
 
-        RecordVideoActionBar(
-            state = currentState,
-            onRecordClick = {
-                record()
-            },
-            onCloseClick = onBack,
+        TopScrim(
             modifier = Modifier
-                .fillMaxWidth()
+                .align(Alignment.TopCenter)
+                .height(140.dp)
+        )
+
+        BottomScrim(
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .height(180.dp)
+        )
+
+        GlassIconButton(
+            iconRes = R.drawable.close,
+            contentDescription = "Close",
+            onClick = onBack,
+            modifier = Modifier
+                .align(Alignment.TopStart)
+                .safeDrawingPadding()
+                .padding(16.dp)
+        )
+
+        val statusText = when (currentState) {
+            is RecordingState.Failed ->
+                "Error! ${currentState.errorCode} : ${currentState.exception}"
+
+            is RecordingState.Recording -> {
+                val seconds = currentState.duration.inWholeMilliseconds / 1000f
+                "%.1f".format(seconds)
+            }
+
+            is RecordingState.Success -> "Done"
+            RecordingState.Ready -> null
+        }
+        if (statusText != null) {
+            GlassSurface(
+                modifier = Modifier
+                    .align(Alignment.TopCenter)
+                    .safeDrawingPadding()
+                    .padding(top = 16.dp)
+            ) {
+                Text(
+                    text = statusText,
+                    color = Color.White,
+                    fontSize = Typography.Size.big,
+                    modifier = Modifier.padding(horizontal = 24.dp, vertical = 12.dp)
+                )
+            }
+        }
+
+        GlassRecordButton(
+            isRecording = currentState is RecordingState.Recording,
+            enabled = currentState == RecordingState.Ready,
+            onClick = { record() },
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .safeDrawingPadding()
+                .padding(bottom = 32.dp)
         )
     }
 }

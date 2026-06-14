@@ -28,7 +28,7 @@ fun CalendarDayCardPastMissing(
         } else {
             "No video for this day! You missed it!"
         }
-        Text(text = text, color = Color.Black)
+        Text(text = text, color = Color.White)
     }
 }
 

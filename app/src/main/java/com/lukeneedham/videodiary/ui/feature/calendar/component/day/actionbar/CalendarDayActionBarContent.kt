@@ -8,7 +8,7 @@ import com.lukeneedham.videodiary.domain.model.Day
 import com.lukeneedham.videodiary.domain.model.ShareRequest
 import com.lukeneedham.videodiary.domain.util.date.StandardDateTimeFormatter
 import com.lukeneedham.videodiary.ui.feature.calendar.MockDataCalendar
-import com.lukeneedham.videodiary.ui.feature.common.Button
+import com.lukeneedham.videodiary.ui.feature.common.glass.GlassButton
 import java.time.LocalDate
 
 /** The content of the action bar, which gets splatted into a layout that the parent decides */
@@ -30,7 +30,7 @@ fun CalendarDayActionBarContent(
         text: String,
         onClick: () -> Unit,
     ) {
-        Button(
+        GlassButton(
             text = text,
             onClick = onClick,
             modifier = buttonModifier

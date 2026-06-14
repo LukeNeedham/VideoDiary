@@ -1,26 +1,19 @@
 package com.lukeneedham.videodiary.ui.feature.calendar.component.portrait
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.lukeneedham.videodiary.BuildConfig
 import com.lukeneedham.videodiary.R
-import com.lukeneedham.videodiary.ui.feature.common.toolbar.ToolbarSize
+import com.lukeneedham.videodiary.ui.feature.common.glass.GlassIconButton
+import com.lukeneedham.videodiary.ui.theme.Typography
 
 @Composable
 fun CalendarToolbarPortrait(
@@ -29,40 +22,26 @@ fun CalendarToolbarPortrait(
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(ToolbarSize.portraitToolbarHeight)
-            .background(color = Color.Black)
-            .padding(vertical = 5.dp, horizontal = 10.dp)
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        modifier = Modifier.fillMaxWidth()
     ) {
         Text(
             text = "Video Diary",
             color = Color.White,
+            fontSize = Typography.Size.medium,
+            modifier = Modifier.weight(1f)
         )
-        Spacer(modifier = Modifier.weight(1f))
         if (BuildConfig.DEBUG) {
-            Image(
-                painter = painterResource(R.drawable.bug),
+            GlassIconButton(
+                iconRes = R.drawable.bug,
                 contentDescription = "Debug options",
-                colorFilter = ColorFilter.tint(color = Color.White),
-                modifier = Modifier
-                    .size(50.dp)
-                    .clickable {
-                        onDebugClick()
-                    }
-                    .padding(10.dp)
+                onClick = onDebugClick,
             )
         }
-        Image(
-            painter = painterResource(R.drawable.movie),
+        GlassIconButton(
+            iconRes = R.drawable.movie,
             contentDescription = "Export full video",
-            colorFilter = ColorFilter.tint(color = Color.White),
-            modifier = Modifier
-                .size(50.dp)
-                .clickable {
-                    exportFullVideo()
-                }
-                .padding(10.dp)
+            onClick = exportFullVideo,
         )
     }
 }

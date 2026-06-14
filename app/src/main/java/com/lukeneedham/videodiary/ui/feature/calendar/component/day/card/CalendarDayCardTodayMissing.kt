@@ -1,13 +1,11 @@
 package com.lukeneedham.videodiary.ui.feature.calendar.component.day.card
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Text
@@ -20,6 +18,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.lukeneedham.videodiary.R
+import com.lukeneedham.videodiary.ui.feature.common.glass.GlassSurface
 
 @Composable
 fun CalendarDayCardTodayMissing(
@@ -32,18 +31,19 @@ fun CalendarDayCardTodayMissing(
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Text(text = "No video for today yet!", color = Color.Black)
+            Text(text = "No video for today yet!", color = Color.White)
             Spacer(modifier = Modifier.height(20.dp))
-            Box(
-                modifier = Modifier
-                    .background(color = Color.Black, shape = CircleShape)
-                    .padding(10.dp)
+            GlassSurface(
+                shape = CircleShape,
+                modifier = Modifier.size(64.dp),
             ) {
                 Image(
-                    painterResource(R.drawable.add),
+                    painter = painterResource(R.drawable.add),
                     contentDescription = "Record now!",
                     colorFilter = ColorFilter.tint(color = Color.White),
-                    modifier = Modifier.size(30.dp)
+                    modifier = Modifier
+                        .align(Alignment.Center)
+                        .size(32.dp)
                 )
             }
         }
@@ -53,5 +53,10 @@ fun CalendarDayCardTodayMissing(
 @Preview
 @Composable
 internal fun PreviewCalendarDayTodayEmpty() {
-    CalendarDayCardTodayMissing()
+    Box(
+        modifier = Modifier
+            .size(300.dp)
+    ) {
+        CalendarDayCardTodayMissing()
+    }
 }

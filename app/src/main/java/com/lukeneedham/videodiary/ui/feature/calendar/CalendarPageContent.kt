@@ -13,7 +13,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.lukeneedham.videodiary.domain.model.Day
@@ -23,6 +22,7 @@ import com.lukeneedham.videodiary.ui.feature.calendar.component.CalendarScroller
 import com.lukeneedham.videodiary.ui.feature.common.datepicker.DiaryDatePickerDialog
 import com.lukeneedham.videodiary.ui.feature.common.videoplayer.VideoPlayerController
 import com.lukeneedham.videodiary.ui.feature.common.videoplayer.rememberVideoPlayerController
+import com.lukeneedham.videodiary.ui.theme.AppBackground
 import java.time.LocalDate
 
 @Composable
@@ -50,7 +50,9 @@ fun CalendarPageContent(
     }
 
     Box(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier
+            .fillMaxSize()
+            .background(AppBackground)
     ) {
         if (days.isNotEmpty() && videoAspectRatio != null) {
             CalendarScroller(
@@ -108,7 +110,7 @@ private fun Preview(
     currentDayIndex: Int,
 ) {
     Box(
-        modifier = Modifier.background(Color.White)
+        modifier = Modifier.background(AppBackground)
     ) {
         CalendarPageContent(
             days = MockDataCalendar.days,
