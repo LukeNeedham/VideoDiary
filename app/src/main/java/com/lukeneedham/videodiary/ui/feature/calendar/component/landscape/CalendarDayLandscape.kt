@@ -44,6 +44,7 @@ fun CalendarDayLandscape(
             CalendarDayCard(
                 day = day,
                 videoAspectRatio = videoAspectRatio,
+                allowRetakeForPastDays = allowRetakeForPastDays,
                 onRecordVideoClick = onRecordVideoClick,
                 videoPlayerController = videoPlayerController,
                 modifier = Modifier

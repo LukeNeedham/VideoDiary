@@ -17,6 +17,7 @@ fun CalendarDayCard(
     day: Day,
     videoAspectRatio: Float,
     videoPlayerController: VideoPlayerController,
+    allowRetakeForPastDays: Boolean,
     onRecordVideoClick: (date: LocalDate) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -34,7 +35,13 @@ fun CalendarDayCard(
                     }
                 )
             } else {
-                CalendarDayCardPastMissing()
+                CalendarDayCardPastMissing(
+                    onRecordVideoClick = if (allowRetakeForPastDays) {
+                        { onRecordVideoClick(day.date) }
+                    } else {
+                        null
+                    }
+                )
             }
         } else {
             CalendarDayCardVideo(
@@ -52,6 +59,7 @@ internal fun PreviewCalendarDayCard() {
     CalendarDayCard(
         day = MockDataCalendar.dayWithVideo,
         videoAspectRatio = 1f,
+        allowRetakeForPastDays = false,
         onRecordVideoClick = {},
         videoPlayerController = rememberVideoPlayerController(),
     )

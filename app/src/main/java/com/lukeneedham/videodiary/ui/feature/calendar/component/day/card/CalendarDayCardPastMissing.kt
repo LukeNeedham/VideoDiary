@@ -1,5 +1,6 @@
 package com.lukeneedham.videodiary.ui.feature.calendar.component.day.card
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.Text
@@ -10,12 +11,24 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 
 @Composable
-fun CalendarDayCardPastMissing() {
+fun CalendarDayCardPastMissing(
+    onRecordVideoClick: (() -> Unit)? = null,
+) {
+    val modifier = if (onRecordVideoClick != null) {
+        Modifier.clickable(onClick = onRecordVideoClick)
+    } else {
+        Modifier
+    }
     Box(
         contentAlignment = Alignment.Center,
-        modifier = Modifier.fillMaxSize()
+        modifier = modifier.fillMaxSize()
     ) {
-        Text(text = "No video for this day! You missed it!", color = Color.Black)
+        val text = if (onRecordVideoClick != null) {
+            "No video for this day! Tap to record one now."
+        } else {
+            "No video for this day! You missed it!"
+        }
+        Text(text = text, color = Color.Black)
     }
 }
 
@@ -23,4 +36,10 @@ fun CalendarDayCardPastMissing() {
 @Composable
 internal fun PreviewCalendarDayMissing() {
     CalendarDayCardPastMissing()
+}
+
+@Preview
+@Composable
+internal fun PreviewCalendarDayMissingRecordable() {
+    CalendarDayCardPastMissing(onRecordVideoClick = {})
 }
