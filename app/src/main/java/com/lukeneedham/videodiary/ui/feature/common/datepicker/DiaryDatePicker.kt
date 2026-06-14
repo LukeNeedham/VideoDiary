@@ -1,22 +1,30 @@
 package com.lukeneedham.videodiary.ui.feature.common.datepicker
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import com.lukeneedham.videodiary.R
 import com.lukeneedham.videodiary.domain.model.Day
+import com.lukeneedham.videodiary.ui.theme.Typography
 import java.time.DayOfWeek
 import java.time.LocalDate
 
@@ -42,18 +50,18 @@ fun DiaryDatePicker(
 
     val today = LocalDate.now()
     val rows = buildList<WeekRow> {
-        var previousWasCollapsed = false
         weekDays.forEach { week ->
             val isCurrentWeek = week.any { it is Weekday.Value && it.day.date == today }
             val isEmpty = week.none { it is Weekday.Value && it.day.video != null }
             if (!isCurrentWeek && isEmpty) {
-                if (!previousWasCollapsed) {
-                    add(WeekRow.Collapsed)
-                    previousWasCollapsed = true
+                val previous = lastOrNull()
+                if (previous is WeekRow.Collapsed) {
+                    this[lastIndex] = WeekRow.Collapsed(previous.weekCount + 1)
+                } else {
+                    add(WeekRow.Collapsed(weekCount = 1))
                 }
             } else {
                 add(WeekRow.Normal(week))
-                previousWasCollapsed = false
             }
         }
     }
@@ -107,17 +115,46 @@ fun DiaryDatePicker(
                 }
 
                 is WeekRow.Collapsed -> {
-                    val collapsedDescription = stringResource(R.string.date_picker_collapsed_weeks_description)
-                    Box(
-                        contentAlignment = Alignment.Center,
+                    val weekCount = row.weekCount
+                    val collapsedDescription = pluralStringResource(
+                        R.plurals.date_picker_collapsed_weeks_description,
+                        weekCount,
+                        weekCount,
+                    )
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(6.dp, Alignment.CenterHorizontally),
                         modifier = Modifier
                             .fillParentMaxWidth()
+                            .padding(vertical = 6.dp)
                             .semantics { contentDescription = collapsedDescription }
                     ) {
-                        Text(text = stringResource(R.string.date_picker_collapsed_weeks))
+                        CollapsedWeeksEllipsis()
+                        Text(
+                            text = pluralStringResource(
+                                R.plurals.date_picker_collapsed_weeks_count,
+                                weekCount,
+                                weekCount,
+                            ),
+                            color = Color.Black.copy(alpha = 0.4f),
+                            fontSize = Typography.Size.extraSmall,
+                        )
                     }
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun CollapsedWeeksEllipsis() {
+    Row(horizontalArrangement = Arrangement.spacedBy(3.dp)) {
+        repeat(3) {
+            Box(
+                modifier = Modifier
+                    .size(4.dp)
+                    .background(color = Color.Black.copy(alpha = 0.4f), shape = CircleShape)
+            )
         }
     }
 }
@@ -129,7 +166,7 @@ private sealed interface Weekday {
 
 private sealed interface WeekRow {
     data class Normal(val week: List<Weekday>) : WeekRow
-    data object Collapsed : WeekRow
+    data class Collapsed(val weekCount: Int) : WeekRow
 }
 
 @Preview
