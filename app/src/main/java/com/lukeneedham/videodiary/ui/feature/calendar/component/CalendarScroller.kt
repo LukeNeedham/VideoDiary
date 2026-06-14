@@ -114,6 +114,7 @@ fun CalendarScroller(
                 onNext = onNext,
                 openDayPicker = openDayPicker,
                 goToToday = goToToday,
+                isToday = currentDay.isToday,
             )
         }
 
