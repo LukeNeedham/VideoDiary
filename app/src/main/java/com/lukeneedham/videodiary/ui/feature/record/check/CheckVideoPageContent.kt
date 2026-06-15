@@ -32,7 +32,11 @@ fun CheckVideoPageContent(
     onRetakeClick: () -> Unit,
     onAccepted: () -> Unit,
 ) {
-    val videoPlayerController = remember { VideoPlayerController() }
+    val videoPlayerController = remember {
+        VideoPlayerController().apply {
+            playingVideo = video
+        }
+    }
     Box(
         modifier = Modifier
             .fillMaxSize()
