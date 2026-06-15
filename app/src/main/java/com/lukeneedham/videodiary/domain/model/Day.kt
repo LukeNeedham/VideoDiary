@@ -6,8 +6,7 @@ import java.time.LocalDate
 data class Day(
     val date: LocalDate,
     val videoFile: File?,
-    /** todo: use */
-    val thumbnailFile: File?,
+    val thumbnailFile: File? = null,
 ) {
     val today = LocalDate.now()
     val isToday = today == date
