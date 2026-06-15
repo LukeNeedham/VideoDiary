@@ -12,6 +12,13 @@ class VideoPlayerController {
     var playingVideo: Video? by mutableStateOf(null)
 
     /**
+     * Whether the currently playing video has rendered its first frame.
+     * Used to keep showing a thumbnail until the player has something to show,
+     * avoiding a black flash while the player is preparing.
+     */
+    var hasRenderedFirstFrame by mutableStateOf(false)
+
+    /**
      * Pauses the video in a temporary way -
      * as opposed to [isTogglePaused], which is a toggle.
      * This is used for the functionality where a video should be pause only while it is 'held'

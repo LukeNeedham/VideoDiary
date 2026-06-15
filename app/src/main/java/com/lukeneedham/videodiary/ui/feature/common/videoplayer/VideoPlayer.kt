@@ -51,27 +51,37 @@ fun VideoPlayer(
         } else {
             val isCurrent = controller.playingVideo == video
 
+            // Drawn underneath the player. While the player's view is hidden
+            // (before its first frame is rendered), this remains visible -
+            // avoiding a black flash when switching to the player.
+            VideoThumbnail(thumbnailFile)
+
             if (isCurrent) {
                 VideoPlayerExo(
                     video = video,
                     controller = controller,
                 )
-            } else if (thumbnailFile != null) {
-                val thumbnail by produceState<Bitmap?>(initialValue = null, thumbnailFile) {
-                    value = withContext(Dispatchers.IO) {
-                        BitmapFactory.decodeFile(thumbnailFile.absolutePath)
-                    }
-                }
-                thumbnail?.let { bitmap ->
-                    Image(
-                        bitmap = bitmap.asImageBitmap(),
-                        contentDescription = null,
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier.fillMaxSize(),
-                    )
-                }
             }
         }
+    }
+}
+
+@Composable
+private fun VideoThumbnail(thumbnailFile: File?) {
+    if (thumbnailFile == null) return
+
+    val thumbnail by produceState<Bitmap?>(initialValue = null, thumbnailFile) {
+        value = withContext(Dispatchers.IO) {
+            BitmapFactory.decodeFile(thumbnailFile.absolutePath)
+        }
+    }
+    thumbnail?.let { bitmap ->
+        Image(
+            bitmap = bitmap.asImageBitmap(),
+            contentDescription = null,
+            contentScale = ContentScale.Crop,
+            modifier = Modifier.fillMaxSize(),
+        )
     }
 }
 
