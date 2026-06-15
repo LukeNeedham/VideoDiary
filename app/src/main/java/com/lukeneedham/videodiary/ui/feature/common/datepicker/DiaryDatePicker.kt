@@ -4,8 +4,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -86,12 +84,16 @@ fun DiaryDatePicker(
 
     LazyColumn(
         state = state,
+        verticalArrangement = Arrangement.spacedBy(2.dp),
         modifier = modifier
     ) {
         items(rows) { row ->
             when (row) {
                 is WeekRow.Normal -> {
-                    Row(modifier = Modifier.fillParentMaxWidth()) {
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(2.dp),
+                        modifier = Modifier.fillParentMaxWidth()
+                    ) {
                         row.week.forEach { weekday ->
                             Box(
                                 modifier = Modifier
@@ -99,12 +101,7 @@ fun DiaryDatePicker(
                             ) {
                                 when (weekday) {
                                     is Weekday.Empty -> {
-                                        Box(
-                                            modifier = Modifier
-                                                .fillMaxWidth()
-                                                .aspectRatio(videoAspectRatio)
-                                                .background(color = Color.Black)
-                                        )
+                                        // Nothing
                                     }
 
                                     is Weekday.Value -> {
