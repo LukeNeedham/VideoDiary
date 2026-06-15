@@ -91,6 +91,34 @@ class VideosDao(
         return if (file.exists()) file else null
     }
 
+    /**
+     * Generates thumbnails for any persisted videos that don't yet have one.
+     * Intended to be run once on app startup, to backfill videos that were
+     * saved before thumbnail generation was introduced.
+     */
+    fun generateMissingThumbnails() {
+        val videoFiles = videosDir.listFiles() ?: return
+        var generatedAny = false
+        videoFiles.forEach { videoFile ->
+            val date = try {
+                videoFileNameMapper.nameToDate(videoFile.name)
+            } catch (e: Exception) {
+                Logger.warning("Skipping video with unrecognised file name: ${videoFile.name}", e)
+                return@forEach
+            }
+
+            val thumbnailFile = getThumbnailFile(date)
+            if (!thumbnailFile.exists()) {
+                videoThumbnailExtractor.extractFirstFrame(videoFile, thumbnailFile)
+                generatedAny = true
+            }
+        }
+
+        if (generatedAny) {
+            refreshVideosState()
+        }
+    }
+
     private fun getVideoFile(name: String) = File(videosDir, name)
 
     private fun getVideoFileName(date: LocalDate) = videoFileNameMapper.dateToName(date)

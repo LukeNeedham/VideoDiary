@@ -109,6 +109,8 @@ object KoinModule {
             RootViewModel(
                 settingsDao = get(),
                 permissionChecker = get(),
+                videosDao = get(),
+                ioDispatcher = get(KoinQualifier.Dispatcher.io),
             )
         }
         viewModel {
