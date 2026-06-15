@@ -21,6 +21,7 @@ import java.io.File
 @Composable
 fun CalendarDayCardVideo(
     video: File,
+    thumbnailFile: File?,
     videoAspectRatio: Float,
     videoPlayerController: VideoPlayerController,
 ) {
@@ -31,6 +32,7 @@ fun CalendarDayCardVideo(
     ) {
         VideoPlayer(
             video = Video.PersistedFile(video),
+            thumbnailFile = thumbnailFile,
             aspectRatio = videoAspectRatio,
             controller = videoPlayerController,
         )
@@ -42,6 +44,7 @@ fun CalendarDayCardVideo(
 internal fun PreviewCalendarDayCardVideo() {
     CalendarDayCardVideo(
         video = MockDataCalendar.file,
+        thumbnailFile = null,
         videoAspectRatio = 1f,
         videoPlayerController = rememberVideoPlayerController(),
     )

@@ -3,6 +3,7 @@ package com.lukeneedham.videodiary.data.persistence
 import android.content.Context
 import android.net.Uri
 import android.provider.MediaStore
+import com.lukeneedham.videodiary.data.mapper.ThumbnailFileNameMapper
 import com.lukeneedham.videodiary.data.mapper.VideoFileNameMapper
 import com.lukeneedham.videodiary.domain.util.logger.Logger
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -13,12 +14,13 @@ import java.time.LocalDate
 class VideosDao(
     private val context: Context,
     private val videoFileNameMapper: VideoFileNameMapper,
+    private val thumbnailFileNameMapper: ThumbnailFileNameMapper,
+    private val videoThumbnailExtractor: VideoThumbnailExtractor,
 ) {
     private val videosDir = File(context.filesDir, "videos").apply {
         mkdirs()
     }
 
-    // todo: wire this up to store and use thumbnails
     private val thumbnailsDir = File(context.filesDir, "thumbnails").apply {
         mkdirs()
     }
@@ -31,6 +33,7 @@ class VideosDao(
     fun deleteVideo(date: LocalDate) {
         val file = getVideoFile(date)
         file.delete()
+        getThumbnailFile(date).delete()
         refreshVideosState()
     }
 
@@ -52,6 +55,7 @@ class VideosDao(
                 }
 
                 sourceFile.copyTo(destinationFile)
+                videoThumbnailExtractor.extractFirstFrame(destinationFile, getThumbnailFile(date))
                 refreshVideosState()
             } else {
                 Logger.error("Failed to get video path from content URI")
@@ -83,13 +87,44 @@ class VideosDao(
     }
 
     fun getThumbnailFileIfExists(date: LocalDate): File? {
-        // todo: no thumbnails yet - implement with thumbnailsDir
-        return null
+        val file = getThumbnailFile(date)
+        return if (file.exists()) file else null
+    }
+
+    /**
+     * Generates thumbnails for any persisted videos that don't yet have one.
+     * Intended to be run once on app startup, to backfill videos that were
+     * saved before thumbnail generation was introduced.
+     */
+    fun generateMissingThumbnails() {
+        val videoFiles = videosDir.listFiles() ?: return
+        var generatedAny = false
+        videoFiles.forEach { videoFile ->
+            val date = try {
+                videoFileNameMapper.nameToDate(videoFile.name)
+            } catch (e: Exception) {
+                Logger.warning("Skipping video with unrecognised file name: ${videoFile.name}", e)
+                return@forEach
+            }
+
+            val thumbnailFile = getThumbnailFile(date)
+            if (!thumbnailFile.exists()) {
+                videoThumbnailExtractor.extractFirstFrame(videoFile, thumbnailFile)
+                generatedAny = true
+            }
+        }
+
+        if (generatedAny) {
+            refreshVideosState()
+        }
     }
 
     private fun getVideoFile(name: String) = File(videosDir, name)
 
     private fun getVideoFileName(date: LocalDate) = videoFileNameMapper.dateToName(date)
+
+    private fun getThumbnailFile(date: LocalDate) =
+        File(thumbnailsDir, thumbnailFileNameMapper.dateToName(date))
 
     /** Should be invoked whenever the persisted video files change in any way */
     private fun refreshVideosState() {

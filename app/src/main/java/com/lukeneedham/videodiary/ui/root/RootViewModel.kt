@@ -8,12 +8,17 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.lukeneedham.videodiary.data.android.PermissionChecker
 import com.lukeneedham.videodiary.data.persistence.SettingsDao
+import com.lukeneedham.videodiary.data.persistence.VideosDao
 import com.lukeneedham.videodiary.ui.permissions.RequiredPermissions
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class RootViewModel(
     private val settingsDao: SettingsDao,
     private val permissionChecker: PermissionChecker,
+    private val videosDao: VideosDao,
+    private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
     private var isMissingPermissions: Boolean? by mutableStateOf(null)
     private var hasSetupCompleted: Boolean? by mutableStateOf(null)
@@ -51,6 +56,11 @@ class RootViewModel(
                 } else {
                     RootOrientationState.Ready(orientation)
                 }
+            }
+        }
+        viewModelScope.launch {
+            withContext(ioDispatcher) {
+                videosDao.generateMissingThumbnails()
             }
         }
     }

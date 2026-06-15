@@ -2,9 +2,11 @@ package com.lukeneedham.videodiary.di
 
 import android.net.Uri
 import com.lukeneedham.videodiary.data.android.PermissionChecker
+import com.lukeneedham.videodiary.data.mapper.ThumbnailFileNameMapper
 import com.lukeneedham.videodiary.data.mapper.VideoFileNameMapper
 import com.lukeneedham.videodiary.data.persistence.SettingsDao
 import com.lukeneedham.videodiary.data.persistence.VideoExportDao
+import com.lukeneedham.videodiary.data.persistence.VideoThumbnailExtractor
 import com.lukeneedham.videodiary.data.persistence.VideosDao
 import com.lukeneedham.videodiary.data.persistence.export.VideoExporter
 import com.lukeneedham.videodiary.data.repository.CalendarRepository
@@ -55,6 +57,8 @@ object KoinModule {
 
     private fun getData() = module {
         factory { VideoFileNameMapper() }
+        factory { ThumbnailFileNameMapper() }
+        factory { VideoThumbnailExtractor() }
         factory {
             PermissionChecker(
                 context = androidContext(),
@@ -64,6 +68,8 @@ object KoinModule {
             VideosDao(
                 context = androidContext(),
                 videoFileNameMapper = get(),
+                thumbnailFileNameMapper = get(),
+                videoThumbnailExtractor = get(),
             )
         }
         factory {
@@ -103,6 +109,8 @@ object KoinModule {
             RootViewModel(
                 settingsDao = get(),
                 permissionChecker = get(),
+                videosDao = get(),
+                ioDispatcher = get(KoinQualifier.Dispatcher.io),
             )
         }
         viewModel {
