@@ -180,6 +180,7 @@ object KoinModule {
         factory {
             DiaryDatePickerViewModel(
                 calendarRepository = get(),
+                videoResolutionRepository = get(),
                 mainDispatcher = get(KoinQualifier.Dispatcher.main)
             )
         }

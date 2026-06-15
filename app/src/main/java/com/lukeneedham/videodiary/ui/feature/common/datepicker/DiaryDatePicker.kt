@@ -34,6 +34,7 @@ import java.time.LocalDate
 fun DiaryDatePicker(
     initialFocusedDate: LocalDate,
     weeks: List<List<Day>>,
+    videoAspectRatio: Float,
     onDateSelected: (LocalDate) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -101,7 +102,7 @@ fun DiaryDatePicker(
                                         Box(
                                             modifier = Modifier
                                                 .fillMaxWidth()
-                                                .aspectRatio(1f)
+                                                .aspectRatio(videoAspectRatio)
                                                 .background(color = Color.Black)
                                         )
                                     }
@@ -110,6 +111,7 @@ fun DiaryDatePicker(
                                         val day = weekday.day
                                         DiaryDatePickerDay(
                                             day = day,
+                                            videoAspectRatio = videoAspectRatio,
                                             onClick = {
                                                 onDateSelected(day.date)
                                             }
@@ -182,6 +184,7 @@ private fun Preview() {
     DiaryDatePicker(
         initialFocusedDate = MockDataDiaryDatePicker.endDate,
         weeks = MockDataDiaryDatePicker.weeks,
+        videoAspectRatio = MockDataDiaryDatePicker.videoAspectRatio,
         onDateSelected = {},
     )
 }

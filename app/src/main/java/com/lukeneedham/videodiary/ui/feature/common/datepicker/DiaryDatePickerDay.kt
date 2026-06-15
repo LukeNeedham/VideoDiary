@@ -34,6 +34,7 @@ import java.util.Locale
 @Composable
 fun DiaryDatePickerDay(
     day: Day,
+    videoAspectRatio: Float,
     onClick: () -> Unit,
 ) {
     val date = day.date
@@ -41,7 +42,7 @@ fun DiaryDatePickerDay(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .aspectRatio(1f)
+            .aspectRatio(videoAspectRatio)
             .background(Color.Black)
             .clickable { onClick() }
     ) {
@@ -53,29 +54,32 @@ fun DiaryDatePickerDay(
                 .align(Alignment.BottomCenter)
                 .fillMaxWidth()
                 .background(Color.Black.copy(alpha = 0.35f))
-                .padding(vertical = 2.dp)
+                .padding(vertical = 1.dp)
         ) {
             Text(
                 text = date.dayOfMonth.toString(),
                 color = Color.White,
                 fontWeight = FontWeight.Bold,
-                fontSize = 14.sp,
+                fontSize = 10.sp,
             )
-            Text(
-                text = date.month.getDisplayName(
-                    TextStyle.SHORT,
-                    Locale.getDefault()
-                ),
-                color = Color.White,
-                fontSize = 8.sp,
-            )
+            val isFirstDayOfMonth = date.dayOfMonth == 1
+            if (isFirstDayOfMonth) {
+                Text(
+                    text = date.month.getDisplayName(
+                        TextStyle.SHORT,
+                        Locale.getDefault()
+                    ),
+                    color = Color.White,
+                    fontSize = 7.sp,
+                )
+            }
             val isFirstDayOfYear = date.dayOfYear == 1
             if (isFirstDayOfYear) {
                 Text(
                     text = date.year.toString(),
                     color = Color.White,
                     fontWeight = FontWeight.Bold,
-                    fontSize = 7.sp,
+                    fontSize = 6.sp,
                 )
             }
         }
@@ -95,7 +99,7 @@ private fun DayThumbnail(thumbnailFile: File?) {
         Image(
             bitmap = bitmap.asImageBitmap(),
             contentDescription = null,
-            contentScale = ContentScale.Crop,
+            contentScale = ContentScale.Fit,
             modifier = Modifier.fillMaxSize(),
         )
     }
@@ -105,6 +109,8 @@ private fun DayThumbnail(thumbnailFile: File?) {
 @Composable
 internal fun PreviewDiaryDatePickerDay() {
     DiaryDatePickerDay(
-        day = MockDataDiaryDatePicker.day, onClick = {},
+        day = MockDataDiaryDatePicker.day,
+        videoAspectRatio = MockDataDiaryDatePicker.videoAspectRatio,
+        onClick = {},
     )
 }
