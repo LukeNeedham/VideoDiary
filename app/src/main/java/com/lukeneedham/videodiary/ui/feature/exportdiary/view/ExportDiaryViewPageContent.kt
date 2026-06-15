@@ -46,6 +46,7 @@ fun ExportDiaryViewPageContent(
     val controller = remember {
         VideoPlayerController().apply {
             isVolumeOn = true
+            playingVideo = Video.PersistedFile(videoFile)
         }
     }
 
