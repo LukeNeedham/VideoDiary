@@ -1,20 +1,27 @@
 package com.lukeneedham.videodiary.ui.feature.common.videoplayer
 
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.material.Text
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.produceState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.lukeneedham.videodiary.R
 import com.lukeneedham.videodiary.domain.model.Video
-import com.lukeneedham.videodiary.domain.util.logger.Logger
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.io.File
 
 /**
@@ -25,6 +32,7 @@ fun VideoPlayer(
     video: Video,
     aspectRatio: Float,
     controller: VideoPlayerController,
+    thumbnailFile: File? = null,
     modifier: Modifier = Modifier
 ) {
     Box(
@@ -48,12 +56,20 @@ fun VideoPlayer(
                     video = video,
                     controller = controller,
                 )
-            } else {
-                // todo: render the thumbnail for this video,
-                //  which should be the first frame of the video.
-                //  Really this should be saved on disk next to the video,
-                //  so we can load it really quickly.
-                Text(text = "thumbnail", color = Color.White)
+            } else if (thumbnailFile != null) {
+                val thumbnail by produceState<Bitmap?>(initialValue = null, thumbnailFile) {
+                    value = withContext(Dispatchers.IO) {
+                        BitmapFactory.decodeFile(thumbnailFile.absolutePath)
+                    }
+                }
+                thumbnail?.let { bitmap ->
+                    Image(
+                        bitmap = bitmap.asImageBitmap(),
+                        contentDescription = null,
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier.fillMaxSize(),
+                    )
+                }
             }
         }
     }
@@ -64,6 +80,7 @@ fun VideoPlayer(
 internal fun PreviewVideoPlayer() {
     VideoPlayer(
         video = Video.PersistedFile(File("")),
+        thumbnailFile = null,
         aspectRatio = 1f,
         controller = rememberVideoPlayerController(),
     )

@@ -45,6 +45,7 @@ fun CalendarDayCard(
         } else {
             CalendarDayCardVideo(
                 video = video,
+                thumbnailFile = day.thumbnailFile,
                 videoAspectRatio = videoAspectRatio,
                 videoPlayerController = videoPlayerController,
             )
