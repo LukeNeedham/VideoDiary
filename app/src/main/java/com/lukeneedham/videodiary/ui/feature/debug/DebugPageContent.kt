@@ -25,6 +25,7 @@ fun DebugPageContent(
     onFillWithMockDataClick: () -> Unit,
     allowRetakeForPastDays: Boolean,
     onAllowRetakeForPastDaysChange: (Boolean) -> Unit,
+    onResyncThumbnailsClick: () -> Unit,
     canGoBack: Boolean,
     onBack: () -> Unit,
 ) {
@@ -61,6 +62,13 @@ fun DebugPageContent(
                     "for that day to be re-recorded. Normally only today's video can be retaken",
                 checked = allowRetakeForPastDays,
                 onCheckedChange = onAllowRetakeForPastDaysChange,
+            )
+
+            DebugOption(
+                title = "Resync thumbnails",
+                description = "Deletes all generated thumbnails and recalculates them " +
+                    "from the saved videos",
+                onClick = onResyncThumbnailsClick,
             )
         }
     }
@@ -134,6 +142,7 @@ internal fun PreviewDebugPageContent() {
         onFillWithMockDataClick = {},
         allowRetakeForPastDays = false,
         onAllowRetakeForPastDaysChange = {},
+        onResyncThumbnailsClick = {},
         canGoBack = true,
         onBack = {},
     )
