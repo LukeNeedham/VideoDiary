@@ -51,20 +51,16 @@ fun VideoPlayer(
         } else {
             val isCurrent = controller.playingVideo == video
 
+            // Drawn underneath the player. While the player's view is hidden
+            // (before its first frame is rendered), this remains visible -
+            // avoiding a black flash when switching to the player.
+            VideoThumbnail(thumbnailFile)
+
             if (isCurrent) {
                 VideoPlayerExo(
                     video = video,
                     controller = controller,
                 )
-
-                // Keep the thumbnail on top until the player has rendered its first
-                // frame, so the player's surface (briefly black while preparing)
-                // is never shown to the user.
-                if (!controller.hasRenderedFirstFrame) {
-                    VideoThumbnail(thumbnailFile)
-                }
-            } else {
-                VideoThumbnail(thumbnailFile)
             }
         }
     }
