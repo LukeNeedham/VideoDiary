@@ -2,11 +2,9 @@ package com.lukeneedham.videodiary.ui.feature.common.videoplayer
 
 import android.view.TextureView
 import android.view.ViewGroup
-import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.net.toUri
 import androidx.media3.common.MediaItem
@@ -65,12 +63,6 @@ fun VideoPlayerExo(
         player.volume = if (controllerIsVolumeOn) 1f else 0f
     }
 
-    // Crossfade in the video surface rather than swapping it in instantly - the
-    // thumbnail's colours don't exactly match the video's, so an instant swap
-    // produces a visible "pop". Fading between them makes the transition seamless.
-    val targetAlpha = if (controller.hasRenderedFirstFrame) 1f else 0f
-    val animatedAlpha by animateFloatAsState(targetValue = targetAlpha, label = "videoAlpha")
-
     AndroidView(
         factory = {
             val view = TextureView(it)
@@ -93,7 +85,7 @@ fun VideoPlayerExo(
             view
         },
         update = { view ->
-            view.alpha = animatedAlpha
+            view.alpha = if (controller.hasRenderedFirstFrame) 1f else 0f
         },
     )
 }
