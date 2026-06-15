@@ -10,7 +10,6 @@ import com.lukeneedham.videodiary.domain.model.Day
 import com.lukeneedham.videodiary.ui.feature.calendar.MockDataCalendar
 import com.lukeneedham.videodiary.ui.feature.common.videoplayer.VideoPlayerController
 import com.lukeneedham.videodiary.ui.feature.common.videoplayer.rememberVideoPlayerController
-import java.time.LocalDate
 
 @Composable
 fun CalendarDayCard(
@@ -18,7 +17,7 @@ fun CalendarDayCard(
     videoAspectRatio: Float,
     videoPlayerController: VideoPlayerController,
     allowRetakeForPastDays: Boolean,
-    onRecordVideoClick: (date: LocalDate) -> Unit,
+    onRecordVideoClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Box(
@@ -31,13 +30,13 @@ fun CalendarDayCard(
             if (isToday) {
                 CalendarDayCardTodayMissing(
                     modifier = Modifier.clickable {
-                        onRecordVideoClick(day.date)
+                        onRecordVideoClick()
                     }
                 )
             } else {
                 CalendarDayCardPastMissing(
                     onRecordVideoClick = if (allowRetakeForPastDays) {
-                        { onRecordVideoClick(day.date) }
+                        { onRecordVideoClick() }
                     } else {
                         null
                     }

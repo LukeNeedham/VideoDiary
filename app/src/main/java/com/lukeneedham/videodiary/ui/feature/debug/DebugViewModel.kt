@@ -13,7 +13,7 @@ class DebugViewModel(
     private val mockDataRepository: MockDataRepository,
     private val settingsDao: SettingsDao,
 ) : ViewModel() {
-    val allowRetakeForPastDays: StateFlow<Boolean> = settingsDao.getDebugAllowRetakeForPastDaysFlow()
+    val allowRetakeForPastDays: StateFlow<Boolean> = settingsDao.getAllowEditPastDaysFlow()
         .stateIn(viewModelScope, SharingStarted.Eagerly, false)
 
     fun fillWithMockData() {

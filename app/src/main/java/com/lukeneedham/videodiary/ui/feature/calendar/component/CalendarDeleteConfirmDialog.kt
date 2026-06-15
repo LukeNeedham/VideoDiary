@@ -57,7 +57,7 @@ fun CalendarDeleteConfirmDialog(
                 .padding(horizontal = 20.dp)
         ) {
             Spacer(modifier = Modifier.height(20.dp))
-            Text(text = "Delete today's video?")
+            Text(text = "Delete video?")
             Spacer(modifier = Modifier.height(20.dp))
             Row {
                 Spacer(modifier = Modifier.weight(1f))

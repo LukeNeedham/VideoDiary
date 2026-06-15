@@ -9,7 +9,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -30,9 +29,9 @@ fun CalendarPageContent(
     days: List<Day>,
     videoAspectRatio: Float?,
     currentDayIndex: Int,
-    allowRetakeForPastDays: Boolean,
+    allowEditPastDays: Boolean,
     onRecordVideoClick: (date: LocalDate) -> Unit,
-    onDeleteTodayVideoClick: () -> Unit,
+    onDeleteVideoClick: (date: LocalDate) -> Unit,
     goToDate: (date: LocalDate) -> Unit,
     setCurrentDayIndex: (Int) -> Unit,
     share: (ShareRequest) -> Unit,
@@ -41,11 +40,7 @@ fun CalendarPageContent(
     val currentDay = days[currentDayIndex]
 
     var showDayPickerDialog by remember { mutableStateOf(false) }
-    var showDeleteConfirmDialog by rememberSaveable { mutableStateOf(false) }
-
-    val onDeleteClick = {
-        showDeleteConfirmDialog = true
-    }
+    var pendingDateToDelete: LocalDate? by remember { mutableStateOf(null) }
 
     Box(
         modifier = Modifier
@@ -56,9 +51,11 @@ fun CalendarPageContent(
             CalendarScroller(
                 days = days,
                 videoAspectRatio = videoAspectRatio,
-                allowRetakeForPastDays = allowRetakeForPastDays,
+                allowEditPastDays = allowEditPastDays,
                 onRecordVideoClick = onRecordVideoClick,
-                onDeleteTodayVideoClick = onDeleteClick,
+                onDeleteVideoClick = {
+                    pendingDateToDelete = it
+                },
                 openDayPicker = {
                     showDayPickerDialog = true
                 },
@@ -91,12 +88,15 @@ fun CalendarPageContent(
             )
         }
 
-        if (showDeleteConfirmDialog) {
+        val dateToDelete = pendingDateToDelete
+        if (dateToDelete != null) {
             CalendarDeleteConfirmDialog(
                 dismiss = {
-                    showDeleteConfirmDialog = false
+                    pendingDateToDelete = null
                 },
-                onConfirm = onDeleteTodayVideoClick,
+                onConfirm = {
+                    onDeleteVideoClick(dateToDelete)
+                },
             )
         }
     }
@@ -113,9 +113,9 @@ private fun Preview(
             days = MockDataCalendar.days,
             videoAspectRatio = MockDataCalendar.videoAspectRatio,
             currentDayIndex = currentDayIndex,
-            allowRetakeForPastDays = false,
+            allowEditPastDays = false,
             onRecordVideoClick = {},
-            onDeleteTodayVideoClick = {},
+            onDeleteVideoClick = {},
             goToDate = {},
             setCurrentDayIndex = {},
             share = {},

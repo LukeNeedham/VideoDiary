@@ -60,7 +60,7 @@ fun GlassIconButton(
     modifier: Modifier = Modifier,
     tint: Color = Color.White,
     enabled: Boolean = true,
-    size: Dp = 52.dp,
+    size: Dp = 50.dp,
     iconSize: Dp = 24.dp,
 ) {
     GlassSurface(

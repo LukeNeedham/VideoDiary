@@ -42,13 +42,13 @@ class CalendarViewModel(
     var currentDayIndex by mutableIntStateOf(0)
         private set
 
-    var allowRetakeForPastDays by mutableStateOf(false)
+    var allowEditPastDays by mutableStateOf(false)
         private set
 
     init {
         viewModelScope.launch {
-            settingsDao.getDebugAllowRetakeForPastDaysFlow().collect { allow ->
-                allowRetakeForPastDays = allow
+            settingsDao.getAllowEditPastDaysFlow().collect { allow ->
+                allowEditPastDays = allow
             }
         }
         viewModelScope.launch {
@@ -66,9 +66,8 @@ class CalendarViewModel(
         }
     }
 
-    fun deleteTodayVideo() {
-        val today = LocalDate.now()
-        videosDao.deleteVideo(today)
+    fun deleteVideo(date: LocalDate) {
+        videosDao.deleteVideo(date)
     }
 
     fun setCurrentDay(index: Int) {

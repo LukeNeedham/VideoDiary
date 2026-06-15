@@ -34,9 +34,9 @@ fun CalendarScroller(
     days: List<Day>,
     currentDayIndex: Int,
     videoAspectRatio: Float,
-    allowRetakeForPastDays: Boolean,
+    allowEditPastDays: Boolean,
     onRecordVideoClick: (date: LocalDate) -> Unit,
-    onDeleteTodayVideoClick: () -> Unit,
+    onDeleteVideoClick: (date: LocalDate) -> Unit,
     openDayPicker: () -> Unit,
     goToToday: () -> Unit,
     setCurrentDayIndex: (Int) -> Unit,
@@ -126,12 +126,17 @@ fun CalendarScroller(
                 .aspectRatio(videoAspectRatio),
         ) { pageIndex ->
             val day = days.getOrNull(pageIndex) ?: return@HorizontalPager
+            val date = day.date
             CalendarDayContent(
                 day = day,
                 videoAspectRatio = videoAspectRatio,
-                allowRetakeForPastDays = allowRetakeForPastDays,
-                onRecordVideoClick = onRecordVideoClick,
-                onDeleteTodayVideoClick = onDeleteTodayVideoClick,
+                allowEditPastDays = allowEditPastDays,
+                onRecordVideoClick = {
+                    onRecordVideoClick(date)
+                },
+                onDeleteVideoClick = {
+                    onDeleteVideoClick(date)
+                },
                 videoPlayerController = videoPlayerController,
                 share = share,
             )
@@ -146,9 +151,9 @@ internal fun PreviewCalendarScroller() {
     CalendarScroller(
         days = MockDataCalendar.days,
         videoAspectRatio = 1f,
-        allowRetakeForPastDays = false,
+        allowEditPastDays = false,
         onRecordVideoClick = {},
-        onDeleteTodayVideoClick = {},
+        onDeleteVideoClick = {},
         openDayPicker = {},
         goToToday = {},
         setCurrentDayIndex = {},

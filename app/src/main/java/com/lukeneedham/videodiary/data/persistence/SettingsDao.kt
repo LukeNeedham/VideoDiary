@@ -38,7 +38,7 @@ class SettingsDao(
     private val videoDurationMillisKey = longPreferencesKey("videoDurationMillis")
 
     /** Debug setting: whether the user is allowed to retake the video for a past day */
-    private val debugAllowRetakeForPastDaysKey = booleanPreferencesKey("debugAllowRetakeForPastDays")
+    private val allowEditPastDays = booleanPreferencesKey("debugAllowRetakeForPastDays")
 
     suspend fun setResolution(resolution: Size) {
         val components = listOf(resolution.width, resolution.height)
@@ -102,13 +102,13 @@ class SettingsDao(
 
     suspend fun setDebugAllowRetakeForPastDays(allow: Boolean) {
         updatePrefs {
-            set(debugAllowRetakeForPastDaysKey, allow)
+            set(allowEditPastDays, allow)
         }
     }
 
-    fun getDebugAllowRetakeForPastDaysFlow(): Flow<Boolean> {
+    fun getAllowEditPastDaysFlow(): Flow<Boolean> {
         return context.dataStore.data.map { prefs ->
-            prefs[debugAllowRetakeForPastDaysKey] ?: false
+            prefs[allowEditPastDays] ?: false
         }
     }
 
