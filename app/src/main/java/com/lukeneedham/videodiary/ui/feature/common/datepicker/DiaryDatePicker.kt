@@ -52,7 +52,7 @@ fun DiaryDatePicker(
     val rows = buildList<WeekRow> {
         weekDays.forEach { week ->
             val isCurrentWeek = week.any { it is Weekday.Value && it.day.date == today }
-            val isEmpty = week.none { it is Weekday.Value && it.day.video != null }
+            val isEmpty = week.none { it is Weekday.Value && it.day.videoFile != null }
             if (!isCurrentWeek && isEmpty) {
                 val previous = lastOrNull()
                 if (previous is WeekRow.Collapsed) {

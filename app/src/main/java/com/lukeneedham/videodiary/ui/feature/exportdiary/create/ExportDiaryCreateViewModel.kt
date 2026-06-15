@@ -17,9 +17,7 @@ import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
-import java.time.Instant
 import java.time.LocalDate
-import java.time.ZoneId
 
 class ExportDiaryCreateViewModel(
     private val videoExportDao: VideoExportDao,
@@ -28,7 +26,7 @@ class ExportDiaryCreateViewModel(
     private var allDays: List<Day> by mutableStateOf(emptyList())
 
     val totalVideoCount: Int? by derivedStateOf {
-        allDays.count { it.video != null }
+        allDays.count { it.videoFile != null }
     }
 
     var exportState: ExportState by mutableStateOf(ExportState.Ready)
@@ -49,7 +47,7 @@ class ExportDiaryCreateViewModel(
             val date = day.date
             val isSelected = date in startDate..endDate
             if (!isSelected) return@mapNotNull null
-            val video = day.video ?: return@mapNotNull null
+            val video = day.videoFile ?: return@mapNotNull null
             ExportDay(
                 date = day.date,
                 video = video,

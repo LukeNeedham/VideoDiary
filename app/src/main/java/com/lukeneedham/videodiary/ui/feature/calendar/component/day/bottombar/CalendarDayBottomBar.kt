@@ -27,9 +27,9 @@ fun CalendarDayBottomBar(
     share: (ShareRequest) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val hasVideo = day.video != null
+    val hasVideo = day.videoFile != null
     val date = day.date
-    val video = day.video
+    val video = day.videoFile
 
     Row(
         horizontalArrangement = Arrangement.spacedBy(8.dp),

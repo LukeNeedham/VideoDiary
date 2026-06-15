@@ -20,9 +20,9 @@ class CalendarRepository(
 
     private fun getAllDays(startDate: LocalDate): List<Day> {
         return getAllDates(startDate).map { date ->
-            val file = videosDao.getVideoFile(date)
-            val existingFile = if (file.exists()) file else null
-            Day(date, existingFile)
+            val videoFile = videosDao.getVideoFileIfExists(date)
+            val thumbnailFile = videosDao.getThumbnailFileIfExists(date)
+            Day(date = date, videoFile = videoFile, thumbnailFile = thumbnailFile)
         }
     }
 

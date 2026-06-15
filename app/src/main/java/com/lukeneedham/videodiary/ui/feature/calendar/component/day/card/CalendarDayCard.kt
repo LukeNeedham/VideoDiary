@@ -24,7 +24,7 @@ fun CalendarDayCard(
         contentAlignment = Alignment.Center,
         modifier = modifier
     ) {
-        val video = day.video
+        val video = day.videoFile
         val isToday = day.isToday
         if (video == null) {
             if (isToday) {

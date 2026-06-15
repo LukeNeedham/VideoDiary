@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -16,6 +17,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.lukeneedham.videodiary.domain.model.Day
 import com.lukeneedham.videodiary.domain.model.ShareRequest
+import com.lukeneedham.videodiary.domain.util.logger.Logger
 import com.lukeneedham.videodiary.ui.feature.calendar.component.CalendarDeleteConfirmDialog
 import com.lukeneedham.videodiary.ui.feature.calendar.component.CalendarScroller
 import com.lukeneedham.videodiary.ui.feature.common.datepicker.DiaryDatePickerDialog

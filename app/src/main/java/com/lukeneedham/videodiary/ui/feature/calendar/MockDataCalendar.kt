@@ -3,7 +3,6 @@ package com.lukeneedham.videodiary.ui.feature.calendar
 import com.lukeneedham.videodiary.domain.model.Day
 import java.io.File
 import java.time.LocalDate
-import java.time.LocalTime
 
 object MockDataCalendar {
     val startDate = LocalDate.of(2024, 3, 27)
@@ -11,11 +10,11 @@ object MockDataCalendar {
     val file = File("")
     val dayWithVideo = Day(
         date = LocalDate.of(2024, 12, 27),
-        video = file,
+        videoFile = file,
     )
     val dayWithoutVideo = Day(
         date = LocalDate.now(),
-        video = null,
+        videoFile = null,
     )
     val days = listOf(
         dayWithVideo,

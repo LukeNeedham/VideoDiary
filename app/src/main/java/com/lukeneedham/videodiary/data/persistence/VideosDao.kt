@@ -18,7 +18,13 @@ class VideosDao(
         mkdirs()
     }
 
+    // todo: wire this up to store and use thumbnails
+    private val thumbnailsDir = File(context.filesDir, "thumbnails").apply {
+        mkdirs()
+    }
+
     private val allVideosMutable = MutableStateFlow(loadAllVideos())
+
     /** A Flow of all video files in the diary, unordered */
     val allVideos = allVideosMutable.asStateFlow()
 
@@ -70,6 +76,16 @@ class VideosDao(
     }
 
     fun getVideoFile(date: LocalDate) = getVideoFile(getVideoFileName(date))
+
+    fun getVideoFileIfExists(date: LocalDate): File? {
+        val file = getVideoFile(getVideoFileName(date))
+        return if (file.exists()) file else null
+    }
+
+    fun getThumbnailFileIfExists(date: LocalDate): File? {
+        // todo: no thumbnails yet - implement with thumbnailsDir
+        return null
+    }
 
     private fun getVideoFile(name: String) = File(videosDir, name)
 

@@ -15,7 +15,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.lukeneedham.videodiary.domain.model.Day
-import com.lukeneedham.videodiary.ui.theme.Typography
 import java.time.format.TextStyle
 import java.util.Locale
 
@@ -34,7 +33,7 @@ fun DiaryDatePickerDay(
                 onClick()
             }
     ) {
-        val hasVideo = day.video != null
+        val hasVideo = day.videoFile != null
         val alpha = if (hasVideo) 1f else 0.4f
         val color = Color.Black.copy(alpha = alpha)
 

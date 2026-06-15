@@ -9,7 +9,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.view.WindowCompat
 import com.lukeneedham.videodiary.domain.model.Orientation
 import com.lukeneedham.videodiary.domain.model.ShareRequest
-import com.lukeneedham.videodiary.ui.media.VideoPlayerPool
+import com.lukeneedham.videodiary.ui.media.VideoPlayerHolder
 import com.lukeneedham.videodiary.ui.permissions.PermissionResultListenerHolder
 import com.lukeneedham.videodiary.ui.root.Root
 import com.lukeneedham.videodiary.ui.share.Sharer
@@ -17,6 +17,7 @@ import org.koin.android.ext.android.inject
 
 class MainActivity : ComponentActivity() {
     private val sharer: Sharer by inject()
+    private val videoPlayerHolder: VideoPlayerHolder by inject()
 
     private val permissionResultListenerHolder = PermissionResultListenerHolder()
 
@@ -37,12 +38,12 @@ class MainActivity : ComponentActivity() {
 
     override fun onPause() {
         super.onPause()
-        VideoPlayerPool.onAppPause()
+        videoPlayerHolder.onAppPause()
     }
 
     override fun onResume() {
         super.onResume()
-        VideoPlayerPool.onAppResume()
+        videoPlayerHolder.onAppResume()
     }
 
     @Suppress("OVERRIDE_DEPRECATION")

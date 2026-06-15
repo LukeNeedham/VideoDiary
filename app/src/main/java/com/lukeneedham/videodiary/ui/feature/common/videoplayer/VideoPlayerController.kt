@@ -4,8 +4,13 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import com.lukeneedham.videodiary.domain.model.Video
+import com.lukeneedham.videodiary.domain.util.logger.Logger
+import java.io.File
 
 class VideoPlayerController {
+    var playingVideo: Video? by mutableStateOf(null)
+
     /**
      * Pauses the video in a temporary way -
      * as opposed to [isTogglePaused], which is a toggle.
@@ -32,7 +37,6 @@ class VideoPlayerController {
     fun temporaryPause() {
         isTemporaryPaused = true
     }
-
 
     fun temporaryResume() {
         isTemporaryPaused = false

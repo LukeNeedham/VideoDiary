@@ -2,6 +2,9 @@ package com.lukeneedham.videodiary.ui.feature.calendar.component
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.awaitEachGesture
+import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.foundation.gestures.waitForUpOrCancellation
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.aspectRatio
@@ -11,11 +14,16 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.PointerEventPass
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.tooling.preview.Preview
 import com.lukeneedham.videodiary.domain.model.Day
 import com.lukeneedham.videodiary.domain.model.ShareRequest
@@ -71,6 +79,14 @@ fun CalendarScroller(
         }
     }
 
+    // Update the video controller with the 'settled' video
+    // this means the playing video only updates once the scroll completes
+    val settledPage = pagerState.settledPage
+    LaunchedEffect(settledPage) {
+        val settledDay = days[settledPage]
+        videoPlayerController.playingVideo = settledDay.video
+    }
+
     // Pause all videos while the pager is being dragged; resume once it settles.
     // Uses snapshotFlow so this only fires on scroll-state transitions, not on
     // every recomposition or at initial composition.
@@ -78,8 +94,11 @@ fun CalendarScroller(
         snapshotFlow { pagerState.isScrollInProgress }
             .distinctUntilChanged()
             .collect { isScrolling ->
-                if (isScrolling) videoPlayerController.temporaryPause()
-                else videoPlayerController.temporaryResume()
+                if (isScrolling) {
+                    videoPlayerController.temporaryPause()
+                } else {
+                    videoPlayerController.temporaryResume()
+                }
             }
     }
 
@@ -118,28 +137,45 @@ fun CalendarScroller(
             )
         }
 
-        HorizontalPager(
-            state = pagerState,
-            beyondBoundsPageCount = 0,
+        Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .aspectRatio(videoAspectRatio),
-        ) { pageIndex ->
-            val day = days.getOrNull(pageIndex) ?: return@HorizontalPager
-            val date = day.date
-            CalendarDayContent(
-                day = day,
-                videoAspectRatio = videoAspectRatio,
-                allowEditPastDays = allowEditPastDays,
-                onRecordVideoClick = {
-                    onRecordVideoClick(date)
-                },
-                onDeleteVideoClick = {
-                    onDeleteVideoClick(date)
-                },
-                videoPlayerController = videoPlayerController,
-                share = share,
-            )
+                .aspectRatio(videoAspectRatio)
+                .pointerInput(Unit) {
+                    awaitEachGesture {
+                        while (true) {
+                            // PointerEventPass.Initial lets this Box see the touch
+                            // BEFORE the horizontal scroll gets a chance to intercept it.
+                            awaitFirstDown(pass = PointerEventPass.Initial)
+                            videoPlayerController.temporaryPause()
+
+                            waitForUpOrCancellation(pass = PointerEventPass.Initial)
+                            videoPlayerController.temporaryResume()
+                        }
+                    }
+                }
+        ) {
+            HorizontalPager(
+                state = pagerState,
+                beyondBoundsPageCount = 0,
+                modifier = Modifier.fillMaxSize()
+            ) { pageIndex ->
+                val day = days.getOrNull(pageIndex) ?: return@HorizontalPager
+                val date = day.date
+                CalendarDayContent(
+                    day = day,
+                    videoAspectRatio = videoAspectRatio,
+                    allowEditPastDays = allowEditPastDays,
+                    onRecordVideoClick = {
+                        onRecordVideoClick(date)
+                    },
+                    onDeleteVideoClick = {
+                        onDeleteVideoClick(date)
+                    },
+                    videoPlayerController = videoPlayerController,
+                    share = share,
+                )
+            }
         }
     }
 }

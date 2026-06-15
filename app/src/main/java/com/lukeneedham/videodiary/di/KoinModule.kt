@@ -21,6 +21,7 @@ import com.lukeneedham.videodiary.ui.feature.record.film.RecordVideoViewModel
 import com.lukeneedham.videodiary.ui.feature.setup.duration.SelectVideoDurationViewModel
 import com.lukeneedham.videodiary.ui.feature.setup.orientation.SetupSelectOrientationViewModel
 import com.lukeneedham.videodiary.ui.feature.setup.resolution.SetupSelectResolutionViewModel
+import com.lukeneedham.videodiary.ui.media.VideoPlayerHolder
 import com.lukeneedham.videodiary.ui.root.RootViewModel
 import com.lukeneedham.videodiary.ui.share.Sharer
 import kotlinx.coroutines.CoroutineDispatcher
@@ -38,6 +39,7 @@ object KoinModule {
         getNonAndroidViewModel(),
         getViewModel(),
         getPersistence(),
+        getUi(),
     )
 
     private fun getUtil() = module {
@@ -187,4 +189,13 @@ object KoinModule {
             )
         }
     }
+
+    private fun getUi() = module {
+        single {
+            VideoPlayerHolder(
+                context = androidContext(),
+            )
+        }
+    }
+
 }

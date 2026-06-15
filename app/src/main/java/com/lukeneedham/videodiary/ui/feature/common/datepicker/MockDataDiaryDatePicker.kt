@@ -14,7 +14,7 @@ object MockDataDiaryDatePicker {
         endDate = endDate,
     ).map {
         Day(
-            date = it, video = null,
+            date = it, videoFile = null,
         )
     }
     val weeks = CalendarUtil.chunkIntoWeeks(days) { it.date }
