@@ -49,17 +49,23 @@ fun DiaryDatePickerDialog(
                 .background(color = Color.White, shape = RoundedCornerShape(10.dp))
         ) {
             Spacer(modifier = Modifier.height(10.dp))
-            DiaryDatePicker(
-                initialFocusedDate = initialFocusedDate,
-                weeks = viewModel.weeks,
-                onDateSelected = {
-                    onDateSelected(it)
-                    onDismiss()
-                },
-                modifier = Modifier
-                    .weight(1f)
-                    .fillMaxWidth()
-            )
+            val videoAspectRatio = viewModel.videoAspectRatio
+            if (videoAspectRatio != null) {
+                DiaryDatePicker(
+                    initialFocusedDate = initialFocusedDate,
+                    weeks = viewModel.weeks,
+                    videoAspectRatio = videoAspectRatio,
+                    onDateSelected = {
+                        onDateSelected(it)
+                        onDismiss()
+                    },
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxWidth()
+                )
+            } else {
+                Spacer(modifier = Modifier.weight(1f))
+            }
             Spacer(modifier = Modifier.height(5.dp))
             Box(
                 modifier = Modifier
