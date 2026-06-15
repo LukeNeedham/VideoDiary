@@ -3,10 +3,12 @@ package com.lukeneedham.videodiary.ui.feature.common.videoplayer
 import android.view.TextureView
 import android.view.ViewGroup
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.net.toUri
 import androidx.media3.common.MediaItem
+import androidx.media3.common.Player
 import com.lukeneedham.videodiary.domain.model.Video
 import com.lukeneedham.videodiary.ui.media.VideoPlayerHolder
 import org.koin.compose.getKoin
@@ -23,7 +25,21 @@ fun VideoPlayerExo(
 
     val player = videoPlayerHolder.player
 
+    DisposableEffect(player, controller) {
+        val listener = object : Player.Listener {
+            override fun onRenderedFirstFrame() {
+                controller.hasRenderedFirstFrame = true
+            }
+        }
+        player.addListener(listener)
+        onDispose {
+            player.removeListener(listener)
+        }
+    }
+
     LaunchedEffect(video) {
+        controller.hasRenderedFirstFrame = false
+
         val videoMediaItem = when (video) {
             is Video.MediaStore -> MediaItem.fromUri(video.uri)
             is Video.PersistedFile -> MediaItem.fromUri(video.file.toUri())

@@ -56,22 +56,36 @@ fun VideoPlayer(
                     video = video,
                     controller = controller,
                 )
-            } else if (thumbnailFile != null) {
-                val thumbnail by produceState<Bitmap?>(initialValue = null, thumbnailFile) {
-                    value = withContext(Dispatchers.IO) {
-                        BitmapFactory.decodeFile(thumbnailFile.absolutePath)
-                    }
+
+                // Keep the thumbnail on top until the player has rendered its first
+                // frame, so the player's surface (briefly black while preparing)
+                // is never shown to the user.
+                if (!controller.hasRenderedFirstFrame) {
+                    VideoThumbnail(thumbnailFile)
                 }
-                thumbnail?.let { bitmap ->
-                    Image(
-                        bitmap = bitmap.asImageBitmap(),
-                        contentDescription = null,
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier.fillMaxSize(),
-                    )
-                }
+            } else {
+                VideoThumbnail(thumbnailFile)
             }
         }
+    }
+}
+
+@Composable
+private fun VideoThumbnail(thumbnailFile: File?) {
+    if (thumbnailFile == null) return
+
+    val thumbnail by produceState<Bitmap?>(initialValue = null, thumbnailFile) {
+        value = withContext(Dispatchers.IO) {
+            BitmapFactory.decodeFile(thumbnailFile.absolutePath)
+        }
+    }
+    thumbnail?.let { bitmap ->
+        Image(
+            bitmap = bitmap.asImageBitmap(),
+            contentDescription = null,
+            contentScale = ContentScale.Crop,
+            modifier = Modifier.fillMaxSize(),
+        )
     }
 }
 
