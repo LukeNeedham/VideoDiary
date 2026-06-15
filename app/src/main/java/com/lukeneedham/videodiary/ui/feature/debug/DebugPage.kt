@@ -16,6 +16,7 @@ fun DebugPage(
         onFillWithMockDataClick = viewModel::fillWithMockData,
         allowRetakeForPastDays = allowRetakeForPastDays,
         onAllowRetakeForPastDaysChange = viewModel::setAllowRetakeForPastDays,
+        onResyncThumbnailsClick = viewModel::resyncThumbnails,
         canGoBack = canGoBack,
         onBack = onBack,
     )

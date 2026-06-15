@@ -172,6 +172,8 @@ object KoinModule {
             DebugViewModel(
                 mockDataRepository = get(),
                 settingsDao = get(),
+                videosDao = get(),
+                ioDispatcher = get(KoinQualifier.Dispatcher.io),
             )
         }
     }
