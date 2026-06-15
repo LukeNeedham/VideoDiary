@@ -1,5 +1,6 @@
 package com.lukeneedham.videodiary.ui.feature.calendar
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -54,6 +55,10 @@ fun CalendarPageContent(
 
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val coroutineScope = rememberCoroutineScope()
+
+    BackHandler(enabled = drawerState.isOpen) {
+        coroutineScope.launch { drawerState.close() }
+    }
 
     ModalDrawer(
         drawerState = drawerState,
