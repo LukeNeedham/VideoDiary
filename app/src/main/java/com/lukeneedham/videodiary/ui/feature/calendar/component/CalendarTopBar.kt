@@ -31,6 +31,7 @@ fun CalendarTopBar(
     onNext: () -> Unit,
     openDayPicker: () -> Unit,
     goToToday: () -> Unit,
+    onMenuClick: () -> Unit,
     isToday: Boolean,
     modifier: Modifier = Modifier,
 ) {
@@ -47,7 +48,7 @@ fun CalendarTopBar(
                 iconRes = R.drawable.menu,
                 contentDescription = "Menu",
                 modifier = Modifier.clickable {
-                    // todo - implement hamburger menu
+                    onMenuClick()
                 }
             )
 
@@ -115,6 +116,7 @@ internal fun PreviewCalendarTopBar() {
             onNext = {},
             openDayPicker = {},
             goToToday = {},
+            onMenuClick = {},
             isToday = false,
         )
     }
@@ -135,6 +137,7 @@ internal fun PreviewCalendarTopBarToday() {
             onNext = {},
             openDayPicker = {},
             goToToday = {},
+            onMenuClick = {},
             isToday = true,
         )
     }
