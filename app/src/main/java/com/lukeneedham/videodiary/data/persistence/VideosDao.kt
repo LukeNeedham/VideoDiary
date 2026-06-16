@@ -97,6 +97,18 @@ class VideosDao(
      * saved before thumbnail generation was introduced.
      */
     suspend fun generateMissingThumbnails() {
+        generateThumbnails(onlyMissing = true)
+    }
+
+    /**
+     * Deletes all existing thumbnails, then regenerates a thumbnail for every persisted video.
+     */
+    suspend fun resyncAllThumbnails() {
+        thumbnailsDir.listFiles()?.forEach { it.delete() }
+        generateThumbnails(onlyMissing = false)
+    }
+
+    private suspend fun generateThumbnails(onlyMissing: Boolean) {
         val videoFiles = videosDir.listFiles() ?: return
         var generatedAny = false
         videoFiles.forEach { videoFile ->
@@ -108,7 +120,7 @@ class VideosDao(
             }
 
             val thumbnailFile = getThumbnailFile(date)
-            if (!thumbnailFile.exists()) {
+            if (!onlyMissing || !thumbnailFile.exists()) {
                 videoThumbnailExtractor.extractFirstFrame(videoFile, thumbnailFile)
                 generatedAny = true
             }

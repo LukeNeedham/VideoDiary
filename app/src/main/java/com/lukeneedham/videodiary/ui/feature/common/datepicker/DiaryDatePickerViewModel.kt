@@ -4,6 +4,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import com.lukeneedham.videodiary.data.repository.CalendarRepository
+import com.lukeneedham.videodiary.data.repository.VideoResolutionRepository
 import com.lukeneedham.videodiary.domain.model.Day
 import com.lukeneedham.videodiary.domain.util.date.CalendarUtil
 import kotlinx.coroutines.CoroutineDispatcher
@@ -13,11 +14,15 @@ import kotlinx.coroutines.launch
 
 class DiaryDatePickerViewModel(
     private val calendarRepository: CalendarRepository,
+    private val videoResolutionRepository: VideoResolutionRepository,
     private val mainDispatcher: CoroutineDispatcher,
 ) {
     private val scope = CoroutineScope(mainDispatcher)
 
     var weeks by mutableStateOf<List<List<Day>>>(emptyList())
+        private set
+
+    var videoAspectRatio by mutableStateOf<Float?>(null)
         private set
 
     init {
@@ -28,6 +33,9 @@ class DiaryDatePickerViewModel(
                     getDate = { it.date }
                 )
             }
+        }
+        scope.launch {
+            videoAspectRatio = videoResolutionRepository.getAspectRatio()
         }
     }
 

@@ -32,6 +32,7 @@ import java.time.LocalDate
 fun DiaryDatePicker(
     initialFocusedDate: LocalDate,
     weeks: List<List<Day>>,
+    videoAspectRatio: Float,
     onDateSelected: (LocalDate) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -83,12 +84,16 @@ fun DiaryDatePicker(
 
     LazyColumn(
         state = state,
-        modifier = modifier
+        verticalArrangement = Arrangement.spacedBy(2.dp),
+        modifier = modifier.padding(horizontal = 2.dp)
     ) {
         items(rows) { row ->
             when (row) {
                 is WeekRow.Normal -> {
-                    Row(modifier = Modifier.fillParentMaxWidth()) {
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(2.dp),
+                        modifier = Modifier.fillParentMaxWidth()
+                    ) {
                         row.week.forEach { weekday ->
                             Box(
                                 modifier = Modifier
@@ -103,6 +108,7 @@ fun DiaryDatePicker(
                                         val day = weekday.day
                                         DiaryDatePickerDay(
                                             day = day,
+                                            videoAspectRatio = videoAspectRatio,
                                             onClick = {
                                                 onDateSelected(day.date)
                                             }
@@ -175,6 +181,7 @@ private fun Preview() {
     DiaryDatePicker(
         initialFocusedDate = MockDataDiaryDatePicker.endDate,
         weeks = MockDataDiaryDatePicker.weeks,
+        videoAspectRatio = MockDataDiaryDatePicker.videoAspectRatio,
         onDateSelected = {},
     )
 }

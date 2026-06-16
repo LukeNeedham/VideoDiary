@@ -18,4 +18,6 @@ object MockDataDiaryDatePicker {
         )
     }
     val weeks = CalendarUtil.chunkIntoWeeks(days) { it.date }
+
+    val videoAspectRatio = 9f / 16f
 }
