@@ -85,7 +85,7 @@ fun DiaryDatePicker(
     LazyColumn(
         state = state,
         verticalArrangement = Arrangement.spacedBy(2.dp),
-        modifier = modifier
+        modifier = modifier.padding(horizontal = 2.dp)
     ) {
         items(rows) { row ->
             when (row) {
