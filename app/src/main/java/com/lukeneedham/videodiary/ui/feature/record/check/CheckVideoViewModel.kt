@@ -29,9 +29,11 @@ class CheckVideoViewModel(
     }
 
     fun acceptVideo() {
-        videosDao.persistVideo(
-            videoContentUri = videoContentUri,
-            date = date,
-        )
+        viewModelScope.launch {
+            videosDao.persistVideo(
+                videoContentUri = videoContentUri,
+                date = date,
+            )
+        }
     }
 }

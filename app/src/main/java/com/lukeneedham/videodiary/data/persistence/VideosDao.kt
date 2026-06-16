@@ -37,7 +37,7 @@ class VideosDao(
         refreshVideosState()
     }
 
-    fun persistVideo(videoContentUri: Uri, date: LocalDate) {
+    suspend fun persistVideo(videoContentUri: Uri, date: LocalDate) {
         try {
             val projection = arrayOf(MediaStore.Video.Media.DATA)
             val cursor =
@@ -96,7 +96,7 @@ class VideosDao(
      * Intended to be run once on app startup, to backfill videos that were
      * saved before thumbnail generation was introduced.
      */
-    fun generateMissingThumbnails() {
+    suspend fun generateMissingThumbnails() {
         val videoFiles = videosDir.listFiles() ?: return
         var generatedAny = false
         videoFiles.forEach { videoFile ->

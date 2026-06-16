@@ -5,7 +5,8 @@ import androidx.annotation.OptIn
 import androidx.core.net.toUri
 import androidx.media3.common.MediaItem
 import androidx.media3.common.util.UnstableApi
-import androidx.media3.effect.OverlaySettings
+import androidx.media3.common.OverlaySettings
+import androidx.media3.effect.StaticOverlaySettings
 import androidx.media3.effect.TextureOverlay
 import androidx.media3.transformer.Composition
 import androidx.media3.transformer.EditedMediaItem
@@ -127,7 +128,7 @@ class VideoExporter(
          * You call setBackgroundFrameAnchor(-1, -1) - You want to place the logo in the bottom-left corner of the video.
          * The result will be that the top-right corner of your logo will be positioned at the bottom-left corner of the video frame.
          */
-        val overlaySettings = OverlaySettings.Builder().apply {
+        val overlaySettings: OverlaySettings = StaticOverlaySettings.Builder().apply {
             setOverlayFrameAnchor(0f, -1f)
             setBackgroundFrameAnchor(0f, -1f)
         }.build()

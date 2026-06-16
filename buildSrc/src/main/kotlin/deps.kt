@@ -19,7 +19,7 @@ object deps {
         }
 
         object media3 {
-            private val version = "1.5.1"
+            private val version = "1.6.1"
             val player = "androidx.media3:media3-exoplayer:$version"
             val transformer = "androidx.media3:media3-transformer:$version"
             val effect = "androidx.media3:media3-effect:$version"

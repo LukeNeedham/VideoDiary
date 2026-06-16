@@ -8,7 +8,7 @@ import android.graphics.Paint
 import android.graphics.Rect
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.effect.BitmapOverlay
-import androidx.media3.effect.OverlaySettings
+import androidx.media3.common.OverlaySettings
 
 @UnstableApi
 class DateOverlay(

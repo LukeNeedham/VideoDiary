@@ -58,7 +58,12 @@ object KoinModule {
     private fun getData() = module {
         factory { VideoFileNameMapper() }
         factory { ThumbnailFileNameMapper() }
-        factory { VideoThumbnailExtractor() }
+        factory {
+            VideoThumbnailExtractor(
+                context = androidContext(),
+                ioDispatcher = get(KoinQualifier.Dispatcher.io),
+            )
+        }
         factory {
             PermissionChecker(
                 context = androidContext(),
