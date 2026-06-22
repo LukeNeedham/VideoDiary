@@ -1,10 +1,11 @@
 name: On Pull Request
 
 on:
-    workflow_call:
+    workflow_call: # Makes sure this job can be acted.
     workflow_dispatch: {}
     pull_request:
         branches:
+            # The following branches are worth running the checks on
             - main
 
 # Cancel in-progress runs for the same PR/branch — only the latest push matters
@@ -14,42 +15,59 @@ concurrency:
 
 permissions:
   id-token: write
-  contents: write
-  pull-requests: write
+  contents: write       # write to allow creating Releases
+  pull-requests: write  # So we can write comments from the workflow
 
 jobs:
+    # Run the gradle build - 
+    # this job handles all the work related to the outputs of the gradle build,
+    # so we don't have to pass large files between jobs.
     build:
         runs-on: ubuntu-latest
 
         steps:
           - uses: actions/checkout@v4
 
-          - name: Set up JDK 17
+          # Setup Java
+          - name: set up JDK 17
             uses: actions/setup-java@v4
             with:
               java-version: '17'
               distribution: 'zulu'
 
+          # Setup Gradle with build caching (caches build outputs, not just downloaded dependencies)
           - name: Setup Gradle
             uses: gradle/actions/setup-gradle@v4
             with:
               cache-read-only: ${{ github.event_name == 'pull_request' && github.base_ref == 'main' }}
 
-          - name: Build debug APK
+          # Build test apk
+          - name: Run CLI - Build
+            shell: bash
             run: ./gradlew assembleDebug --no-daemon --build-cache
 
+          # Set time we can timestamp messages
           - name: Set current time
             run: |
               echo "CURRENT_TIME=$(TZ='Europe/Amsterdam' date +'%d/%m/%Y %H:%M:%S')" >> $GITHUB_ENV
+              # We create a safe tag name using the unique PR number and GitHub run attempt
+              echo "RELEASE_TAG=pr-${{ github.event.pull_request.number || 'manual' }}-build-${{ github.run_number }}-${{ github.run_attempt }}" >> $GITHUB_ENV
 
           - name: Generate Release Tag
             id: generate-tag
             run: |
+              # Use head_ref for PRs, fallback to ref_name for manual dispatches
               RAW_BRANCH="${{ github.head_ref || github.ref_name }}"
+              
+              # Replace slashes and special characters with dashes, convert to lowercase
               CLEAN_BRANCH=$(echo "$RAW_BRANCH" | sed 's/\//-/g' | tr '[:upper:]' '[:lower:]')
+
+              # Combine branch name with run identifiers
               TAG_NAME="${CLEAN_BRANCH}-${{ github.run_number }}-${{ github.run_attempt }}"
+              
               echo "tag=$TAG_NAME" >> $GITHUB_OUTPUT
 
+          # Create a unique GitHub Release and upload the APK
           - name: Create Release and Upload APK
             id: create-release
             uses: ncipollo/release-action@v1
@@ -61,13 +79,13 @@ jobs:
               prerelease: true
               draft: false
 
+          # Write a comment on the PR with the direct download link to the release asset
           - name: Write Example APK comment
-            if: github.event_name == 'pull_request'
             uses: marocchino/sticky-pull-request-comment@v3
             with:
               header: example-app-link
               message: |
-                App apk at:
+                App apk at: 
                 https://github.com/${{ github.repository }}/releases/download/${{ steps.generate-tag.outputs.tag }}/app-debug.apk
 
                 * **Triggered by:** PR Commit `${{ github.sha }}`
