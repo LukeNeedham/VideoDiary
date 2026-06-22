@@ -119,7 +119,7 @@ fun CameraInput(
     LaunchedEffect(focusTapCount) {
         if (focusTapCount == 0) return@LaunchedEffect
         focusAlpha.snapTo(1f)
-        delay(1000)
+        delay(700)
         focusAlpha.animateTo(0f, animationSpec = tween(500))
         focusTapOffset = null
     }
