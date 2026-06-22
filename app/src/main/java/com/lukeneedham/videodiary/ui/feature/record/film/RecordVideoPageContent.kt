@@ -56,8 +56,22 @@ fun RecordVideoPageContent(
 
     var state: RecordingState by remember { mutableStateOf(RecordingState.Ready) }
     var camera: Camera? by remember { mutableStateOf(null) }
-    var brightnessValue by remember { mutableFloatStateOf(0.5f) }
-    var zoomValue by remember { mutableFloatStateOf(0f) }
+    var brightnessValue by remember { mutableFloatStateOf(Float.NaN) }
+    var zoomValue by remember { mutableFloatStateOf(Float.NaN) }
+
+    LaunchedEffect(camera) {
+        val cam = camera ?: return@LaunchedEffect
+        val exposureState = cam.cameraInfo.exposureState
+        val range = exposureState.exposureCompensationRange
+        if (range.lower < range.upper) {
+            val current = exposureState.exposureCompensationIndex
+            brightnessValue = ((current - range.lower).toFloat() / (range.upper - range.lower))
+        }
+        val zoomState = cam.cameraInfo.zoomState.value
+        if (zoomState != null) {
+            zoomValue = zoomState.linearZoom
+        }
+    }
 
     val recorder = remember(quality) {
         Recorder.Builder()
@@ -144,31 +158,31 @@ fun RecordVideoPageContent(
                     .padding(16.dp)
             )
 
-            if (currentState is RecordingState.Recording) {
-                val cam = camera
-                if (cam != null) {
-                    val exposureState = cam.cameraInfo.exposureState
-                    val exposureRange = exposureState.exposureCompensationRange
-                    val supportsExposure = exposureRange.lower < exposureRange.upper
+            val cam = camera
+            if (cam != null) {
+                val exposureState = cam.cameraInfo.exposureState
+                val exposureRange = exposureState.exposureCompensationRange
+                val supportsExposure = exposureRange.lower < exposureRange.upper
 
-                    if (supportsExposure) {
-                        CameraControlSlider(
-                            value = brightnessValue,
-                            onValueChange = { newValue ->
-                                brightnessValue = newValue
-                                val index = exposureRange.lower +
-                                        ((exposureRange.upper - exposureRange.lower) * newValue).toInt()
-                                cam.cameraControl.setExposureCompensationIndex(index)
-                            },
-                            iconRes = R.drawable.brightness,
-                            contentDescription = "Brightness",
-                            modifier = Modifier
-                                .align(Alignment.CenterStart)
-                                .fillMaxHeight(0.6f)
-                                .padding(start = 8.dp),
-                        )
-                    }
+                if (supportsExposure && !brightnessValue.isNaN()) {
+                    CameraControlSlider(
+                        value = brightnessValue,
+                        onValueChange = { newValue ->
+                            brightnessValue = newValue
+                            val index = exposureRange.lower +
+                                    ((exposureRange.upper - exposureRange.lower) * newValue).toInt()
+                            cam.cameraControl.setExposureCompensationIndex(index)
+                        },
+                        iconRes = R.drawable.brightness,
+                        contentDescription = "Brightness",
+                        modifier = Modifier
+                            .align(Alignment.CenterStart)
+                            .fillMaxHeight(0.6f)
+                            .padding(start = 8.dp),
+                    )
+                }
 
+                if (!zoomValue.isNaN()) {
                     CameraControlSlider(
                         value = zoomValue,
                         onValueChange = { newValue ->
