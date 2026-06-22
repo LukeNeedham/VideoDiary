@@ -171,7 +171,7 @@ fun CameraInput(
             Canvas(modifier = Modifier.fillMaxSize()) {
                 drawCircle(
                     color = Color.White.copy(alpha = focusAlpha.value),
-                    radius = 40.dp.toPx(),
+                    radius = 25.dp.toPx(),
                     center = currentFocusTapOffset,
                     style = Stroke(width = 2.dp.toPx())
                 )
