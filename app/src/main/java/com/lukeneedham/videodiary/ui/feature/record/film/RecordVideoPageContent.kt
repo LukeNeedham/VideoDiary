@@ -3,6 +3,7 @@ package com.lukeneedham.videodiary.ui.feature.record.film
 import android.net.Uri
 import android.util.Size
 import androidx.camera.core.Camera
+import androidx.camera.core.ZoomState
 import androidx.camera.video.Quality
 import androidx.camera.video.QualitySelector
 import androidx.camera.video.Recorder
@@ -18,6 +19,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
+import androidx.lifecycle.Observer
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -67,9 +69,21 @@ fun RecordVideoPageContent(
             val current = exposureState.exposureCompensationIndex
             brightnessValue = ((current - range.lower).toFloat() / (range.upper - range.lower))
         }
-        val zoomState = cam.cameraInfo.zoomState.value
-        if (zoomState != null) {
-            zoomValue = zoomState.linearZoom
+    }
+
+    DisposableEffect(camera) {
+        val cam = camera
+        val observer = if (cam != null) {
+            val obs = Observer<ZoomState> { zoomState ->
+                zoomValue = zoomState.linearZoom
+            }
+            cam.cameraInfo.zoomState.observeForever(obs)
+            obs
+        } else null
+        onDispose {
+            if (cam != null && observer != null) {
+                cam.cameraInfo.zoomState.removeObserver(observer)
+            }
         }
     }
 
