@@ -105,8 +105,8 @@ fun RecordVideoPageContent(
     ) {
         Box(
             modifier = Modifier
-                .weight(1f)
                 .fillMaxWidth()
+                .aspectRatio(resolution.width.toFloat() / resolution.height.toFloat())
         ) {
             CameraInput(
                 currentResolution = resolution,
@@ -140,10 +140,10 @@ fun RecordVideoPageContent(
         Box(
             contentAlignment = Alignment.Center,
             modifier = Modifier
+                .weight(1f)
                 .fillMaxWidth()
                 .background(Color.Black)
                 .navigationBarsPadding()
-                .height(120.dp)
         ) {
             val centerButtonModifier = Modifier
                 .padding(vertical = 10.dp)

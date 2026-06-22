@@ -46,8 +46,8 @@ fun CheckVideoPageContent(
     ) {
         Box(
             modifier = Modifier
-                .weight(1f)
                 .fillMaxWidth()
+                .aspectRatio(videoAspectRatio ?: (9f / 16f))
         ) {
             if (videoAspectRatio != null) {
                 VideoPlayer(
@@ -77,10 +77,10 @@ fun CheckVideoPageContent(
 
         Box(
             modifier = Modifier
+                .weight(1f)
                 .fillMaxWidth()
                 .background(Color.Black)
                 .navigationBarsPadding()
-                .height(120.dp)
                 .padding(horizontal = 16.dp)
         ) {
             Row(
