@@ -8,6 +8,11 @@ on:
             # The following branches are worth running the checks on
             - main
 
+# Cancel in-progress runs for the same PR/branch — only the latest push matters
+concurrency:
+  group: build-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
 permissions:
   id-token: write
   contents: write       # write to allow creating Releases
@@ -29,12 +34,17 @@ jobs:
             with:
               java-version: '17'
               distribution: 'zulu'
-              cache: 'gradle' # Automatically cache build dependencies
+
+          # Setup Gradle with build caching (caches build outputs, not just downloaded dependencies)
+          - name: Setup Gradle
+            uses: gradle/actions/setup-gradle@v4
+            with:
+              cache-read-only: ${{ github.event_name == 'pull_request' && github.base_ref == 'main' }}
 
           # Build test apk
           - name: Run CLI - Build
             shell: bash
-            run: ./gradlew assembleDebug
+            run: ./gradlew assembleDebug --no-daemon --build-cache
 
           # Set time we can timestamp messages
           - name: Set current time
