@@ -31,7 +31,7 @@ import com.lukeneedham.videodiary.ui.feature.common.videoplayer.VideoPlayerContr
 @Composable
 fun CheckVideoPageContent(
     video: Video,
-    videoAspectRatio: Float?,
+    videoAspectRatio: Float,
     onCancelClick: () -> Unit,
     onRetakeClick: () -> Unit,
     onAccepted: () -> Unit,
@@ -44,35 +44,33 @@ fun CheckVideoPageContent(
     Column(
         modifier = Modifier.fillMaxSize()
     ) {
-        if (videoAspectRatio != null) {
-            Box(
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .aspectRatio(videoAspectRatio)
+        ) {
+            VideoPlayer(
+                video = video,
+                aspectRatio = videoAspectRatio,
+                controller = videoPlayerController,
+                modifier = Modifier.fillMaxSize(),
+            )
+
+            TopScrim(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .aspectRatio(videoAspectRatio)
-            ) {
-                VideoPlayer(
-                    video = video,
-                    aspectRatio = videoAspectRatio,
-                    controller = videoPlayerController,
-                    modifier = Modifier.fillMaxSize(),
-                )
+                    .align(Alignment.TopCenter)
+                    .height(140.dp)
+            )
 
-                TopScrim(
-                    modifier = Modifier
-                        .align(Alignment.TopCenter)
-                        .height(140.dp)
-                )
-
-                GlassIconButton(
-                    iconRes = R.drawable.close,
-                    contentDescription = "Cancel",
-                    onClick = onCancelClick,
-                    modifier = Modifier
-                        .align(Alignment.TopStart)
-                        .safeDrawingPadding()
-                        .padding(16.dp)
-                )
-            }
+            GlassIconButton(
+                iconRes = R.drawable.close,
+                contentDescription = "Cancel",
+                onClick = onCancelClick,
+                modifier = Modifier
+                    .align(Alignment.TopStart)
+                    .safeDrawingPadding()
+                    .padding(16.dp)
+            )
         }
 
         Box(
