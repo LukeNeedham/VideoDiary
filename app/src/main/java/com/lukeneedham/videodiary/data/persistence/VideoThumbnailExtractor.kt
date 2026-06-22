@@ -15,10 +15,16 @@ import java.io.FileOutputStream
 /**
  * Extracts the first frame of a video file and saves it as a JPEG thumbnail.
  *
- * [MediaMetadataRetriever] decodes frames using BT.601 YUV-to-RGB conversion, but
- * HD video (recorded by CameraX) is encoded as BT.709 and played back using BT.709
- * by ExoPlayer. A colour-correction matrix is applied so the saved thumbnail matches
- * what the video looks like during playback.
+ * The saved thumbnail is colour-corrected so it visually matches ExoPlayer
+ * playback. Two adjustments are combined into a single [ColorMatrix]:
+ *
+ * 1. **BT.601 → BT.709** — [MediaMetadataRetriever] decodes with BT.601
+ *    coefficients, but CameraX records BT.709 video and ExoPlayer plays it
+ *    back as BT.709.
+ * 2. **Saturation boost** — the Compose [Image] rendering path (software
+ *    bitmap → sRGB 2D canvas) produces slightly less vivid colours than
+ *    ExoPlayer's hardware-accelerated TextureView pipeline. A small
+ *    saturation increase compensates for this difference.
  */
 class VideoThumbnailExtractor(
     private val ioDispatcher: CoroutineDispatcher,
@@ -29,7 +35,7 @@ class VideoThumbnailExtractor(
             try {
                 retriever.setDataSource(videoFile.absolutePath)
                 val frame = retriever.frameAtTime ?: return@withContext
-                val corrected = applyBt709Correction(frame)
+                val corrected = applyColourCorrection(frame)
                 FileOutputStream(thumbnailFile).use { output ->
                     corrected.compress(Bitmap.CompressFormat.JPEG, JPEG_QUALITY, output)
                 }
@@ -43,10 +49,9 @@ class VideoThumbnailExtractor(
 
     companion object {
         private const val JPEG_QUALITY = 90
+        private const val SATURATION_BOOST = 1.2f
 
-        // Combined matrix: inverse(BT.601 limited-range) * BT.709 limited-range.
-        // Converts RGB values produced by a BT.601 decode back to YCbCr, then
-        // re-decodes them using BT.709 coefficients to match on-screen playback.
+        // BT.601→BT.709 colour-space correction matrix.
         private val BT601_TO_BT709 = ColorMatrix(
             floatArrayOf(
                 1.0863f, -0.0724f, -0.0140f, 0f, 0f,
@@ -56,11 +61,18 @@ class VideoThumbnailExtractor(
             ),
         )
 
-        private val correctionPaint = Paint().apply {
-            colorFilter = ColorMatrixColorFilter(BT601_TO_BT709)
+        private val correctionMatrix = ColorMatrix().apply {
+            set(BT601_TO_BT709)
+            val saturationMatrix = ColorMatrix()
+            saturationMatrix.setSaturation(SATURATION_BOOST)
+            postConcat(saturationMatrix)
         }
 
-        private fun applyBt709Correction(src: Bitmap): Bitmap {
+        private val correctionPaint = Paint().apply {
+            colorFilter = ColorMatrixColorFilter(correctionMatrix)
+        }
+
+        private fun applyColourCorrection(src: Bitmap): Bitmap {
             val dst = Bitmap.createBitmap(src.width, src.height, Bitmap.Config.ARGB_8888)
             Canvas(dst).drawBitmap(src, 0f, 0f, correctionPaint)
             return dst

@@ -81,7 +81,7 @@ class RootViewModel(
     companion object {
         // Bump when the thumbnail extraction algorithm changes, so existing
         // thumbnails are regenerated on next startup.
-        private const val THUMBNAIL_VERSION = 1
+        private const val THUMBNAIL_VERSION = 2
     }
 
     private fun hasAllRequiredPermissions(): Boolean {
