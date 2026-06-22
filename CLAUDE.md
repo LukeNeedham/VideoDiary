@@ -2,6 +2,10 @@
 
 This file provides guidance for AI assistants (and developers) working with this repository.
 
+# Commands
+Here is a list of short-hand commands that you may be asked.
+- "Implement the top todo" - read the TODO.md file and inplement the top item, following the rules described in that file.
+
 ## Project overview
 
 **Video Diary** is an open-source Android app (Kotlin + Jetpack Compose) that lets users record
