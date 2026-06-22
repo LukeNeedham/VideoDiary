@@ -29,7 +29,6 @@ fun RecordingCountdownButton(
     Box(
         contentAlignment = Alignment.Center,
         modifier = modifier
-            .size(76.dp)
             .clip(CircleShape)
             .background(AccentRecord, CircleShape)
             .border(width = 3.dp, color = Color.White, shape = CircleShape)

@@ -5,6 +5,8 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -78,7 +80,8 @@ fun CheckVideoPageContent(
                 .fillMaxWidth()
                 .background(Color.Black)
                 .navigationBarsPadding()
-                .padding(vertical = 24.dp, horizontal = 16.dp)
+                .height(120.dp)
+                .padding(horizontal = 16.dp)
         ) {
             Row(
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
@@ -104,7 +107,11 @@ fun CheckVideoPageContent(
 
             GlassAcceptButton(
                 onClick = onAccepted,
-                modifier = Modifier.align(Alignment.Center)
+                modifier = Modifier
+                    .align(Alignment.Center)
+                    .padding(vertical = 10.dp)
+                    .fillMaxHeight()
+                    .aspectRatio(1f)
             )
 
             GlassIconButton(

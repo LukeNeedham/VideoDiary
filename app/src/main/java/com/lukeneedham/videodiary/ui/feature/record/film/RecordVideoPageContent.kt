@@ -9,6 +9,8 @@ import androidx.camera.video.VideoCapture
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -141,8 +143,12 @@ fun RecordVideoPageContent(
                 .fillMaxWidth()
                 .background(Color.Black)
                 .navigationBarsPadding()
-                .padding(vertical = 24.dp)
+                .height(120.dp)
         ) {
+            val centerButtonModifier = Modifier
+                .padding(vertical = 10.dp)
+                .fillMaxHeight()
+                .aspectRatio(1f)
             if (currentState is RecordingState.Recording) {
                 val remainingSeconds = ((videoDurationMillis - currentState.duration.inWholeMilliseconds) / 1000.0)
                     .coerceAtLeast(0.0)
@@ -153,12 +159,14 @@ fun RecordVideoPageContent(
                         videoRecorder.cancelRecording()
                         state = RecordingState.Ready
                     },
+                    modifier = centerButtonModifier,
                 )
             } else {
                 GlassRecordButton(
                     isRecording = false,
                     enabled = currentState == RecordingState.Ready,
                     onClick = { record() },
+                    modifier = centerButtonModifier,
                 )
             }
         }

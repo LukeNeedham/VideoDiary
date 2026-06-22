@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
@@ -122,7 +123,6 @@ fun GlassRecordButton(
     Box(
         contentAlignment = Alignment.Center,
         modifier = modifier
-            .size(76.dp)
             .alpha(if (enabled) 1f else 0.4f)
             .clip(CircleShape)
             .background(GlassFill, CircleShape)
@@ -130,10 +130,10 @@ fun GlassRecordButton(
             .clickable(enabled = enabled, onClick = onClick),
     ) {
         val innerShape = if (isRecording) RoundedCornerShape(8.dp) else CircleShape
-        val innerSize = if (isRecording) 28.dp else 60.dp
+        val innerFraction = if (isRecording) 0.37f else 0.79f
         Box(
             modifier = Modifier
-                .size(innerSize)
+                .fillMaxSize(innerFraction)
                 .background(AccentRecord, innerShape)
         )
     }
@@ -148,7 +148,6 @@ fun GlassAcceptButton(
     Box(
         contentAlignment = Alignment.Center,
         modifier = modifier
-            .size(76.dp)
             .alpha(if (enabled) 1f else 0.4f)
             .clip(CircleShape)
             .background(GlassFill, CircleShape)
@@ -158,14 +157,14 @@ fun GlassAcceptButton(
         Box(
             contentAlignment = Alignment.Center,
             modifier = Modifier
-                .size(60.dp)
+                .fillMaxSize(0.79f)
                 .background(AccentAccept, CircleShape)
         ) {
             Image(
                 painter = painterResource(R.drawable.tick),
                 contentDescription = "Accept",
                 colorFilter = ColorFilter.tint(Color.White),
-                modifier = Modifier.size(32.dp),
+                modifier = Modifier.fillMaxSize(0.53f),
             )
         }
     }
@@ -223,10 +222,12 @@ private fun PreviewGlassComponents() {
             GlassRecordButton(
                 isRecording = false,
                 onClick = {},
+                modifier = Modifier.size(76.dp),
             )
             GlassRecordButton(
                 isRecording = true,
                 onClick = {},
+                modifier = Modifier.size(76.dp),
             )
         }
     }
