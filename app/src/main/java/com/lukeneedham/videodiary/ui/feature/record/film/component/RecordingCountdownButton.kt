@@ -22,7 +22,7 @@ import com.lukeneedham.videodiary.ui.theme.Typography
 
 @Composable
 fun RecordingCountdownButton(
-    remainingSeconds: Int,
+    remainingText: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -36,7 +36,7 @@ fun RecordingCountdownButton(
             .clickable(onClick = onClick),
     ) {
         Text(
-            text = remainingSeconds.toString(),
+            text = remainingText,
             color = Color.White,
             fontSize = Typography.Size.big,
             fontWeight = FontWeight.Bold,
@@ -53,7 +53,7 @@ private fun PreviewRecordingCountdownButton() {
             .padding(20.dp),
     ) {
         RecordingCountdownButton(
-            remainingSeconds = 7,
+            remainingText = "7.3",
             onClick = {},
         )
     }

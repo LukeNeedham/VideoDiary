@@ -39,7 +39,6 @@ import com.lukeneedham.videodiary.ui.feature.common.glass.GlassSurface
 import com.lukeneedham.videodiary.ui.feature.common.glass.TopScrim
 import com.lukeneedham.videodiary.ui.feature.record.film.component.RecordingCountdownButton
 import com.lukeneedham.videodiary.ui.theme.Typography
-import kotlin.math.ceil
 
 @Composable
 fun RecordVideoPageContent(
@@ -172,12 +171,15 @@ fun RecordVideoPageContent(
                 .padding(vertical = 24.dp)
         ) {
             if (currentState is RecordingState.Recording) {
-                val remainingSeconds = ceil(
-                    (videoDurationMillis - currentState.duration.inWholeMilliseconds) / 1000.0
-                ).toInt().coerceAtLeast(0)
+                val remainingSeconds = ((videoDurationMillis - currentState.duration.inWholeMilliseconds) / 1000.0)
+                    .coerceAtLeast(0.0)
+                val remainingText = "%.1f".format(remainingSeconds)
                 RecordingCountdownButton(
-                    remainingSeconds = remainingSeconds,
-                    onClick = { record() },
+                    remainingText = remainingText,
+                    onClick = {
+                        videoRecorder.cancelRecording()
+                        state = RecordingState.Ready
+                    },
                 )
             } else {
                 GlassRecordButton(
