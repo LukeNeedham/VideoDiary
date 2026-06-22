@@ -29,11 +29,19 @@ class VideoRecorder(
     private val timestampFormat = "yyyy-MM-dd-HH-mm-ss-SSS"
 
     private var recordingInProgress: Recording? = null
+    @Volatile
+    private var isCancelling = false
+
+    fun cancelRecording() {
+        isCancelling = true
+        disposeRunningRecording()
+    }
 
     fun startRecording(
         videoDurationMillis: Long,
         onStateUpdate: (RecordingState) -> Unit,
     ) {
+        isCancelling = false
         disposeRunningRecording()
 
         val timestamp = SimpleDateFormat(timestampFormat, Locale.US)
@@ -64,6 +72,17 @@ class VideoRecorder(
             when (recordEvent) {
                 is VideoRecordEvent.Finalize -> {
                     timer.stop()
+
+                    if (isCancelling) {
+                        val output = recordEvent.outputResults.outputUri
+                        try {
+                            context.contentResolver.delete(output, null, null)
+                        } catch (e: Exception) {
+                            Log.w("VideoRecorder", "Failed to delete cancelled recording", e)
+                        }
+                        isCancelling = false
+                        return@start
+                    }
 
                     val error = recordEvent.error
                     if (error == VideoRecordEvent.Finalize.ERROR_NONE) {

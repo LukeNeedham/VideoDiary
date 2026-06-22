@@ -6,13 +6,15 @@ import androidx.camera.video.Quality
 import androidx.camera.video.QualitySelector
 import androidx.camera.video.Recorder
 import androidx.camera.video.VideoCapture
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -30,12 +32,10 @@ import androidx.compose.ui.unit.dp
 import com.lukeneedham.videodiary.R
 import com.lukeneedham.videodiary.domain.util.logger.Logger
 import com.lukeneedham.videodiary.ui.feature.common.camera.CameraInput
-import com.lukeneedham.videodiary.ui.feature.common.glass.BottomScrim
 import com.lukeneedham.videodiary.ui.feature.common.glass.GlassIconButton
 import com.lukeneedham.videodiary.ui.feature.common.glass.GlassRecordButton
-import com.lukeneedham.videodiary.ui.feature.common.glass.GlassSurface
 import com.lukeneedham.videodiary.ui.feature.common.glass.TopScrim
-import com.lukeneedham.videodiary.ui.theme.Typography
+import com.lukeneedham.videodiary.ui.feature.record.film.component.RecordingCountdownButton
 
 @Composable
 fun RecordVideoPageContent(
@@ -98,80 +98,70 @@ fun RecordVideoPageContent(
         }
     }
 
-    Box(
+    Column(
         modifier = Modifier.fillMaxSize()
     ) {
-        CameraInput(
-            currentResolution = resolution,
-            videoCapture = videoCapture,
-            onResolutionLoaded = { resolution, isMissing, loadedRotation ->
-                if (isMissing) {
-                    Logger.error("No camera feed available for resolution: $resolution")
-                }
-            },
-            canZoom = true,
-            modifier = Modifier.fillMaxSize()
-        )
-
-        TopScrim(
+        Box(
             modifier = Modifier
-                .align(Alignment.TopCenter)
-                .height(140.dp)
-        )
+                .weight(1f)
+                .fillMaxWidth()
+        ) {
+            CameraInput(
+                currentResolution = resolution,
+                videoCapture = videoCapture,
+                onResolutionLoaded = { resolution, isMissing, loadedRotation ->
+                    if (isMissing) {
+                        Logger.error("No camera feed available for resolution: $resolution")
+                    }
+                },
+                canZoom = true,
+                modifier = Modifier.fillMaxSize()
+            )
 
-        BottomScrim(
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .height(180.dp)
-        )
-
-        GlassIconButton(
-            iconRes = R.drawable.close,
-            contentDescription = "Close",
-            onClick = onBack,
-            modifier = Modifier
-                .align(Alignment.TopStart)
-                .safeDrawingPadding()
-                .padding(16.dp)
-        )
-
-        val statusText = when (currentState) {
-            is RecordingState.Failed ->
-                "Error! ${currentState.errorCode} : ${currentState.exception}"
-
-            is RecordingState.Recording -> {
-                val seconds = currentState.duration.inWholeMilliseconds / 1000f
-                "%.1f".format(seconds)
-            }
-
-            is RecordingState.Success -> "Done"
-            RecordingState.Ready -> null
-        }
-        if (statusText != null) {
-            GlassSurface(
+            TopScrim(
                 modifier = Modifier
                     .align(Alignment.TopCenter)
+                    .height(140.dp)
+            )
+
+            GlassIconButton(
+                iconRes = R.drawable.close,
+                contentDescription = "Close",
+                onClick = onBack,
+                modifier = Modifier
+                    .align(Alignment.TopStart)
                     .safeDrawingPadding()
-                    .padding(top = 16.dp)
-            ) {
-                Text(
-                    text = statusText,
-                    color = Color.White,
-                    fontSize = Typography.Size.big,
-                    modifier = Modifier.padding(horizontal = 24.dp, vertical = 12.dp)
+                    .padding(16.dp)
+            )
+        }
+
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(Color.Black)
+                .navigationBarsPadding()
+                .padding(vertical = 24.dp)
+        ) {
+            if (currentState is RecordingState.Recording) {
+                val remainingSeconds = ((videoDurationMillis - currentState.duration.inWholeMilliseconds) / 1000.0)
+                    .coerceAtLeast(0.0)
+                val remainingText = "%.1f".format(remainingSeconds)
+                RecordingCountdownButton(
+                    remainingText = remainingText,
+                    onClick = {
+                        videoRecorder.cancelRecording()
+                        state = RecordingState.Ready
+                    },
+                )
+            } else {
+                GlassRecordButton(
+                    isRecording = false,
+                    enabled = currentState == RecordingState.Ready,
+                    onClick = { record() },
                 )
             }
         }
-
-        GlassRecordButton(
-            isRecording = currentState is RecordingState.Recording,
-            enabled = currentState == RecordingState.Ready,
-            onClick = { record() },
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .safeDrawingPadding()
-                .padding(bottom = 32.dp)
-        )
     }
 }
 
