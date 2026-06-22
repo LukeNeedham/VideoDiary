@@ -11,6 +11,8 @@ import androidx.camera.video.VideoCapture
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -171,57 +173,40 @@ fun RecordVideoPageContent(
                     .safeDrawingPadding()
                     .padding(16.dp)
             )
-
-            val cam = camera
-            if (cam != null) {
-                val exposureState = cam.cameraInfo.exposureState
-                val exposureRange = exposureState.exposureCompensationRange
-                val supportsExposure = exposureRange.lower < exposureRange.upper
-
-                if (supportsExposure && !brightnessValue.isNaN()) {
-                    CameraControlSlider(
-                        value = brightnessValue,
-                        onValueChange = { newValue ->
-                            brightnessValue = newValue
-                            val index = exposureRange.lower +
-                                    ((exposureRange.upper - exposureRange.lower) * newValue).toInt()
-                            cam.cameraControl.setExposureCompensationIndex(index)
-                        },
-                        iconRes = R.drawable.brightness,
-                        contentDescription = "Brightness",
-                        modifier = Modifier
-                            .align(Alignment.CenterStart)
-                            .fillMaxHeight(0.6f)
-                            .padding(start = 8.dp),
-                    )
-                }
-
-                if (!zoomValue.isNaN()) {
-                    CameraControlSlider(
-                        value = zoomValue,
-                        onValueChange = { newValue ->
-                            zoomValue = newValue
-                            cam.cameraControl.setLinearZoom(newValue)
-                        },
-                        iconRes = R.drawable.zoom,
-                        contentDescription = "Zoom",
-                        modifier = Modifier
-                            .align(Alignment.CenterEnd)
-                            .fillMaxHeight(0.6f)
-                            .padding(end = 8.dp),
-                    )
-                }
-            }
         }
 
-        Box(
-            contentAlignment = Alignment.Center,
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .weight(1f)
                 .fillMaxWidth()
                 .background(Color.Black)
                 .navigationBarsPadding()
+                .padding(horizontal = 12.dp)
         ) {
+            val cam = camera
+            val exposureState = cam?.cameraInfo?.exposureState
+            val exposureRange = exposureState?.exposureCompensationRange
+            val supportsExposure = exposureRange != null
+                    && exposureRange.lower < exposureRange.upper
+
+            if (supportsExposure && !brightnessValue.isNaN() && cam != null && exposureRange != null) {
+                CameraControlSlider(
+                    value = brightnessValue,
+                    onValueChange = { newValue ->
+                        brightnessValue = newValue
+                        val index = exposureRange.lower +
+                                ((exposureRange.upper - exposureRange.lower) * newValue).toInt()
+                        cam.cameraControl.setExposureCompensationIndex(index)
+                    },
+                    iconRes = R.drawable.brightness,
+                    contentDescription = "Brightness",
+                    modifier = Modifier.weight(1f),
+                )
+            } else {
+                Spacer(modifier = Modifier.weight(1f))
+            }
+
             val centerButtonModifier = Modifier
                 .padding(vertical = 10.dp)
                 .fillMaxHeight()
@@ -245,6 +230,21 @@ fun RecordVideoPageContent(
                     onClick = { record() },
                     modifier = centerButtonModifier,
                 )
+            }
+
+            if (cam != null && !zoomValue.isNaN()) {
+                CameraControlSlider(
+                    value = zoomValue,
+                    onValueChange = { newValue ->
+                        zoomValue = newValue
+                        cam.cameraControl.setLinearZoom(newValue)
+                    },
+                    iconRes = R.drawable.zoom,
+                    contentDescription = "Zoom",
+                    modifier = Modifier.weight(1f),
+                )
+            } else {
+                Spacer(modifier = Modifier.weight(1f))
             }
         }
     }

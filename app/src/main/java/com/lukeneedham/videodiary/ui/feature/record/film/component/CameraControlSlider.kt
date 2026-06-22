@@ -5,7 +5,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
-import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
@@ -34,12 +34,12 @@ fun CameraControlSlider(
     modifier: Modifier = Modifier,
 ) {
     val thumbRadiusDp = 10.dp
-    val trackWidthDp = 4.dp
-    val touchTargetWidthDp = 44.dp
+    val trackHeightDp = 4.dp
+    val touchTargetHeightDp = 44.dp
     val thumbRadiusPx = with(LocalDensity.current) { thumbRadiusDp.toPx() }
 
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
         modifier = modifier,
     ) {
         Image(
@@ -49,24 +49,24 @@ fun CameraControlSlider(
             modifier = Modifier.size(20.dp),
         )
 
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.width(8.dp))
 
         Canvas(
             modifier = Modifier
                 .weight(1f)
-                .width(touchTargetWidthDp)
+                .height(touchTargetHeightDp)
                 .pointerInput(Unit) {
                     awaitEachGesture {
                         val down = awaitFirstDown()
-                        val trackTop = thumbRadiusPx
-                        val trackBottom = size.height - thumbRadiusPx
-                        val trackHeight = trackBottom - trackTop
+                        val trackLeft = thumbRadiusPx
+                        val trackRight = size.width - thumbRadiusPx
+                        val trackWidth = trackRight - trackLeft
 
-                        fun valueFromY(y: Float): Float {
-                            return (1f - ((y - trackTop) / trackHeight)).coerceIn(0f, 1f)
+                        fun valueFromX(x: Float): Float {
+                            return ((x - trackLeft) / trackWidth).coerceIn(0f, 1f)
                         }
 
-                        onValueChange(valueFromY(down.position.y))
+                        onValueChange(valueFromX(down.position.x))
                         down.consume()
 
                         while (true) {
@@ -74,29 +74,29 @@ fun CameraControlSlider(
                             val change = event.changes.firstOrNull() ?: break
                             if (!change.pressed) break
                             change.consume()
-                            onValueChange(valueFromY(change.position.y))
+                            onValueChange(valueFromX(change.position.x))
                         }
                     }
                 }
         ) {
-            val centerX = size.width / 2
-            val trackTop = thumbRadiusPx
-            val trackBottom = size.height - thumbRadiusPx
-            val trackHeight = trackBottom - trackTop
-            val trackWidthPx = trackWidthDp.toPx()
+            val centerY = size.height / 2
+            val trackLeft = thumbRadiusPx
+            val trackRight = size.width - thumbRadiusPx
+            val trackWidth = trackRight - trackLeft
+            val trackHeightPx = trackHeightDp.toPx()
 
             drawRoundRect(
                 color = Color.White.copy(alpha = 0.3f),
-                topLeft = Offset(centerX - trackWidthPx / 2, trackTop),
-                size = Size(trackWidthPx, trackHeight),
-                cornerRadius = CornerRadius(trackWidthPx / 2),
+                topLeft = Offset(trackLeft, centerY - trackHeightPx / 2),
+                size = Size(trackWidth, trackHeightPx),
+                cornerRadius = CornerRadius(trackHeightPx / 2),
             )
 
-            val thumbY = trackTop + trackHeight * (1f - value)
+            val thumbX = trackLeft + trackWidth * value
             drawCircle(
                 color = Color.White,
                 radius = thumbRadiusPx,
-                center = Offset(centerX, thumbY),
+                center = Offset(thumbX, centerY),
             )
         }
     }
@@ -105,15 +105,15 @@ fun CameraControlSlider(
 @Preview
 @Composable
 private fun PreviewCameraControlSlider() {
-    Column(
-        modifier = Modifier.background(Color.DarkGray),
+    Row(
+        modifier = Modifier.background(Color.Black),
     ) {
         CameraControlSlider(
             value = 0.5f,
             onValueChange = {},
             iconRes = R.drawable.brightness,
             contentDescription = "Brightness",
-            modifier = Modifier.height(200.dp),
+            modifier = Modifier.width(150.dp),
         )
     }
 }
