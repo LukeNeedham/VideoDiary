@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -35,10 +34,8 @@ import com.lukeneedham.videodiary.domain.util.logger.Logger
 import com.lukeneedham.videodiary.ui.feature.common.camera.CameraInput
 import com.lukeneedham.videodiary.ui.feature.common.glass.GlassIconButton
 import com.lukeneedham.videodiary.ui.feature.common.glass.GlassRecordButton
-import com.lukeneedham.videodiary.ui.feature.common.glass.GlassSurface
 import com.lukeneedham.videodiary.ui.feature.common.glass.TopScrim
 import com.lukeneedham.videodiary.ui.feature.record.film.component.RecordingCountdownButton
-import com.lukeneedham.videodiary.ui.theme.Typography
 
 @Composable
 fun RecordVideoPageContent(
@@ -136,30 +133,6 @@ fun RecordVideoPageContent(
                     .safeDrawingPadding()
                     .padding(16.dp)
             )
-
-            val statusText = when (currentState) {
-                is RecordingState.Failed ->
-                    "Error! ${currentState.errorCode} : ${currentState.exception}"
-
-                is RecordingState.Recording,
-                is RecordingState.Success,
-                RecordingState.Ready -> null
-            }
-            if (statusText != null) {
-                GlassSurface(
-                    modifier = Modifier
-                        .align(Alignment.TopCenter)
-                        .safeDrawingPadding()
-                        .padding(top = 16.dp)
-                ) {
-                    Text(
-                        text = statusText,
-                        color = Color.White,
-                        fontSize = Typography.Size.big,
-                        modifier = Modifier.padding(horizontal = 24.dp, vertical = 12.dp)
-                    )
-                }
-            }
         }
 
         Box(
