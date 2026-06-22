@@ -60,7 +60,12 @@ class RootViewModel(
         }
         viewModelScope.launch {
             withContext(ioDispatcher) {
-                videosDao.generateMissingThumbnails()
+                if (settingsDao.getThumbnailVersion() < THUMBNAIL_VERSION) {
+                    videosDao.resyncAllThumbnails()
+                    settingsDao.setThumbnailVersion(THUMBNAIL_VERSION)
+                } else {
+                    videosDao.generateMissingThumbnails()
+                }
             }
         }
     }
@@ -71,6 +76,12 @@ class RootViewModel(
 
     fun onSetupComplete() {
         hasSetupCompleted = true
+    }
+
+    companion object {
+        // Bump when the thumbnail extraction algorithm changes, so existing
+        // thumbnails are regenerated on next startup.
+        private const val THUMBNAIL_VERSION = 1
     }
 
     private fun hasAllRequiredPermissions(): Boolean {

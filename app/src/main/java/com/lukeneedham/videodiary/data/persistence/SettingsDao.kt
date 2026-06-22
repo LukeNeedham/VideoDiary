@@ -40,6 +40,12 @@ class SettingsDao(
     /** Debug setting: whether the user is allowed to retake the video for a past day */
     private val allowEditPastDays = booleanPreferencesKey("debugAllowRetakeForPastDays")
 
+    /**
+     * Tracks the thumbnail extraction algorithm version so that all thumbnails
+     * can be regenerated once when the algorithm changes.
+     */
+    private val thumbnailVersionKey = intPreferencesKey("thumbnailVersion")
+
     suspend fun setResolution(resolution: Size) {
         val components = listOf(resolution.width, resolution.height)
         val string = components.joinToString(resolutionSeparator)
@@ -104,6 +110,14 @@ class SettingsDao(
         updatePrefs {
             set(allowEditPastDays, allow)
         }
+    }
+
+    suspend fun getThumbnailVersion(): Int {
+        return getPrefs()[thumbnailVersionKey] ?: 0
+    }
+
+    suspend fun setThumbnailVersion(version: Int) {
+        updatePrefs { set(thumbnailVersionKey, version) }
     }
 
     fun getAllowEditPastDaysFlow(): Flow<Boolean> {

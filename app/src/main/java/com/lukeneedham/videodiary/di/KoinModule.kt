@@ -60,7 +60,6 @@ object KoinModule {
         factory { ThumbnailFileNameMapper() }
         factory {
             VideoThumbnailExtractor(
-                context = androidContext(),
                 ioDispatcher = get(KoinQualifier.Dispatcher.io),
             )
         }
