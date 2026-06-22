@@ -13,8 +13,7 @@ fun CheckVideoPage(
         onCancelClick = onCancelClick,
         onRetakeClick = onRetakeClick,
         onAccepted = {
-            viewModel.acceptVideo()
-            onAccepted()
+            viewModel.acceptVideo { onAccepted() }
         },
         video = viewModel.video,
         videoAspectRatio = viewModel.videoAspectRatio,
