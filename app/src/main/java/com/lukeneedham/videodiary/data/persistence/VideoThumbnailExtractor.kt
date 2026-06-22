@@ -5,7 +5,6 @@ import android.graphics.Bitmap
 import androidx.core.net.toUri
 import androidx.media3.common.MediaItem
 import androidx.media3.common.util.UnstableApi
-import androidx.media3.exoplayer.mediacodec.MediaCodecSelector
 import androidx.media3.transformer.ExperimentalFrameExtractor
 import com.lukeneedham.videodiary.domain.util.logger.Logger
 import kotlinx.coroutines.CoroutineDispatcher
@@ -29,11 +28,7 @@ class VideoThumbnailExtractor(
     suspend fun extractFirstFrame(videoFile: File, thumbnailFile: File) {
         val frameExtractor = ExperimentalFrameExtractor(
             context,
-            ExperimentalFrameExtractor.Configuration.Builder()
-                // Match the hardware decoders used for on-screen playback, so the
-                // extracted frame's colours match the video's.
-                .setMediaCodecSelector(MediaCodecSelector.DEFAULT)
-                .build(),
+            ExperimentalFrameExtractor.Configuration.Builder().build(),
         )
         try {
             frameExtractor.setMediaItem(MediaItem.fromUri(videoFile.toUri()), emptyList())
