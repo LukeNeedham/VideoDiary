@@ -48,6 +48,7 @@ fun CameraInput(
     videoCapture: VideoCapture<Recorder>,
     canZoom: Boolean,
     onResolutionLoaded: (resolution: Size, isMissing: Boolean, rotation: CameraResolutionRotation) -> Unit,
+    onCameraReady: (Camera?) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
@@ -113,6 +114,11 @@ fun CameraInput(
 
     LaunchedEffect(previewView, videoCapture) {
         setupPreview()
+    }
+
+    val onCameraReadyUpdated by rememberUpdatedState(onCameraReady)
+    LaunchedEffect(camera) {
+        onCameraReadyUpdated(camera)
     }
 
     // Animate focus indicator: snap in, hold, then fade out

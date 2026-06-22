@@ -2,6 +2,7 @@ package com.lukeneedham.videodiary.ui.feature.record.film
 
 import android.net.Uri
 import android.util.Size
+import androidx.camera.core.Camera
 import androidx.camera.video.Quality
 import androidx.camera.video.QualitySelector
 import androidx.camera.video.Recorder
@@ -21,6 +22,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -37,6 +39,7 @@ import com.lukeneedham.videodiary.ui.feature.common.camera.CameraInput
 import com.lukeneedham.videodiary.ui.feature.common.glass.GlassIconButton
 import com.lukeneedham.videodiary.ui.feature.common.glass.GlassRecordButton
 import com.lukeneedham.videodiary.ui.feature.common.glass.TopScrim
+import com.lukeneedham.videodiary.ui.feature.record.film.component.CameraControlSlider
 import com.lukeneedham.videodiary.ui.feature.record.film.component.RecordingCountdownButton
 
 @Composable
@@ -52,6 +55,9 @@ fun RecordVideoPageContent(
     val coroutineScope = rememberCoroutineScope()
 
     var state: RecordingState by remember { mutableStateOf(RecordingState.Ready) }
+    var camera: Camera? by remember { mutableStateOf(null) }
+    var brightnessValue by remember { mutableFloatStateOf(0.5f) }
+    var zoomValue by remember { mutableFloatStateOf(0f) }
 
     val recorder = remember(quality) {
         Recorder.Builder()
@@ -118,6 +124,7 @@ fun RecordVideoPageContent(
                     }
                 },
                 canZoom = true,
+                onCameraReady = { camera = it },
                 modifier = Modifier.fillMaxSize()
             )
 
@@ -136,6 +143,47 @@ fun RecordVideoPageContent(
                     .safeDrawingPadding()
                     .padding(16.dp)
             )
+
+            if (currentState is RecordingState.Recording) {
+                val cam = camera
+                if (cam != null) {
+                    val exposureState = cam.cameraInfo.exposureState
+                    val exposureRange = exposureState.exposureCompensationRange
+                    val supportsExposure = exposureRange.lower < exposureRange.upper
+
+                    if (supportsExposure) {
+                        CameraControlSlider(
+                            value = brightnessValue,
+                            onValueChange = { newValue ->
+                                brightnessValue = newValue
+                                val index = exposureRange.lower +
+                                        ((exposureRange.upper - exposureRange.lower) * newValue).toInt()
+                                cam.cameraControl.setExposureCompensationIndex(index)
+                            },
+                            iconRes = R.drawable.brightness,
+                            contentDescription = "Brightness",
+                            modifier = Modifier
+                                .align(Alignment.CenterStart)
+                                .fillMaxHeight(0.6f)
+                                .padding(start = 8.dp),
+                        )
+                    }
+
+                    CameraControlSlider(
+                        value = zoomValue,
+                        onValueChange = { newValue ->
+                            zoomValue = newValue
+                            cam.cameraControl.setLinearZoom(newValue)
+                        },
+                        iconRes = R.drawable.zoom,
+                        contentDescription = "Zoom",
+                        modifier = Modifier
+                            .align(Alignment.CenterEnd)
+                            .fillMaxHeight(0.6f)
+                            .padding(end = 8.dp),
+                    )
+                }
+            }
         }
 
         Box(
