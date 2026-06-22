@@ -59,6 +59,10 @@ object deps {
             }
         }
 
+        object coroutines {
+            val guava = "org.jetbrains.kotlinx:kotlinx-coroutines-guava:1.8.0"
+        }
+
         object desugaring {
             val coreLibrary = "com.android.tools:desugar_jdk_libs:2.0.2"
         }

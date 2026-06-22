@@ -7,18 +7,12 @@ import androidx.media3.common.MediaItem
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.mediacodec.MediaCodecSelector
 import androidx.media3.transformer.ExperimentalFrameExtractor
-import com.google.common.util.concurrent.FutureCallback
-import com.google.common.util.concurrent.Futures
-import com.google.common.util.concurrent.ListenableFuture
-import com.google.common.util.concurrent.MoreExecutors
 import com.lukeneedham.videodiary.domain.util.logger.Logger
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.guava.await
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileOutputStream
-import kotlin.coroutines.resume
-import kotlin.coroutines.resumeWithException
 
 /**
  * Extracts the first frame of a video file and saves it as a JPEG thumbnail.
@@ -60,16 +54,3 @@ class VideoThumbnailExtractor(
         private const val jpegQuality = 90
     }
 }
-
-private suspend fun <T> ListenableFuture<T>.await(): T =
-    suspendCancellableCoroutine { continuation ->
-        Futures.addCallback(
-            this,
-            object : FutureCallback<T> {
-                override fun onSuccess(result: T) = continuation.resume(result)
-                override fun onFailure(t: Throwable) = continuation.resumeWithException(t)
-            },
-            MoreExecutors.directExecutor(),
-        )
-        continuation.invokeOnCancellation { cancel(false) }
-    }
