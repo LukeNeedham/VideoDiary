@@ -30,6 +30,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.lukeneedham.videodiary.R
+import com.lukeneedham.videodiary.ui.theme.AccentAccept
 import com.lukeneedham.videodiary.ui.theme.AccentRecord
 import com.lukeneedham.videodiary.ui.theme.GlassBorder
 import com.lukeneedham.videodiary.ui.theme.GlassFill
@@ -135,6 +136,38 @@ fun GlassRecordButton(
                 .size(innerSize)
                 .background(AccentRecord, innerShape)
         )
+    }
+}
+
+@Composable
+fun GlassAcceptButton(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+) {
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = modifier
+            .size(76.dp)
+            .alpha(if (enabled) 1f else 0.4f)
+            .clip(CircleShape)
+            .background(GlassFill, CircleShape)
+            .border(width = 3.dp, color = Color.White, shape = CircleShape)
+            .clickable(enabled = enabled, onClick = onClick),
+    ) {
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = Modifier
+                .size(60.dp)
+                .background(AccentAccept, CircleShape)
+        ) {
+            Image(
+                painter = painterResource(R.drawable.tick),
+                contentDescription = "Accept",
+                colorFilter = ColorFilter.tint(Color.White),
+                modifier = Modifier.size(32.dp),
+            )
+        }
     }
 }
 
