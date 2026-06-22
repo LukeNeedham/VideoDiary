@@ -2,5 +2,5 @@
 This is an ordered list of todo items. Each item should be done in isolation, and a separate PR opened for each item. Items must be done in order. When an item is done, the PR should include the original TODO text in the description, and the todo should be removed from this list. When asked to implement the top todo item, you always take just the top item.
 
 # Todos
-- clicking the recording button cancels the current recording and goes back to the record button state, where no recording is yet in progress
+- fix the flash when navigating from the record page to the video review page - it flashes with the "confirm" button being enormous, because the video isnt rendering yet (so 0 height)
 - when a video is recording, show a slider on the left hand side to control brightness, and a slider on the right hand side to control zoom
