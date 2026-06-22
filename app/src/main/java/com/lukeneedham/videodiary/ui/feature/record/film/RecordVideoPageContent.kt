@@ -44,6 +44,7 @@ fun RecordVideoPageContent(
     videoDurationMillis: Long,
     resolution: Size,
     quality: Quality,
+    videoAspectRatio: Float,
     onRecordingFinished: (videoContentUri: Uri) -> Unit,
     onBack: () -> Unit,
 ) {
@@ -106,7 +107,7 @@ fun RecordVideoPageContent(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .aspectRatio(resolution.width.toFloat() / resolution.height.toFloat())
+                .aspectRatio(videoAspectRatio)
         ) {
             CameraInput(
                 currentResolution = resolution,
@@ -179,6 +180,7 @@ internal fun PreviewRecordVideoPage() {
     RecordVideoPageContent(
         quality = Quality.HD,
         resolution = Size(100, 300),
+        videoAspectRatio = 100f / 300f,
         onRecordingFinished = {},
         videoDurationMillis = 3000,
         onBack = {},

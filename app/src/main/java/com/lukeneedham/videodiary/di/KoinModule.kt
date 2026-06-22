@@ -139,6 +139,7 @@ object KoinModule {
         viewModel {
             RecordVideoViewModel(
                 settingsDao = get(),
+                videoResolutionRepository = get(),
             )
         }
         viewModel { (date: LocalDate, videoContentUri: Uri) ->

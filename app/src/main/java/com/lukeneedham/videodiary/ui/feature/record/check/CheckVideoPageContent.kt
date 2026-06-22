@@ -44,35 +44,35 @@ fun CheckVideoPageContent(
     Column(
         modifier = Modifier.fillMaxSize()
     ) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .aspectRatio(videoAspectRatio ?: (9f / 16f))
-        ) {
-            if (videoAspectRatio != null) {
+        if (videoAspectRatio != null) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .aspectRatio(videoAspectRatio)
+            ) {
                 VideoPlayer(
                     video = video,
                     aspectRatio = videoAspectRatio,
                     controller = videoPlayerController,
                     modifier = Modifier.fillMaxSize(),
                 )
+
+                TopScrim(
+                    modifier = Modifier
+                        .align(Alignment.TopCenter)
+                        .height(140.dp)
+                )
+
+                GlassIconButton(
+                    iconRes = R.drawable.close,
+                    contentDescription = "Cancel",
+                    onClick = onCancelClick,
+                    modifier = Modifier
+                        .align(Alignment.TopStart)
+                        .safeDrawingPadding()
+                        .padding(16.dp)
+                )
             }
-
-            TopScrim(
-                modifier = Modifier
-                    .align(Alignment.TopCenter)
-                    .height(140.dp)
-            )
-
-            GlassIconButton(
-                iconRes = R.drawable.close,
-                contentDescription = "Cancel",
-                onClick = onCancelClick,
-                modifier = Modifier
-                    .align(Alignment.TopStart)
-                    .safeDrawingPadding()
-                    .padding(16.dp)
-            )
         }
 
         Box(
