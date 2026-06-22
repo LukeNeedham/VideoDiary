@@ -101,10 +101,11 @@ class VideosDao(
     }
 
     /**
-     * Deletes all existing thumbnails, then regenerates a thumbnail for every persisted video.
+     * Regenerates the thumbnail for every persisted video, overwriting any
+     * existing thumbnails. Avoids deleting files first so that the calendar
+     * can still display existing thumbnails while regeneration is in progress.
      */
     suspend fun resyncAllThumbnails() {
-        thumbnailsDir.listFiles()?.forEach { it.delete() }
         generateThumbnails(onlyMissing = false)
     }
 
