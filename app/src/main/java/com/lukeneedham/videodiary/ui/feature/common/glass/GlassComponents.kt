@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
@@ -30,6 +31,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.lukeneedham.videodiary.R
+import com.lukeneedham.videodiary.ui.theme.AccentAccept
 import com.lukeneedham.videodiary.ui.theme.AccentRecord
 import com.lukeneedham.videodiary.ui.theme.GlassBorder
 import com.lukeneedham.videodiary.ui.theme.GlassFill
@@ -121,7 +123,6 @@ fun GlassRecordButton(
     Box(
         contentAlignment = Alignment.Center,
         modifier = modifier
-            .size(76.dp)
             .alpha(if (enabled) 1f else 0.4f)
             .clip(CircleShape)
             .background(GlassFill, CircleShape)
@@ -129,12 +130,43 @@ fun GlassRecordButton(
             .clickable(enabled = enabled, onClick = onClick),
     ) {
         val innerShape = if (isRecording) RoundedCornerShape(8.dp) else CircleShape
-        val innerSize = if (isRecording) 28.dp else 60.dp
+        val innerFraction = if (isRecording) 0.37f else 0.79f
         Box(
             modifier = Modifier
-                .size(innerSize)
+                .fillMaxSize(innerFraction)
                 .background(AccentRecord, innerShape)
         )
+    }
+}
+
+@Composable
+fun GlassAcceptButton(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+) {
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = modifier
+            .alpha(if (enabled) 1f else 0.4f)
+            .clip(CircleShape)
+            .background(GlassFill, CircleShape)
+            .border(width = 3.dp, color = Color.White, shape = CircleShape)
+            .clickable(enabled = enabled, onClick = onClick),
+    ) {
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = Modifier
+                .fillMaxSize(0.79f)
+                .background(AccentAccept, CircleShape)
+        ) {
+            Image(
+                painter = painterResource(R.drawable.tick),
+                contentDescription = "Accept",
+                colorFilter = ColorFilter.tint(Color.White),
+                modifier = Modifier.fillMaxSize(0.53f),
+            )
+        }
     }
 }
 
@@ -190,10 +222,12 @@ private fun PreviewGlassComponents() {
             GlassRecordButton(
                 isRecording = false,
                 onClick = {},
+                modifier = Modifier.size(76.dp),
             )
             GlassRecordButton(
                 isRecording = true,
                 onClick = {},
+                modifier = Modifier.size(76.dp),
             )
         }
     }

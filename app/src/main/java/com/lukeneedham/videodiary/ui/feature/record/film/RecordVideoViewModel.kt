@@ -7,15 +7,20 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.lukeneedham.videodiary.data.persistence.SettingsDao
+import com.lukeneedham.videodiary.data.repository.VideoResolutionRepository
 import kotlinx.coroutines.launch
 
 class RecordVideoViewModel(
     private val settingsDao: SettingsDao,
+    private val videoResolutionRepository: VideoResolutionRepository,
 ) : ViewModel() {
     var resolution: Size? by mutableStateOf(null)
         private set
 
     var videoDurationMillis: Long? by mutableStateOf(null)
+        private set
+
+    var videoAspectRatio: Float? by mutableStateOf(null)
         private set
 
     init {
@@ -25,6 +30,10 @@ class RecordVideoViewModel(
 
         viewModelScope.launch {
             videoDurationMillis = settingsDao.getVideoDuration()?.inWholeMilliseconds
+        }
+
+        viewModelScope.launch {
+            videoAspectRatio = videoResolutionRepository.getAspectRatio()
         }
     }
 }
