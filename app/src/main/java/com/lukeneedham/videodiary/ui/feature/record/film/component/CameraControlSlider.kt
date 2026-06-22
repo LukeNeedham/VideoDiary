@@ -5,8 +5,9 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
-import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -38,8 +39,8 @@ fun CameraControlSlider(
     val touchTargetHeightDp = 44.dp
     val thumbRadiusPx = with(LocalDensity.current) { thumbRadiusDp.toPx() }
 
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier,
     ) {
         Image(
@@ -49,11 +50,11 @@ fun CameraControlSlider(
             modifier = Modifier.size(20.dp),
         )
 
-        Spacer(modifier = Modifier.width(8.dp))
+        Spacer(modifier = Modifier.height(4.dp))
 
         Canvas(
             modifier = Modifier
-                .weight(1f)
+                .fillMaxWidth()
                 .height(touchTargetHeightDp)
                 .pointerInput(Unit) {
                     awaitEachGesture {
@@ -105,7 +106,7 @@ fun CameraControlSlider(
 @Preview
 @Composable
 private fun PreviewCameraControlSlider() {
-    Row(
+    Column(
         modifier = Modifier.background(Color.Black),
     ) {
         CameraControlSlider(
