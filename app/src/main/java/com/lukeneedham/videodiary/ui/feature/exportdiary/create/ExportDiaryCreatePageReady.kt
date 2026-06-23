@@ -36,6 +36,8 @@ import com.lukeneedham.videodiary.ui.feature.common.Button
 import com.lukeneedham.videodiary.ui.feature.common.datepicker.DiaryDatePickerDialog
 import com.lukeneedham.videodiary.ui.feature.exportdiary.create.component.ExportDiaryCreateDatePicker
 import com.lukeneedham.videodiary.ui.feature.exportdiary.create.component.ExportDiaryEmptyCreate
+import com.lukeneedham.videodiary.ui.feature.exportdiary.create.component.ExportDiaryThumbnailGrid
+import com.lukeneedham.videodiary.ui.feature.exportdiary.create.model.ExportDayThumbnail
 import com.lukeneedham.videodiary.ui.feature.exportdiary.create.model.ExportState
 import com.lukeneedham.videodiary.ui.theme.Typography
 import java.time.LocalDate
@@ -44,6 +46,7 @@ import java.time.LocalDate
 fun ExportDiaryCreatePageReady(
     totalVideoCount: Int,
     selectedVideoCount: Int?,
+    selectedDayThumbnails: List<ExportDayThumbnail>?,
     exportStartDate: LocalDate,
     exportEndDate: LocalDate,
     exportState: ExportState,
@@ -154,6 +157,22 @@ fun ExportDiaryCreatePageReady(
                                 )
                             )
                         }
+
+                        if (!selectedDayThumbnails.isNullOrEmpty()) {
+                            Spacer(modifier = Modifier.height(20.dp))
+
+                            Text(
+                                text = "Videos to include:",
+                                color = Color.Black,
+                                fontSize = Typography.Size.small,
+                            )
+
+                            Spacer(modifier = Modifier.height(10.dp))
+
+                            ExportDiaryThumbnailGrid(
+                                thumbnails = selectedDayThumbnails,
+                            )
+                        }
                     }
                     Spacer(modifier = Modifier.height(10.dp))
 
@@ -243,6 +262,7 @@ internal fun PreviewExportDiaryCreatePageReady() {
     ExportDiaryCreatePageReady(
         totalVideoCount = 10,
         selectedVideoCount = 5,
+        selectedDayThumbnails = emptyList(),
         exportStartDate = MockDataExportDiaryCreate.startDate,
         exportEndDate = MockDataExportDiaryCreate.endDate,
         exportState = MockDataExportDiaryCreate.exportState,
