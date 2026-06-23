@@ -104,7 +104,7 @@ fun CameraControlSlider(
 
 @Preview
 @Composable
-private fun PreviewCameraControlSlider() {
+private fun Preview() {
     Column(
         modifier = Modifier.background(Color.Black),
     ) {
