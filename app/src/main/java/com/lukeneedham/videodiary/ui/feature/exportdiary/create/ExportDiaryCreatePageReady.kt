@@ -2,6 +2,8 @@ package com.lukeneedham.videodiary.ui.feature.exportdiary.create
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -34,6 +36,7 @@ import com.lukeneedham.videodiary.ui.feature.exportdiary.create.model.ExportStat
 import com.lukeneedham.videodiary.ui.theme.Typography
 import java.time.LocalDate
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun ExportDiaryCreatePageReady(
     totalVideoCount: Int,
@@ -73,30 +76,34 @@ fun ExportDiaryCreatePageReady(
                             .weight(1f)
                             .verticalScroll(rememberScrollState())
                     ) {
-                        Text(
-                            text = "Export will include videos...",
-                            color = Color.Black,
-                            fontSize = Typography.Size.small,
-                        )
-                        Spacer(modifier = Modifier.height(20.dp))
-
-                        ExportDiaryCreateDatePicker(
-                            date = exportStartDate,
-                            label = "From",
-                            onChange = {
-                                showStartDatePicker = true
-                            },
-                        )
-
-                        Spacer(modifier = Modifier.height(20.dp))
-
-                        ExportDiaryCreateDatePicker(
-                            date = exportEndDate,
-                            label = "To",
-                            onChange = {
-                                showEndDatePicker = true
-                            },
-                        )
+                        FlowRow(
+                            verticalArrangement = androidx.compose.foundation.layout.Arrangement.Center,
+                        ) {
+                            Text(
+                                text = "Export from ",
+                                color = Color.Black,
+                                fontSize = Typography.Size.small,
+                                modifier = Modifier.align(Alignment.CenterVertically),
+                            )
+                            ExportDiaryCreateDatePicker(
+                                date = exportStartDate,
+                                onClick = {
+                                    showStartDatePicker = true
+                                },
+                            )
+                            Text(
+                                text = " up to and including ",
+                                color = Color.Black,
+                                fontSize = Typography.Size.small,
+                                modifier = Modifier.align(Alignment.CenterVertically),
+                            )
+                            ExportDiaryCreateDatePicker(
+                                date = exportEndDate,
+                                onClick = {
+                                    showEndDatePicker = true
+                                },
+                            )
+                        }
 
                         Spacer(modifier = Modifier.height(30.dp))
 
