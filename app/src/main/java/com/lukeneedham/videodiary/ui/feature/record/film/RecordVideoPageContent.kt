@@ -208,7 +208,7 @@ fun RecordVideoPageContent(
             }
 
             val centerButtonModifier = Modifier
-                .padding(vertical = 10.dp)
+                 .padding(vertical = 10.dp, horizontal = 5.dp)
                 .fillMaxHeight()
                 .aspectRatio(1f)
             if (currentState is RecordingState.Recording) {
