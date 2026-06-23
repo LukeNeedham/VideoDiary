@@ -182,7 +182,7 @@ fun RecordVideoPageContent(
                 .fillMaxWidth()
                 .background(Color.Black)
                 .navigationBarsPadding()
-                .padding(horizontal = 12.dp)
+                .padding(horizontal = 8.dp)
         ) {
             val cam = camera
             val exposureState = cam?.cameraInfo?.exposureState
