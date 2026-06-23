@@ -3,6 +3,7 @@ package com.lukeneedham.videodiary.ui.feature.exportdiary.create.component
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Text
@@ -26,12 +27,12 @@ fun ExportDiaryCreateDatePicker(
     Box(
         contentAlignment = Alignment.Center,
         modifier = Modifier
+            .fillMaxSize()
             .background(
                 color = Color.Black,
-                shape = RoundedCornerShape(10.dp),
+                shape = RoundedCornerShape(8.dp),
             )
             .clickable { onClick() }
-            .padding(horizontal = 12.dp, vertical = 8.dp)
     ) {
         Text(
             text = dateText,

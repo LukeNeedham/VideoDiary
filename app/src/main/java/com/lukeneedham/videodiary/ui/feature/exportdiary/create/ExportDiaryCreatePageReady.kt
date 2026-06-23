@@ -2,8 +2,6 @@ package com.lukeneedham.videodiary.ui.feature.exportdiary.create
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -12,6 +10,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.appendInlineContent
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Checkbox
 import androidx.compose.material.CheckboxDefaults
@@ -25,9 +24,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.Placeholder
+import androidx.compose.ui.text.PlaceholderVerticalAlign
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.em
+import androidx.compose.ui.unit.sp
 import com.lukeneedham.videodiary.ui.feature.common.Button
 import com.lukeneedham.videodiary.ui.feature.common.datepicker.DiaryDatePickerDialog
 import com.lukeneedham.videodiary.ui.feature.exportdiary.create.component.ExportDiaryCreateDatePicker
@@ -36,7 +40,6 @@ import com.lukeneedham.videodiary.ui.feature.exportdiary.create.model.ExportStat
 import com.lukeneedham.videodiary.ui.theme.Typography
 import java.time.LocalDate
 
-@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun ExportDiaryCreatePageReady(
     totalVideoCount: Int,
@@ -76,34 +79,48 @@ fun ExportDiaryCreatePageReady(
                             .weight(1f)
                             .verticalScroll(rememberScrollState())
                     ) {
-                        FlowRow(
-                            verticalArrangement = androidx.compose.foundation.layout.Arrangement.Center,
-                        ) {
-                            Text(
-                                text = "Export from ",
-                                color = Color.Black,
-                                fontSize = Typography.Size.small,
-                                modifier = Modifier.align(Alignment.CenterVertically),
-                            )
-                            ExportDiaryCreateDatePicker(
-                                date = exportStartDate,
-                                onClick = {
-                                    showStartDatePicker = true
-                                },
-                            )
-                            Text(
-                                text = " up to and including ",
-                                color = Color.Black,
-                                fontSize = Typography.Size.small,
-                                modifier = Modifier.align(Alignment.CenterVertically),
-                            )
-                            ExportDiaryCreateDatePicker(
-                                date = exportEndDate,
-                                onClick = {
-                                    showEndDatePicker = true
-                                },
-                            )
+                        val startDateId = "startDate"
+                        val endDateId = "endDate"
+
+                        val annotatedString = buildAnnotatedString {
+                            append("Export from ")
+                            appendInlineContent(startDateId)
+                            append(" up to and including ")
+                            appendInlineContent(endDateId)
                         }
+
+                        val datePlaceholder = Placeholder(
+                            width = 7.5.em,
+                            height = 2.em,
+                            placeholderVerticalAlign = PlaceholderVerticalAlign.Center,
+                        )
+
+                        val inlineContent = mapOf(
+                            startDateId to androidx.compose.foundation.text.InlineTextContent(
+                                placeholder = datePlaceholder,
+                            ) {
+                                ExportDiaryCreateDatePicker(
+                                    date = exportStartDate,
+                                    onClick = { showStartDatePicker = true },
+                                )
+                            },
+                            endDateId to androidx.compose.foundation.text.InlineTextContent(
+                                placeholder = datePlaceholder,
+                            ) {
+                                ExportDiaryCreateDatePicker(
+                                    date = exportEndDate,
+                                    onClick = { showEndDatePicker = true },
+                                )
+                            },
+                        )
+
+                        Text(
+                            text = annotatedString,
+                            inlineContent = inlineContent,
+                            color = Color.Black,
+                            fontSize = Typography.Size.small,
+                            lineHeight = 44.sp,
+                        )
 
                         Spacer(modifier = Modifier.height(30.dp))
 
