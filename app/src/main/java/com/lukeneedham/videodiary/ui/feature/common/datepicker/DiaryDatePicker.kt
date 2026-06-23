@@ -14,6 +14,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -27,6 +28,8 @@ import com.lukeneedham.videodiary.domain.model.Day
 import com.lukeneedham.videodiary.ui.theme.Typography
 import java.time.DayOfWeek
 import java.time.LocalDate
+import java.time.format.TextStyle
+import java.util.Locale
 
 @Composable
 fun DiaryDatePicker(
@@ -34,6 +37,7 @@ fun DiaryDatePicker(
     weeks: List<List<Day>>,
     videoAspectRatio: Float,
     onDateSelected: (LocalDate) -> Unit,
+    onFirstVisibleMonthChanged: (monthName: String, year: String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val weekDays = weeks.map { week ->
@@ -57,9 +61,10 @@ fun DiaryDatePicker(
             if (!isCurrentWeek && isEmpty) {
                 val previous = lastOrNull()
                 if (previous is WeekRow.Collapsed) {
-                    this[lastIndex] = WeekRow.Collapsed(previous.weekCount + 1)
+                    this[lastIndex] = WeekRow.Collapsed(previous.weekCount + 1, previous.firstDate)
                 } else {
-                    add(WeekRow.Collapsed(weekCount = 1))
+                    val firstDate = week.filterIsInstance<Weekday.Value>().first().day.date
+                    add(WeekRow.Collapsed(weekCount = 1, firstDate = firstDate))
                 }
             } else {
                 add(WeekRow.Normal(week))
@@ -80,6 +85,27 @@ fun DiaryDatePicker(
 
     LaunchedEffect(firstVisibleWeekIndex) {
         state.scrollToItem(firstVisibleWeekIndex)
+    }
+
+    LaunchedEffect(rows) {
+        snapshotFlow { state.firstVisibleItemIndex }
+            .collect { index ->
+                if (index in rows.indices) {
+                    val date = when (val row = rows[index]) {
+                        is WeekRow.Normal -> {
+                            row.week.filterIsInstance<Weekday.Value>()
+                                .firstOrNull()?.day?.date
+                        }
+                        is WeekRow.Collapsed -> row.firstDate
+                    }
+                    if (date != null) {
+                        val monthName = date.month.getDisplayName(
+                            TextStyle.FULL, Locale.getDefault()
+                        )
+                        onFirstVisibleMonthChanged(monthName, date.year.toString())
+                    }
+                }
+            }
     }
 
     LazyColumn(
@@ -172,7 +198,7 @@ private sealed interface Weekday {
 
 private sealed interface WeekRow {
     data class Normal(val week: List<Weekday>) : WeekRow
-    data class Collapsed(val weekCount: Int) : WeekRow
+    data class Collapsed(val weekCount: Int, val firstDate: LocalDate) : WeekRow
 }
 
 @Preview
@@ -183,5 +209,6 @@ private fun Preview() {
         weeks = MockDataDiaryDatePicker.weeks,
         videoAspectRatio = MockDataDiaryDatePicker.videoAspectRatio,
         onDateSelected = {},
+        onFirstVisibleMonthChanged = { _, _ -> },
     )
 }
