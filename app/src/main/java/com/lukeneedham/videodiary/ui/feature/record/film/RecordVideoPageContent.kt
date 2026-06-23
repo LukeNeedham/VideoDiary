@@ -2,6 +2,8 @@ package com.lukeneedham.videodiary.ui.feature.record.film
 
 import android.net.Uri
 import android.util.Size
+import androidx.camera.core.Camera
+import androidx.camera.core.ZoomState
 import androidx.camera.video.Quality
 import androidx.camera.video.QualitySelector
 import androidx.camera.video.Recorder
@@ -9,6 +11,8 @@ import androidx.camera.video.VideoCapture
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -17,10 +21,12 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
+import androidx.lifecycle.Observer
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -37,6 +43,7 @@ import com.lukeneedham.videodiary.ui.feature.common.camera.CameraInput
 import com.lukeneedham.videodiary.ui.feature.common.glass.GlassIconButton
 import com.lukeneedham.videodiary.ui.feature.common.glass.GlassRecordButton
 import com.lukeneedham.videodiary.ui.feature.common.glass.TopScrim
+import com.lukeneedham.videodiary.ui.feature.record.film.component.CameraControlSlider
 import com.lukeneedham.videodiary.ui.feature.record.film.component.RecordingCountdownButton
 
 @Composable
@@ -52,6 +59,35 @@ fun RecordVideoPageContent(
     val coroutineScope = rememberCoroutineScope()
 
     var state: RecordingState by remember { mutableStateOf(RecordingState.Ready) }
+    var camera: Camera? by remember { mutableStateOf(null) }
+    var brightnessValue by remember { mutableFloatStateOf(Float.NaN) }
+    var zoomValue by remember { mutableFloatStateOf(Float.NaN) }
+
+    LaunchedEffect(camera) {
+        val cam = camera ?: return@LaunchedEffect
+        val exposureState = cam.cameraInfo.exposureState
+        val range = exposureState.exposureCompensationRange
+        if (range.lower < range.upper) {
+            val current = exposureState.exposureCompensationIndex
+            brightnessValue = ((current - range.lower).toFloat() / (range.upper - range.lower))
+        }
+    }
+
+    DisposableEffect(camera) {
+        val cam = camera
+        val observer = if (cam != null) {
+            val obs = Observer<ZoomState> { zoomState ->
+                zoomValue = zoomState.linearZoom
+            }
+            cam.cameraInfo.zoomState.observeForever(obs)
+            obs
+        } else null
+        onDispose {
+            if (cam != null && observer != null) {
+                cam.cameraInfo.zoomState.removeObserver(observer)
+            }
+        }
+    }
 
     val recorder = remember(quality) {
         Recorder.Builder()
@@ -118,6 +154,7 @@ fun RecordVideoPageContent(
                     }
                 },
                 canZoom = true,
+                onCameraReady = { camera = it },
                 modifier = Modifier.fillMaxSize()
             )
 
@@ -138,16 +175,40 @@ fun RecordVideoPageContent(
             )
         }
 
-        Box(
-            contentAlignment = Alignment.Center,
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .weight(1f)
                 .fillMaxWidth()
                 .background(Color.Black)
                 .navigationBarsPadding()
+                .padding(horizontal = 8.dp)
         ) {
+            val cam = camera
+            val exposureState = cam?.cameraInfo?.exposureState
+            val exposureRange = exposureState?.exposureCompensationRange
+            val supportsExposure = exposureRange != null
+                    && exposureRange.lower < exposureRange.upper
+
+            if (supportsExposure && !brightnessValue.isNaN() && cam != null && exposureRange != null) {
+                CameraControlSlider(
+                    value = brightnessValue,
+                    onValueChange = { newValue ->
+                        brightnessValue = newValue
+                        val index = exposureRange.lower +
+                                ((exposureRange.upper - exposureRange.lower) * newValue).toInt()
+                        cam.cameraControl.setExposureCompensationIndex(index)
+                    },
+                    iconRes = R.drawable.brightness,
+                    contentDescription = "Brightness",
+                    modifier = Modifier.weight(1f),
+                )
+            } else {
+                Spacer(modifier = Modifier.weight(1f))
+            }
+
             val centerButtonModifier = Modifier
-                .padding(vertical = 10.dp)
+                 .padding(vertical = 10.dp, horizontal = 5.dp)
                 .fillMaxHeight()
                 .aspectRatio(1f)
             if (currentState is RecordingState.Recording) {
@@ -169,6 +230,21 @@ fun RecordVideoPageContent(
                     onClick = { record() },
                     modifier = centerButtonModifier,
                 )
+            }
+
+            if (cam != null && !zoomValue.isNaN()) {
+                CameraControlSlider(
+                    value = zoomValue,
+                    onValueChange = { newValue ->
+                        zoomValue = newValue
+                        cam.cameraControl.setLinearZoom(newValue)
+                    },
+                    iconRes = R.drawable.zoom,
+                    contentDescription = "Zoom",
+                    modifier = Modifier.weight(1f),
+                )
+            } else {
+                Spacer(modifier = Modifier.weight(1f))
             }
         }
     }
