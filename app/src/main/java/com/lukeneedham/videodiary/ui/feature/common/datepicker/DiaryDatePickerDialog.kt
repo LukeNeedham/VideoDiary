@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.draw.clip
@@ -59,8 +58,7 @@ fun DiaryDatePickerDialog(
             modifier = Modifier
                 .fillMaxWidth(0.9f)
                 .fillMaxHeight(0.6f)
-                .clip(RoundedCornerShape(10.dp))
-                .background(color = Color.White)
+                .background(color = Color.White, shape = RoundedCornerShape(10.dp))
         ) {
             Box(
                 modifier = Modifier
@@ -108,11 +106,12 @@ fun DiaryDatePickerDialog(
                     modifier = Modifier
                         .weight(1f)
                         .fillMaxWidth()
+                        .padding(bottom = 2.dp)
+                        .clip(RoundedCornerShape(bottomStart = 10.dp, bottomEnd = 10.dp))
                 )
             } else {
                 Spacer(modifier = Modifier.weight(1f))
             }
-            Spacer(modifier = Modifier.height(2.dp))
         }
     }
 }
