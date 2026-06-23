@@ -28,8 +28,6 @@ import com.lukeneedham.videodiary.domain.model.Day
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
-import java.time.format.TextStyle
-import java.util.Locale
 
 @Composable
 fun DiaryDatePickerDay(
@@ -62,17 +60,6 @@ fun DiaryDatePickerDay(
                 fontWeight = FontWeight.Bold,
                 fontSize = 10.sp,
             )
-            val isFirstDayOfMonth = date.dayOfMonth == 1
-            if (isFirstDayOfMonth) {
-                Text(
-                    text = date.month.getDisplayName(
-                        TextStyle.SHORT,
-                        Locale.getDefault()
-                    ),
-                    color = Color.White,
-                    fontSize = 7.sp,
-                )
-            }
             val isFirstDayOfYear = date.dayOfYear == 1
             if (isFirstDayOfYear) {
                 Text(
