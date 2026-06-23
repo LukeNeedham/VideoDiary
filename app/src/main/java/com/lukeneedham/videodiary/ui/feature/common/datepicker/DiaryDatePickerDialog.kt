@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
@@ -25,6 +26,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import org.koin.compose.koinInject
@@ -44,6 +46,7 @@ fun DiaryDatePickerDialog(
     }
 
     var topBarMonthName by remember { mutableStateOf("") }
+    var topBarYear by remember { mutableStateOf("") }
 
     Dialog(
         onDismissRequest = onDismiss,
@@ -62,20 +65,29 @@ fun DiaryDatePickerDialog(
                     .fillMaxWidth()
                     .padding(4.dp)
             ) {
-                Text(
-                    text = topBarMonthName,
-                    fontWeight = FontWeight.Bold,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.align(Alignment.Center)
-                )
                 Icon(
                     imageVector = Icons.Default.Close,
                     contentDescription = "Close",
                     modifier = Modifier
-                        .align(Alignment.CenterEnd)
+                        .align(Alignment.CenterStart)
                         .clickable { onDismiss() }
                         .padding(8.dp)
                 )
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier.align(Alignment.Center)
+                ) {
+                    Text(
+                        text = topBarMonthName,
+                        fontWeight = FontWeight.Bold,
+                        textAlign = TextAlign.Center,
+                    )
+                    Text(
+                        text = topBarYear,
+                        fontSize = 12.sp,
+                        textAlign = TextAlign.Center,
+                    )
+                }
             }
             val videoAspectRatio = viewModel.videoAspectRatio
             if (videoAspectRatio != null) {
@@ -87,7 +99,10 @@ fun DiaryDatePickerDialog(
                         onDateSelected(it)
                         onDismiss()
                     },
-                    onFirstVisibleMonthChanged = { topBarMonthName = it },
+                    onFirstVisibleMonthChanged = { monthName, year ->
+                        topBarMonthName = monthName
+                        topBarYear = year
+                    },
                     modifier = Modifier
                         .weight(1f)
                         .fillMaxWidth()
@@ -95,6 +110,7 @@ fun DiaryDatePickerDialog(
             } else {
                 Spacer(modifier = Modifier.weight(1f))
             }
+            Spacer(modifier = Modifier.height(2.dp))
         }
     }
 }

@@ -37,7 +37,7 @@ fun DiaryDatePicker(
     weeks: List<List<Day>>,
     videoAspectRatio: Float,
     onDateSelected: (LocalDate) -> Unit,
-    onFirstVisibleMonthChanged: (String) -> Unit,
+    onFirstVisibleMonthChanged: (monthName: String, year: String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val weekDays = weeks.map { week ->
@@ -91,19 +91,18 @@ fun DiaryDatePicker(
         snapshotFlow { state.firstVisibleItemIndex }
             .collect { index ->
                 if (index in rows.indices) {
-                    val monthName = when (val row = rows[index]) {
+                    val date = when (val row = rows[index]) {
                         is WeekRow.Normal -> {
                             row.week.filterIsInstance<Weekday.Value>()
-                                .firstOrNull()?.day?.date?.month
-                                ?.getDisplayName(TextStyle.FULL, Locale.getDefault())
+                                .firstOrNull()?.day?.date
                         }
-                        is WeekRow.Collapsed -> {
-                            row.firstDate.month
-                                .getDisplayName(TextStyle.FULL, Locale.getDefault())
-                        }
+                        is WeekRow.Collapsed -> row.firstDate
                     }
-                    if (monthName != null) {
-                        onFirstVisibleMonthChanged(monthName)
+                    if (date != null) {
+                        val monthName = date.month.getDisplayName(
+                            TextStyle.FULL, Locale.getDefault()
+                        )
+                        onFirstVisibleMonthChanged(monthName, date.year.toString())
                     }
                 }
             }
@@ -210,6 +209,6 @@ private fun Preview() {
         weeks = MockDataDiaryDatePicker.weeks,
         videoAspectRatio = MockDataDiaryDatePicker.videoAspectRatio,
         onDateSelected = {},
-        onFirstVisibleMonthChanged = {},
+        onFirstVisibleMonthChanged = { _, _ -> },
     )
 }
