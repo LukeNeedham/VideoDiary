@@ -5,3 +5,4 @@ This is an ordered list of todo items. Each item should be done in isolation, an
 - change the export page date pickers. in a single line it should read "export from X up to and including Y", where X and Y are filled with dates, and are clickable, and open the date picker when clicked. to make clear they are clickable they should be inside buttons with a background
 - make the app reactive to the current date. if the current date changes while the app is active, the user wont be able to see the current day until they restart the app - fix this
 - after exporting a video, give the user the option to give it a name and save it in the app. there will be a new page, export catalogue, where the user can see all their saved exports again.
+- improve onboarding flow - make beautiful, split across multiple pages, add page indicator at the bottom of each page so the user can see how far they are
