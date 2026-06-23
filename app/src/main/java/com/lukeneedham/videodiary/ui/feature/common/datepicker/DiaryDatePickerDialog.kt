@@ -58,7 +58,9 @@ fun DiaryDatePickerDialog(
             modifier = Modifier
                 .fillMaxWidth(0.9f)
                 .fillMaxHeight(0.6f)
-                .background(color = Color.White, shape = RoundedCornerShape(10.dp))
+                .clip(RoundedCornerShape(10.dp))
+                .background(color = Color.White)
+                .padding(bottom = 2.dp)
         ) {
             Box(
                 modifier = Modifier
@@ -106,8 +108,6 @@ fun DiaryDatePickerDialog(
                     modifier = Modifier
                         .weight(1f)
                         .fillMaxWidth()
-                        .padding(bottom = 2.dp)
-                        .clip(RoundedCornerShape(bottomStart = 10.dp, bottomEnd = 10.dp))
                 )
             } else {
                 Spacer(modifier = Modifier.weight(1f))
