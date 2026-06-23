@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.draw.clip
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
@@ -58,7 +59,8 @@ fun DiaryDatePickerDialog(
             modifier = Modifier
                 .fillMaxWidth(0.9f)
                 .fillMaxHeight(0.6f)
-                .background(color = Color.White, shape = RoundedCornerShape(10.dp))
+                .clip(RoundedCornerShape(10.dp))
+                .background(color = Color.White)
         ) {
             Box(
                 modifier = Modifier
