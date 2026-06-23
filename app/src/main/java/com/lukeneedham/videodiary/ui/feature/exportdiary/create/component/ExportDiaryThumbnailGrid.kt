@@ -1,5 +1,6 @@
 package com.lukeneedham.videodiary.ui.feature.exportdiary.create.component
 
+import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -44,32 +45,37 @@ private fun ExportDiaryThumbnailItem(
     item: ExportDayThumbnail,
     modifier: Modifier = Modifier,
 ) {
+    val thumbnailFile = item.thumbnailFile
+    val bitmap by produceState<Bitmap?>(initialValue = null, thumbnailFile) {
+        value = if (thumbnailFile != null) {
+            withContext(Dispatchers.IO) {
+                BitmapFactory.decodeFile(thumbnailFile.absolutePath)
+            }
+        } else {
+            null
+        }
+    }
+
+    val aspectRatio = bitmap?.let { it.width.toFloat() / it.height.toFloat() }
+
     Box(
         contentAlignment = Alignment.Center,
         modifier = modifier
             .height(48.dp)
-            .aspectRatio(9f / 16f)
+            .then(
+                if (aspectRatio != null) Modifier.aspectRatio(aspectRatio)
+                else Modifier
+            )
             .clip(RoundedCornerShape(3.dp))
             .background(Color.Black),
     ) {
-        val thumbnailFile = item.thumbnailFile
-        if (thumbnailFile != null) {
-            val bitmap by produceState(
-                initialValue = null as android.graphics.Bitmap?,
-                thumbnailFile,
-            ) {
-                value = withContext(Dispatchers.IO) {
-                    BitmapFactory.decodeFile(thumbnailFile.absolutePath)
-                }
-            }
-            bitmap?.let {
-                Image(
-                    bitmap = it.asImageBitmap(),
-                    contentDescription = null,
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier.matchParentSize(),
-                )
-            }
+        bitmap?.let {
+            Image(
+                bitmap = it.asImageBitmap(),
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.matchParentSize(),
+            )
         }
     }
 }
