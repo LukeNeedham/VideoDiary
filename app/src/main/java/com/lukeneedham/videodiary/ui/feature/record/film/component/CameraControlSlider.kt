@@ -94,7 +94,7 @@ fun CameraControlSlider(
 
             val thumbX = trackLeft + trackWidth * value
             drawCircle(
-                color = Color.White.copy(alpha = 0.7f),
+                color = Color(0xFFDDDDDD),
                 radius = thumbRadiusPx,
                 center = Offset(thumbX, centerY),
             )
