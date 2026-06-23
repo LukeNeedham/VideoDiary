@@ -50,7 +50,6 @@ fun CameraControlSlider(
             modifier = Modifier.size(20.dp),
         )
 
-        Spacer(modifier = Modifier.height(4.dp))
 
         Canvas(
             modifier = Modifier
