@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.appendInlineContent
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Checkbox
 import androidx.compose.material.CheckboxDefaults
@@ -23,9 +24,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.Placeholder
+import androidx.compose.ui.text.PlaceholderVerticalAlign
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.em
+import androidx.compose.ui.unit.sp
 import com.lukeneedham.videodiary.ui.feature.common.Button
 import com.lukeneedham.videodiary.ui.feature.common.datepicker.DiaryDatePickerDialog
 import com.lukeneedham.videodiary.ui.feature.exportdiary.create.component.ExportDiaryCreateDatePicker
@@ -73,29 +79,47 @@ fun ExportDiaryCreatePageReady(
                             .weight(1f)
                             .verticalScroll(rememberScrollState())
                     ) {
+                        val startDateId = "startDate"
+                        val endDateId = "endDate"
+
+                        val annotatedString = buildAnnotatedString {
+                            append("Export from ")
+                            appendInlineContent(startDateId)
+                            append(" up to and including ")
+                            appendInlineContent(endDateId)
+                        }
+
+                        val datePlaceholder = Placeholder(
+                            width = 7.5.em,
+                            height = 2.em,
+                            placeholderVerticalAlign = PlaceholderVerticalAlign.Center,
+                        )
+
+                        val inlineContent = mapOf(
+                            startDateId to androidx.compose.foundation.text.InlineTextContent(
+                                placeholder = datePlaceholder,
+                            ) {
+                                ExportDiaryCreateDatePicker(
+                                    date = exportStartDate,
+                                    onClick = { showStartDatePicker = true },
+                                )
+                            },
+                            endDateId to androidx.compose.foundation.text.InlineTextContent(
+                                placeholder = datePlaceholder,
+                            ) {
+                                ExportDiaryCreateDatePicker(
+                                    date = exportEndDate,
+                                    onClick = { showEndDatePicker = true },
+                                )
+                            },
+                        )
+
                         Text(
-                            text = "Export will include videos...",
+                            text = annotatedString,
+                            inlineContent = inlineContent,
                             color = Color.Black,
                             fontSize = Typography.Size.small,
-                        )
-                        Spacer(modifier = Modifier.height(20.dp))
-
-                        ExportDiaryCreateDatePicker(
-                            date = exportStartDate,
-                            label = "From",
-                            onChange = {
-                                showStartDatePicker = true
-                            },
-                        )
-
-                        Spacer(modifier = Modifier.height(20.dp))
-
-                        ExportDiaryCreateDatePicker(
-                            date = exportEndDate,
-                            label = "To",
-                            onChange = {
-                                showEndDatePicker = true
-                            },
+                            lineHeight = 44.sp,
                         )
 
                         Spacer(modifier = Modifier.height(30.dp))
