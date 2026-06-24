@@ -36,9 +36,9 @@ import com.lukeneedham.videodiary.ui.theme.Typography
 import java.io.File
 
 private val ThumbnailHeight = 60.dp
+private val ThumbnailWidth = 40.dp
 private val ThumbnailSpacing = 2.dp
 private val EllipsisWidth = 24.dp
-private val MinThumbnailWidth = 40.dp
 
 @Composable
 fun SavedExportItem(
@@ -106,21 +106,14 @@ private fun SavedExportThumbnailRow(
     modifier: Modifier = Modifier,
 ) {
     BoxWithConstraints(modifier = modifier) {
-        val maxFitCount = maxThumbnailCount(
-            availableWidth = maxWidth,
-            thumbnailCount = thumbnailFiles.size,
-        )
+        val maxFitCount = maxThumbnailCount(maxWidth)
 
         if (thumbnailFiles.size <= maxFitCount) {
             Row(
                 horizontalArrangement = Arrangement.spacedBy(ThumbnailSpacing),
-                modifier = Modifier.fillMaxWidth(),
             ) {
                 for (file in thumbnailFiles) {
-                    ThumbnailImage(
-                        file = file,
-                        modifier = Modifier.weight(1f),
-                    )
+                    ThumbnailImage(file = file)
                 }
             }
         } else {
@@ -132,13 +125,9 @@ private fun SavedExportThumbnailRow(
             Row(
                 horizontalArrangement = Arrangement.spacedBy(ThumbnailSpacing),
                 verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.fillMaxWidth(),
             ) {
                 for (file in firstThumbnails) {
-                    ThumbnailImage(
-                        file = file,
-                        modifier = Modifier.weight(1f),
-                    )
+                    ThumbnailImage(file = file)
                 }
                 Text(
                     text = "…",
@@ -147,10 +136,7 @@ private fun SavedExportThumbnailRow(
                     modifier = Modifier.width(EllipsisWidth),
                 )
                 for (file in lastThumbnails) {
-                    ThumbnailImage(
-                        file = file,
-                        modifier = Modifier.weight(1f),
-                    )
+                    ThumbnailImage(file = file)
                 }
             }
         }
@@ -167,24 +153,17 @@ private fun ThumbnailImage(
         contentDescription = null,
         contentScale = ContentScale.Crop,
         modifier = modifier
-            .height(ThumbnailHeight),
+            .size(width = ThumbnailWidth, height = ThumbnailHeight),
     )
 }
 
-private fun maxThumbnailCount(
-    availableWidth: Dp,
-    thumbnailCount: Int,
-): Int {
-    if (thumbnailCount <= 1) return thumbnailCount
-    val totalSpacing = ThumbnailSpacing * (thumbnailCount - 1)
-    val widthPerThumbnail = (availableWidth - totalSpacing) / thumbnailCount
-    if (widthPerThumbnail >= MinThumbnailWidth) return thumbnailCount
-    return ((availableWidth + ThumbnailSpacing) / (MinThumbnailWidth + ThumbnailSpacing)).toInt()
+private fun maxThumbnailCount(availableWidth: Dp): Int {
+    return ((availableWidth + ThumbnailSpacing) / (ThumbnailWidth + ThumbnailSpacing)).toInt()
         .coerceAtLeast(1)
 }
 
 private fun maxThumbnailCountWithEllipsis(availableWidth: Dp): Int {
     val widthForThumbnails = availableWidth - EllipsisWidth - ThumbnailSpacing * 2
-    val count = ((widthForThumbnails + ThumbnailSpacing) / (MinThumbnailWidth + ThumbnailSpacing)).toInt()
+    val count = ((widthForThumbnails + ThumbnailSpacing) / (ThumbnailWidth + ThumbnailSpacing)).toInt()
     return (count / 2 * 2).coerceAtLeast(2)
 }
