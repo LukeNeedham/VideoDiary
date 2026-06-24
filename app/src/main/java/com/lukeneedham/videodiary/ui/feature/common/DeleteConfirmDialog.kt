@@ -1,4 +1,4 @@
-package com.lukeneedham.videodiary.ui.feature.exportdiary.hub
+package com.lukeneedham.videodiary.ui.feature.common
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -21,7 +21,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 
 @Composable
-fun ExportDeleteConfirmDialog(
+fun DeleteConfirmDialog(
+    title: String,
     onConfirm: () -> Unit,
     dismiss: () -> Unit,
 ) {
@@ -57,7 +58,7 @@ fun ExportDeleteConfirmDialog(
                 .padding(horizontal = 20.dp)
         ) {
             Spacer(modifier = Modifier.height(20.dp))
-            Text(text = "Delete saved export?")
+            Text(text = title)
             Spacer(modifier = Modifier.height(20.dp))
             Row {
                 Spacer(modifier = Modifier.weight(1f))
@@ -84,8 +85,9 @@ fun ExportDeleteConfirmDialog(
 
 @Preview
 @Composable
-private fun PreviewExportDeleteConfirmDialog() {
-    ExportDeleteConfirmDialog(
+private fun PreviewDeleteConfirmDialog() {
+    DeleteConfirmDialog(
+        title = "Delete item?",
         onConfirm = {},
         dismiss = {},
     )

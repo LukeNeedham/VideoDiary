@@ -91,7 +91,6 @@ object KoinModule {
             SavedExportsDao(
                 context = androidContext(),
                 roomDao = get<AppDatabase>().savedExportDao(),
-                thumbnailFileNameMapper = get(),
             )
         }
     }
@@ -189,6 +188,7 @@ object KoinModule {
         viewModel {
             ExportHubViewModel(
                 savedExportsDao = get(),
+                videosDao = get(),
             )
         }
         viewModel {

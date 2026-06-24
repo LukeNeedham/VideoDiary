@@ -1,7 +1,6 @@
 package com.lukeneedham.videodiary.data.persistence
 
 import android.content.Context
-import com.lukeneedham.videodiary.data.mapper.ThumbnailFileNameMapper
 import com.lukeneedham.videodiary.data.persistence.room.SavedExportEntity
 import com.lukeneedham.videodiary.data.persistence.room.SavedExportRoomDao
 import com.lukeneedham.videodiary.domain.model.ExportedVideo
@@ -15,13 +14,10 @@ import java.time.LocalDate
 class SavedExportsDao(
     context: Context,
     private val roomDao: SavedExportRoomDao,
-    private val thumbnailFileNameMapper: ThumbnailFileNameMapper,
 ) {
     private val savedExportsDir = File(context.filesDir, "saved_exports").apply {
         mkdirs()
     }
-
-    private val thumbnailsDir = File(context.filesDir, "thumbnails")
 
     val allSavedExports: Flow<List<SavedExport>> = roomDao.getAll().map { entities ->
         entities.mapNotNull { entity -> entityToModel(entity) }
@@ -58,11 +54,6 @@ class SavedExportsDao(
         return try {
             val dates = entity.includedDates.split(",").map { LocalDate.parse(it) }
 
-            val thumbnailFiles = dates.mapNotNull { date ->
-                val file = File(thumbnailsDir, thumbnailFileNameMapper.dateToName(date))
-                if (file.exists()) file else null
-            }
-
             SavedExport(
                 id = entity.id,
                 name = entity.name,
@@ -70,7 +61,7 @@ class SavedExportsDao(
                 startDate = dates.min(),
                 endDate = dates.max(),
                 dayVideoCount = dates.size,
-                thumbnailFiles = thumbnailFiles,
+                includedDates = dates,
             )
         } catch (e: Exception) {
             Logger.warning("Failed to parse saved export: ${entity.id}", e)

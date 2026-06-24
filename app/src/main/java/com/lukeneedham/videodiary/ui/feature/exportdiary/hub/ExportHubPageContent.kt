@@ -3,7 +3,6 @@ package com.lukeneedham.videodiary.ui.feature.exportdiary.hub
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -14,11 +13,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -31,13 +27,11 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import coil.compose.AsyncImage
 import com.lukeneedham.videodiary.R
 import com.lukeneedham.videodiary.domain.model.SavedExport
-import com.lukeneedham.videodiary.domain.util.date.StandardDateTimeFormatter
+import com.lukeneedham.videodiary.ui.feature.common.DeleteConfirmDialog
 import com.lukeneedham.videodiary.ui.feature.common.toolbar.GenericToolbar
 import com.lukeneedham.videodiary.ui.theme.AppBackground
 import com.lukeneedham.videodiary.ui.theme.AppSurfaceVariant
@@ -47,7 +41,7 @@ import java.time.LocalDate
 
 @Composable
 fun ExportHubPageContent(
-    savedExports: List<SavedExport>,
+    savedExports: List<SavedExportWithThumbnails>,
     canGoBack: Boolean,
     onBack: () -> Unit,
     onCreateExportClick: () -> Unit,
@@ -95,11 +89,12 @@ fun ExportHubPageContent(
                     )
                 }
             } else {
-                items(savedExports, key = { it.id }) { export ->
+                items(savedExports, key = { it.export.id }) { item ->
                     SavedExportItem(
-                        export = export,
-                        onClick = { onExportClick(export) },
-                        onDeleteClick = { pendingIdToDelete = export.id },
+                        export = item.export,
+                        thumbnailFiles = item.thumbnailFiles,
+                        onClick = { onExportClick(item.export) },
+                        onDeleteClick = { pendingIdToDelete = item.export.id },
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                 }
@@ -109,7 +104,8 @@ fun ExportHubPageContent(
 
     val idToDelete = pendingIdToDelete
     if (idToDelete != null) {
-        ExportDeleteConfirmDialog(
+        DeleteConfirmDialog(
+            title = "Delete saved export?",
             dismiss = {
                 pendingIdToDelete = null
             },
@@ -155,73 +151,6 @@ private fun CreateExportButton(
     }
 }
 
-@Composable
-private fun SavedExportItem(
-    export: SavedExport,
-    onClick: () -> Unit,
-    onDeleteClick: () -> Unit,
-) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(12.dp))
-            .background(AppSurfaceVariant)
-            .clickable(onClick = onClick)
-    ) {
-        if (export.thumbnailFiles.isNotEmpty()) {
-            LazyRow(
-                horizontalArrangement = Arrangement.spacedBy(2.dp),
-                modifier = Modifier.fillMaxWidth(),
-            ) {
-                items(export.thumbnailFiles) { thumbnailFile ->
-                    AsyncImage(
-                        model = thumbnailFile,
-                        contentDescription = null,
-                        modifier = Modifier.height(60.dp),
-                    )
-                }
-            }
-        }
-
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(16.dp),
-        ) {
-            Column(
-                modifier = Modifier.weight(1f)
-            ) {
-                Text(
-                    text = export.name,
-                    color = Color.White,
-                    fontSize = Typography.Size.medium,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                )
-                Spacer(modifier = Modifier.height(4.dp))
-                val start = export.startDate.format(StandardDateTimeFormatter.date)
-                val end = export.endDate.format(StandardDateTimeFormatter.date)
-                Text(
-                    text = "$start to $end · ${export.dayVideoCount} videos",
-                    color = Color.White.copy(alpha = 0.6f),
-                    fontSize = Typography.Size.extraSmall,
-                )
-            }
-
-            IconButton(
-                onClick = onDeleteClick,
-                modifier = Modifier.size(40.dp),
-            ) {
-                Icon(
-                    painter = painterResource(R.drawable.delete),
-                    contentDescription = "Delete",
-                    tint = Color.White.copy(alpha = 0.6f),
-                    modifier = Modifier.size(20.dp),
-                )
-            }
-        }
-    }
-}
-
 @Preview
 @Composable
 private fun PreviewEmpty() {
@@ -240,21 +169,29 @@ private fun PreviewEmpty() {
 private fun PreviewWithItems() {
     ExportHubPageContent(
         savedExports = listOf(
-            SavedExport(
-                id = "1",
-                name = "Summer 2024",
-                videoFile = File("mock"),
-                startDate = LocalDate.of(2024, 6, 1),
-                endDate = LocalDate.of(2024, 8, 31),
-                dayVideoCount = 45,
+            SavedExportWithThumbnails(
+                export = SavedExport(
+                    id = "1",
+                    name = "Summer 2024",
+                    videoFile = File("mock"),
+                    startDate = LocalDate.of(2024, 6, 1),
+                    endDate = LocalDate.of(2024, 8, 31),
+                    dayVideoCount = 45,
+                    includedDates = emptyList(),
+                ),
+                thumbnailFiles = emptyList(),
             ),
-            SavedExport(
-                id = "2",
-                name = "Holiday Trip",
-                videoFile = File("mock"),
-                startDate = LocalDate.of(2024, 12, 20),
-                endDate = LocalDate.of(2025, 1, 5),
-                dayVideoCount = 12,
+            SavedExportWithThumbnails(
+                export = SavedExport(
+                    id = "2",
+                    name = "Holiday Trip",
+                    videoFile = File("mock"),
+                    startDate = LocalDate.of(2024, 12, 20),
+                    endDate = LocalDate.of(2025, 1, 5),
+                    dayVideoCount = 12,
+                    includedDates = emptyList(),
+                ),
+                thumbnailFiles = emptyList(),
             ),
         ),
         canGoBack = true,

@@ -10,5 +10,5 @@ data class SavedExport(
     val startDate: LocalDate,
     val endDate: LocalDate,
     val dayVideoCount: Int,
-    val thumbnailFiles: List<File> = emptyList(),
+    val includedDates: List<LocalDate>,
 )
