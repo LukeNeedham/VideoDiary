@@ -26,6 +26,7 @@ fun ExportDiaryCreatePage(
         exportStartDate = viewModel.exportStartDate,
         exportEndDate = viewModel.exportEndDate,
         selectedVideoCount = viewModel.selectedVideoCount,
+        selectedDayThumbnails = viewModel.selectedDayThumbnails,
         diaryStartDate = viewModel.diaryStartDate,
         onStartDateSelected = { viewModel.exportStartDate = it },
         onEndDateSelected = { viewModel.exportEndDate = it },

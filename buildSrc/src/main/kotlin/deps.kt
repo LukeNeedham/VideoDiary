@@ -63,6 +63,10 @@ object deps {
             val coreLibrary = "com.android.tools:desugar_jdk_libs:2.0.2"
         }
 
+        object coil {
+            val compose = "io.coil-kt:coil-compose:2.7.0"
+        }
+
         object koin {
             val bom = "io.insert-koin:koin-bom:4.0.1"
             val core = "io.insert-koin:koin-core"

@@ -12,6 +12,7 @@ import com.lukeneedham.videodiary.data.repository.CalendarRepository
 import com.lukeneedham.videodiary.domain.model.Day
 import com.lukeneedham.videodiary.domain.model.ExportedVideo
 import com.lukeneedham.videodiary.ui.feature.exportdiary.create.model.ExportDay
+import com.lukeneedham.videodiary.ui.feature.exportdiary.create.model.ExportDayThumbnail
 import com.lukeneedham.videodiary.ui.feature.exportdiary.create.model.ExportState
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -57,6 +58,23 @@ class ExportDiaryCreateViewModel(
 
     val selectedVideoCount: Int? by derivedStateOf {
         selectedDays?.size
+    }
+
+    val selectedDayThumbnails: List<ExportDayThumbnail>? by derivedStateOf {
+        val allDays = allDays
+        if (allDays.isEmpty()) return@derivedStateOf null
+        val startDate = exportStartDate ?: return@derivedStateOf null
+        val endDate = exportEndDate ?: return@derivedStateOf null
+
+        allDays.mapNotNull { day ->
+            val isSelected = day.date in startDate..endDate
+            if (!isSelected) return@mapNotNull null
+            if (day.videoFile == null) return@mapNotNull null
+            ExportDayThumbnail(
+                date = day.date,
+                thumbnailFile = day.thumbnailFile,
+            )
+        }
     }
 
     val diaryStartDate by derivedStateOf {
