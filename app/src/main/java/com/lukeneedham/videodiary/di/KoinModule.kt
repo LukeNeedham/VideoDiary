@@ -18,8 +18,8 @@ import com.lukeneedham.videodiary.data.repository.VideoResolutionRepository
 import com.lukeneedham.videodiary.ui.feature.calendar.CalendarViewModel
 import com.lukeneedham.videodiary.ui.feature.common.datepicker.DiaryDatePickerViewModel
 import com.lukeneedham.videodiary.ui.feature.debug.DebugViewModel
-import com.lukeneedham.videodiary.ui.feature.exportdiary.catalogue.ExportCatalogueViewModel
 import com.lukeneedham.videodiary.ui.feature.exportdiary.create.ExportDiaryCreateViewModel
+import com.lukeneedham.videodiary.ui.feature.exportdiary.hub.ExportHubViewModel
 import com.lukeneedham.videodiary.ui.feature.exportdiary.view.ExportDiaryViewViewModel
 import com.lukeneedham.videodiary.ui.feature.permissions.RequestPermissionsViewModel
 import com.lukeneedham.videodiary.ui.feature.record.check.CheckVideoViewModel
@@ -186,7 +186,7 @@ object KoinModule {
             )
         }
         viewModel {
-            ExportCatalogueViewModel(
+            ExportHubViewModel(
                 savedExportsDao = get(),
             )
         }

@@ -6,7 +6,6 @@ import com.lukeneedham.videodiary.domain.model.ShareRequest
 import com.lukeneedham.videodiary.domain.util.logger.Logger
 import com.lukeneedham.videodiary.ui.feature.calendar.CalendarPage
 import com.lukeneedham.videodiary.ui.feature.debug.DebugPage
-import com.lukeneedham.videodiary.ui.feature.exportdiary.catalogue.ExportCataloguePage
 import com.lukeneedham.videodiary.ui.feature.exportdiary.create.ExportDiaryCreatePage
 import com.lukeneedham.videodiary.ui.feature.exportdiary.hub.ExportHubPage
 import com.lukeneedham.videodiary.ui.feature.exportdiary.view.ExportDiaryViewPage
@@ -91,13 +90,20 @@ fun NormalRouter(
             }
 
             is NormalPage.ExportHub -> ExportHubPage(
+                viewModel = koinViewModel(),
                 canGoBack = canGoBack,
                 onBack = onBack,
                 onCreateExportClick = {
                     navigate(NormalPage.ExportDiaryCreate)
                 },
-                onSavedExportsClick = {
-                    navigate(NormalPage.ExportCatalogue)
+                onExportClick = { savedExport ->
+                    val exportedVideo = ExportedVideo(
+                        videoFile = savedExport.videoFile,
+                        startDate = savedExport.startDate,
+                        endDate = savedExport.endDate,
+                        dayVideoCount = savedExport.dayVideoCount,
+                    )
+                    navigate(NormalPage.ExportDiaryView(exportedVideo))
                 },
             )
 
@@ -116,21 +122,6 @@ fun NormalRouter(
                 canGoBack = canGoBack,
                 onBack = onBack,
                 exportedVideo = page.exportedVideo,
-            )
-
-            is NormalPage.ExportCatalogue -> ExportCataloguePage(
-                viewModel = koinViewModel(),
-                onExportClick = { savedExport ->
-                    val exportedVideo = ExportedVideo(
-                        videoFile = savedExport.videoFile,
-                        startDate = savedExport.startDate,
-                        endDate = savedExport.endDate,
-                        dayVideoCount = savedExport.dayVideoCount,
-                    )
-                    navigate(NormalPage.ExportDiaryView(exportedVideo))
-                },
-                canGoBack = canGoBack,
-                onBack = onBack,
             )
 
             is NormalPage.Debug -> DebugPage(

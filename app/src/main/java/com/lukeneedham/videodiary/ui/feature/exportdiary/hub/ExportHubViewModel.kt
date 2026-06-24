@@ -1,4 +1,4 @@
-package com.lukeneedham.videodiary.ui.feature.exportdiary.catalogue
+package com.lukeneedham.videodiary.ui.feature.exportdiary.hub
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -9,7 +9,7 @@ import com.lukeneedham.videodiary.data.persistence.SavedExportsDao
 import com.lukeneedham.videodiary.domain.model.SavedExport
 import kotlinx.coroutines.launch
 
-class ExportCatalogueViewModel(
+class ExportHubViewModel(
     private val savedExportsDao: SavedExportsDao,
 ) : ViewModel() {
     var savedExports: List<SavedExport> by mutableStateOf(emptyList())
