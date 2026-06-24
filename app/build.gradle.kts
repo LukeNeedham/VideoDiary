@@ -92,6 +92,9 @@ dependencies {
     implementation(deps.libs.media3.transformer)
     implementation(deps.libs.media3.effect)
 
+    // Coil
+    implementation(deps.libs.coil.compose)
+
     // Koin
     implementation(platform(deps.libs.koin.bom))
     implementation(deps.libs.koin.core)
