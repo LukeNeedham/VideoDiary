@@ -4,13 +4,21 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flow
+import java.time.Duration
 import java.time.LocalDate
+import java.time.LocalDateTime
 
 class CurrentDateRepository {
     val currentDate: Flow<LocalDate> = flow {
         while (true) {
-            emit(LocalDate.now())
-            delay(60_000)
+            val now = LocalDate.now()
+            emit(now)
+            val tomorrow = now.plusDays(1).atStartOfDay()
+            val delayMillis = Duration.between(
+                LocalDateTime.now(),
+                tomorrow
+            ).toMillis().coerceAtLeast(1000)
+            delay(delayMillis)
         }
     }.distinctUntilChanged()
 }
