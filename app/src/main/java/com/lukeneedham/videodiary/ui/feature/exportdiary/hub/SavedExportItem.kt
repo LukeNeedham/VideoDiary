@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
@@ -123,8 +122,8 @@ private fun SavedExportThumbnailRow(
             val lastThumbnails = thumbnailFiles.takeLast(sideCount)
 
             Row(
-                horizontalArrangement = Arrangement.spacedBy(ThumbnailSpacing),
                 verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth(),
             ) {
                 for (file in firstThumbnails) {
                     ThumbnailImage(file = file)
@@ -133,7 +132,7 @@ private fun SavedExportThumbnailRow(
                     text = "…",
                     color = Color.White.copy(alpha = 0.6f),
                     textAlign = TextAlign.Center,
-                    modifier = Modifier.width(EllipsisWidth),
+                    modifier = Modifier.weight(1f),
                 )
                 for (file in lastThumbnails) {
                     ThumbnailImage(file = file)
