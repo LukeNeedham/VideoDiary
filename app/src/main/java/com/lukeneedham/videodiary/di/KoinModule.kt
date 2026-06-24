@@ -4,6 +4,7 @@ import android.net.Uri
 import com.lukeneedham.videodiary.data.android.PermissionChecker
 import com.lukeneedham.videodiary.data.mapper.ThumbnailFileNameMapper
 import com.lukeneedham.videodiary.data.mapper.VideoFileNameMapper
+import com.lukeneedham.videodiary.data.persistence.SavedExportsDao
 import com.lukeneedham.videodiary.data.persistence.SettingsDao
 import com.lukeneedham.videodiary.data.persistence.VideoExportDao
 import com.lukeneedham.videodiary.data.persistence.VideoThumbnailExtractor
@@ -13,10 +14,13 @@ import com.lukeneedham.videodiary.data.repository.CalendarRepository
 import com.lukeneedham.videodiary.data.repository.CurrentDateRepository
 import com.lukeneedham.videodiary.data.repository.MockDataRepository
 import com.lukeneedham.videodiary.data.repository.VideoResolutionRepository
+import com.lukeneedham.videodiary.domain.model.ExportedVideo
 import com.lukeneedham.videodiary.ui.feature.calendar.CalendarViewModel
 import com.lukeneedham.videodiary.ui.feature.common.datepicker.DiaryDatePickerViewModel
 import com.lukeneedham.videodiary.ui.feature.debug.DebugViewModel
+import com.lukeneedham.videodiary.ui.feature.exportdiary.catalogue.ExportCatalogueViewModel
 import com.lukeneedham.videodiary.ui.feature.exportdiary.create.ExportDiaryCreateViewModel
+import com.lukeneedham.videodiary.ui.feature.exportdiary.save.ExportDiarySaveViewModel
 import com.lukeneedham.videodiary.ui.feature.exportdiary.view.ExportDiaryViewViewModel
 import com.lukeneedham.videodiary.ui.feature.permissions.RequestPermissionsViewModel
 import com.lukeneedham.videodiary.ui.feature.record.check.CheckVideoViewModel
@@ -82,6 +86,11 @@ object KoinModule {
             VideoExportDao(
                 context = androidContext(),
                 videoExporter = get(),
+            )
+        }
+        single {
+            SavedExportsDao(
+                context = androidContext(),
             )
         }
     }
@@ -172,6 +181,18 @@ object KoinModule {
         viewModel {
             ExportDiaryViewViewModel(
                 videoResolutionRepository = get(),
+            )
+        }
+        viewModel { (exportedVideo: ExportedVideo) ->
+            ExportDiarySaveViewModel(
+                exportedVideo = exportedVideo,
+                savedExportsDao = get(),
+                ioDispatcher = get(KoinQualifier.Dispatcher.io),
+            )
+        }
+        viewModel {
+            ExportCatalogueViewModel(
+                savedExportsDao = get(),
             )
         }
         viewModel {

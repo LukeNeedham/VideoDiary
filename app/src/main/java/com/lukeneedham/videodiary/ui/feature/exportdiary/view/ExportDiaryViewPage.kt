@@ -11,6 +11,7 @@ fun ExportDiaryViewPage(
     share: (ShareRequest) -> Unit,
     canGoBack: Boolean,
     onBack: () -> Unit,
+    onSave: () -> Unit,
 ) {
     ExportDiaryViewPageContent(
         share = share,
@@ -18,5 +19,6 @@ fun ExportDiaryViewPage(
         exportedVideo = exportedVideo,
         canGoBack = canGoBack,
         onBack = onBack,
+        onSave = onSave,
     )
 }

@@ -40,6 +40,7 @@ fun ExportDiaryViewPageContent(
     videoAspectRatio: Float?,
     canGoBack: Boolean,
     onBack: () -> Unit,
+    onSave: () -> Unit,
 ) {
     val videoFile = exportedVideo.videoFile
 
@@ -152,6 +153,11 @@ fun ExportDiaryViewPageContent(
             Box(modifier = Modifier.width(8.dp))
 
             GlassButton(
+                text = "Save",
+                onClick = onSave,
+            )
+
+            GlassButton(
                 text = "Share",
                 onClick = {
                     val shareText = "Full Video Diary"
@@ -181,6 +187,7 @@ private fun PreviewPortrait() {
             videoAspectRatio = 1f,
             canGoBack = true,
             onBack = {},
+            onSave = {},
         )
     }
 }
@@ -199,6 +206,7 @@ private fun PreviewLandscape() {
             videoAspectRatio = 1f,
             canGoBack = true,
             onBack = {},
+            onSave = {},
         )
     }
 }

@@ -5,7 +5,9 @@ import com.lukeneedham.videodiary.domain.model.ShareRequest
 import com.lukeneedham.videodiary.domain.util.logger.Logger
 import com.lukeneedham.videodiary.ui.feature.calendar.CalendarPage
 import com.lukeneedham.videodiary.ui.feature.debug.DebugPage
+import com.lukeneedham.videodiary.ui.feature.exportdiary.catalogue.ExportCataloguePage
 import com.lukeneedham.videodiary.ui.feature.exportdiary.create.ExportDiaryCreatePage
+import com.lukeneedham.videodiary.ui.feature.exportdiary.save.ExportDiarySavePage
 import com.lukeneedham.videodiary.ui.feature.exportdiary.view.ExportDiaryViewPage
 import com.lukeneedham.videodiary.ui.feature.record.check.CheckVideoPage
 import com.lukeneedham.videodiary.ui.feature.record.film.RecordVideoPage
@@ -51,6 +53,9 @@ fun NormalRouter(
                 },
                 onExportClick = {
                     navigate(NormalPage.ExportDiaryCreate)
+                },
+                onExportCatalogueClick = {
+                    navigate(NormalPage.ExportCatalogue)
                 },
                 onDebugClick = {
                     navigate(NormalPage.Debug)
@@ -102,6 +107,36 @@ fun NormalRouter(
                 canGoBack = canGoBack,
                 onBack = onBack,
                 exportedVideo = page.exportedVideo,
+                onSave = {
+                    navigate(NormalPage.ExportDiarySave(page.exportedVideo))
+                },
+            )
+
+            is NormalPage.ExportDiarySave -> ExportDiarySavePage(
+                viewModel = koinViewModel {
+                    parametersOf(page.exportedVideo)
+                },
+                exportedVideo = page.exportedVideo,
+                canGoBack = canGoBack,
+                onBack = onBack,
+                onSaved = {
+                    navigate(NormalPage.ExportCatalogue)
+                },
+            )
+
+            is NormalPage.ExportCatalogue -> ExportCataloguePage(
+                viewModel = koinViewModel(),
+                onExportClick = { savedExport ->
+                    val exportedVideo = com.lukeneedham.videodiary.domain.model.ExportedVideo(
+                        videoFile = savedExport.videoFile,
+                        startDate = savedExport.startDate,
+                        endDate = savedExport.endDate,
+                        dayVideoCount = savedExport.dayVideoCount,
+                    )
+                    navigate(NormalPage.ExportDiaryView(exportedVideo))
+                },
+                canGoBack = canGoBack,
+                onBack = onBack,
             )
 
             is NormalPage.Debug -> DebugPage(

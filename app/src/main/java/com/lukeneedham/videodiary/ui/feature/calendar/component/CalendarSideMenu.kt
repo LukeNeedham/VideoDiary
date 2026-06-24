@@ -27,6 +27,7 @@ import com.lukeneedham.videodiary.ui.theme.AppSurface
 @Composable
 fun CalendarSideMenu(
     onExportClick: () -> Unit,
+    onExportCatalogueClick: () -> Unit,
     onDebugClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -40,6 +41,12 @@ fun CalendarSideMenu(
             iconRes = R.drawable.movie,
             text = "Export diary",
             onClick = onExportClick,
+        )
+
+        CalendarSideMenuItem(
+            iconRes = R.drawable.movie,
+            text = "Saved exports",
+            onClick = onExportCatalogueClick,
         )
 
         if (BuildConfig.DEBUG) {
@@ -84,6 +91,7 @@ private fun CalendarSideMenuItem(
 private fun PreviewCalendarSideMenu() {
     CalendarSideMenu(
         onExportClick = {},
+        onExportCatalogueClick = {},
         onDebugClick = {},
         modifier = Modifier.width(280.dp),
     )
