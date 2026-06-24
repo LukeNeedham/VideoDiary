@@ -88,9 +88,7 @@ object KoinModule {
 
     private fun getRepositories() = module {
         single {
-            CurrentDateRepository(
-                ioDispatcher = get(KoinQualifier.Dispatcher.io),
-            )
+            CurrentDateRepository()
         }
         single {
             CalendarRepository(
