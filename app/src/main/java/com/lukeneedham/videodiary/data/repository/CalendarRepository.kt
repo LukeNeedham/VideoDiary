@@ -4,22 +4,25 @@ import com.lukeneedham.videodiary.data.mapper.VideoFileNameMapper
 import com.lukeneedham.videodiary.data.persistence.VideosDao
 import com.lukeneedham.videodiary.domain.model.Day
 import com.lukeneedham.videodiary.domain.util.date.CalendarUtil
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.combine
 import java.time.LocalDate
 
 class CalendarRepository(
     private val videosDao: VideosDao,
     private val videoFileNameMapper: VideoFileNameMapper,
+    private val currentDateRepository: CurrentDateRepository,
 ) {
-    val allDays = videosDao.allVideos.map { allVideos ->
-        val today = LocalDate.now()
+    val allDays = combine(
+        videosDao.allVideos,
+        currentDateRepository.currentDate,
+    ) { allVideos, today ->
         val startDate =
             allVideos.minOfOrNull { videoFileNameMapper.nameToDate(it.name) } ?: today
-        getAllDays(startDate)
+        getAllDays(startDate, today)
     }
 
-    private fun getAllDays(startDate: LocalDate): List<Day> {
-        return getAllDates(startDate).map { date ->
+    private fun getAllDays(startDate: LocalDate, today: LocalDate): List<Day> {
+        return getAllDates(startDate, today).map { date ->
             val videoFile = videosDao.getVideoFileIfExists(date)
             val thumbnailFile = videosDao.getThumbnailFileIfExists(date)
             Day(date = date, videoFile = videoFile, thumbnailFile = thumbnailFile)
@@ -27,6 +30,6 @@ class CalendarRepository(
     }
 
     /** @return an ordered list of all dates between the start date and today (both inclusive) */
-    private fun getAllDates(startDate: LocalDate) =
-        CalendarUtil.getAllDates(startDate, LocalDate.now())
+    private fun getAllDates(startDate: LocalDate, today: LocalDate) =
+        CalendarUtil.getAllDates(startDate, today)
 }
