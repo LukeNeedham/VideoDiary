@@ -38,7 +38,7 @@ fun CalendarSideMenu(
     ) {
         CalendarSideMenuItem(
             iconRes = R.drawable.movie,
-            text = "Export diary",
+            text = "Export",
             onClick = onExportClick,
         )
 

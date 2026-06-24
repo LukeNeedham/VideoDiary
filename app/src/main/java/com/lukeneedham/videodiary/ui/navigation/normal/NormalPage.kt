@@ -16,6 +16,7 @@ sealed class NormalPage : Parcelable {
         val videoContentUri: Uri,
     ) : NormalPage()
 
+    data object ExportHub : NormalPage()
     data object ExportDiaryCreate : NormalPage()
     data class ExportDiaryView(val exportedVideo: ExportedVideo) : NormalPage()
 

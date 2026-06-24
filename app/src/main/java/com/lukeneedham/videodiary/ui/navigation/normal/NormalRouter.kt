@@ -1,11 +1,13 @@
 package com.lukeneedham.videodiary.ui.navigation.normal
 
 import androidx.compose.runtime.Composable
+import com.lukeneedham.videodiary.domain.model.ExportedVideo
 import com.lukeneedham.videodiary.domain.model.ShareRequest
 import com.lukeneedham.videodiary.domain.util.logger.Logger
 import com.lukeneedham.videodiary.ui.feature.calendar.CalendarPage
 import com.lukeneedham.videodiary.ui.feature.debug.DebugPage
 import com.lukeneedham.videodiary.ui.feature.exportdiary.create.ExportDiaryCreatePage
+import com.lukeneedham.videodiary.ui.feature.exportdiary.hub.ExportHubPage
 import com.lukeneedham.videodiary.ui.feature.exportdiary.view.ExportDiaryViewPage
 import com.lukeneedham.videodiary.ui.feature.record.check.CheckVideoPage
 import com.lukeneedham.videodiary.ui.feature.record.film.RecordVideoPage
@@ -50,7 +52,7 @@ fun NormalRouter(
                     navigate(NormalPage.RecordVideo(date))
                 },
                 onExportClick = {
-                    navigate(NormalPage.ExportDiaryCreate)
+                    navigate(NormalPage.ExportHub)
                 },
                 onDebugClick = {
                     navigate(NormalPage.Debug)
@@ -86,6 +88,24 @@ fun NormalRouter(
                     onCancelClick = returnToCalendar,
                 )
             }
+
+            is NormalPage.ExportHub -> ExportHubPage(
+                viewModel = koinViewModel(),
+                canGoBack = canGoBack,
+                onBack = onBack,
+                onCreateExportClick = {
+                    navigate(NormalPage.ExportDiaryCreate)
+                },
+                onExportClick = { savedExport ->
+                    val exportedVideo = ExportedVideo(
+                        videoFile = savedExport.videoFile,
+                        startDate = savedExport.startDate,
+                        endDate = savedExport.endDate,
+                        dayVideoCount = savedExport.dayVideoCount,
+                    )
+                    navigate(NormalPage.ExportDiaryView(exportedVideo))
+                },
+            )
 
             is NormalPage.ExportDiaryCreate -> ExportDiaryCreatePage(
                 viewModel = koinViewModel(),

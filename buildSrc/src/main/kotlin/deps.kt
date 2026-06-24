@@ -3,12 +3,14 @@ object deps {
         object versions {
             val agp = "8.7.1"
             val kotlin = "2.0.0"
+            val ksp = "2.0.0-1.0.21"
         }
 
         val application = "com.android.application"
         val kotlinAndroid = "org.jetbrains.kotlin.android"
         val kotlinCompose = "org.jetbrains.kotlin.plugin.compose"
         val parcelize = "kotlin-parcelize"
+        val ksp = "com.google.devtools.ksp"
     }
 
     object libs {
@@ -57,6 +59,13 @@ object deps {
                 val preview = "androidx.compose.ui:ui-tooling-preview"
                 val manifest = "androidx.compose.ui:ui-test-manifest"
             }
+        }
+
+        object room {
+            private val version = "2.6.1"
+            val runtime = "androidx.room:room-runtime:$version"
+            val ktx = "androidx.room:room-ktx:$version"
+            val compiler = "androidx.room:room-compiler:$version"
         }
 
         object desugaring {
