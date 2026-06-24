@@ -60,7 +60,7 @@ object deps {
         }
 
         object desugaring {
-            val coreLibrary = "com.android.tools:desugar_jdk_libs:2.0.2"
+            val coreLibrary = "com.android.tools:desugar_jdk_libs:2.1.4"
         }
 
         object coil {

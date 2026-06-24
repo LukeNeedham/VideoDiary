@@ -10,6 +10,7 @@ import com.lukeneedham.videodiary.data.persistence.VideoThumbnailExtractor
 import com.lukeneedham.videodiary.data.persistence.VideosDao
 import com.lukeneedham.videodiary.data.persistence.export.VideoExporter
 import com.lukeneedham.videodiary.data.repository.CalendarRepository
+import com.lukeneedham.videodiary.data.repository.CurrentDateRepository
 import com.lukeneedham.videodiary.data.repository.MockDataRepository
 import com.lukeneedham.videodiary.data.repository.VideoResolutionRepository
 import com.lukeneedham.videodiary.ui.feature.calendar.CalendarViewModel
@@ -87,9 +88,13 @@ object KoinModule {
 
     private fun getRepositories() = module {
         single {
+            CurrentDateRepository()
+        }
+        single {
             CalendarRepository(
                 videosDao = get(),
                 videoFileNameMapper = get(),
+                currentDateRepository = get(),
             )
         }
         factory {
