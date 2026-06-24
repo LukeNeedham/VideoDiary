@@ -37,20 +37,14 @@ private fun ExportDiaryThumbnailItem(
     item: ExportDayThumbnail,
     modifier: Modifier = Modifier,
 ) {
-    Box(
-        contentAlignment = Alignment.Center,
-        modifier = modifier
-            .height(75.dp)
-            .clip(RoundedCornerShape(3.dp))
-            .background(Color.Black),
-    ) {
-        if (item.thumbnailFile != null) {
-            AsyncImage(
-                model = item.thumbnailFile,
-                contentDescription = null,
-                contentScale = ContentScale.Fit,
-                modifier = Modifier.matchParentSize(),
-            )
-        }
+    if (item.thumbnailFile != null) {
+        AsyncImage(
+            model = item.thumbnailFile,
+            contentDescription = null,
+            contentScale = ContentScale.Fit,
+            modifier = modifier
+                .height(75.dp)
+                .clip(RoundedCornerShape(3.dp)),
+        )
     }
 }
