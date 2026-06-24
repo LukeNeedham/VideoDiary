@@ -10,12 +10,15 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.appendInlineContent
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Checkbox
 import androidx.compose.material.CheckboxDefaults
 import androidx.compose.material.LinearProgressIndicator
 import androidx.compose.material.Text
+import androidx.compose.material.TextField
+import androidx.compose.material.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -54,6 +57,8 @@ fun ExportDiaryCreatePageReady(
     onEndDateSelected: (LocalDate?) -> Unit,
     exportIncludeDateStamp: Boolean,
     setExportIncludeDateStamp: (Boolean) -> Unit,
+    exportName: String,
+    onExportNameChange: (String) -> Unit,
     export: () -> Unit,
 ) {
     var showStartDatePicker by remember { mutableStateOf(false) }
@@ -157,6 +162,42 @@ fun ExportDiaryCreatePageReady(
                                 )
                             )
                         }
+
+                        Spacer(modifier = Modifier.height(30.dp))
+
+                        Text(
+                            text = "Export name (optional)",
+                            color = Color.Black,
+                            fontSize = Typography.Size.small,
+                        )
+                        Text(
+                            text = "Give your export a name to save it in the app for later",
+                            color = Color.Black,
+                            fontSize = Typography.Size.extraSmall,
+                        )
+
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        TextField(
+                            value = exportName,
+                            onValueChange = onExportNameChange,
+                            placeholder = {
+                                Text(
+                                    text = "e.g. Summer 2024",
+                                    color = Color.Black.copy(alpha = 0.4f),
+                                )
+                            },
+                            singleLine = true,
+                            colors = TextFieldDefaults.textFieldColors(
+                                textColor = Color.Black,
+                                backgroundColor = Color.White,
+                                cursorColor = Color.Black,
+                                focusedIndicatorColor = Color.Black,
+                                unfocusedIndicatorColor = Color.Black.copy(alpha = 0.3f),
+                            ),
+                            shape = RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp),
+                            modifier = Modifier.fillMaxWidth(),
+                        )
 
                         if (!selectedDayThumbnails.isNullOrEmpty()) {
                             Spacer(modifier = Modifier.height(20.dp))
@@ -270,6 +311,8 @@ internal fun PreviewExportDiaryCreatePageReady() {
         onEndDateSelected = {},
         exportIncludeDateStamp = true,
         setExportIncludeDateStamp = {},
+        exportName = "",
+        onExportNameChange = {},
         export = {},
     )
 }

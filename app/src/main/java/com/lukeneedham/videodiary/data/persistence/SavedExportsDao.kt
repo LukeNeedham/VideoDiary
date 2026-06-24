@@ -1,97 +1,70 @@
 package com.lukeneedham.videodiary.data.persistence
 
 import android.content.Context
+import com.lukeneedham.videodiary.data.persistence.room.SavedExportEntity
+import com.lukeneedham.videodiary.data.persistence.room.SavedExportRoomDao
 import com.lukeneedham.videodiary.domain.model.ExportedVideo
 import com.lukeneedham.videodiary.domain.model.SavedExport
 import com.lukeneedham.videodiary.domain.util.logger.Logger
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import java.io.File
 import java.time.LocalDate
 
 class SavedExportsDao(
     context: Context,
+    private val roomDao: SavedExportRoomDao,
 ) {
     private val savedExportsDir = File(context.filesDir, "saved_exports").apply {
         mkdirs()
     }
 
-    private val allSavedExportsMutable = MutableStateFlow(loadAll())
-    val allSavedExports = allSavedExportsMutable.asStateFlow()
+    val allSavedExports: Flow<List<SavedExport>> = roomDao.getAll().map { entities ->
+        entities.mapNotNull { entity -> entityToModel(entity) }
+    }
 
-    fun saveExport(name: String, exportedVideo: ExportedVideo): SavedExport {
+    suspend fun saveExport(name: String, exportedVideo: ExportedVideo) {
         val id = System.currentTimeMillis().toString()
-        val exportDir = File(savedExportsDir, id).apply { mkdirs() }
+        val videoFileName = "$id.mp4"
+        val videoFile = File(savedExportsDir, videoFileName)
 
-        val videoFile = File(exportDir, VIDEO_FILE_NAME)
         exportedVideo.videoFile.copyTo(videoFile, overwrite = true)
 
-        val metadataFile = File(exportDir, METADATA_FILE_NAME)
-        metadataFile.writeText(
-            listOf(
-                name,
-                exportedVideo.startDate.toString(),
-                exportedVideo.endDate.toString(),
-                exportedVideo.dayVideoCount.toString(),
-            ).joinToString("\n")
-        )
-
-        val savedExport = SavedExport(
+        val entity = SavedExportEntity(
             id = id,
             name = name,
-            videoFile = videoFile,
-            startDate = exportedVideo.startDate,
-            endDate = exportedVideo.endDate,
+            videoFileName = videoFileName,
+            startDate = exportedVideo.startDate.toString(),
+            endDate = exportedVideo.endDate.toString(),
             dayVideoCount = exportedVideo.dayVideoCount,
         )
-        refreshState()
-        return savedExport
+        roomDao.insert(entity)
     }
 
-    fun deleteSavedExport(id: String) {
-        val exportDir = File(savedExportsDir, id)
-        exportDir.deleteRecursively()
-        refreshState()
+    suspend fun deleteSavedExport(id: String) {
+        roomDao.deleteById(id)
+        val files = savedExportsDir.listFiles() ?: return
+        files.filter { it.name.startsWith(id) }.forEach { it.delete() }
     }
 
-    private fun refreshState() {
-        allSavedExportsMutable.value = loadAll()
-    }
-
-    private fun loadAll(): List<SavedExport> {
-        val dirs = savedExportsDir.listFiles()?.filter { it.isDirectory } ?: return emptyList()
-        return dirs.mapNotNull { dir -> loadExport(dir) }
-            .sortedByDescending { it.id }
-    }
-
-    private fun loadExport(dir: File): SavedExport? {
-        val id = dir.name
-        val videoFile = File(dir, VIDEO_FILE_NAME)
-        val metadataFile = File(dir, METADATA_FILE_NAME)
-
-        if (!videoFile.exists() || !metadataFile.exists()) {
-            Logger.warning("Skipping saved export with missing files: $id")
+    private fun entityToModel(entity: SavedExportEntity): SavedExport? {
+        val videoFile = File(savedExportsDir, entity.videoFileName)
+        if (!videoFile.exists()) {
+            Logger.warning("Saved export video file missing: ${entity.videoFileName}")
             return null
         }
-
         return try {
-            val lines = metadataFile.readLines()
             SavedExport(
-                id = id,
-                name = lines[0],
+                id = entity.id,
+                name = entity.name,
                 videoFile = videoFile,
-                startDate = LocalDate.parse(lines[1]),
-                endDate = LocalDate.parse(lines[2]),
-                dayVideoCount = lines[3].toInt(),
+                startDate = LocalDate.parse(entity.startDate),
+                endDate = LocalDate.parse(entity.endDate),
+                dayVideoCount = entity.dayVideoCount,
             )
         } catch (e: Exception) {
-            Logger.warning("Skipping saved export with invalid metadata: $id", e)
+            Logger.warning("Failed to parse saved export: ${entity.id}", e)
             null
         }
-    }
-
-    companion object {
-        private const val VIDEO_FILE_NAME = "video.mp4"
-        private const val METADATA_FILE_NAME = "metadata.txt"
     }
 }

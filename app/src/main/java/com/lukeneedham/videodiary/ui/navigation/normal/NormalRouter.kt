@@ -1,13 +1,14 @@
 package com.lukeneedham.videodiary.ui.navigation.normal
 
 import androidx.compose.runtime.Composable
+import com.lukeneedham.videodiary.domain.model.ExportedVideo
 import com.lukeneedham.videodiary.domain.model.ShareRequest
 import com.lukeneedham.videodiary.domain.util.logger.Logger
 import com.lukeneedham.videodiary.ui.feature.calendar.CalendarPage
 import com.lukeneedham.videodiary.ui.feature.debug.DebugPage
 import com.lukeneedham.videodiary.ui.feature.exportdiary.catalogue.ExportCataloguePage
 import com.lukeneedham.videodiary.ui.feature.exportdiary.create.ExportDiaryCreatePage
-import com.lukeneedham.videodiary.ui.feature.exportdiary.save.ExportDiarySavePage
+import com.lukeneedham.videodiary.ui.feature.exportdiary.hub.ExportHubPage
 import com.lukeneedham.videodiary.ui.feature.exportdiary.view.ExportDiaryViewPage
 import com.lukeneedham.videodiary.ui.feature.record.check.CheckVideoPage
 import com.lukeneedham.videodiary.ui.feature.record.film.RecordVideoPage
@@ -52,10 +53,7 @@ fun NormalRouter(
                     navigate(NormalPage.RecordVideo(date))
                 },
                 onExportClick = {
-                    navigate(NormalPage.ExportDiaryCreate)
-                },
-                onExportCatalogueClick = {
-                    navigate(NormalPage.ExportCatalogue)
+                    navigate(NormalPage.ExportHub)
                 },
                 onDebugClick = {
                     navigate(NormalPage.Debug)
@@ -92,6 +90,17 @@ fun NormalRouter(
                 )
             }
 
+            is NormalPage.ExportHub -> ExportHubPage(
+                canGoBack = canGoBack,
+                onBack = onBack,
+                onCreateExportClick = {
+                    navigate(NormalPage.ExportDiaryCreate)
+                },
+                onSavedExportsClick = {
+                    navigate(NormalPage.ExportCatalogue)
+                },
+            )
+
             is NormalPage.ExportDiaryCreate -> ExportDiaryCreatePage(
                 viewModel = koinViewModel(),
                 canGoBack = canGoBack,
@@ -107,27 +116,12 @@ fun NormalRouter(
                 canGoBack = canGoBack,
                 onBack = onBack,
                 exportedVideo = page.exportedVideo,
-                onSave = {
-                    navigate(NormalPage.ExportDiarySave(page.exportedVideo))
-                },
-            )
-
-            is NormalPage.ExportDiarySave -> ExportDiarySavePage(
-                viewModel = koinViewModel {
-                    parametersOf(page.exportedVideo)
-                },
-                exportedVideo = page.exportedVideo,
-                canGoBack = canGoBack,
-                onBack = onBack,
-                onSaved = {
-                    navigate(NormalPage.ExportCatalogue)
-                },
             )
 
             is NormalPage.ExportCatalogue -> ExportCataloguePage(
                 viewModel = koinViewModel(),
                 onExportClick = { savedExport ->
-                    val exportedVideo = com.lukeneedham.videodiary.domain.model.ExportedVideo(
+                    val exportedVideo = ExportedVideo(
                         videoFile = savedExport.videoFile,
                         startDate = savedExport.startDate,
                         endDate = savedExport.endDate,

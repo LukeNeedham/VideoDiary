@@ -6,6 +6,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.lukeneedham.videodiary.data.persistence.SavedExportsDao
 import com.lukeneedham.videodiary.data.persistence.VideoExportDao
 import com.lukeneedham.videodiary.data.persistence.export.VideoExportState
 import com.lukeneedham.videodiary.data.repository.CalendarRepository
@@ -14,15 +15,19 @@ import com.lukeneedham.videodiary.domain.model.ExportedVideo
 import com.lukeneedham.videodiary.ui.feature.exportdiary.create.model.ExportDay
 import com.lukeneedham.videodiary.ui.feature.exportdiary.create.model.ExportDayThumbnail
 import com.lukeneedham.videodiary.ui.feature.exportdiary.create.model.ExportState
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.time.LocalDate
 
 class ExportDiaryCreateViewModel(
     private val videoExportDao: VideoExportDao,
     private val calendarRepository: CalendarRepository,
+    private val savedExportsDao: SavedExportsDao,
+    private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
     private var allDays: List<Day> by mutableStateOf(emptyList())
 
@@ -37,6 +42,8 @@ class ExportDiaryCreateViewModel(
     var exportEndDate: LocalDate? by mutableStateOf(null)
 
     var exportIncludeDateStamp: Boolean by mutableStateOf(true)
+
+    var exportName: String by mutableStateOf("")
 
     private val selectedDays: List<ExportDay>? by derivedStateOf {
         val allDays = allDays
@@ -91,8 +98,6 @@ class ExportDiaryCreateViewModel(
         viewModelScope.launch {
             calendarRepository.allDays.collect { days ->
                 allDays = days
-                // Update end date to the date of the last video
-                // only when the user hasn't already selected another explicit end date
                 if (exportStartDate == null) {
                     exportStartDate = days.firstOrNull()?.date
                 }
@@ -140,6 +145,14 @@ class ExportDiaryCreateViewModel(
                             endDate = endDate,
                             dayVideoCount = selectedDays.size,
                         )
+
+                        val trimmedName = exportName.trim()
+                        if (trimmedName.isNotEmpty()) {
+                            withContext(ioDispatcher) {
+                                savedExportsDao.saveExport(trimmedName, exportedVideo)
+                            }
+                        }
+
                         exportState = ExportState.Ready
                         onExportedMutable.emit(exportedVideo)
                     }

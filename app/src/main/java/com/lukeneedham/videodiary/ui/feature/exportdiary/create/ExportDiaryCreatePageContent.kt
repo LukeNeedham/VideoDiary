@@ -31,6 +31,8 @@ fun ExportDiaryCreatePageContent(
     onEndDateSelected: (LocalDate?) -> Unit,
     exportIncludeDateStamp: Boolean,
     setExportIncludeDateStamp: (Boolean) -> Unit,
+    exportName: String,
+    onExportNameChange: (String) -> Unit,
     export: () -> Unit,
 ) {
     Column(
@@ -62,6 +64,8 @@ fun ExportDiaryCreatePageContent(
                     onEndDateSelected = onEndDateSelected,
                     exportIncludeDateStamp = exportIncludeDateStamp,
                     setExportIncludeDateStamp = setExportIncludeDateStamp,
+                    exportName = exportName,
+                    onExportNameChange = onExportNameChange,
                     export = export,
                 )
             }
@@ -90,6 +94,8 @@ internal fun PreviewExportDiaryPageContent() {
             onEndDateSelected = {},
             exportIncludeDateStamp = true,
             setExportIncludeDateStamp = {},
+            exportName = "",
+            onExportNameChange = {},
         )
     }
 }

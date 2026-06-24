@@ -3,4 +3,5 @@ plugins {
     id(deps.plugins.application) version(deps.plugins.versions.agp) apply false
     id(deps.plugins.kotlinAndroid) version(deps.plugins.versions.kotlin) apply false
     id(deps.plugins.kotlinCompose) version(deps.plugins.versions.kotlin) apply false
+    id(deps.plugins.ksp) version(deps.plugins.versions.ksp) apply false
 }

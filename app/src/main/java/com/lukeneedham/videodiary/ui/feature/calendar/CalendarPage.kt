@@ -9,7 +9,6 @@ fun CalendarPage(
     viewModel: CalendarViewModel,
     onRecordVideoClick: (date: LocalDate) -> Unit,
     onExportClick: () -> Unit,
-    onExportCatalogueClick: () -> Unit,
     onDebugClick: () -> Unit,
     share: (ShareRequest) -> Unit,
 ) {
@@ -25,7 +24,6 @@ fun CalendarPage(
         share = share,
         videoPlayerController = viewModel.videoPlayerController,
         onExportClick = onExportClick,
-        onExportCatalogueClick = onExportCatalogueClick,
         onDebugClick = onDebugClick,
     )
 }

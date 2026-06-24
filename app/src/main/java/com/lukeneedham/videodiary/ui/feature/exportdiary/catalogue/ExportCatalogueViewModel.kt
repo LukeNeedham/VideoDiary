@@ -24,6 +24,8 @@ class ExportCatalogueViewModel(
     }
 
     fun deleteExport(id: String) {
-        savedExportsDao.deleteSavedExport(id)
+        viewModelScope.launch {
+            savedExportsDao.deleteSavedExport(id)
+        }
     }
 }
