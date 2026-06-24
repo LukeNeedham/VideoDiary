@@ -1,5 +1,6 @@
 package com.lukeneedham.videodiary.ui.feature.exportdiary.hub
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -11,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
@@ -20,9 +22,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -34,7 +36,6 @@ import com.lukeneedham.videodiary.ui.theme.AppSurfaceVariant
 import com.lukeneedham.videodiary.ui.theme.Typography
 import java.io.File
 
-private val ThumbnailHeight = 60.dp
 private val ThumbnailWidth = 40.dp
 private val ThumbnailSpacing = 2.dp
 private val EllipsisWidth = 24.dp
@@ -117,9 +118,10 @@ private fun SavedExportThumbnailRow(
             }
         } else {
             val maxWithEllipsis = maxThumbnailCountWithEllipsis(maxWidth)
-            val sideCount = maxWithEllipsis / 2
-            val firstThumbnails = thumbnailFiles.take(sideCount)
-            val lastThumbnails = thumbnailFiles.takeLast(sideCount)
+            val firstCount = (maxWithEllipsis + 1) / 2
+            val lastCount = maxWithEllipsis / 2
+            val firstThumbnails = thumbnailFiles.take(firstCount)
+            val lastThumbnails = thumbnailFiles.takeLast(lastCount)
 
             Row(
                 verticalAlignment = Alignment.CenterVertically,
@@ -128,11 +130,13 @@ private fun SavedExportThumbnailRow(
                 for (file in firstThumbnails) {
                     ThumbnailImage(file = file)
                 }
-                Text(
-                    text = "…",
-                    color = Color.White.copy(alpha = 0.6f),
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.weight(1f),
+                Image(
+                    painter = painterResource(R.drawable.ellipsis),
+                    contentDescription = null,
+                    colorFilter = ColorFilter.tint(Color.White.copy(alpha = 0.6f)),
+                    modifier = Modifier
+                        .weight(1f)
+                        .width(EllipsisWidth),
                 )
                 for (file in lastThumbnails) {
                     ThumbnailImage(file = file)
@@ -152,7 +156,7 @@ private fun ThumbnailImage(
         contentDescription = null,
         contentScale = ContentScale.Crop,
         modifier = modifier
-            .size(width = ThumbnailWidth, height = ThumbnailHeight),
+            .width(ThumbnailWidth),
     )
 }
 
@@ -163,6 +167,6 @@ private fun maxThumbnailCount(availableWidth: Dp): Int {
 
 private fun maxThumbnailCountWithEllipsis(availableWidth: Dp): Int {
     val widthForThumbnails = availableWidth - EllipsisWidth - ThumbnailSpacing * 2
-    val count = ((widthForThumbnails + ThumbnailSpacing) / (ThumbnailWidth + ThumbnailSpacing)).toInt()
-    return (count / 2 * 2).coerceAtLeast(2)
+    return ((widthForThumbnails + ThumbnailSpacing) / (ThumbnailWidth + ThumbnailSpacing)).toInt()
+        .coerceAtLeast(2)
 }
