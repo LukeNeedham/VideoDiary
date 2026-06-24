@@ -23,12 +23,23 @@ class SavedExportsDao(
         entities.mapNotNull { entity -> entityToModel(entity) }
     }
 
-    suspend fun saveExport(name: String, exportedVideo: ExportedVideo) {
+    suspend fun saveExport(
+        name: String,
+        exportedVideo: ExportedVideo,
+        thumbnailFiles: List<File>,
+    ) {
         val id = System.currentTimeMillis().toString()
         val videoFileName = "$id.mp4"
         val videoFile = File(savedExportsDir, videoFileName)
 
         exportedVideo.videoFile.copyTo(videoFile, overwrite = true)
+
+        val thumbnailFileNames = thumbnailFiles.mapIndexedNotNull { index, source ->
+            if (!source.exists()) return@mapIndexedNotNull null
+            val thumbName = "${id}_thumb_$index.jpg"
+            source.copyTo(File(savedExportsDir, thumbName), overwrite = true)
+            thumbName
+        }
 
         val entity = SavedExportEntity(
             id = id,
@@ -37,6 +48,7 @@ class SavedExportsDao(
             startDate = exportedVideo.startDate.toString(),
             endDate = exportedVideo.endDate.toString(),
             dayVideoCount = exportedVideo.dayVideoCount,
+            thumbnailFileNames = thumbnailFileNames.joinToString(","),
         )
         roomDao.insert(entity)
     }
@@ -54,6 +66,15 @@ class SavedExportsDao(
             return null
         }
         return try {
+            val thumbnailFiles = if (entity.thumbnailFileNames.isNotEmpty()) {
+                entity.thumbnailFileNames.split(",").mapNotNull { thumbName ->
+                    val thumbFile = File(savedExportsDir, thumbName)
+                    if (thumbFile.exists()) thumbFile else null
+                }
+            } else {
+                emptyList()
+            }
+
             SavedExport(
                 id = entity.id,
                 name = entity.name,
@@ -61,6 +82,7 @@ class SavedExportsDao(
                 startDate = LocalDate.parse(entity.startDate),
                 endDate = LocalDate.parse(entity.endDate),
                 dayVideoCount = entity.dayVideoCount,
+                thumbnailFiles = thumbnailFiles,
             )
         } catch (e: Exception) {
             Logger.warning("Failed to parse saved export: ${entity.id}", e)

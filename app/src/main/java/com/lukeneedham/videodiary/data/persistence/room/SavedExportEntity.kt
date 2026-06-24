@@ -11,4 +11,5 @@ data class SavedExportEntity(
     val startDate: String,
     val endDate: String,
     val dayVideoCount: Int,
+    val thumbnailFileNames: String = "",
 )
