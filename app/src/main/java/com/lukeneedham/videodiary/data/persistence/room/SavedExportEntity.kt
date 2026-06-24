@@ -7,9 +7,5 @@ import androidx.room.PrimaryKey
 data class SavedExportEntity(
     @PrimaryKey val id: String,
     val name: String,
-    val videoFileName: String,
-    val startDate: String,
-    val endDate: String,
-    val dayVideoCount: Int,
-    val thumbnailFileNames: String = "",
+    val includedDates: String,
 )

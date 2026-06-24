@@ -148,14 +148,12 @@ class ExportDiaryCreateViewModel(
 
                         val trimmedName = exportName.trim()
                         if (trimmedName.isNotEmpty()) {
-                            val thumbnails = selectedDayThumbnails
-                                ?.mapNotNull { it.thumbnailFile }
-                                ?: emptyList()
+                            val dates = selectedDays?.map { it.date } ?: emptyList()
                             withContext(ioDispatcher) {
                                 savedExportsDao.saveExport(
                                     trimmedName,
                                     exportedVideo,
-                                    thumbnails,
+                                    dates,
                                 )
                             }
                         }

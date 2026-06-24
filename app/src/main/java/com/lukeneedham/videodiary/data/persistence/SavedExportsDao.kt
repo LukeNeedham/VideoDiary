@@ -1,6 +1,7 @@
 package com.lukeneedham.videodiary.data.persistence
 
 import android.content.Context
+import com.lukeneedham.videodiary.data.mapper.ThumbnailFileNameMapper
 import com.lukeneedham.videodiary.data.persistence.room.SavedExportEntity
 import com.lukeneedham.videodiary.data.persistence.room.SavedExportRoomDao
 import com.lukeneedham.videodiary.domain.model.ExportedVideo
@@ -14,10 +15,13 @@ import java.time.LocalDate
 class SavedExportsDao(
     context: Context,
     private val roomDao: SavedExportRoomDao,
+    private val thumbnailFileNameMapper: ThumbnailFileNameMapper,
 ) {
     private val savedExportsDir = File(context.filesDir, "saved_exports").apply {
         mkdirs()
     }
+
+    private val thumbnailsDir = File(context.filesDir, "thumbnails")
 
     val allSavedExports: Flow<List<SavedExport>> = roomDao.getAll().map { entities ->
         entities.mapNotNull { entity -> entityToModel(entity) }
@@ -26,62 +30,46 @@ class SavedExportsDao(
     suspend fun saveExport(
         name: String,
         exportedVideo: ExportedVideo,
-        thumbnailFiles: List<File>,
+        includedDates: List<LocalDate>,
     ) {
         val id = System.currentTimeMillis().toString()
-        val videoFileName = "$id.mp4"
-        val videoFile = File(savedExportsDir, videoFileName)
-
+        val videoFile = File(savedExportsDir, "$id.mp4")
         exportedVideo.videoFile.copyTo(videoFile, overwrite = true)
-
-        val thumbnailFileNames = thumbnailFiles.mapIndexedNotNull { index, source ->
-            if (!source.exists()) return@mapIndexedNotNull null
-            val thumbName = "${id}_thumb_$index.jpg"
-            source.copyTo(File(savedExportsDir, thumbName), overwrite = true)
-            thumbName
-        }
 
         val entity = SavedExportEntity(
             id = id,
             name = name,
-            videoFileName = videoFileName,
-            startDate = exportedVideo.startDate.toString(),
-            endDate = exportedVideo.endDate.toString(),
-            dayVideoCount = exportedVideo.dayVideoCount,
-            thumbnailFileNames = thumbnailFileNames.joinToString(","),
+            includedDates = includedDates.joinToString(","),
         )
         roomDao.insert(entity)
     }
 
     suspend fun deleteSavedExport(id: String) {
         roomDao.deleteById(id)
-        val files = savedExportsDir.listFiles() ?: return
-        files.filter { it.name.startsWith(id) }.forEach { it.delete() }
+        File(savedExportsDir, "$id.mp4").delete()
     }
 
     private fun entityToModel(entity: SavedExportEntity): SavedExport? {
-        val videoFile = File(savedExportsDir, entity.videoFileName)
+        val videoFile = File(savedExportsDir, "${entity.id}.mp4")
         if (!videoFile.exists()) {
-            Logger.warning("Saved export video file missing: ${entity.videoFileName}")
+            Logger.warning("Saved export video file missing: ${entity.id}")
             return null
         }
         return try {
-            val thumbnailFiles = if (entity.thumbnailFileNames.isNotEmpty()) {
-                entity.thumbnailFileNames.split(",").mapNotNull { thumbName ->
-                    val thumbFile = File(savedExportsDir, thumbName)
-                    if (thumbFile.exists()) thumbFile else null
-                }
-            } else {
-                emptyList()
+            val dates = entity.includedDates.split(",").map { LocalDate.parse(it) }
+
+            val thumbnailFiles = dates.mapNotNull { date ->
+                val file = File(thumbnailsDir, thumbnailFileNameMapper.dateToName(date))
+                if (file.exists()) file else null
             }
 
             SavedExport(
                 id = entity.id,
                 name = entity.name,
                 videoFile = videoFile,
-                startDate = LocalDate.parse(entity.startDate),
-                endDate = LocalDate.parse(entity.endDate),
-                dayVideoCount = entity.dayVideoCount,
+                startDate = dates.min(),
+                endDate = dates.max(),
+                dayVideoCount = dates.size,
                 thumbnailFiles = thumbnailFiles,
             )
         } catch (e: Exception) {

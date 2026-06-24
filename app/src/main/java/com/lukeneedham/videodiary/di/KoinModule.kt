@@ -91,6 +91,7 @@ object KoinModule {
             SavedExportsDao(
                 context = androidContext(),
                 roomDao = get<AppDatabase>().savedExportDao(),
+                thumbnailFileNameMapper = get(),
             )
         }
     }
