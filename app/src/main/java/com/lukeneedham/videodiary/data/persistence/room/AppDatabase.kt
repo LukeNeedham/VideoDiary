@@ -15,8 +15,6 @@ abstract class AppDatabase : RoomDatabase() {
                 context,
                 AppDatabase::class.java,
                 "video_diary_db"
-            )
-                .fallbackToDestructiveMigration()
-                .build()
+            ).build()
     }
 }
