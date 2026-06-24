@@ -40,7 +40,7 @@ private fun ExportDiaryThumbnailItem(
     Box(
         contentAlignment = Alignment.Center,
         modifier = modifier
-            .height(70.dp)
+            .height(75.dp)
             .clip(RoundedCornerShape(3.dp))
             .background(Color.Black),
     ) {
