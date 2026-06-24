@@ -37,7 +37,7 @@ private fun ExportDiaryThumbnailItem(
             contentDescription = null,
             contentScale = ContentScale.Fit,
             modifier = modifier
-                .height(75.dp),
+                .height(90.dp),
         )
     }
 }
