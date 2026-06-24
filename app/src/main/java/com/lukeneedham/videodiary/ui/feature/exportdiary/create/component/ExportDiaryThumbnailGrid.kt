@@ -31,7 +31,7 @@ fun ExportDiaryThumbnailGrid(
     modifier: Modifier = Modifier,
 ) {
     LazyRow(
-        horizontalArrangement = Arrangement.spacedBy(4.dp),
+        horizontalArrangement = Arrangement.spacedBy(2.dp),
         modifier = modifier,
     ) {
         items(thumbnails, key = { it.date }) { item ->
@@ -61,12 +61,11 @@ private fun ExportDiaryThumbnailItem(
     Box(
         contentAlignment = Alignment.Center,
         modifier = modifier
-            .height(48.dp)
+            .height(70.dp)
             .then(
                 if (aspectRatio != null) Modifier.aspectRatio(aspectRatio)
                 else Modifier
             )
-            .clip(RoundedCornerShape(3.dp))
             .background(Color.Black),
     ) {
         bitmap?.let {
