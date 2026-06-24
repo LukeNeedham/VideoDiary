@@ -36,7 +36,7 @@ import com.lukeneedham.videodiary.ui.feature.common.Button
 import com.lukeneedham.videodiary.ui.feature.common.datepicker.DiaryDatePickerDialog
 import com.lukeneedham.videodiary.ui.feature.exportdiary.create.component.ExportDiaryCreateDatePicker
 import com.lukeneedham.videodiary.ui.feature.exportdiary.create.component.ExportDiaryEmptyCreate
-import com.lukeneedham.videodiary.ui.feature.exportdiary.create.component.ExportDiaryThumbnailGrid
+import com.lukeneedham.videodiary.ui.feature.exportdiary.create.component.ExportDiaryThumbnailRow
 import com.lukeneedham.videodiary.ui.feature.exportdiary.create.model.ExportDayThumbnail
 import com.lukeneedham.videodiary.ui.feature.exportdiary.create.model.ExportState
 import com.lukeneedham.videodiary.ui.theme.Typography
@@ -169,7 +169,7 @@ fun ExportDiaryCreatePageReady(
 
                             Spacer(modifier = Modifier.height(10.dp))
 
-                            ExportDiaryThumbnailGrid(
+                            ExportDiaryThumbnailRow(
                                 thumbnails = selectedDayThumbnails,
                             )
                         }

@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.lukeneedham.videodiary.domain.model.Day
+import java.io.File
 
 @Composable
 fun DiaryDatePickerDay(
@@ -66,7 +67,7 @@ fun DiaryDatePickerDay(
 }
 
 @Composable
-private fun DayThumbnail(thumbnailFile: java.io.File?) {
+private fun DayThumbnail(thumbnailFile: File?) {
     if (thumbnailFile == null) return
 
     AsyncImage(
