@@ -154,7 +154,7 @@ private fun ThumbnailImage(
     AsyncImage(
         model = file,
         contentDescription = null,
-        contentScale = ContentScale.Crop,
+        contentScale = ContentScale.FillWidth,
         modifier = modifier
             .width(ThumbnailWidth),
     )
