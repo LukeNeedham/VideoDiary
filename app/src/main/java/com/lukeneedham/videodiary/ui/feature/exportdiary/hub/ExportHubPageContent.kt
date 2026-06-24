@@ -178,7 +178,7 @@ private fun SavedExportItem(
                     AsyncImage(
                         model = thumbnailFile,
                         contentDescription = null,
-                        contentScale = ContentScale.Crop,
+                        contentScale = ContentScale.Fit,
                         modifier = Modifier.height(60.dp),
                     )
                 }
