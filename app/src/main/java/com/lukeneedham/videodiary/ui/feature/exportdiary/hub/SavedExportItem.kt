@@ -1,8 +1,10 @@
 package com.lukeneedham.videodiary.ui.feature.exportdiary.hub
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -10,8 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
@@ -21,8 +22,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.lukeneedham.videodiary.R
@@ -31,6 +34,10 @@ import com.lukeneedham.videodiary.domain.util.date.StandardDateTimeFormatter
 import com.lukeneedham.videodiary.ui.theme.AppSurfaceVariant
 import com.lukeneedham.videodiary.ui.theme.Typography
 import java.io.File
+
+private val ThumbnailWidth = 40.dp
+private val ThumbnailSpacing = 2.dp
+private val EllipsisWidth = 24.dp
 
 @Composable
 fun SavedExportItem(
@@ -84,18 +91,80 @@ fun SavedExportItem(
         }
 
         if (thumbnailFiles.isNotEmpty()) {
-            LazyRow(
-                horizontalArrangement = Arrangement.spacedBy(2.dp),
+            SavedExportThumbnailRow(
+                thumbnailFiles = thumbnailFiles,
+                modifier = Modifier.fillMaxWidth(),
+            )
+        }
+    }
+}
+
+@Composable
+private fun SavedExportThumbnailRow(
+    thumbnailFiles: List<File>,
+    modifier: Modifier = Modifier,
+) {
+    BoxWithConstraints(modifier = modifier) {
+        val maxFitCount = maxThumbnailCount(maxWidth)
+
+        if (thumbnailFiles.size <= maxFitCount) {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(ThumbnailSpacing),
+            ) {
+                for (file in thumbnailFiles) {
+                    ThumbnailImage(file = file)
+                }
+            }
+        } else {
+            val maxWithEllipsis = maxThumbnailCountWithEllipsis(maxWidth)
+            val firstCount = (maxWithEllipsis + 1) / 2
+            val lastCount = maxWithEllipsis / 2
+            val firstThumbnails = thumbnailFiles.take(firstCount)
+            val lastThumbnails = thumbnailFiles.takeLast(lastCount)
+
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.fillMaxWidth(),
             ) {
-                items(thumbnailFiles) { thumbnailFile ->
-                    AsyncImage(
-                        model = thumbnailFile,
-                        contentDescription = null,
-                        modifier = Modifier.height(60.dp),
-                    )
+                for (file in firstThumbnails) {
+                    ThumbnailImage(file = file)
+                }
+                Image(
+                    painter = painterResource(R.drawable.ellipsis),
+                    contentDescription = null,
+                    colorFilter = ColorFilter.tint(Color.White.copy(alpha = 0.6f)),
+                    modifier = Modifier
+                        .weight(1f)
+                        .width(EllipsisWidth),
+                )
+                for (file in lastThumbnails) {
+                    ThumbnailImage(file = file)
                 }
             }
         }
     }
+}
+
+@Composable
+private fun ThumbnailImage(
+    file: File,
+    modifier: Modifier = Modifier,
+) {
+    AsyncImage(
+        model = file,
+        contentDescription = null,
+        modifier = modifier
+            .width(ThumbnailWidth),
+    )
+}
+
+private fun maxThumbnailCount(availableWidth: Dp): Int {
+    return ((availableWidth + ThumbnailSpacing) / (ThumbnailWidth + ThumbnailSpacing)).toInt()
+        .coerceAtLeast(1)
+}
+
+private fun maxThumbnailCountWithEllipsis(availableWidth: Dp): Int {
+    val widthForThumbnails = availableWidth - EllipsisWidth - ThumbnailSpacing * 2
+    return ((widthForThumbnails + ThumbnailSpacing) / (ThumbnailWidth + ThumbnailSpacing)).toInt()
+        .coerceAtLeast(2)
 }
