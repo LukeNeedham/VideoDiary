@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -43,6 +44,7 @@ private val EllipsisWidth = 24.dp
 fun SavedExportItem(
     export: SavedExport,
     thumbnailFiles: List<File>,
+    videoAspectRatio: Float?,
     onClick: () -> Unit,
     onDeleteClick: () -> Unit,
 ) {
@@ -90,9 +92,10 @@ fun SavedExportItem(
             }
         }
 
-        if (thumbnailFiles.isNotEmpty()) {
+        if (thumbnailFiles.isNotEmpty() && videoAspectRatio != null) {
             SavedExportThumbnailRow(
                 thumbnailFiles = thumbnailFiles,
+                videoAspectRatio = videoAspectRatio,
                 modifier = Modifier.fillMaxWidth(),
             )
         }
@@ -102,6 +105,7 @@ fun SavedExportItem(
 @Composable
 private fun SavedExportThumbnailRow(
     thumbnailFiles: List<File>,
+    videoAspectRatio: Float,
     modifier: Modifier = Modifier,
 ) {
     BoxWithConstraints(modifier = modifier) {
@@ -112,7 +116,7 @@ private fun SavedExportThumbnailRow(
                 horizontalArrangement = Arrangement.spacedBy(ThumbnailSpacing),
             ) {
                 for (file in thumbnailFiles) {
-                    ThumbnailImage(file = file)
+                    ThumbnailImage(file = file, videoAspectRatio = videoAspectRatio)
                 }
             }
         } else {
@@ -127,18 +131,16 @@ private fun SavedExportThumbnailRow(
                 modifier = Modifier.fillMaxWidth(),
             ) {
                 for (file in firstThumbnails) {
-                    ThumbnailImage(file = file)
+                    ThumbnailImage(file = file, videoAspectRatio = videoAspectRatio)
                 }
                 Image(
                     painter = painterResource(R.drawable.ellipsis),
                     contentDescription = null,
                     colorFilter = ColorFilter.tint(Color.White.copy(alpha = 0.6f)),
-                    modifier = Modifier
-                        .weight(1f)
-                        .width(EllipsisWidth),
+                    modifier = Modifier.weight(1f),
                 )
                 for (file in lastThumbnails) {
-                    ThumbnailImage(file = file)
+                    ThumbnailImage(file = file, videoAspectRatio = videoAspectRatio)
                 }
             }
         }
@@ -148,13 +150,15 @@ private fun SavedExportThumbnailRow(
 @Composable
 private fun ThumbnailImage(
     file: File,
+    videoAspectRatio: Float,
     modifier: Modifier = Modifier,
 ) {
     AsyncImage(
         model = file,
         contentDescription = null,
         modifier = modifier
-            .width(ThumbnailWidth),
+            .width(ThumbnailWidth)
+            .aspectRatio(videoAspectRatio),
     )
 }
 
