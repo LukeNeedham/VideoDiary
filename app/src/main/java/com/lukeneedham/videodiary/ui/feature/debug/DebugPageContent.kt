@@ -26,6 +26,7 @@ fun DebugPageContent(
     allowRetakeForPastDays: Boolean,
     onAllowRetakeForPastDaysChange: (Boolean) -> Unit,
     onResyncThumbnailsClick: () -> Unit,
+    onCrashLogClick: () -> Unit,
     canGoBack: Boolean,
     onBack: () -> Unit,
 ) {
@@ -69,6 +70,12 @@ fun DebugPageContent(
                 description = "Deletes all generated thumbnails and recalculates them " +
                     "from the saved videos",
                 onClick = onResyncThumbnailsClick,
+            )
+
+            DebugOption(
+                title = "Crash logs",
+                description = "View all fatal crash logs recorded by the app",
+                onClick = onCrashLogClick,
             )
         }
     }
@@ -143,6 +150,7 @@ internal fun PreviewDebugPageContent() {
         allowRetakeForPastDays = false,
         onAllowRetakeForPastDaysChange = {},
         onResyncThumbnailsClick = {},
+        onCrashLogClick = {},
         canGoBack = true,
         onBack = {},
     )

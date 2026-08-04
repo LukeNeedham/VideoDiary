@@ -9,6 +9,7 @@ fun DebugPage(
     viewModel: DebugViewModel,
     canGoBack: Boolean,
     onBack: () -> Unit,
+    onCrashLogClick: () -> Unit,
 ) {
     val allowRetakeForPastDays by viewModel.allowRetakeForPastDays.collectAsState()
 
@@ -17,6 +18,7 @@ fun DebugPage(
         allowRetakeForPastDays = allowRetakeForPastDays,
         onAllowRetakeForPastDaysChange = viewModel::setAllowRetakeForPastDays,
         onResyncThumbnailsClick = viewModel::resyncThumbnails,
+        onCrashLogClick = onCrashLogClick,
         canGoBack = canGoBack,
         onBack = onBack,
     )
