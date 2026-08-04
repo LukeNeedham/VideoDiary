@@ -5,6 +5,7 @@ import com.lukeneedham.videodiary.domain.model.ExportedVideo
 import com.lukeneedham.videodiary.domain.model.ShareRequest
 import com.lukeneedham.videodiary.domain.util.logger.Logger
 import com.lukeneedham.videodiary.ui.feature.calendar.CalendarPage
+import com.lukeneedham.videodiary.ui.feature.crashlog.CrashLogPage
 import com.lukeneedham.videodiary.ui.feature.debug.DebugPage
 import com.lukeneedham.videodiary.ui.feature.exportdiary.create.ExportDiaryCreatePage
 import com.lukeneedham.videodiary.ui.feature.exportdiary.hub.ExportHubPage
@@ -125,6 +126,15 @@ fun NormalRouter(
             )
 
             is NormalPage.Debug -> DebugPage(
+                viewModel = koinViewModel(),
+                canGoBack = canGoBack,
+                onBack = onBack,
+                onCrashLogClick = {
+                    navigate(NormalPage.CrashLog)
+                },
+            )
+
+            is NormalPage.CrashLog -> CrashLogPage(
                 viewModel = koinViewModel(),
                 canGoBack = canGoBack,
                 onBack = onBack,
