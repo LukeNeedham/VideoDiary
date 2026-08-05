@@ -11,17 +11,14 @@ data class SetupIntroSlide(
     val accentColor: Color,
     val title: String,
     val description: String,
-    /** Whether [iconRes] should be tinted with [accentColor], or drawn using its own colors */
-    val tintIcon: Boolean = true,
 )
 
 val setupIntroSlides = listOf(
     SetupIntroSlide(
-        iconRes = R.mipmap.ic_launcher_round,
+        iconRes = R.drawable.play,
         accentColor = AccentHighlight,
         title = "Welcome to your Video Diary",
         description = "Record your life, one short video a day. Here's how it works...",
-        tintIcon = false,
     ),
     SetupIntroSlide(
         iconRes = R.drawable.movie,

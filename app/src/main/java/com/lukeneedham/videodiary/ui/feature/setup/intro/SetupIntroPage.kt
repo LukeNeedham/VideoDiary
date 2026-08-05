@@ -134,7 +134,7 @@ private fun SetupIntroSlideContent(
             Image(
                 painter = painterResource(slide.iconRes),
                 contentDescription = null,
-                colorFilter = if (slide.tintIcon) ColorFilter.tint(slide.accentColor) else null,
+                colorFilter = ColorFilter.tint(slide.accentColor),
                 modifier = Modifier.size(70.dp),
             )
         }
