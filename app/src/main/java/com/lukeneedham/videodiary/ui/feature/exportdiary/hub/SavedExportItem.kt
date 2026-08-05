@@ -127,6 +127,7 @@ private fun SavedExportThumbnailRow(
             val lastThumbnails = thumbnailFiles.takeLast(lastCount)
 
             Row(
+                horizontalArrangement = Arrangement.spacedBy(ThumbnailSpacing),
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.fillMaxWidth(),
             ) {
