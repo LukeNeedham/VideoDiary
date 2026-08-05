@@ -15,7 +15,6 @@ import androidx.compose.foundation.text.appendInlineContent
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Checkbox
 import androidx.compose.material.CheckboxDefaults
-import androidx.compose.material.LinearProgressIndicator
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
@@ -41,7 +40,6 @@ import com.lukeneedham.videodiary.ui.feature.exportdiary.create.component.Export
 import com.lukeneedham.videodiary.ui.feature.exportdiary.create.component.ExportDiaryEmptyCreate
 import com.lukeneedham.videodiary.ui.feature.exportdiary.create.component.ExportDiaryThumbnailRow
 import com.lukeneedham.videodiary.ui.feature.exportdiary.create.model.ExportDayThumbnail
-import com.lukeneedham.videodiary.ui.feature.exportdiary.create.model.ExportState
 import com.lukeneedham.videodiary.ui.theme.Typography
 import java.time.LocalDate
 
@@ -52,7 +50,6 @@ fun ExportDiaryCreatePageReady(
     selectedDayThumbnails: List<ExportDayThumbnail>?,
     exportStartDate: LocalDate,
     exportEndDate: LocalDate,
-    exportState: ExportState,
     onStartDateSelected: (LocalDate?) -> Unit,
     onEndDateSelected: (LocalDate?) -> Unit,
     exportIncludeDateStamp: Boolean,
@@ -225,53 +222,16 @@ fun ExportDiaryCreatePageReady(
 
                     Spacer(modifier = Modifier.height(15.dp))
 
-                    when (exportState) {
-                        is ExportState.InProgress -> {
-                            Column(
-                                horizontalAlignment = Alignment.CenterHorizontally,
-                                modifier = Modifier.fillMaxWidth()
-                            ) {
-                                Text(
-                                    text = "Export in progress..."
-                                )
-                                Spacer(modifier = Modifier.height(10.dp))
-
-                                LinearProgressIndicator(
-                                    progress = exportState.progressFraction,
-                                    color = Color.Black,
-                                )
-                            }
-                        }
-
-                        is ExportState.Failed -> {
-                            Text(
-                                text = "Something went wrong during the export: ${exportState.error}"
-                            )
-                            Spacer(modifier = Modifier.height(5.dp))
-                            Text(
-                                text = "Feel free to try again"
-                            )
-                            Spacer(modifier = Modifier.height(5.dp))
-                            Button(
-                                text = "Export",
-                                onClick = export,
-                                modifier = Modifier.fillMaxWidth()
-                            )
-                        }
-
-                        ExportState.Ready -> {
-                            if (selectedVideoCount == 0) {
-                                Text(
-                                    text = "Cannot export - please select at least one video",
-                                )
-                            } else {
-                                Button(
-                                    text = "Export",
-                                    onClick = export,
-                                    modifier = Modifier.fillMaxWidth()
-                                )
-                            }
-                        }
+                    if (selectedVideoCount == 0) {
+                        Text(
+                            text = "Cannot export - please select at least one video",
+                        )
+                    } else {
+                        Button(
+                            text = "Export",
+                            onClick = export,
+                            modifier = Modifier.fillMaxWidth()
+                        )
                     }
                 }
             }
@@ -306,7 +266,6 @@ internal fun PreviewExportDiaryCreatePageReady() {
         selectedDayThumbnails = emptyList(),
         exportStartDate = MockDataExportDiaryCreate.startDate,
         exportEndDate = MockDataExportDiaryCreate.endDate,
-        exportState = MockDataExportDiaryCreate.exportState,
         onStartDateSelected = {},
         onEndDateSelected = {},
         exportIncludeDateStamp = true,
