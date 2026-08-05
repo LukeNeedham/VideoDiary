@@ -1,5 +1,6 @@
 package com.lukeneedham.videodiary.ui.feature.setup.duration
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -12,11 +13,14 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.lukeneedham.videodiary.ui.feature.common.Button
 import com.lukeneedham.videodiary.ui.feature.common.IntPicker
+import com.lukeneedham.videodiary.ui.feature.common.pageindicator.PageIndicator
 import com.lukeneedham.videodiary.ui.feature.common.toolbar.GenericToolbar
+import com.lukeneedham.videodiary.ui.navigation.setup.SetupProgress
 
 @Composable
 fun SelectVideoDurationPageContent(
@@ -54,6 +58,20 @@ fun SelectVideoDurationPageContent(
             }
             Spacer(modifier = Modifier.weight(1f))
         }
+
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 10.dp),
+        ) {
+            PageIndicator(
+                pageCount = SetupProgress.TOTAL_PAGE_COUNT,
+                currentPageIndex = SetupProgress.DURATION_PAGE_INDEX,
+                color = Color.Black,
+            )
+        }
+
         Button(
             text = "Next",
             onClick = onContinue,

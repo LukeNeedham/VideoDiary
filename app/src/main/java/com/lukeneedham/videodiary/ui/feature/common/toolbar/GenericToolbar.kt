@@ -5,6 +5,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -23,10 +25,12 @@ import com.lukeneedham.videodiary.R
 fun GenericToolbar(
     canGoBack: Boolean,
     onBack: () -> Unit,
+    modifier: Modifier = Modifier,
+    endContent: @Composable RowScope.() -> Unit = {},
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .height(ToolbarSize.portraitToolbarHeight)
             .background(color = Color.Black)
@@ -48,6 +52,8 @@ fun GenericToolbar(
                 )
             }
         }
+        Spacer(modifier = Modifier.weight(1f))
+        endContent()
     }
 }
 

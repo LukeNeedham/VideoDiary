@@ -38,6 +38,7 @@ import com.lukeneedham.videodiary.ui.feature.common.camera.CameraInput
 import com.lukeneedham.videodiary.ui.feature.common.camera.CameraQualityEffect
 import com.lukeneedham.videodiary.ui.feature.common.pageindicator.PageIndicator
 import com.lukeneedham.videodiary.ui.feature.common.toolbar.GenericToolbar
+import com.lukeneedham.videodiary.ui.navigation.setup.SetupProgress
 
 @OptIn(ExperimentalCamera2Interop::class)
 @Composable
@@ -159,6 +160,19 @@ fun SetupPageContent(
                         .fillMaxWidth()
                 )
             }
+        }
+
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 10.dp),
+        ) {
+            PageIndicator(
+                pageCount = SetupProgress.TOTAL_PAGE_COUNT,
+                currentPageIndex = SetupProgress.RESOLUTION_PAGE_INDEX,
+                color = Color.Black,
+            )
         }
 
         val rotationLocal = rotation
