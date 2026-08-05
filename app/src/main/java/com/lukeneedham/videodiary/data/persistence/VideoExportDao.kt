@@ -19,6 +19,8 @@ class VideoExportDao(
     fun export(videos: List<ExportDay>, exportIncludeDateStamp: Boolean): Flow<VideoExportState> =
         videoExporter.export(videos, outputFile, exportIncludeDateStamp)
 
+    fun cancel() = videoExporter.cancel()
+
     companion object {
         const val outputFileName = "export.mp4"
     }

@@ -29,6 +29,7 @@ class VideoExporter(
 ) {
     private var isComplete = false
     private var failureException: Exception? = null
+    private var isCancelled = false
 
     private val listener = object : Transformer.Listener {
         override fun onCompleted(composition: Composition, exportResult: ExportResult) {
@@ -62,6 +63,7 @@ class VideoExporter(
 
         isComplete = false
         failureException = null
+        isCancelled = false
 
         val editedMediaItems = inputVideos.map { input ->
             val mediaItem = MediaItem.fromUri(input.video.toUri())
@@ -96,6 +98,12 @@ class VideoExporter(
             while (isFlowing) {
                 val error = failureException
                 val state = when {
+                    isCancelled -> {
+                        isFlowing = false
+                        outputFile.delete()
+                        VideoExportState.Cancelled
+                    }
+
                     isComplete -> {
                         isFlowing = false
                         VideoExportState.Success(outputFile)
@@ -116,6 +124,11 @@ class VideoExporter(
                 delay(250)
             }
         }
+    }
+
+    fun cancel() {
+        isCancelled = true
+        transformer.cancel()
     }
 
     private fun createTextOverlay(

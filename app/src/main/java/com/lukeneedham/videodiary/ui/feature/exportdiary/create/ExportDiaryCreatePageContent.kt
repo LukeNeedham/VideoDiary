@@ -13,7 +13,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import com.lukeneedham.videodiary.ui.feature.common.toolbar.GenericToolbar
 import com.lukeneedham.videodiary.ui.feature.exportdiary.create.model.ExportDayThumbnail
-import com.lukeneedham.videodiary.ui.feature.exportdiary.create.model.ExportState
 import java.time.LocalDate
 
 @Composable
@@ -26,7 +25,6 @@ fun ExportDiaryCreatePageContent(
     diaryStartDate: LocalDate?,
     exportStartDate: LocalDate?,
     exportEndDate: LocalDate?,
-    exportState: ExportState,
     onStartDateSelected: (LocalDate?) -> Unit,
     onEndDateSelected: (LocalDate?) -> Unit,
     exportIncludeDateStamp: Boolean,
@@ -59,7 +57,6 @@ fun ExportDiaryCreatePageContent(
                     selectedDayThumbnails = selectedDayThumbnails,
                     exportStartDate = exportStartDate,
                     exportEndDate = exportEndDate,
-                    exportState = exportState,
                     onStartDateSelected = onStartDateSelected,
                     onEndDateSelected = onEndDateSelected,
                     exportIncludeDateStamp = exportIncludeDateStamp,
@@ -85,7 +82,6 @@ internal fun PreviewExportDiaryPageContent() {
             totalVideoCount = 10,
             selectedVideoCount = 5,
             selectedDayThumbnails = emptyList(),
-            exportState = MockDataExportDiaryCreate.exportState,
             export = {},
             exportStartDate = MockDataExportDiaryCreate.startDate,
             exportEndDate = MockDataExportDiaryCreate.endDate,
