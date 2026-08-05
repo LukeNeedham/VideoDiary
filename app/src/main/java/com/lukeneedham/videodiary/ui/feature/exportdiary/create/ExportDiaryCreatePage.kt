@@ -1,28 +1,19 @@
 package com.lukeneedham.videodiary.ui.feature.exportdiary.create
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import com.lukeneedham.videodiary.domain.model.ExportedVideo
+import com.lukeneedham.videodiary.ui.feature.exportdiary.create.model.ExportRequest
 
 @Composable
 fun ExportDiaryCreatePage(
     viewModel: ExportDiaryCreateViewModel,
     canGoBack: Boolean,
     onBack: () -> Unit,
-    onExported: (exportedVideo: ExportedVideo) -> Unit,
+    onExportRequested: (exportRequest: ExportRequest) -> Unit,
 ) {
-    LaunchedEffect(viewModel) {
-        viewModel.onExportedFlow.collect {
-            onExported(it)
-        }
-    }
-
     ExportDiaryCreatePageContent(
         canGoBack = canGoBack,
         onBack = onBack,
         totalVideoCount = viewModel.totalVideoCount,
-        exportState = viewModel.exportState,
-        export = viewModel::export,
         exportStartDate = viewModel.exportStartDate,
         exportEndDate = viewModel.exportEndDate,
         selectedVideoCount = viewModel.selectedVideoCount,
@@ -34,5 +25,8 @@ fun ExportDiaryCreatePage(
         setExportIncludeDateStamp = { viewModel.exportIncludeDateStamp = it },
         exportName = viewModel.exportName,
         onExportNameChange = { viewModel.exportName = it },
+        export = {
+            viewModel.exportRequest?.let(onExportRequested)
+        },
     )
 }

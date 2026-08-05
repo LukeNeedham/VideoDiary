@@ -9,6 +9,7 @@ import com.lukeneedham.videodiary.ui.feature.crashlog.CrashLogPage
 import com.lukeneedham.videodiary.ui.feature.debug.DebugPage
 import com.lukeneedham.videodiary.ui.feature.exportdiary.create.ExportDiaryCreatePage
 import com.lukeneedham.videodiary.ui.feature.exportdiary.hub.ExportHubPage
+import com.lukeneedham.videodiary.ui.feature.exportdiary.progress.ExportDiaryProgressPage
 import com.lukeneedham.videodiary.ui.feature.exportdiary.view.ExportDiaryViewPage
 import com.lukeneedham.videodiary.ui.feature.record.check.CheckVideoPage
 import com.lukeneedham.videodiary.ui.feature.record.film.RecordVideoPage
@@ -112,9 +113,22 @@ fun NormalRouter(
                 viewModel = koinViewModel(),
                 canGoBack = canGoBack,
                 onBack = onBack,
-                onExported = {
-                    navigate(NormalPage.ExportDiaryView(it))
+                onExportRequested = { exportRequest ->
+                    navigate(NormalPage.ExportDiaryProgress(exportRequest))
                 }
+            )
+
+            is NormalPage.ExportDiaryProgress -> ExportDiaryProgressPage(
+                viewModel = koinViewModel {
+                    parametersOf(page.exportRequest)
+                },
+                onExported = { exportedVideo ->
+                    navController.popUpTo { it is NormalPage.ExportDiaryCreate }
+                    navigate(NormalPage.ExportDiaryView(exportedVideo))
+                },
+                onExit = {
+                    pop()
+                },
             )
 
             is NormalPage.ExportDiaryView -> ExportDiaryViewPage(
