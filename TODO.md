@@ -3,5 +3,4 @@ This is an ordered list of todo items. Each item should be done in isolation, an
 
 # Todos
 - the export video view page needs to be updated to follow the same design as the calendar video player - video takes full width, height is driven by aspect ratio as from repo, video aligned to bottom, black toolbar aligned to top fills remaining height. toolbar contains back button, and name of export (if applicable) is centered, with the date range in small text underneath (or centered if there is no name). pause, mute buttons float aligned to bottom -left, share button floats aligned to bottom-right.
-- new share icon - use the curved arrow icon that whatsapp uses
 - improve onboarding flow - make beautiful, split across multiple pages, add page indicator at the bottom of each page so the user can see how far they are
