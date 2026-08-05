@@ -21,7 +21,9 @@ import com.lukeneedham.videodiary.ui.feature.common.datepicker.DiaryDatePickerVi
 import com.lukeneedham.videodiary.ui.feature.crashlog.CrashLogViewModel
 import com.lukeneedham.videodiary.ui.feature.debug.DebugViewModel
 import com.lukeneedham.videodiary.ui.feature.exportdiary.create.ExportDiaryCreateViewModel
+import com.lukeneedham.videodiary.ui.feature.exportdiary.create.model.ExportRequest
 import com.lukeneedham.videodiary.ui.feature.exportdiary.hub.ExportHubViewModel
+import com.lukeneedham.videodiary.ui.feature.exportdiary.progress.ExportDiaryProgressViewModel
 import com.lukeneedham.videodiary.ui.feature.exportdiary.view.ExportDiaryViewViewModel
 import com.lukeneedham.videodiary.ui.feature.permissions.RequestPermissionsViewModel
 import com.lukeneedham.videodiary.ui.feature.record.check.CheckVideoViewModel
@@ -181,8 +183,13 @@ object KoinModule {
         }
         viewModel {
             ExportDiaryCreateViewModel(
-                videoExportDao = get(),
                 calendarRepository = get(),
+            )
+        }
+        viewModel { (exportRequest: ExportRequest) ->
+            ExportDiaryProgressViewModel(
+                exportRequest = exportRequest,
+                videoExportDao = get(),
                 savedExportsDao = get(),
                 ioDispatcher = get(KoinQualifier.Dispatcher.io),
             )
