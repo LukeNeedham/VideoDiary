@@ -139,14 +139,15 @@ class ExportDiaryCreateViewModel(
                     }
 
                     is VideoExportState.Success -> {
+                        val trimmedName = exportName.trim()
                         val exportedVideo = ExportedVideo(
                             videoFile = state.outputFile,
+                            name = trimmedName.ifEmpty { null },
                             startDate = startDate,
                             endDate = endDate,
                             dayVideoCount = selectedDays.size,
                         )
 
-                        val trimmedName = exportName.trim()
                         if (trimmedName.isNotEmpty()) {
                             val dates = selectedDays?.map { it.date } ?: emptyList()
                             withContext(ioDispatcher) {
