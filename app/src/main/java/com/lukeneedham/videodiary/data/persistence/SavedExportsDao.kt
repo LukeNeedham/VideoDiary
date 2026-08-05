@@ -36,6 +36,7 @@ class SavedExportsDao(
             id = id,
             name = name,
             includedDates = includedDates.joinToString(","),
+            timestampCreated = System.currentTimeMillis(),
         )
         roomDao.insert(entity)
     }

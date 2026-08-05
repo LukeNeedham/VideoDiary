@@ -42,6 +42,7 @@ import java.time.LocalDate
 @Composable
 fun ExportHubPageContent(
     savedExports: List<SavedExportWithThumbnails>,
+    videoAspectRatio: Float?,
     canGoBack: Boolean,
     onBack: () -> Unit,
     onCreateExportClick: () -> Unit,
@@ -93,6 +94,7 @@ fun ExportHubPageContent(
                     SavedExportItem(
                         export = item.export,
                         thumbnailFiles = item.thumbnailFiles,
+                        videoAspectRatio = videoAspectRatio,
                         onClick = { onExportClick(item.export) },
                         onDeleteClick = { pendingIdToDelete = item.export.id },
                     )
@@ -156,6 +158,7 @@ private fun CreateExportButton(
 private fun PreviewEmpty() {
     ExportHubPageContent(
         savedExports = emptyList(),
+        videoAspectRatio = 9f / 16f,
         canGoBack = true,
         onBack = {},
         onCreateExportClick = {},
@@ -194,6 +197,7 @@ private fun PreviewWithItems() {
                 thumbnailFiles = emptyList(),
             ),
         ),
+        videoAspectRatio = 9f / 16f,
         canGoBack = true,
         onBack = {},
         onCreateExportClick = {},

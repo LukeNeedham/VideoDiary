@@ -196,6 +196,7 @@ object KoinModule {
             ExportHubViewModel(
                 savedExportsDao = get(),
                 videosDao = get(),
+                videoResolutionRepository = get(),
             )
         }
         viewModel {

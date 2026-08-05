@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface SavedExportRoomDao {
-    @Query("SELECT * FROM saved_exports ORDER BY id DESC")
+    @Query("SELECT * FROM saved_exports ORDER BY timestampCreated DESC")
     fun getAll(): Flow<List<SavedExportEntity>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)

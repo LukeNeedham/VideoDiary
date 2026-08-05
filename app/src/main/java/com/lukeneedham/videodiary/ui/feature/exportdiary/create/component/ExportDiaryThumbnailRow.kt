@@ -6,7 +6,6 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.lukeneedham.videodiary.ui.feature.exportdiary.create.model.ExportDayThumbnail
@@ -35,7 +34,6 @@ private fun ExportDiaryThumbnailItem(
         AsyncImage(
             model = item.thumbnailFile,
             contentDescription = null,
-            contentScale = ContentScale.Fit,
             modifier = modifier
                 .height(90.dp),
         )

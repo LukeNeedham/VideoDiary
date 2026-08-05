@@ -13,6 +13,7 @@ fun ExportHubPage(
 ) {
     ExportHubPageContent(
         savedExports = viewModel.savedExports,
+        videoAspectRatio = viewModel.videoAspectRatio,
         canGoBack = canGoBack,
         onBack = onBack,
         onCreateExportClick = onCreateExportClick,

@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.lukeneedham.videodiary.data.persistence.SavedExportsDao
 import com.lukeneedham.videodiary.data.persistence.VideosDao
+import com.lukeneedham.videodiary.data.repository.VideoResolutionRepository
 import com.lukeneedham.videodiary.domain.model.SavedExport
 import kotlinx.coroutines.launch
 import java.io.File
@@ -19,11 +20,18 @@ data class SavedExportWithThumbnails(
 class ExportHubViewModel(
     private val savedExportsDao: SavedExportsDao,
     private val videosDao: VideosDao,
+    private val videoResolutionRepository: VideoResolutionRepository,
 ) : ViewModel() {
     var savedExports: List<SavedExportWithThumbnails> by mutableStateOf(emptyList())
         private set
 
+    var videoAspectRatio: Float? by mutableStateOf(null)
+        private set
+
     init {
+        viewModelScope.launch {
+            videoAspectRatio = videoResolutionRepository.getAspectRatio()
+        }
         viewModelScope.launch {
             savedExportsDao.allSavedExports.collect { exports ->
                 savedExports = exports.map { export ->
