@@ -1,19 +1,16 @@
 package com.lukeneedham.videodiary.ui.feature.calendar.component.day.bottombar
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import com.lukeneedham.videodiary.R
 import com.lukeneedham.videodiary.domain.model.Day
 import com.lukeneedham.videodiary.domain.model.ShareRequest
 import com.lukeneedham.videodiary.domain.util.date.StandardDateTimeFormatter
 import com.lukeneedham.videodiary.ui.feature.calendar.MockDataCalendar
 import com.lukeneedham.videodiary.ui.feature.common.glass.GlassIconButton
+import com.lukeneedham.videodiary.ui.feature.common.glass.VideoControlsRow
 import com.lukeneedham.videodiary.ui.feature.common.videoplayer.VideoPlayerController
 import com.lukeneedham.videodiary.ui.feature.common.videoplayer.rememberVideoPlayerController
 
@@ -31,12 +28,8 @@ fun CalendarDayBottomBar(
     val date = day.date
     val video = day.videoFile
 
-    Row(
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = modifier
-    ) {
-        if (hasVideo) {
+    if (hasVideo) {
+        VideoControlsRow(modifier = modifier) {
             // Mute button
             val muteButtonIcon =
                 if (videoPlayerController.isVolumeOn) R.drawable.volume_on else R.drawable.volume_off

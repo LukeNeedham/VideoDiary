@@ -1,13 +1,11 @@
 package com.lukeneedham.videodiary.ui.feature.exportdiary.view
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -34,8 +32,10 @@ import com.lukeneedham.videodiary.domain.model.ShareRequest
 import com.lukeneedham.videodiary.domain.model.Video
 import com.lukeneedham.videodiary.domain.util.date.StandardDateTimeFormatter
 import com.lukeneedham.videodiary.ui.feature.common.glass.GlassIconButton
+import com.lukeneedham.videodiary.ui.feature.common.glass.VideoControlsRow
 import com.lukeneedham.videodiary.ui.feature.common.videoplayer.VideoPlayer
 import com.lukeneedham.videodiary.ui.feature.common.videoplayer.VideoPlayerController
+import com.lukeneedham.videodiary.ui.feature.common.videoplayer.VideoToolbarLayout
 import com.lukeneedham.videodiary.ui.theme.Typography
 
 @Composable
@@ -55,74 +55,57 @@ fun ExportDiaryViewPageContent(
         }
     }
 
-    Column(modifier = Modifier.fillMaxSize()) {
-        Box(
-            modifier = Modifier
-                .weight(1f)
-                .fillMaxWidth()
-                .background(Color.Black)
-        ) {
+    VideoToolbarLayout(
+        videoAspectRatio = videoAspectRatio,
+        toolbar = {
             ExportDiaryViewToolbar(
                 exportedVideo = exportedVideo,
                 canGoBack = canGoBack,
                 onBack = onBack,
             )
-        }
+        },
+    ) { aspectRatio ->
+        VideoPlayer(
+            video = Video.PersistedFile(videoFile),
+            aspectRatio = aspectRatio,
+            controller = controller,
+            modifier = Modifier.fillMaxSize(),
+        )
 
-        if (videoAspectRatio != null) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .aspectRatio(videoAspectRatio)
-            ) {
-                VideoPlayer(
-                    video = Video.PersistedFile(videoFile),
-                    aspectRatio = videoAspectRatio,
-                    controller = controller,
-                    modifier = Modifier.fillMaxSize(),
-                )
+        VideoControlsRow(
+            modifier = Modifier.align(Alignment.BottomCenter)
+        ) {
+            val muteIcon =
+                if (controller.isVolumeOn) R.drawable.volume_on else R.drawable.volume_off
+            GlassIconButton(
+                iconRes = muteIcon,
+                contentDescription = "Toggle sound",
+                onClick = { controller.toggleVolumeOn() },
+            )
 
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier
-                        .align(Alignment.BottomStart)
-                        .padding(12.dp)
-                ) {
-                    val muteIcon =
-                        if (controller.isVolumeOn) R.drawable.volume_on else R.drawable.volume_off
-                    GlassIconButton(
-                        iconRes = muteIcon,
-                        contentDescription = "Toggle sound",
-                        onClick = { controller.toggleVolumeOn() },
+            val isPlaying = !controller.isTogglePaused
+            val playIcon = if (isPlaying) R.drawable.pause else R.drawable.play
+            GlassIconButton(
+                iconRes = playIcon,
+                contentDescription = "Play/pause",
+                onClick = { controller.toggleIsPlaying() },
+            )
+
+            Spacer(modifier = Modifier.weight(1f))
+
+            GlassIconButton(
+                iconRes = R.drawable.share,
+                contentDescription = "Share",
+                onClick = {
+                    val shareText = "Full Video Diary"
+                    val request = ShareRequest(
+                        title = shareText,
+                        text = shareText,
+                        video = videoFile,
                     )
-
-                    val isPlaying = !controller.isTogglePaused
-                    val playIcon = if (isPlaying) R.drawable.pause else R.drawable.play
-                    GlassIconButton(
-                        iconRes = playIcon,
-                        contentDescription = "Play/pause",
-                        onClick = { controller.toggleIsPlaying() },
-                    )
-                }
-
-                GlassIconButton(
-                    iconRes = R.drawable.share,
-                    contentDescription = "Share",
-                    onClick = {
-                        val shareText = "Full Video Diary"
-                        val request = ShareRequest(
-                            title = shareText,
-                            text = shareText,
-                            video = videoFile,
-                        )
-                        share(request)
-                    },
-                    modifier = Modifier
-                        .align(Alignment.BottomEnd)
-                        .padding(12.dp)
-                )
-            }
+                    share(request)
+                },
+            )
         }
     }
 }
