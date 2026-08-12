@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
@@ -195,6 +196,26 @@ fun BottomScrim(modifier: Modifier = Modifier) {
                     colors = listOf(Color.Transparent, Color.Black.copy(alpha = 0.7f)),
                 )
             )
+    )
+}
+
+/**
+ * A full-width row of floating "glass" controls (e.g. mute/play/share buttons), intended to
+ * overlap the bottom of a video.
+ */
+@Composable
+fun VideoControlsRow(
+    modifier: Modifier = Modifier,
+    content: @Composable RowScope.() -> Unit,
+) {
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 12.dp)
+            .padding(bottom = 10.dp),
+        content = content,
     )
 }
 

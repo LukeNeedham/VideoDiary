@@ -57,14 +57,15 @@ class ExportDiaryProgressViewModel(
                     }
 
                     is VideoExportState.Success -> {
+                        val name = exportRequest.name
                         val exportedVideo = ExportedVideo(
                             videoFile = state.outputFile,
+                            name = name.ifEmpty { null },
                             startDate = exportRequest.startDate,
                             endDate = exportRequest.endDate,
                             dayVideoCount = exportRequest.days.size,
                         )
 
-                        val name = exportRequest.name
                         if (name.isNotEmpty()) {
                             withContext(ioDispatcher) {
                                 savedExportsDao.saveExport(
