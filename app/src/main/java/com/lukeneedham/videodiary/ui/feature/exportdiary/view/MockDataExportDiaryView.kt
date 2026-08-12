@@ -10,8 +10,10 @@ object MockDataExportDiaryView {
     val endDate = LocalDate.of(2024, 4, 20)
     val exportedVideo = ExportedVideo(
         videoFile = file,
+        name = "Spring Trip",
         startDate = startDate,
         endDate = endDate,
         dayVideoCount = 10,
     )
+    val exportedVideoUnnamed = exportedVideo.copy(name = null)
 }

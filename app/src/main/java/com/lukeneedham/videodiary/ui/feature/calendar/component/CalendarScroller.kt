@@ -1,15 +1,11 @@
 package com.lukeneedham.videodiary.ui.feature.calendar.component
 
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.waitForUpOrCancellation
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.runtime.Composable
@@ -21,7 +17,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.tooling.preview.Preview
@@ -31,6 +26,7 @@ import com.lukeneedham.videodiary.domain.util.date.StandardDateTimeFormatter
 import com.lukeneedham.videodiary.ui.feature.calendar.MockDataCalendar
 import com.lukeneedham.videodiary.ui.feature.calendar.component.day.CalendarDayContent
 import com.lukeneedham.videodiary.ui.feature.common.videoplayer.VideoPlayerController
+import com.lukeneedham.videodiary.ui.feature.common.videoplayer.VideoToolbarLayout
 import com.lukeneedham.videodiary.ui.feature.common.videoplayer.rememberVideoPlayerController
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
@@ -121,13 +117,9 @@ fun CalendarScroller(
     val onPrevious: () -> Unit = remember(navigateByOffset) { { navigateByOffset(-1) } }
     val onNext: () -> Unit = remember(navigateByOffset) { { navigateByOffset(1) } }
 
-    Column(modifier = Modifier.fillMaxSize()) {
-        Box(
-            modifier = Modifier
-                .weight(1f)
-                .fillMaxWidth()
-                .background(Color.Black)
-        ) {
+    VideoToolbarLayout(
+        videoAspectRatio = videoAspectRatio,
+        toolbar = {
             CalendarTopBar(
                 currentDateFormatted = currentDateFormatted,
                 onPrevious = onPrevious,
@@ -137,12 +129,11 @@ fun CalendarScroller(
                 onMenuClick = onMenuClick,
                 isToday = currentDay.isToday,
             )
-        }
-
+        },
+    ) { aspectRatio ->
         Box(
             modifier = Modifier
-                .fillMaxWidth()
-                .aspectRatio(videoAspectRatio)
+                .fillMaxSize()
                 .pointerInput(Unit) {
                     awaitEachGesture {
                         while (true) {
@@ -166,7 +157,7 @@ fun CalendarScroller(
                 val date = day.date
                 CalendarDayContent(
                     day = day,
-                    videoAspectRatio = videoAspectRatio,
+                    videoAspectRatio = aspectRatio,
                     allowEditPastDays = allowEditPastDays,
                     onRecordVideoClick = {
                         onRecordVideoClick(date)

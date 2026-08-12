@@ -8,6 +8,7 @@ import java.time.LocalDate
 @Parcelize
 data class ExportedVideo(
     val videoFile: File,
+    val name: String?,
     val startDate: LocalDate,
     val endDate: LocalDate,
     val dayVideoCount: Int,

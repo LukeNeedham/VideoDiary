@@ -2,9 +2,7 @@ package com.lukeneedham.videodiary.ui.feature.calendar.component.day
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -57,11 +55,7 @@ fun CalendarDayContent(
             onRecordVideoClick = onRecordVideoClick,
             onDeleteVideoClick = onDeleteVideoClick,
             share = share,
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .fillMaxWidth()
-                .padding(horizontal = 12.dp)
-                .padding(bottom = 10.dp)
+            modifier = Modifier.align(Alignment.BottomCenter)
         )
     }
 }

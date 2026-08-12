@@ -101,6 +101,7 @@ fun NormalRouter(
                 onExportClick = { savedExport ->
                     val exportedVideo = ExportedVideo(
                         videoFile = savedExport.videoFile,
+                        name = savedExport.name,
                         startDate = savedExport.startDate,
                         endDate = savedExport.endDate,
                         dayVideoCount = savedExport.dayVideoCount,
