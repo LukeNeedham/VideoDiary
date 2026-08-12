@@ -200,8 +200,8 @@ fun BottomScrim(modifier: Modifier = Modifier) {
 }
 
 /**
- * A full-width row of floating "glass" controls (e.g. mute/play/share buttons), intended to
- * overlap the bottom of a video.
+ * A full-width row of "glass" controls (e.g. mute/play/share buttons), intended for a video's
+ * bottom toolbar.
  */
 @Composable
 fun VideoControlsRow(
@@ -213,8 +213,7 @@ fun VideoControlsRow(
         verticalAlignment = Alignment.CenterVertically,
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 12.dp)
-            .padding(bottom = 10.dp),
+            .padding(horizontal = 12.dp, vertical = 10.dp),
         content = content,
     )
 }
