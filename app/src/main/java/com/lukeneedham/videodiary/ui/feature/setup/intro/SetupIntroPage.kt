@@ -101,7 +101,7 @@ fun SetupIntroPage(
         }
 
         Button(
-            text = if (isLastSlide) "Get started" else "Next",
+            text = "Next",
             onClick = {
                 if (isLastSlide) onContinue() else goToSlide(pagerState.currentPage + 1)
             },

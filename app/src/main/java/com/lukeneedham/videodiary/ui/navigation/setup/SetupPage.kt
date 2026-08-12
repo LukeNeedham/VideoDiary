@@ -8,6 +8,7 @@ import java.time.LocalDate
 @Parcelize
 sealed class SetupPage : Parcelable {
     data object Intro : SetupPage()
+    data object RequestPermissions : SetupPage()
     data object SelectOrientation : SetupPage()
     data object SelectResolution : SetupPage()
     data object SelectVideoDuration : SetupPage()

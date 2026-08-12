@@ -3,10 +3,12 @@ package com.lukeneedham.videodiary.ui.navigation.setup
 import androidx.compose.runtime.Composable
 import com.lukeneedham.videodiary.domain.model.Orientation
 import com.lukeneedham.videodiary.domain.util.logger.Logger
+import com.lukeneedham.videodiary.ui.feature.permissions.RequestPermissionsPage
 import com.lukeneedham.videodiary.ui.feature.setup.duration.SelectVideoDurationPage
 import com.lukeneedham.videodiary.ui.feature.setup.intro.SetupIntroPage
 import com.lukeneedham.videodiary.ui.feature.setup.orientation.SetupSelectOrientationPage
 import com.lukeneedham.videodiary.ui.feature.setup.resolution.SetupSelectResolutionPage
+import com.lukeneedham.videodiary.ui.permissions.PermissionResultListenerHolder
 import dev.olshevski.navigation.reimagined.NavBackHandler
 import dev.olshevski.navigation.reimagined.NavHost
 import dev.olshevski.navigation.reimagined.navigate
@@ -18,6 +20,9 @@ import org.koin.compose.viewmodel.koinViewModel
 fun SetupRouter(
     onSetupComplete: () -> Unit,
     setOrientation: (Orientation) -> Unit,
+    requestPermission: (permission: String) -> Unit,
+    permissionResultListenerHolder: PermissionResultListenerHolder,
+    onPermissionsAcquired: () -> Unit,
 ) {
     val navController = rememberNavController<SetupPage>(startDestination = SetupPage.Intro)
 
@@ -43,10 +48,24 @@ fun SetupRouter(
         when (page) {
             SetupPage.Intro -> SetupIntroPage(
                 onContinue = {
-                    navigate(SetupPage.SelectOrientation)
+                    navigate(SetupPage.RequestPermissions)
                 },
                 canGoBack = canGoBack,
                 onBack = onBack,
+            )
+
+            SetupPage.RequestPermissions -> RequestPermissionsPage(
+                viewModel = koinViewModel(),
+                requestPermission = requestPermission,
+                onContinue = {
+                    onPermissionsAcquired()
+                    navigate(SetupPage.SelectOrientation)
+                },
+                permissionResultListenerHolder = permissionResultListenerHolder,
+                canGoBack = canGoBack,
+                onBack = onBack,
+                pageIndexOffset = SetupProgress.PERMISSIONS_START_INDEX,
+                totalPageCount = SetupProgress.TOTAL_PAGE_COUNT,
             )
 
             SetupPage.SelectOrientation -> SetupSelectOrientationPage(

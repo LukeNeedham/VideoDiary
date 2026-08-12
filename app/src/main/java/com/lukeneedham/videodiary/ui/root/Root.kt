@@ -75,6 +75,9 @@ fun Root(
                     SetupRouter(
                         onSetupComplete = viewModel::onSetupComplete,
                         setOrientation = setOrientation,
+                        requestPermission = requestPermission,
+                        permissionResultListenerHolder = permissionResultListenerHolder,
+                        onPermissionsAcquired = viewModel::onPermissionsAcquired,
                     )
                 }
 
