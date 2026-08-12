@@ -50,8 +50,6 @@ fun SetupRouter(
                 onContinue = {
                     navigate(SetupPage.RequestPermissions)
                 },
-                canGoBack = canGoBack,
-                onBack = onBack,
             )
 
             SetupPage.RequestPermissions -> RequestPermissionsPage(
@@ -62,8 +60,6 @@ fun SetupRouter(
                     navigate(SetupPage.SelectOrientation)
                 },
                 permissionResultListenerHolder = permissionResultListenerHolder,
-                canGoBack = canGoBack,
-                onBack = onBack,
                 pageIndexOffset = SetupProgress.PERMISSIONS_START_INDEX,
                 totalPageCount = SetupProgress.TOTAL_PAGE_COUNT,
             )

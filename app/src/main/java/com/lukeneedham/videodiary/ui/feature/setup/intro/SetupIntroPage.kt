@@ -41,14 +41,11 @@ import kotlinx.coroutines.launch
 @Composable
 fun SetupIntroPage(
     onContinue: () -> Unit,
-    canGoBack: Boolean,
-    onBack: () -> Unit,
 ) {
     val slides = setupIntroSlides
     val pagerState = rememberPagerState { slides.size }
     val coroutineScope = rememberCoroutineScope()
 
-    val isFirstSlide by remember { derivedStateOf { pagerState.currentPage == 0 } }
     val isLastSlide by remember { derivedStateOf { pagerState.currentPage == slides.lastIndex } }
 
     fun goToSlide(index: Int) {
@@ -61,10 +58,8 @@ fun SetupIntroPage(
         modifier = Modifier.fillMaxSize()
     ) {
         GenericToolbar(
-            canGoBack = !isFirstSlide || canGoBack,
-            onBack = {
-                if (isFirstSlide) onBack() else goToSlide(pagerState.currentPage - 1)
-            },
+            canGoBack = false,
+            onBack = {},
             endContent = {
                 if (!isLastSlide) {
                     Text(
@@ -166,8 +161,6 @@ private fun SetupIntroSlideContent(
 internal fun PreviewSetupIntroPage() {
     SetupIntroPage(
         onContinue = {},
-        canGoBack = true,
-        onBack = {},
     )
 }
 

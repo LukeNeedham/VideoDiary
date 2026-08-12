@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -19,10 +20,9 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -41,7 +41,9 @@ import com.lukeneedham.videodiary.ui.permissions.RequiredPermissions
 import com.lukeneedham.videodiary.ui.theme.AccentAccept
 import com.lukeneedham.videodiary.ui.theme.AccentHighlight
 import com.lukeneedham.videodiary.ui.theme.Typography
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.delay
+
+private const val AUTO_CONTINUE_DELAY_MILLIS = 500L
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -50,22 +52,31 @@ fun RequestPermissionsPageContent(
     onContinue: () -> Unit,
     acquiredPermissions: List<String>,
     requiredPermissions: List<RequiredPermission>,
-    canGoBack: Boolean,
-    onBack: () -> Unit,
     pageIndexOffset: Int = 0,
     totalPageCount: Int = requiredPermissions.size,
 ) {
     val pagerState = rememberPagerState { requiredPermissions.size }
-    val coroutineScope = rememberCoroutineScope()
 
-    val isFirstPage by remember { derivedStateOf { pagerState.currentPage == 0 } }
-    val isLastPage by remember { derivedStateOf { pagerState.currentPage == requiredPermissions.lastIndex } }
     val currentPermission = requiredPermissions.getOrNull(pagerState.currentPage)
     val isCurrentGranted = currentPermission != null && currentPermission.permission in acquiredPermissions
 
-    fun goToPage(index: Int) {
-        coroutineScope.launch {
-            pagerState.animateScrollToPage(index)
+    // Once the permission shown on the current page is granted, automatically move on - to the
+    // next page, or out of the permission flow entirely once every permission is granted.
+    LaunchedEffect(pagerState.currentPage, isCurrentGranted) {
+        if (!isCurrentGranted) return@LaunchedEffect
+        delay(AUTO_CONTINUE_DELAY_MILLIS)
+
+        if (pagerState.currentPage < requiredPermissions.lastIndex) {
+            pagerState.animateScrollToPage(pagerState.currentPage + 1)
+            return@LaunchedEffect
+        }
+
+        val allGranted = requiredPermissions.all { it.permission in acquiredPermissions }
+        if (allGranted) {
+            onContinue()
+        } else {
+            val firstMissingIndex = requiredPermissions.indexOfFirst { it.permission !in acquiredPermissions }
+            pagerState.animateScrollToPage(firstMissingIndex)
         }
     }
 
@@ -73,16 +84,12 @@ fun RequestPermissionsPageContent(
         modifier = Modifier.fillMaxSize()
     ) {
         GenericToolbar(
-            canGoBack = !isFirstPage || canGoBack,
-            onBack = {
-                if (isFirstPage) onBack() else goToPage(pagerState.currentPage - 1)
-            },
+            canGoBack = false,
+            onBack = {},
         )
 
         HorizontalPager(
             state = pagerState,
-            // Permissions are mandatory, so page changes are only driven by the button below
-            userScrollEnabled = false,
             modifier = Modifier
                 .weight(1f)
                 .fillMaxWidth(),
@@ -107,23 +114,22 @@ fun RequestPermissionsPageContent(
             )
         }
 
-        Button(
-            text = when {
-                !isCurrentGranted -> "Grant permission"
-                isLastPage -> "Continue"
-                else -> "Next"
-            },
-            onClick = {
-                when {
-                    !isCurrentGranted -> currentPermission?.let { requestPermission(it.permission) }
-                    isLastPage -> onContinue()
-                    else -> goToPage(pagerState.currentPage + 1)
-                }
-            },
+        Box(
             modifier = Modifier
                 .fillMaxWidth()
+                .heightIn(min = 80.dp)
                 .padding(15.dp),
-        )
+        ) {
+            if (!isCurrentGranted) {
+                Button(
+                    text = "Grant permission",
+                    onClick = {
+                        currentPermission?.let { requestPermission(it.permission) }
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                )
+            }
+        }
     }
 }
 
@@ -211,7 +217,5 @@ internal fun PreviewRequestPermissionsPageContent() {
         onContinue = {},
         acquiredPermissions = emptyList(),
         requiredPermissions = RequiredPermissions.permissions,
-        canGoBack = false,
-        onBack = {},
     )
 }
