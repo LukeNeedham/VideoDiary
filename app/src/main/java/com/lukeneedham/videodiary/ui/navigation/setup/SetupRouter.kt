@@ -1,14 +1,28 @@
 package com.lukeneedham.videodiary.ui.navigation.setup
 
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
 import com.lukeneedham.videodiary.domain.model.Orientation
+import com.lukeneedham.videodiary.ui.feature.common.Button
+import com.lukeneedham.videodiary.ui.feature.common.pageindicator.PageIndicator
 import com.lukeneedham.videodiary.ui.feature.permissions.RequestPermissionPage
 import com.lukeneedham.videodiary.ui.feature.permissions.RequestPermissionsViewModel
 import com.lukeneedham.videodiary.ui.feature.setup.duration.SelectVideoDurationPage
@@ -28,6 +42,10 @@ private const val AUTO_CONTINUE_DELAY_MILLIS = 500L
  * continuous swipeable pager. Pages are only revealed as their prerequisites are met: permission
  * pages reveal one at a time as each is granted, and the setup pages that follow (which rely on
  * the camera) aren't revealed until every permission is granted.
+ *
+ * The page indicator and the primary action button live outside the pager, so they stay static
+ * while only the page content itself swipes; each page reports its own action up via
+ * [PagerAction].
  */
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -68,56 +86,103 @@ fun SetupRouter(
         }
     }
 
-    // Once the permission shown on the settled page is granted, automatically move on to the next
-    // page. Keyed on settledPage (not currentPage) so this isn't cancelled and restarted by its
-    // own in-flight scroll animation, or by the user's drag, mid-transition.
+    // Once a permission is granted, automatically move on to the next page - but only once per
+    // permission, not every time its page is revisited (e.g. by swiping back to it).
+    var autoAdvancedPermissions by remember { mutableStateOf(emptySet<String>()) }
+
+    // Keyed on settledPage (not currentPage) so this isn't cancelled and restarted by its own
+    // in-flight scroll animation, or by the user's drag, mid-transition.
     val settledPage = pagerState.settledPage
     val settledPermission = requiredPermissions.getOrNull(settledPage - SetupProgress.PERMISSIONS_START_INDEX)
-    val isSettledPermissionGranted = settledPermission != null && settledPermission.permission in acquiredPermissions
+    val isSettledPermissionNewlyGranted = settledPermission != null &&
+        settledPermission.permission in acquiredPermissions &&
+        settledPermission.permission !in autoAdvancedPermissions
 
-    LaunchedEffect(settledPage, isSettledPermissionGranted) {
-        if (!isSettledPermissionGranted) return@LaunchedEffect
+    LaunchedEffect(settledPage, isSettledPermissionNewlyGranted) {
+        if (!isSettledPermissionNewlyGranted) return@LaunchedEffect
+        val permission = requireNotNull(settledPermission)
         delay(AUTO_CONTINUE_DELAY_MILLIS)
+        autoAdvancedPermissions = autoAdvancedPermissions + permission.permission
         pagerState.animateScrollToPage(settledPage + 1)
     }
 
-    HorizontalPager(
-        state = pagerState,
-        modifier = Modifier.fillMaxSize(),
-    ) { page ->
-        when {
-            page < SetupProgress.INTRO_SLIDE_COUNT -> SetupIntroSlidePage(
-                slide = setupIntroSlides[page],
-                pageIndex = page,
-                onNext = ::goToNextPage,
-            )
+    var bottomAction: PagerAction? by remember { mutableStateOf(null) }
 
-            page < SetupProgress.ORIENTATION_PAGE_INDEX -> {
-                val permission = requiredPermissions[page - SetupProgress.PERMISSIONS_START_INDEX]
-                RequestPermissionPage(
-                    permission = permission,
-                    isGranted = permission.permission in acquiredPermissions,
-                    requestPermission = requestPermission,
-                    pageIndex = page,
-                    totalPageCount = SetupProgress.TOTAL_PAGE_COUNT,
+    Column(modifier = Modifier.fillMaxSize()) {
+        HorizontalPager(
+            state = pagerState,
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxWidth(),
+        ) { page ->
+            when {
+                page < SetupProgress.INTRO_SLIDE_COUNT -> SetupIntroSlidePage(
+                    slide = setupIntroSlides[page],
+                    reportBottomAction = { bottomAction = it },
+                    onNext = ::goToNextPage,
+                )
+
+                page < SetupProgress.ORIENTATION_PAGE_INDEX -> {
+                    val permission = requiredPermissions[page - SetupProgress.PERMISSIONS_START_INDEX]
+                    RequestPermissionPage(
+                        permission = permission,
+                        isGranted = permission.permission in acquiredPermissions,
+                        requestPermission = requestPermission,
+                        reportBottomAction = { bottomAction = it },
+                    )
+                }
+
+                page == SetupProgress.ORIENTATION_PAGE_INDEX -> SetupSelectOrientationPage(
+                    viewModel = koinViewModel(),
+                    onContinue = ::goToNextPage,
+                    setOrientation = setOrientation,
+                    reportBottomAction = { bottomAction = it },
+                )
+
+                page == SetupProgress.RESOLUTION_PAGE_INDEX -> SetupSelectResolutionPage(
+                    viewModel = koinViewModel(),
+                    onContinue = ::goToNextPage,
+                    reportBottomAction = { bottomAction = it },
+                )
+
+                else -> SelectVideoDurationPage(
+                    viewModel = koinViewModel(),
+                    onContinue = onSetupComplete,
+                    reportBottomAction = { bottomAction = it },
                 )
             }
+        }
 
-            page == SetupProgress.ORIENTATION_PAGE_INDEX -> SetupSelectOrientationPage(
-                viewModel = koinViewModel(),
-                onContinue = ::goToNextPage,
-                setOrientation = setOrientation,
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 10.dp),
+        ) {
+            PageIndicator(
+                pageCount = SetupProgress.TOTAL_PAGE_COUNT,
+                currentPageIndex = pagerState.currentPage,
+                color = Color.Black,
             )
+        }
 
-            page == SetupProgress.RESOLUTION_PAGE_INDEX -> SetupSelectResolutionPage(
-                viewModel = koinViewModel(),
-                onContinue = ::goToNextPage,
-            )
-
-            else -> SelectVideoDurationPage(
-                viewModel = koinViewModel(),
-                onContinue = onSetupComplete,
-            )
+        // Reserve the button's height even when there's no action to show, so the page doesn't
+        // jump right before an automatic transition to the next page.
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .heightIn(min = 80.dp)
+                .padding(15.dp),
+        ) {
+            val action = bottomAction
+            if (action != null) {
+                Button(
+                    text = action.label,
+                    enabled = action.enabled,
+                    onClick = action.onClick,
+                    modifier = Modifier.fillMaxWidth(),
+                )
+            }
         }
     }
 }

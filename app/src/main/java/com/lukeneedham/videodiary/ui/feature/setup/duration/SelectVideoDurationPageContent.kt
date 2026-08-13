@@ -1,6 +1,5 @@
 package com.lukeneedham.videodiary.ui.feature.setup.duration
 
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -11,72 +10,43 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.lukeneedham.videodiary.ui.feature.common.Button
 import com.lukeneedham.videodiary.ui.feature.common.IntPicker
-import com.lukeneedham.videodiary.ui.feature.common.pageindicator.PageIndicator
-import com.lukeneedham.videodiary.ui.feature.common.toolbar.GenericToolbar
-import com.lukeneedham.videodiary.ui.navigation.setup.SetupProgress
+import com.lukeneedham.videodiary.ui.navigation.setup.PagerAction
 
 @Composable
 fun SelectVideoDurationPageContent(
     seconds: Int,
     setSeconds: (Int) -> Unit,
     onContinue: () -> Unit,
+    reportBottomAction: (PagerAction?) -> Unit,
 ) {
+    SideEffect {
+        reportBottomAction(PagerAction(label = "Next", onClick = onContinue))
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .padding(20.dp)
     ) {
-        GenericToolbar(
-            canGoBack = false, onBack = {},
-        )
-
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .weight(1f)
-                .padding(20.dp)
+        Text(text = "Select the duration of each video")
+        Spacer(modifier = Modifier.height(10.dp))
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.fillMaxWidth()
         ) {
-            Text(text = "Select the duration of each video")
-            Spacer(modifier = Modifier.height(10.dp))
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                IntPicker(
-                    value = seconds, setValue = setSeconds,
-                )
-                Spacer(modifier = Modifier.width(10.dp))
-                Text(text = "seconds")
-            }
-            Spacer(modifier = Modifier.weight(1f))
-        }
-
-        Box(
-            contentAlignment = Alignment.Center,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 10.dp),
-        ) {
-            PageIndicator(
-                pageCount = SetupProgress.TOTAL_PAGE_COUNT,
-                currentPageIndex = SetupProgress.DURATION_PAGE_INDEX,
-                color = Color.Black,
+            IntPicker(
+                value = seconds, setValue = setSeconds,
             )
+            Spacer(modifier = Modifier.width(10.dp))
+            Text(text = "seconds")
         }
-
-        Button(
-            text = "Next",
-            onClick = onContinue,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(15.dp)
-        )
+        Spacer(modifier = Modifier.weight(1f))
     }
 }
 
@@ -87,5 +57,6 @@ internal fun PreviewSelectVideoDurationPageContent() {
         seconds = 1,
         setSeconds = {},
         onContinue = {},
+        reportBottomAction = {},
     )
 }

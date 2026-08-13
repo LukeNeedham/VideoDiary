@@ -6,13 +6,13 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -22,65 +22,23 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.lukeneedham.videodiary.ui.feature.common.Button
-import com.lukeneedham.videodiary.ui.feature.common.pageindicator.PageIndicator
-import com.lukeneedham.videodiary.ui.feature.common.toolbar.GenericToolbar
-import com.lukeneedham.videodiary.ui.navigation.setup.SetupProgress
+import com.lukeneedham.videodiary.ui.navigation.setup.PagerAction
 import com.lukeneedham.videodiary.ui.theme.Typography
 
 /** One slide of the onboarding intro, as a single page within the wider onboarding pager. */
 @Composable
 fun SetupIntroSlidePage(
     slide: SetupIntroSlide,
-    pageIndex: Int,
+    reportBottomAction: (PagerAction?) -> Unit,
     onNext: () -> Unit,
 ) {
-    Column(
-        modifier = Modifier.fillMaxSize()
-    ) {
-        GenericToolbar(
-            canGoBack = false,
-            onBack = {},
-        )
-
-        SetupIntroSlideContent(
-            slide = slide,
-            modifier = Modifier
-                .weight(1f)
-                .fillMaxWidth(),
-        )
-
-        Box(
-            contentAlignment = Alignment.Center,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 10.dp),
-        ) {
-            PageIndicator(
-                pageCount = SetupProgress.TOTAL_PAGE_COUNT,
-                currentPageIndex = pageIndex,
-                color = Color.Black,
-            )
-        }
-
-        Button(
-            text = "Next",
-            onClick = onNext,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(15.dp),
-        )
+    SideEffect {
+        reportBottomAction(PagerAction(label = "Next", onClick = onNext))
     }
-}
 
-@Composable
-private fun SetupIntroSlideContent(
-    slide: SetupIntroSlide,
-    modifier: Modifier = Modifier,
-) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = modifier
+        modifier = Modifier
             .fillMaxSize()
             .padding(horizontal = 30.dp),
     ) {
@@ -127,7 +85,7 @@ private fun SetupIntroSlideContent(
 internal fun PreviewSetupIntroSlidePage() {
     SetupIntroSlidePage(
         slide = setupIntroSlides.first(),
-        pageIndex = 0,
+        reportBottomAction = {},
         onNext = {},
     )
 }

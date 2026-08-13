@@ -17,9 +17,9 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -33,17 +33,16 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import com.lukeneedham.videodiary.domain.model.CameraResolutionRotation
-import com.lukeneedham.videodiary.ui.feature.common.Button
 import com.lukeneedham.videodiary.ui.feature.common.camera.CameraInput
 import com.lukeneedham.videodiary.ui.feature.common.camera.CameraQualityEffect
 import com.lukeneedham.videodiary.ui.feature.common.pageindicator.PageIndicator
-import com.lukeneedham.videodiary.ui.feature.common.toolbar.GenericToolbar
-import com.lukeneedham.videodiary.ui.navigation.setup.SetupProgress
+import com.lukeneedham.videodiary.ui.navigation.setup.PagerAction
 
 @OptIn(ExperimentalCamera2Interop::class)
 @Composable
 fun SetupPageContent(
     onContinueClick: (resolution: Size, rotation: CameraResolutionRotation) -> Unit,
+    reportBottomAction: (PagerAction?) -> Unit,
 ) {
     val context = LocalContext.current
 
@@ -94,98 +93,75 @@ fun SetupPageContent(
         }
     }
 
+    val rotationLocal = rotation
+    SideEffect {
+        reportBottomAction(
+            PagerAction(
+                label = "Next",
+                enabled = currentResolution != null && !currentResolutionMissing && rotationLocal != null,
+                onClick = {
+                    if (currentResolution != null && rotationLocal != null) {
+                        onContinueClick(currentResolution, rotationLocal)
+                    }
+                },
+            )
+        )
+    }
+
     Column(
         modifier = Modifier.fillMaxSize()
     ) {
-        GenericToolbar(
-            canGoBack = false, onBack = {},
+        ResolutionSelector(
+            currentResolutionIndex = currentResolutionIndex,
+            setCurrentResolutionIndex = ::setCurrentResolutionIndex,
+            currentResolutionName = currentResolutionName,
         )
-
-        Spacer(modifier = Modifier.height(2.dp))
-        Column(
-            modifier = Modifier
-                .weight(1f)
-                .fillMaxWidth()
-        ) {
-            ResolutionSelector(
-                currentResolutionIndex = currentResolutionIndex,
-                setCurrentResolutionIndex = ::setCurrentResolutionIndex,
-                currentResolutionName = currentResolutionName,
-            )
-
-            Box(
-                contentAlignment = Alignment.Center,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                PageIndicator(
-                    pageCount = resolutions.size,
-                    currentPageIndex = currentResolutionIndex,
-                    color = Color.Black,
-                )
-            }
-
-            Spacer(modifier = Modifier.height(10.dp))
-
-            CameraQualityEffect(currentResolution) {
-                currentQuality = it
-            }
-
-            val currentQualityLocal = currentQuality
-            if (currentQualityLocal != null && currentResolution != null) {
-                // Dummy recorder and video capture -
-                // just used to configure the preview with the selected quality
-                val recorder = remember(currentQualityLocal) {
-                    Recorder.Builder()
-                        .setQualitySelector(
-                            QualitySelector.from(currentQualityLocal)
-                        )
-                        .build()
-                }
-                val videoCapture = remember(recorder) {
-                    VideoCapture.Builder(recorder).build()
-                }
-
-                CameraInput(
-                    videoCapture = videoCapture,
-                    currentResolution = currentResolution,
-                    onResolutionLoaded = { resolution, isMissing, loadedRotation ->
-                        currentResolutionMissing = isMissing
-                        rotation = loadedRotation
-                    },
-                    canZoom = false,
-                    modifier = Modifier
-                        .weight(1f)
-                        .fillMaxWidth()
-                )
-            }
-        }
 
         Box(
             contentAlignment = Alignment.Center,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 10.dp),
+            modifier = Modifier.fillMaxWidth()
         ) {
             PageIndicator(
-                pageCount = SetupProgress.TOTAL_PAGE_COUNT,
-                currentPageIndex = SetupProgress.RESOLUTION_PAGE_INDEX,
+                pageCount = resolutions.size,
+                currentPageIndex = currentResolutionIndex,
                 color = Color.Black,
             )
         }
 
-        val rotationLocal = rotation
-        Button(
-            text = "Next",
-            enabled = currentResolution != null && !currentResolutionMissing && rotationLocal != null,
-            onClick = {
-                if (currentResolution != null && rotationLocal != null) {
-                    onContinueClick(currentResolution, rotationLocal)
-                }
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(15.dp)
-        )
+        Spacer(modifier = Modifier.height(10.dp))
+
+        CameraQualityEffect(currentResolution) {
+            currentQuality = it
+        }
+
+        val currentQualityLocal = currentQuality
+        if (currentQualityLocal != null && currentResolution != null) {
+            // Dummy recorder and video capture -
+            // just used to configure the preview with the selected quality
+            val recorder = remember(currentQualityLocal) {
+                Recorder.Builder()
+                    .setQualitySelector(
+                        QualitySelector.from(currentQualityLocal)
+                    )
+                    .build()
+            }
+            val videoCapture = remember(recorder) {
+                VideoCapture.Builder(recorder).build()
+            }
+
+            CameraInput(
+                videoCapture = videoCapture,
+                currentResolution = currentResolution,
+                onResolutionLoaded = { resolution, isMissing, loadedRotation ->
+                    currentResolutionMissing = isMissing
+                    rotation = loadedRotation
+                },
+                canZoom = false,
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth()
+            )
+        }
     }
 }
 
@@ -194,5 +170,6 @@ fun SetupPageContent(
 internal fun PreviewSetupPageContent() {
     SetupPageContent(
         onContinueClick = { _, _ -> },
+        reportBottomAction = {},
     )
 }
