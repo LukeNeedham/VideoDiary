@@ -28,12 +28,17 @@ class RootViewModel(
 
     val state: RootState by derivedStateOf {
         val isMissingPermissions = isMissingPermissions ?: return@derivedStateOf RootState.Loading
-        if (isMissingPermissions) return@derivedStateOf RootState.NeedsPermissions
-
         val hasSetupCompleted = hasSetupCompleted ?: return@derivedStateOf RootState.Loading
 
-        val needsSetup =
-            !hasSetupCompleted || orientationState is RootOrientationState.NeedsSetup
+        // First-time (or interrupted) setup always goes through the setup wizard, which shows the
+        // onboarding intro before requesting permissions part-way through.
+        if (!hasSetupCompleted) return@derivedStateOf RootState.NeedsSetup
+
+        // Returning user whose setup previously completed, but a permission has since been
+        // revoked (e.g. from system settings) - re-request it directly, without the full wizard.
+        if (isMissingPermissions) return@derivedStateOf RootState.NeedsPermissions
+
+        val needsSetup = orientationState is RootOrientationState.NeedsSetup
         if (needsSetup) return@derivedStateOf RootState.NeedsSetup
         RootState.Ready
     }

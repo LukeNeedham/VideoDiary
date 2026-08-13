@@ -1,14 +1,19 @@
 package com.lukeneedham.videodiary.ui.feature.setup.resolution
 
+import android.util.Size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import com.lukeneedham.videodiary.domain.model.CameraResolutionRotation
 
 @Composable
 fun SetupSelectResolutionPage(
     viewModel: SetupSelectResolutionViewModel,
     onContinue: () -> Unit,
-    canGoBack: Boolean,
-    onBack: () -> Unit,
+    resolutions: List<Size>,
+    currentResolutionIndex: Int,
+    setCurrentResolutionIndex: (Int) -> Unit,
+    rotation: CameraResolutionRotation?,
+    onResolutionLoaded: (resolution: Size, isMissing: Boolean, rotation: CameraResolutionRotation) -> Unit,
 ) {
     LaunchedEffect(Unit) {
         viewModel.onSavedEventFlow.collect {
@@ -17,9 +22,10 @@ fun SetupSelectResolutionPage(
     }
 
     SetupPageContent(
-        onContinueClick = { resolution, rotation ->
-            viewModel.saveSettings(resolution, rotation)
-        },
-        canGoBack = canGoBack, onBack = onBack,
+        resolutions = resolutions,
+        currentResolutionIndex = currentResolutionIndex,
+        setCurrentResolutionIndex = setCurrentResolutionIndex,
+        rotation = rotation,
+        onResolutionLoaded = onResolutionLoaded,
     )
 }
