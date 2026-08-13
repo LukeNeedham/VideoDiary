@@ -1,7 +1,5 @@
 package com.lukeneedham.videodiary.ui.feature.exportdiary.view
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -12,17 +10,12 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Text
-import androidx.compose.material.minimumInteractiveComponentSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -57,12 +50,49 @@ fun ExportDiaryViewPageContent(
 
     VideoToolbarLayout(
         videoAspectRatio = videoAspectRatio,
-        toolbar = {
+        topOverlay = {
             ExportDiaryViewToolbar(
                 exportedVideo = exportedVideo,
                 canGoBack = canGoBack,
                 onBack = onBack,
             )
+        },
+        bottomBar = {
+            VideoControlsRow(
+                modifier = Modifier.align(Alignment.Center)
+            ) {
+                val muteIcon =
+                    if (controller.isVolumeOn) R.drawable.volume_on else R.drawable.volume_off
+                GlassIconButton(
+                    iconRes = muteIcon,
+                    contentDescription = "Toggle sound",
+                    onClick = { controller.toggleVolumeOn() },
+                )
+
+                val isPlaying = !controller.isTogglePaused
+                val playIcon = if (isPlaying) R.drawable.pause else R.drawable.play
+                GlassIconButton(
+                    iconRes = playIcon,
+                    contentDescription = "Play/pause",
+                    onClick = { controller.toggleIsPlaying() },
+                )
+
+                Spacer(modifier = Modifier.weight(1f))
+
+                GlassIconButton(
+                    iconRes = R.drawable.share,
+                    contentDescription = "Share",
+                    onClick = {
+                        val shareText = "Full Video Diary"
+                        val request = ShareRequest(
+                            title = shareText,
+                            text = shareText,
+                            video = videoFile,
+                        )
+                        share(request)
+                    },
+                )
+            }
         },
     ) { aspectRatio ->
         VideoPlayer(
@@ -71,42 +101,6 @@ fun ExportDiaryViewPageContent(
             controller = controller,
             modifier = Modifier.fillMaxSize(),
         )
-
-        VideoControlsRow(
-            modifier = Modifier.align(Alignment.BottomCenter)
-        ) {
-            val muteIcon =
-                if (controller.isVolumeOn) R.drawable.volume_on else R.drawable.volume_off
-            GlassIconButton(
-                iconRes = muteIcon,
-                contentDescription = "Toggle sound",
-                onClick = { controller.toggleVolumeOn() },
-            )
-
-            val isPlaying = !controller.isTogglePaused
-            val playIcon = if (isPlaying) R.drawable.pause else R.drawable.play
-            GlassIconButton(
-                iconRes = playIcon,
-                contentDescription = "Play/pause",
-                onClick = { controller.toggleIsPlaying() },
-            )
-
-            Spacer(modifier = Modifier.weight(1f))
-
-            GlassIconButton(
-                iconRes = R.drawable.share,
-                contentDescription = "Share",
-                onClick = {
-                    val shareText = "Full Video Diary"
-                    val request = ShareRequest(
-                        title = shareText,
-                        text = shareText,
-                        video = videoFile,
-                    )
-                    share(request)
-                },
-            )
-        }
     }
 }
 
@@ -117,83 +111,55 @@ private fun ExportDiaryViewToolbar(
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Box(
-        contentAlignment = Alignment.Center,
-        modifier = modifier.fillMaxSize()
-    ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 12.dp)
-        ) {
-            Box(modifier = Modifier.size(50.dp)) {
-                if (canGoBack) {
-                    ToolbarIconButton(
-                        iconRes = R.drawable.back,
-                        contentDescription = "Back",
-                        onClick = onBack,
-                    )
-                }
-            }
-
-            val name = exportedVideo.name
-            val start = exportedVideo.startDate.format(StandardDateTimeFormatter.date)
-            val end = exportedVideo.endDate.format(StandardDateTimeFormatter.date)
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier
-                    .weight(1f)
-                    .padding(horizontal = 8.dp)
-            ) {
-                if (name != null) {
-                    Text(
-                        text = name,
-                        color = Color.White,
-                        textAlign = TextAlign.Center,
-                        fontSize = Typography.Size.medium,
-                    )
-                    Text(
-                        text = "$start to $end",
-                        color = Color.White.copy(alpha = 0.7f),
-                        textAlign = TextAlign.Center,
-                        fontSize = Typography.Size.extraSmall,
-                    )
-                } else {
-                    Text(
-                        text = "$start to $end",
-                        color = Color.White,
-                        textAlign = TextAlign.Center,
-                        fontSize = Typography.Size.medium,
-                    )
-                }
-            }
-
-            Box(modifier = Modifier.size(50.dp))
-        }
-    }
-}
-
-@Composable
-private fun ToolbarIconButton(
-    iconRes: Int,
-    contentDescription: String?,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    Box(
-        contentAlignment = Alignment.Center,
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
         modifier = modifier
-            .minimumInteractiveComponentSize()
-            .clip(CircleShape)
-            .clickable(onClick = onClick)
+            .fillMaxWidth()
+            .padding(horizontal = 12.dp, vertical = 8.dp)
     ) {
-        Image(
-            painter = painterResource(iconRes),
-            contentDescription = contentDescription,
-            colorFilter = ColorFilter.tint(Color.White),
-            modifier = Modifier.size(24.dp),
-        )
+        Box(modifier = Modifier.size(50.dp)) {
+            if (canGoBack) {
+                GlassIconButton(
+                    iconRes = R.drawable.back,
+                    contentDescription = "Back",
+                    onClick = onBack,
+                )
+            }
+        }
+
+        val name = exportedVideo.name
+        val start = exportedVideo.startDate.format(StandardDateTimeFormatter.date)
+        val end = exportedVideo.endDate.format(StandardDateTimeFormatter.date)
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier
+                .weight(1f)
+                .padding(horizontal = 8.dp)
+        ) {
+            if (name != null) {
+                Text(
+                    text = name,
+                    color = Color.White,
+                    textAlign = TextAlign.Center,
+                    fontSize = Typography.Size.medium,
+                )
+                Text(
+                    text = "$start to $end",
+                    color = Color.White.copy(alpha = 0.7f),
+                    textAlign = TextAlign.Center,
+                    fontSize = Typography.Size.extraSmall,
+                )
+            } else {
+                Text(
+                    text = "$start to $end",
+                    color = Color.White,
+                    textAlign = TextAlign.Center,
+                    fontSize = Typography.Size.medium,
+                )
+            }
+        }
+
+        Box(modifier = Modifier.size(50.dp))
     }
 }
 

@@ -16,6 +16,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.pointerInput
@@ -25,6 +26,7 @@ import com.lukeneedham.videodiary.domain.model.ShareRequest
 import com.lukeneedham.videodiary.domain.util.date.StandardDateTimeFormatter
 import com.lukeneedham.videodiary.ui.feature.calendar.MockDataCalendar
 import com.lukeneedham.videodiary.ui.feature.calendar.component.day.CalendarDayContent
+import com.lukeneedham.videodiary.ui.feature.calendar.component.day.bottombar.CalendarDayBottomBar
 import com.lukeneedham.videodiary.ui.feature.common.videoplayer.VideoPlayerController
 import com.lukeneedham.videodiary.ui.feature.common.videoplayer.VideoToolbarLayout
 import com.lukeneedham.videodiary.ui.feature.common.videoplayer.rememberVideoPlayerController
@@ -119,7 +121,7 @@ fun CalendarScroller(
 
     VideoToolbarLayout(
         videoAspectRatio = videoAspectRatio,
-        toolbar = {
+        topOverlay = {
             CalendarTopBar(
                 currentDateFormatted = currentDateFormatted,
                 onPrevious = onPrevious,
@@ -128,6 +130,17 @@ fun CalendarScroller(
                 goToToday = goToToday,
                 onMenuClick = onMenuClick,
                 isToday = currentDay.isToday,
+            )
+        },
+        bottomBar = {
+            CalendarDayBottomBar(
+                videoPlayerController = videoPlayerController,
+                day = currentDay,
+                isEditable = currentDay.isToday || allowEditPastDays,
+                onRecordVideoClick = { onRecordVideoClick(currentDay.date) },
+                onDeleteVideoClick = { onDeleteVideoClick(currentDay.date) },
+                share = share,
+                modifier = Modifier.align(Alignment.Center),
             )
         },
     ) { aspectRatio ->
@@ -162,11 +175,7 @@ fun CalendarScroller(
                     onRecordVideoClick = {
                         onRecordVideoClick(date)
                     },
-                    onDeleteVideoClick = {
-                        onDeleteVideoClick(date)
-                    },
                     videoPlayerController = videoPlayerController,
-                    share = share,
                 )
             }
         }
