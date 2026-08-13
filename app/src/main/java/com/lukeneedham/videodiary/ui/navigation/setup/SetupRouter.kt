@@ -131,10 +131,14 @@ fun SetupRouter(
         }
     }
 
-    val revealedPageCount = if (allPermissionsGranted) {
-        SetupProgress.TOTAL_PAGE_COUNT
-    } else {
-        SetupProgress.PERMISSIONS_START_INDEX + firstMissingPermissionIndex + 1
+    val isResolutionReady = currentResolution != null && !currentResolutionMissing && resolutionRotation != null
+
+    // Pages beyond the current prerequisite aren't revealed yet, so the user can't swipe past a
+    // permission without granting it, or past resolution selection without a valid resolution.
+    val revealedPageCount = when {
+        !allPermissionsGranted -> SetupProgress.PERMISSIONS_START_INDEX + firstMissingPermissionIndex + 1
+        !isResolutionReady -> SetupProgress.RESOLUTION_PAGE_INDEX + 1
+        else -> SetupProgress.TOTAL_PAGE_COUNT
     }
 
     val pagerState = rememberPagerState { revealedPageCount }
@@ -177,7 +181,6 @@ fun SetupRouter(
             val rotationLocal = resolutionRotation
             PagerAction(
                 label = "Next",
-                enabled = currentResolution != null && !currentResolutionMissing && rotationLocal != null,
                 onClick = {
                     if (currentResolution != null && rotationLocal != null) {
                         resolutionViewModel.saveSettings(currentResolution, rotationLocal)
