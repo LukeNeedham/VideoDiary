@@ -106,7 +106,12 @@ fun SetupRouter(
         pagerState.animateScrollToPage(settledPage + 1)
     }
 
-    var bottomAction: PagerAction? by remember { mutableStateOf(null) }
+    // Compose can keep both the outgoing and incoming page composed during a swipe transition, so
+    // each reported action is tagged with the page it came from - only the action tagged with the
+    // currently active page is ever displayed, so a lingering report from a page swiped away from
+    // can never end up shown (and clicked) on the wrong page.
+    var reportedBottomAction: Pair<Int, PagerAction>? by remember { mutableStateOf(null) }
+    val bottomAction = reportedBottomAction?.takeIf { (page, _) -> page == pagerState.currentPage }?.second
 
     Column(modifier = Modifier.fillMaxSize()) {
         HorizontalPager(
@@ -115,10 +120,14 @@ fun SetupRouter(
                 .weight(1f)
                 .fillMaxWidth(),
         ) { page ->
+            val reportBottomAction: (PagerAction?) -> Unit = { action ->
+                reportedBottomAction = action?.let { page to it }
+            }
+
             when {
                 page < SetupProgress.INTRO_SLIDE_COUNT -> SetupIntroSlidePage(
                     slide = setupIntroSlides[page],
-                    reportBottomAction = { bottomAction = it },
+                    reportBottomAction = reportBottomAction,
                     onNext = ::goToNextPage,
                 )
 
@@ -128,7 +137,7 @@ fun SetupRouter(
                         permission = permission,
                         isGranted = permission.permission in acquiredPermissions,
                         requestPermission = requestPermission,
-                        reportBottomAction = { bottomAction = it },
+                        reportBottomAction = reportBottomAction,
                     )
                 }
 
@@ -136,19 +145,19 @@ fun SetupRouter(
                     viewModel = koinViewModel(),
                     onContinue = ::goToNextPage,
                     setOrientation = setOrientation,
-                    reportBottomAction = { bottomAction = it },
+                    reportBottomAction = reportBottomAction,
                 )
 
                 page == SetupProgress.RESOLUTION_PAGE_INDEX -> SetupSelectResolutionPage(
                     viewModel = koinViewModel(),
                     onContinue = ::goToNextPage,
-                    reportBottomAction = { bottomAction = it },
+                    reportBottomAction = reportBottomAction,
                 )
 
                 else -> SelectVideoDurationPage(
                     viewModel = koinViewModel(),
                     onContinue = onSetupComplete,
-                    reportBottomAction = { bottomAction = it },
+                    reportBottomAction = reportBottomAction,
                 )
             }
         }
@@ -174,12 +183,11 @@ fun SetupRouter(
                 .heightIn(min = 80.dp)
                 .padding(15.dp),
         ) {
-            val action = bottomAction
-            if (action != null) {
+            if (bottomAction != null) {
                 Button(
-                    text = action.label,
-                    enabled = action.enabled,
-                    onClick = action.onClick,
+                    text = bottomAction.label,
+                    enabled = bottomAction.enabled,
+                    onClick = bottomAction.onClick,
                     modifier = Modifier.fillMaxWidth(),
                 )
             }
