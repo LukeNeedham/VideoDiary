@@ -27,15 +27,13 @@ fun SelectVideoDurationPageContent(
     seconds: Int,
     setSeconds: (Int) -> Unit,
     onContinue: () -> Unit,
-    canGoBack: Boolean,
-    onBack: () -> Unit,
 ) {
     Column(
         modifier = Modifier
             .fillMaxSize()
     ) {
         GenericToolbar(
-            canGoBack = canGoBack, onBack = onBack,
+            canGoBack = false, onBack = {},
         )
 
         Column(
@@ -88,6 +86,6 @@ internal fun PreviewSelectVideoDurationPageContent() {
     SelectVideoDurationPageContent(
         seconds = 1,
         setSeconds = {},
-        onContinue = {}, canGoBack = true, onBack = {},
+        onContinue = {},
     )
 }

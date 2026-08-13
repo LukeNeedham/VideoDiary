@@ -29,15 +29,13 @@ fun SetupSelectOrientationPageContent(
     selectedOption: Orientation,
     setSelectedOption: (Orientation) -> Unit,
     onContinue: () -> Unit,
-    canGoBack: Boolean,
-    onBack: () -> Unit,
 ) {
     Column(
         modifier = Modifier
             .fillMaxSize()
     ) {
         GenericToolbar(
-            canGoBack = canGoBack, onBack = onBack,
+            canGoBack = false, onBack = {},
         )
 
         Column(
@@ -110,6 +108,6 @@ internal fun PreviewSetupSelectOrientationPageContent() {
         options = Orientation.entries,
         selectedOption = Orientation.Portrait,
         setSelectedOption = {},
-        onContinue = {}, canGoBack = true, onBack = {},
+        onContinue = {},
     )
 }

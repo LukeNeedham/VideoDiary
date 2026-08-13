@@ -44,8 +44,6 @@ import com.lukeneedham.videodiary.ui.navigation.setup.SetupProgress
 @Composable
 fun SetupPageContent(
     onContinueClick: (resolution: Size, rotation: CameraResolutionRotation) -> Unit,
-    canGoBack: Boolean,
-    onBack: () -> Unit,
 ) {
     val context = LocalContext.current
 
@@ -100,7 +98,7 @@ fun SetupPageContent(
         modifier = Modifier.fillMaxSize()
     ) {
         GenericToolbar(
-            canGoBack = canGoBack, onBack = onBack,
+            canGoBack = false, onBack = {},
         )
 
         Spacer(modifier = Modifier.height(2.dp))
@@ -195,6 +193,6 @@ fun SetupPageContent(
 @Composable
 internal fun PreviewSetupPageContent() {
     SetupPageContent(
-        onContinueClick = { _, _ -> }, canGoBack = true, onBack = {},
+        onContinueClick = { _, _ -> },
     )
 }

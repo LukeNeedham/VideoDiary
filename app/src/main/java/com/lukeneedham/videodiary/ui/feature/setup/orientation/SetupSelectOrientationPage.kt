@@ -9,8 +9,6 @@ fun SetupSelectOrientationPage(
     viewModel: SetupSelectOrientationViewModel,
     onContinue: () -> Unit,
     setOrientation: (Orientation) -> Unit,
-    canGoBack: Boolean,
-    onBack: () -> Unit,
 ) {
     LaunchedEffect(Unit) {
         viewModel.onSavedEventFlow.collect {
@@ -31,6 +29,5 @@ fun SetupSelectOrientationPage(
         onContinue = {
             viewModel.saveSettings()
         },
-        canGoBack = canGoBack, onBack = onBack,
     )
 }

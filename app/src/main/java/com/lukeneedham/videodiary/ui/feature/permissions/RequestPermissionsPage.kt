@@ -10,8 +10,6 @@ fun RequestPermissionsPage(
     requestPermission: (permission: String) -> Unit,
     onContinue: () -> Unit,
     permissionResultListenerHolder: PermissionResultListenerHolder,
-    pageIndexOffset: Int = 0,
-    totalPageCount: Int = viewModel.requiredPermissions.size,
 ) {
     LaunchedEffect(permissionResultListenerHolder, viewModel) {
         permissionResultListenerHolder.onPermissionResult = viewModel::onPermissionResult
@@ -22,7 +20,5 @@ fun RequestPermissionsPage(
         onContinue = onContinue,
         acquiredPermissions = viewModel.acquiredPermissions,
         requiredPermissions = viewModel.requiredPermissions,
-        pageIndexOffset = pageIndexOffset,
-        totalPageCount = totalPageCount,
     )
 }
