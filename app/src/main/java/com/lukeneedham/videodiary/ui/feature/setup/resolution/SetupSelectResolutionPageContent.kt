@@ -7,7 +7,9 @@ import androidx.camera.video.Recorder
 import androidx.camera.video.VideoCapture
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -99,35 +101,34 @@ fun SetupPageContent(
                     VideoCapture.Builder(recorder).build()
                 }
 
-                Box(
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier
                         .weight(1f)
                         .fillMaxWidth()
                 ) {
+                    GlassIconButton(
+                        iconRes = R.drawable.chevron_left,
+                        contentDescription = "Previous resolution",
+                        onClick = { setCurrentResolutionIndex(currentResolutionIndex - 1) },
+                        modifier = Modifier.padding(8.dp),
+                    )
+
                     CameraInput(
                         videoCapture = videoCapture,
                         currentResolution = currentResolution,
                         onResolutionLoaded = onResolutionLoaded,
                         canZoom = false,
-                        modifier = Modifier.fillMaxSize()
-                    )
-
-                    GlassIconButton(
-                        iconRes = R.drawable.chevron_left,
-                        contentDescription = "Previous resolution",
-                        onClick = { setCurrentResolutionIndex(currentResolutionIndex - 1) },
                         modifier = Modifier
-                            .align(Alignment.CenterStart)
-                            .padding(12.dp),
+                            .weight(1f)
+                            .fillMaxHeight()
                     )
 
                     GlassIconButton(
                         iconRes = R.drawable.chevron_right,
                         contentDescription = "Next resolution",
                         onClick = { setCurrentResolutionIndex(currentResolutionIndex + 1) },
-                        modifier = Modifier
-                            .align(Alignment.CenterEnd)
-                            .padding(12.dp),
+                        modifier = Modifier.padding(8.dp),
                     )
                 }
             }
