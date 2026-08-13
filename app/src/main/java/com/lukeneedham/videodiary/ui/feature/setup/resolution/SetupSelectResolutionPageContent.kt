@@ -32,11 +32,13 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
+import com.lukeneedham.videodiary.R
 import com.lukeneedham.videodiary.domain.model.CameraResolutionRotation
 import com.lukeneedham.videodiary.ui.feature.common.Button
 import com.lukeneedham.videodiary.ui.feature.common.camera.CameraInput
 import com.lukeneedham.videodiary.ui.feature.common.camera.CameraQualityEffect
 import com.lukeneedham.videodiary.ui.feature.common.pageindicator.PageIndicator
+import com.lukeneedham.videodiary.ui.feature.setup.SetupStepHeader
 
 /**
  * Unlike the other onboarding pages, this one keeps its own "Next" button rather than reporting
@@ -100,6 +102,13 @@ fun SetupPageContent(
     Column(
         modifier = Modifier.fillMaxSize()
     ) {
+        SetupStepHeader(
+            iconRes = R.drawable.camera,
+            title = "Select video quality",
+            description = "Tap the arrows to preview each available resolution.",
+            modifier = Modifier.padding(top = 20.dp, bottom = 10.dp),
+        )
+
         Column(
             modifier = Modifier
                 .weight(1f)

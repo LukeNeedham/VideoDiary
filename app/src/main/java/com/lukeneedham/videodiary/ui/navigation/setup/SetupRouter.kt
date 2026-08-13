@@ -11,11 +11,7 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -33,11 +29,8 @@ import com.lukeneedham.videodiary.ui.feature.setup.orientation.SetupSelectOrient
 import com.lukeneedham.videodiary.ui.feature.setup.orientation.SetupSelectOrientationViewModel
 import com.lukeneedham.videodiary.ui.feature.setup.resolution.SetupSelectResolutionPage
 import com.lukeneedham.videodiary.ui.permissions.PermissionResultListenerHolder
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.compose.viewmodel.koinViewModel
-
-private const val AUTO_CONTINUE_DELAY_MILLIS = 500L
 
 /**
  * The whole onboarding flow (intro, permissions, orientation, resolution, video duration) is one
@@ -94,26 +87,6 @@ fun SetupRouter(
         }
     }
 
-    // Once a permission is granted, automatically move on to the next page - but only once per
-    // permission, not every time its page is revisited (e.g. by swiping back to it).
-    var autoAdvancedPermissions by remember { mutableStateOf(emptySet<String>()) }
-
-    // Keyed on settledPage (not currentPage) so this isn't cancelled and restarted by its own
-    // in-flight scroll animation, or by the user's drag, mid-transition.
-    val settledPage = pagerState.settledPage
-    val settledPermission = requiredPermissions.getOrNull(settledPage - SetupProgress.PERMISSIONS_START_INDEX)
-    val isSettledPermissionNewlyGranted = settledPermission != null &&
-        settledPermission.permission in acquiredPermissions &&
-        settledPermission.permission !in autoAdvancedPermissions
-
-    LaunchedEffect(settledPage, isSettledPermissionNewlyGranted) {
-        if (!isSettledPermissionNewlyGranted) return@LaunchedEffect
-        val permission = requireNotNull(settledPermission)
-        delay(AUTO_CONTINUE_DELAY_MILLIS)
-        autoAdvancedPermissions = autoAdvancedPermissions + permission.permission
-        pagerState.animateScrollToPage(settledPage + 1)
-    }
-
     val currentPage = pagerState.currentPage
     val currentPageAction: PagerAction? = when {
         currentPage < SetupProgress.INTRO_SLIDE_COUNT -> PagerAction(
@@ -123,10 +96,13 @@ fun SetupRouter(
 
         currentPage < SetupProgress.ORIENTATION_PAGE_INDEX -> {
             val permission = requiredPermissions.getOrNull(currentPage - SetupProgress.PERMISSIONS_START_INDEX)
-            if (permission == null || permission.permission in acquiredPermissions) {
-                null
-            } else {
-                PagerAction(
+            when {
+                permission == null -> null
+                permission.permission in acquiredPermissions -> PagerAction(
+                    label = "Next",
+                    onClick = ::goToNextPage,
+                )
+                else -> PagerAction(
                     label = "Grant permission",
                     onClick = { requestPermission(permission.permission) },
                 )

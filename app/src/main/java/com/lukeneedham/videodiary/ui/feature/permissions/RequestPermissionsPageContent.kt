@@ -10,11 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -24,9 +20,7 @@ import com.lukeneedham.videodiary.ui.feature.common.Button
 import com.lukeneedham.videodiary.ui.feature.common.pageindicator.PageIndicator
 import com.lukeneedham.videodiary.ui.permissions.RequiredPermission
 import com.lukeneedham.videodiary.ui.permissions.RequiredPermissions
-import kotlinx.coroutines.delay
-
-private const val AUTO_CONTINUE_DELAY_MILLIS = 500L
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -42,31 +36,7 @@ fun RequestPermissionsPageContent(
     val revealedPageCount = if (firstMissingIndex == -1) requiredPermissions.size else firstMissingIndex + 1
 
     val pagerState = rememberPagerState { revealedPageCount }
-
-    // Once a permission is granted, automatically move on - but only once per permission, not
-    // every time its page is revisited (e.g. by swiping back to it).
-    var autoAdvancedPermissions by remember { mutableStateOf(emptySet<String>()) }
-
-    // Keyed on settledPage (not currentPage) so this isn't cancelled and restarted by its own
-    // in-flight scroll animation, or by the user's drag, mid-transition.
-    val settledPage = pagerState.settledPage
-    val settledPermission = requiredPermissions.getOrNull(settledPage)
-    val isSettledPermissionNewlyGranted = settledPermission != null &&
-        settledPermission.permission in acquiredPermissions &&
-        settledPermission.permission !in autoAdvancedPermissions
-
-    LaunchedEffect(settledPage, isSettledPermissionNewlyGranted) {
-        if (!isSettledPermissionNewlyGranted) return@LaunchedEffect
-        val permission = requireNotNull(settledPermission)
-        delay(AUTO_CONTINUE_DELAY_MILLIS)
-        autoAdvancedPermissions = autoAdvancedPermissions + permission.permission
-
-        if (settledPage < requiredPermissions.lastIndex) {
-            pagerState.animateScrollToPage(settledPage + 1)
-        } else {
-            onContinue()
-        }
-    }
+    val coroutineScope = rememberCoroutineScope()
 
     Column(
         modifier = Modifier.fillMaxSize()
@@ -99,21 +69,30 @@ fun RequestPermissionsPageContent(
 
         val currentPermission = requiredPermissions.getOrNull(pagerState.currentPage)
         val isCurrentGranted = currentPermission != null && currentPermission.permission in acquiredPermissions
+        val isLastPage = pagerState.currentPage == requiredPermissions.lastIndex
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .heightIn(min = 80.dp)
                 .padding(15.dp),
         ) {
-            if (!isCurrentGranted) {
-                Button(
-                    text = "Grant permission",
-                    onClick = {
-                        currentPermission?.let { requestPermission(it.permission) }
-                    },
-                    modifier = Modifier.fillMaxWidth(),
-                )
-            }
+            Button(
+                text = when {
+                    !isCurrentGranted -> "Grant permission"
+                    isLastPage -> "Continue"
+                    else -> "Next"
+                },
+                onClick = {
+                    when {
+                        !isCurrentGranted -> currentPermission?.let { requestPermission(it.permission) }
+                        isLastPage -> onContinue()
+                        else -> coroutineScope.launch {
+                            pagerState.animateScrollToPage(pagerState.currentPage + 1)
+                        }
+                    }
+                },
+                modifier = Modifier.fillMaxWidth(),
+            )
         }
     }
 }
