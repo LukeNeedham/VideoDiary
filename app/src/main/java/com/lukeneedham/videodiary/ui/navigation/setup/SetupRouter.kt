@@ -36,6 +36,7 @@ import com.lukeneedham.videodiary.ui.feature.common.Button
 import com.lukeneedham.videodiary.ui.feature.common.pageindicator.PageIndicator
 import com.lukeneedham.videodiary.ui.feature.permissions.RequestPermissionPage
 import com.lukeneedham.videodiary.ui.feature.permissions.RequestPermissionsViewModel
+import com.lukeneedham.videodiary.ui.feature.setup.complete.SetupCompletePage
 import com.lukeneedham.videodiary.ui.feature.setup.duration.SelectVideoDurationPage
 import com.lukeneedham.videodiary.ui.feature.setup.duration.SelectVideoDurationViewModel
 import com.lukeneedham.videodiary.ui.feature.setup.intro.SetupIntroSlidePage
@@ -181,6 +182,7 @@ fun SetupRouter(
             val rotationLocal = resolutionRotation
             PagerAction(
                 label = "Next",
+                enabled = isResolutionReady,
                 onClick = {
                     if (currentResolution != null && rotationLocal != null) {
                         resolutionViewModel.saveSettings(currentResolution, rotationLocal)
@@ -192,6 +194,11 @@ fun SetupRouter(
         currentPage == SetupProgress.DURATION_PAGE_INDEX -> PagerAction(
             label = "Next",
             onClick = { durationViewModel.saveSettings() },
+        )
+
+        currentPage == SetupProgress.FINAL_PAGE_INDEX -> PagerAction(
+            label = "Get started",
+            onClick = onSetupComplete,
         )
 
         else -> null
@@ -236,10 +243,12 @@ fun SetupRouter(
                     },
                 )
 
-                else -> SelectVideoDurationPage(
+                page == SetupProgress.DURATION_PAGE_INDEX -> SelectVideoDurationPage(
                     viewModel = durationViewModel,
-                    onContinue = onSetupComplete,
+                    onContinue = ::goToNextPage,
                 )
+
+                else -> SetupCompletePage()
             }
         }
 
