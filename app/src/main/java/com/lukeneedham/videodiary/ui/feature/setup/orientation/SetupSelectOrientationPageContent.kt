@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -17,20 +16,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.lukeneedham.videodiary.domain.model.Orientation
 import com.lukeneedham.videodiary.ui.feature.common.SingleOptionSelector
-import com.lukeneedham.videodiary.ui.navigation.setup.PagerAction
 
 @Composable
 fun SetupSelectOrientationPageContent(
     options: List<Orientation>,
     selectedOption: Orientation,
     setSelectedOption: (Orientation) -> Unit,
-    onContinue: () -> Unit,
-    reportBottomAction: (PagerAction?) -> Unit,
 ) {
-    SideEffect {
-        reportBottomAction(PagerAction(label = "Next", onClick = onContinue))
-    }
-
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -76,7 +68,5 @@ internal fun PreviewSetupSelectOrientationPageContent() {
         options = Orientation.entries,
         selectedOption = Orientation.Portrait,
         setSelectedOption = {},
-        onContinue = {},
-        reportBottomAction = {},
     )
 }

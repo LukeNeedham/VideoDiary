@@ -10,25 +10,17 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.lukeneedham.videodiary.ui.feature.common.IntPicker
-import com.lukeneedham.videodiary.ui.navigation.setup.PagerAction
 
 @Composable
 fun SelectVideoDurationPageContent(
     seconds: Int,
     setSeconds: (Int) -> Unit,
-    onContinue: () -> Unit,
-    reportBottomAction: (PagerAction?) -> Unit,
 ) {
-    SideEffect {
-        reportBottomAction(PagerAction(label = "Next", onClick = onContinue))
-    }
-
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -56,7 +48,5 @@ internal fun PreviewSelectVideoDurationPageContent() {
     SelectVideoDurationPageContent(
         seconds = 1,
         setSeconds = {},
-        onContinue = {},
-        reportBottomAction = {},
     )
 }

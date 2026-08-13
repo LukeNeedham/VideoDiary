@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -22,20 +21,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.lukeneedham.videodiary.ui.navigation.setup.PagerAction
 import com.lukeneedham.videodiary.ui.theme.Typography
 
 /** One slide of the onboarding intro, as a single page within the wider onboarding pager. */
 @Composable
 fun SetupIntroSlidePage(
     slide: SetupIntroSlide,
-    reportBottomAction: (PagerAction?) -> Unit,
-    onNext: () -> Unit,
 ) {
-    SideEffect {
-        reportBottomAction(PagerAction(label = "Next", onClick = onNext))
-    }
-
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
@@ -85,7 +77,5 @@ fun SetupIntroSlidePage(
 internal fun PreviewSetupIntroSlidePage() {
     SetupIntroSlidePage(
         slide = setupIntroSlides.first(),
-        reportBottomAction = {},
-        onNext = {},
     )
 }
