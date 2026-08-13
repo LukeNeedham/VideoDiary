@@ -59,8 +59,6 @@ fun CameraInput(
         }
     }
 
-    val canZoomUpdated by rememberUpdatedState(canZoom)
-
     var resolutionMissing by remember(currentResolution) { mutableStateOf(false) }
     var camera: Camera? by remember { mutableStateOf(null) }
 
@@ -147,19 +145,27 @@ fun CameraInput(
                     focusTapCount++
                 }
             }
-            .pointerInput(Unit) {
-                detectTransformGestures { _, _, zoomChange, _ ->
-                    if (!canZoomUpdated) return@detectTransformGestures
-                    val cam = camera ?: return@detectTransformGestures
-                    val zoomState = cam.cameraInfo.zoomState.value ?: return@detectTransformGestures
-                    val newZoom = zoomState.zoomRatio * zoomChange
-                    val boundedNewZoom = newZoom.coerceIn(
-                        zoomState.minZoomRatio,
-                        zoomState.maxZoomRatio,
-                    )
-                    camera?.cameraControl?.setZoomRatio(boundedNewZoom)
+            .then(
+                // Only claim pan/transform gestures when zoom is actually enabled - otherwise this
+                // would swallow single-finger swipes meant for an ancestor (e.g. a pager) even
+                // though the gesture ends up doing nothing.
+                if (canZoom) {
+                    Modifier.pointerInput(Unit) {
+                        detectTransformGestures { _, _, zoomChange, _ ->
+                            val cam = camera ?: return@detectTransformGestures
+                            val zoomState = cam.cameraInfo.zoomState.value ?: return@detectTransformGestures
+                            val newZoom = zoomState.zoomRatio * zoomChange
+                            val boundedNewZoom = newZoom.coerceIn(
+                                zoomState.minZoomRatio,
+                                zoomState.maxZoomRatio,
+                            )
+                            camera?.cameraControl?.setZoomRatio(boundedNewZoom)
+                        }
+                    }
+                } else {
+                    Modifier
                 }
-            }
+            )
     ) {
         if (resolutionMissing) {
             Text(

@@ -12,6 +12,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.lukeneedham.videodiary.R
@@ -46,7 +47,6 @@ fun SetupSelectOrientationPageContent(
                 options = options,
                 selectedOption = selectedOption,
                 setSelectedOption = setSelectedOption,
-                color = Color.Black,
                 modifier = Modifier.fillMaxWidth(),
             ) { option, isSelected ->
                 val text = when (option) {
@@ -54,13 +54,14 @@ fun SetupSelectOrientationPageContent(
                     Orientation.Landscape -> "Landscape"
                 }
 
-                val targetTextColor = if (isSelected) Color.White else Color.Black
+                val targetTextColor = if (isSelected) Color.White else Color.DarkGray
                 val textColor by animateColorAsState(
                     targetValue = targetTextColor,
                     label = "Animate orientation text color"
                 )
                 Text(
                     text = text,
+                    fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
                     color = textColor,
                 )
             }

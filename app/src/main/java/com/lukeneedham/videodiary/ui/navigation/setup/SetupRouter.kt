@@ -1,5 +1,12 @@
 package com.lukeneedham.videodiary.ui.navigation.setup
 
+import android.hardware.camera2.CameraCharacteristics
+import android.hardware.camera2.CameraMetadata
+import android.util.Size
+import androidx.camera.camera2.interop.Camera2CameraInfo
+import androidx.camera.camera2.interop.ExperimentalCamera2Interop
+import androidx.camera.lifecycle.ProcessCameraProvider
+import androidx.camera.video.QualitySelector
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -11,11 +18,19 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
+import com.lukeneedham.videodiary.domain.model.CameraResolutionRotation
 import com.lukeneedham.videodiary.domain.model.Orientation
 import com.lukeneedham.videodiary.ui.feature.common.Button
 import com.lukeneedham.videodiary.ui.feature.common.pageindicator.PageIndicator
@@ -28,6 +43,7 @@ import com.lukeneedham.videodiary.ui.feature.setup.intro.setupIntroSlides
 import com.lukeneedham.videodiary.ui.feature.setup.orientation.SetupSelectOrientationPage
 import com.lukeneedham.videodiary.ui.feature.setup.orientation.SetupSelectOrientationViewModel
 import com.lukeneedham.videodiary.ui.feature.setup.resolution.SetupSelectResolutionPage
+import com.lukeneedham.videodiary.ui.feature.setup.resolution.SetupSelectResolutionViewModel
 import com.lukeneedham.videodiary.ui.permissions.PermissionResultListenerHolder
 import kotlinx.coroutines.launch
 import org.koin.compose.viewmodel.koinViewModel
@@ -40,13 +56,13 @@ import org.koin.compose.viewmodel.koinViewModel
  *
  * The page indicator and the primary action button live outside the pager, so they stay static
  * while only the page content itself swipes. The button is computed directly here from state this
- * composable already holds (view models, permission grants) - the same reliable pattern the page
- * indicator uses - rather than relying on a page composed inside the pager to report it, since
- * pager pages are subcomposed on their own schedule and can't safely drive rendering outside the
- * pager. Resolution is the one exception: its "Next" button depends on local, asynchronously
- * loaded camera readiness, so it keeps its own internal button instead.
+ * composable already holds (view models, permission grants, camera resolution readiness) - the
+ * same reliable pattern the page indicator uses - rather than relying on a page composed inside
+ * the pager to report it, since pager pages are subcomposed on their own schedule and can't safely
+ * drive rendering outside the pager.
  */
 @OptIn(ExperimentalFoundationApi::class)
+@androidx.annotation.OptIn(ExperimentalCamera2Interop::class)
 @Composable
 fun SetupRouter(
     onSetupComplete: () -> Unit,
@@ -57,6 +73,7 @@ fun SetupRouter(
 ) {
     val permissionsViewModel: RequestPermissionsViewModel = koinViewModel()
     val orientationViewModel: SetupSelectOrientationViewModel = koinViewModel()
+    val resolutionViewModel: SetupSelectResolutionViewModel = koinViewModel()
     val durationViewModel: SelectVideoDurationViewModel = koinViewModel()
 
     LaunchedEffect(permissionResultListenerHolder, permissionsViewModel) {
@@ -70,6 +87,48 @@ fun SetupRouter(
 
     LaunchedEffect(allPermissionsGranted) {
         if (allPermissionsGranted) onPermissionsAcquired()
+    }
+
+    // Resolution's camera state is hoisted here (rather than owned by its own page content) so
+    // its readiness can drive the router's own "Next" button, the same reliable way every other
+    // page's action is computed.
+    val context = LocalContext.current
+    var resolutions by remember { mutableStateOf(emptyList<Size>()) }
+    var resolutionRotation: CameraResolutionRotation? by remember { mutableStateOf(null) }
+    var currentResolutionIndex by remember { mutableIntStateOf(0) }
+    val currentResolution = resolutions.getOrNull(currentResolutionIndex)
+    var currentResolutionMissing by remember(currentResolution) { mutableStateOf(false) }
+
+    LaunchedEffect(Unit) {
+        val cameraProviderFuture = ProcessCameraProvider.getInstance(context)
+        cameraProviderFuture.addListener(
+            {
+                val cameraProvider: ProcessCameraProvider = cameraProviderFuture.get()
+                val cameraInfos = cameraProvider.availableCameraInfos.filter {
+                    Camera2CameraInfo
+                        .from(it)
+                        .getCameraCharacteristic(CameraCharacteristics.LENS_FACING) == CameraMetadata.LENS_FACING_BACK
+                }
+
+                val cameraInfo = cameraInfos.first()
+                resolutions =
+                    QualitySelector.getSupportedQualities(cameraInfo).mapNotNull { quality ->
+                        QualitySelector.getResolution(cameraInfo, quality)
+                    }
+                        // Show the resolution with the most pixels first
+                        .sortedByDescending {
+                            it.width * it.height
+                        }
+            },
+            ContextCompat.getMainExecutor(context)
+        )
+    }
+
+    fun setCurrentResolutionIndex(index: Int) {
+        val resolutionsCount = resolutions.size
+        if (resolutionsCount != 0) {
+            currentResolutionIndex = index.mod(resolutionsCount)
+        }
     }
 
     val revealedPageCount = if (allPermissionsGranted) {
@@ -114,7 +173,18 @@ fun SetupRouter(
             onClick = { orientationViewModel.saveSettings() },
         )
 
-        currentPage == SetupProgress.RESOLUTION_PAGE_INDEX -> null
+        currentPage == SetupProgress.RESOLUTION_PAGE_INDEX -> {
+            val rotationLocal = resolutionRotation
+            PagerAction(
+                label = "Next",
+                enabled = currentResolution != null && !currentResolutionMissing && rotationLocal != null,
+                onClick = {
+                    if (currentResolution != null && rotationLocal != null) {
+                        resolutionViewModel.saveSettings(currentResolution, rotationLocal)
+                    }
+                },
+            )
+        }
 
         currentPage == SetupProgress.DURATION_PAGE_INDEX -> PagerAction(
             label = "Next",
@@ -151,8 +221,16 @@ fun SetupRouter(
                 )
 
                 page == SetupProgress.RESOLUTION_PAGE_INDEX -> SetupSelectResolutionPage(
-                    viewModel = koinViewModel(),
+                    viewModel = resolutionViewModel,
                     onContinue = ::goToNextPage,
+                    resolutions = resolutions,
+                    currentResolutionIndex = currentResolutionIndex,
+                    setCurrentResolutionIndex = ::setCurrentResolutionIndex,
+                    rotation = resolutionRotation,
+                    onResolutionLoaded = { _, isMissing, loadedRotation ->
+                        currentResolutionMissing = isMissing
+                        resolutionRotation = loadedRotation
+                    },
                 )
 
                 else -> SelectVideoDurationPage(
@@ -175,25 +253,21 @@ fun SetupRouter(
             )
         }
 
-        // Resolution renders its own internal button (see the class doc), so no space is reserved
-        // for it here - only its content and the page indicator above take up the pager's height.
-        if (currentPage != SetupProgress.RESOLUTION_PAGE_INDEX) {
-            // Reserve the button's height even when there's no action to show, so the page
-            // doesn't jump right before an automatic transition to the next page.
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .heightIn(min = 80.dp)
-                    .padding(15.dp),
-            ) {
-                if (currentPageAction != null) {
-                    Button(
-                        text = currentPageAction.label,
-                        enabled = currentPageAction.enabled,
-                        onClick = currentPageAction.onClick,
-                        modifier = Modifier.fillMaxWidth(),
-                    )
-                }
+        // Reserve the button's height even when there's no action to show, so the page doesn't
+        // jump right before an automatic transition to the next page.
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .heightIn(min = 80.dp)
+                .padding(15.dp),
+        ) {
+            if (currentPageAction != null) {
+                Button(
+                    text = currentPageAction.label,
+                    enabled = currentPageAction.enabled,
+                    onClick = currentPageAction.onClick,
+                    modifier = Modifier.fillMaxWidth(),
+                )
             }
         }
     }
