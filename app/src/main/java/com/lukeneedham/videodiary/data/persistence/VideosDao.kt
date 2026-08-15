@@ -3,6 +3,7 @@ package com.lukeneedham.videodiary.data.persistence
 import android.content.Context
 import android.net.Uri
 import android.provider.MediaStore
+import com.lukeneedham.videodiary.R
 import com.lukeneedham.videodiary.data.mapper.ThumbnailFileNameMapper
 import com.lukeneedham.videodiary.data.mapper.VideoFileNameMapper
 import com.lukeneedham.videodiary.domain.util.logger.Logger
@@ -68,13 +69,18 @@ class VideosDao(
     }
 
     /**
-     * Deletes all existing videos and creates empty placeholder video files for [dates].
-     * Used to fill the diary with mock data for debugging.
+     * Deletes all existing videos and creates placeholder video files for [dates], copied from
+     * the `sample_video` raw resource. Used to fill the diary with mock data for debugging.
      */
     fun fillWithMockVideos(dates: List<LocalDate>) {
         videosDir.listFiles()?.forEach { it.delete() }
+        thumbnailsDir.listFiles()?.forEach { it.delete() }
         dates.forEach { date ->
-            getVideoFile(date).createNewFile()
+            val videoFile = getVideoFile(date)
+            context.resources.openRawResource(R.raw.sample_video).use { input ->
+                videoFile.outputStream().use { output -> input.copyTo(output) }
+            }
+            videoThumbnailExtractor.extractFirstFrame(videoFile, getThumbnailFile(date))
         }
         refreshVideosState()
     }
