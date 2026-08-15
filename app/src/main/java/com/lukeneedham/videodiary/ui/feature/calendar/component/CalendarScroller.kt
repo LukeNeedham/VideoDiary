@@ -160,9 +160,15 @@ fun CalendarScroller(
                             val up = waitForUpOrCancellation(pass = PointerEventPass.Initial)
                             videoPlayerController.temporaryResume()
 
-                            // Only treat this as an edge tap (not a swipe) if the pointer
-                            // didn't move beyond touch slop between down and up.
-                            if (up != null && (up.position - down.position).getDistance() < viewConfiguration.touchSlop) {
+                            // Only treat this as an edge tap (not a swipe or long press) if
+                            // the pointer didn't move beyond touch slop between down and up,
+                            // and it was released before the long-press timeout.
+                            val pressDurationMillis = up?.let { it.uptimeMillis - down.uptimeMillis }
+                            val isTap = up != null &&
+                                (up.position - down.position).getDistance() < viewConfiguration.touchSlop &&
+                                pressDurationMillis != null &&
+                                pressDurationMillis < viewConfiguration.longPressTimeoutMillis
+                            if (isTap) {
                                 val width = size.width
                                 when {
                                     down.position.x < width * EDGE_TAP_FRACTION -> onPrevious()
