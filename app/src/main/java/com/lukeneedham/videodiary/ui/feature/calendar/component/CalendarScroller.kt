@@ -34,6 +34,10 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 
+// Fraction of the video's width, on either side, that counts as an edge tap for
+// navigating to the previous/next day.
+private const val EDGE_TAP_FRACTION = 0.25f
+
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun CalendarScroller(
@@ -124,8 +128,6 @@ fun CalendarScroller(
         topOverlay = {
             CalendarTopBar(
                 currentDateFormatted = currentDateFormatted,
-                onPrevious = onPrevious,
-                onNext = onNext,
                 openDayPicker = openDayPicker,
                 goToToday = goToToday,
                 onMenuClick = onMenuClick,
@@ -147,16 +149,26 @@ fun CalendarScroller(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .pointerInput(Unit) {
+                .pointerInput(onPrevious, onNext) {
                     awaitEachGesture {
                         while (true) {
                             // PointerEventPass.Initial lets this Box see the touch
                             // BEFORE the horizontal scroll gets a chance to intercept it.
-                            awaitFirstDown(pass = PointerEventPass.Initial)
+                            val down = awaitFirstDown(pass = PointerEventPass.Initial)
                             videoPlayerController.temporaryPause()
 
-                            waitForUpOrCancellation(pass = PointerEventPass.Initial)
+                            val up = waitForUpOrCancellation(pass = PointerEventPass.Initial)
                             videoPlayerController.temporaryResume()
+
+                            // Only treat this as an edge tap (not a swipe) if the pointer
+                            // didn't move beyond touch slop between down and up.
+                            if (up != null && (up.position - down.position).getDistance() < viewConfiguration.touchSlop) {
+                                val width = size.width
+                                when {
+                                    down.position.x < width * EDGE_TAP_FRACTION -> onPrevious()
+                                    down.position.x > width * (1f - EDGE_TAP_FRACTION) -> onNext()
+                                }
+                            }
                         }
                     }
                 }
