@@ -127,9 +127,14 @@ All DI wiring lives in `di/KoinModule.kt`, grouped into module functions:
   Debug page, `AndroidLoggerEngine` verbose logging).
 - The Debug page (`ui/feature/debug/`) lets developers fill the diary with mock data via
   `MockDataRepository` / `VideosDao.fillWithMockVideos(...)` — only reachable from debug builds.
+  Mock entries are populated by copying the `sample_video` raw resource in as each video file.
 - `app/src/debug/res/drawable/preview_video` is a large placeholder image used by Composable
   Previews for video players; it's excluded from release builds. A small fallback `preview_video`
   exists in the main `drawable` folder so release builds still compile. See [docs/Screenshots.md](docs/Screenshots.md).
+- `app/src/debug/res/raw/sample_video` is the real placeholder video copied into mock diary
+  entries; it's excluded from release builds. A tiny fallback `sample_video` exists in the main
+  `raw` folder (never actually used) so release builds still compile, mirroring the
+  `preview_video` pattern above.
 
 ## Build, run & test
 
