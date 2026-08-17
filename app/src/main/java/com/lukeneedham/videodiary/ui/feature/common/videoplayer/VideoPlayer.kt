@@ -26,6 +26,8 @@ fun VideoPlayer(
     aspectRatio: Float,
     controller: VideoPlayerController,
     thumbnailFile: File? = null,
+    // False when a caller hosts its own persistent VideoPlayerExo elsewhere instead.
+    showPlayer: Boolean = true,
     modifier: Modifier = Modifier
 ) {
     Box(
@@ -49,7 +51,7 @@ fun VideoPlayer(
             // avoiding a black flash when switching to the player.
             VideoThumbnail(thumbnailFile)
 
-            if (isCurrent) {
+            if (showPlayer && isCurrent) {
                 VideoPlayerExo(
                     video = video,
                     controller = controller,

@@ -20,6 +20,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.tooling.preview.Preview
 import com.lukeneedham.videodiary.domain.model.Day
 import com.lukeneedham.videodiary.domain.model.ShareRequest
@@ -28,6 +29,7 @@ import com.lukeneedham.videodiary.ui.feature.calendar.MockDataCalendar
 import com.lukeneedham.videodiary.ui.feature.calendar.component.day.CalendarDayContent
 import com.lukeneedham.videodiary.ui.feature.calendar.component.day.bottombar.CalendarDayBottomBar
 import com.lukeneedham.videodiary.ui.feature.common.videoplayer.VideoPlayerController
+import com.lukeneedham.videodiary.ui.feature.common.videoplayer.VideoPlayerExo
 import com.lukeneedham.videodiary.ui.feature.common.videoplayer.VideoToolbarLayout
 import com.lukeneedham.videodiary.ui.feature.common.videoplayer.rememberVideoPlayerController
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -200,6 +202,17 @@ fun CalendarScroller(
                         onRecordVideoClick(date)
                     },
                     videoPlayerController = videoPlayerController,
+                )
+            }
+
+            // Hosted once here rather than per-page: recreating VideoPlayerExo's native
+            // TextureView on every day navigation left the video area briefly unresponsive
+            // to touch. Hidden mid-swipe since it doesn't track page-drag offset itself.
+            val playingVideo = videoPlayerController.playingVideo
+            if (!LocalInspectionMode.current && playingVideo != null && !pagerState.isScrollInProgress) {
+                VideoPlayerExo(
+                    video = playingVideo,
+                    controller = videoPlayerController,
                 )
             }
         }

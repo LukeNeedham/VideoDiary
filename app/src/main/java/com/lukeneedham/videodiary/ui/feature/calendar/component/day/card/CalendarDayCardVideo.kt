@@ -35,6 +35,8 @@ fun CalendarDayCardVideo(
             thumbnailFile = thumbnailFile,
             aspectRatio = videoAspectRatio,
             controller = videoPlayerController,
+            // The live player is hosted once, persistently, in CalendarScroller instead.
+            showPlayer = false,
         )
     }
 }
