@@ -112,9 +112,15 @@ fun CalendarScroller(
 
     // pagerState.pageCount mirrors days.size dynamically via the pageCount lambda, so
     // these callbacks only need pagerState and coroutineScope as stable remember keys.
+    //
+    // Uses targetPage (the page the pager is animating towards, or currentPage if idle)
+    // rather than currentPage, which only updates once an in-flight animation settles.
+    // Basing the offset on currentPage would make a tap during an ongoing page-flip
+    // resolve to the same target already being animated to - i.e. a no-op - making
+    // rapid taps feel like they're being ignored until the prior animation finishes.
     val navigateByOffset: (Int) -> Unit = remember(pagerState, coroutineScope) {
         { offset ->
-            val target = pagerState.currentPage + offset
+            val target = pagerState.targetPage + offset
             if (target >= 0 && target < pagerState.pageCount) {
                 coroutineScope.launch { pagerState.animateScrollToPage(target) }
             }
