@@ -18,6 +18,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalInspectionMode
@@ -205,14 +206,19 @@ fun CalendarScroller(
                 )
             }
 
-            // Hosted once here rather than per-page: recreating VideoPlayerExo's native
-            // TextureView on every day navigation left the video area briefly unresponsive
-            // to touch. Hidden mid-swipe since it doesn't track page-drag offset itself.
+            // Hosted once here rather than per-page, and kept composed across navigation
+            // (gated on there being a video at all, not on scroll state) so its native
+            // TextureView is never torn down and recreated on a tap/swipe - that recreation
+            // was what left the video area briefly unresponsive to touch. Hidden via alpha
+            // rather than removed from composition, since it doesn't track page-drag offset.
             val playingVideo = videoPlayerController.playingVideo
-            if (!LocalInspectionMode.current && playingVideo != null && !pagerState.isScrollInProgress) {
+            if (!LocalInspectionMode.current && playingVideo != null) {
                 VideoPlayerExo(
                     video = playingVideo,
                     controller = videoPlayerController,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .alpha(if (pagerState.isScrollInProgress) 0f else 1f),
                 )
             }
         }
