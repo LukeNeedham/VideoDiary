@@ -1,9 +1,7 @@
 package com.lukeneedham.videodiary.ui.feature.calendar.component
 
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.gestures.awaitEachGesture
-import androidx.compose.foundation.gestures.awaitFirstDown
-import androidx.compose.foundation.gestures.waitForUpOrCancellation
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.pager.HorizontalPager
@@ -19,7 +17,6 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.tooling.preview.Preview
@@ -159,33 +156,26 @@ fun CalendarScroller(
             modifier = Modifier
                 .fillMaxSize()
                 .pointerInput(onPrevious, onNext) {
-                    awaitEachGesture {
-                        while (true) {
-                            // PointerEventPass.Initial lets this Box see the touch
-                            // BEFORE the horizontal scroll gets a chance to intercept it.
-                            val down = awaitFirstDown(pass = PointerEventPass.Initial)
+                    detectTapGestures(
+                        onPress = {
+                            // Fires on every touch-down, whether it ends up being a tap, a
+                            // long press, or a swipe - tryAwaitRelease suspends until the
+                            // gesture ends however it ends, so playback always resumes.
                             videoPlayerController.temporaryPause()
-
-                            val up = waitForUpOrCancellation(pass = PointerEventPass.Initial)
+                            tryAwaitRelease()
                             videoPlayerController.temporaryResume()
-
-                            // Only treat this as an edge tap (not a swipe or long press) if
-                            // the pointer didn't move beyond touch slop between down and up,
-                            // and it was released before the long-press timeout.
-                            val pressDurationMillis = up?.let { it.uptimeMillis - down.uptimeMillis }
-                            val isTap = up != null &&
-                                (up.position - down.position).getDistance() < viewConfiguration.touchSlop &&
-                                pressDurationMillis != null &&
-                                pressDurationMillis < viewConfiguration.longPressTimeoutMillis
-                            if (isTap) {
-                                val width = size.width
-                                when {
-                                    down.position.x < width * EDGE_TAP_FRACTION -> onPrevious()
-                                    down.position.x > width * (1f - EDGE_TAP_FRACTION) -> onNext()
-                                }
+                        },
+                        // Providing this makes detectTapGestures distinguish a long press
+                        // from a tap (onTap below then only fires for a genuine tap).
+                        onLongPress = {},
+                        onTap = { offset ->
+                            val width = size.width
+                            when {
+                                offset.x < width * EDGE_TAP_FRACTION -> onPrevious()
+                                offset.x > width * (1f - EDGE_TAP_FRACTION) -> onNext()
                             }
-                        }
-                    }
+                        },
+                    )
                 }
         ) {
             HorizontalPager(
