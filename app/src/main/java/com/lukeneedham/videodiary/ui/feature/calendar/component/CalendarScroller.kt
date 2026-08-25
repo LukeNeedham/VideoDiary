@@ -1,9 +1,7 @@
 package com.lukeneedham.videodiary.ui.feature.calendar.component
 
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.gestures.awaitEachGesture
-import androidx.compose.foundation.gestures.awaitFirstDown
-import androidx.compose.foundation.gestures.waitForUpOrCancellation
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.pager.HorizontalPager
@@ -18,8 +16,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.pointer.PointerEventPass
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.tooling.preview.Preview
 import com.lukeneedham.videodiary.domain.model.Day
 import com.lukeneedham.videodiary.domain.model.ShareRequest
@@ -28,11 +27,16 @@ import com.lukeneedham.videodiary.ui.feature.calendar.MockDataCalendar
 import com.lukeneedham.videodiary.ui.feature.calendar.component.day.CalendarDayContent
 import com.lukeneedham.videodiary.ui.feature.calendar.component.day.bottombar.CalendarDayBottomBar
 import com.lukeneedham.videodiary.ui.feature.common.videoplayer.VideoPlayerController
+import com.lukeneedham.videodiary.ui.feature.common.videoplayer.VideoPlayerExo
 import com.lukeneedham.videodiary.ui.feature.common.videoplayer.VideoToolbarLayout
 import com.lukeneedham.videodiary.ui.feature.common.videoplayer.rememberVideoPlayerController
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import java.time.LocalDate
+
+// Fraction of the video's width, on either side, that counts as an edge tap for
+// navigating to the previous/next day.
+private const val EDGE_TAP_FRACTION = 0.25f
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -108,9 +112,15 @@ fun CalendarScroller(
 
     // pagerState.pageCount mirrors days.size dynamically via the pageCount lambda, so
     // these callbacks only need pagerState and coroutineScope as stable remember keys.
+    //
+    // Uses targetPage (the page the pager is animating towards, or currentPage if idle)
+    // rather than currentPage, which only updates once an in-flight animation settles.
+    // Basing the offset on currentPage would make a tap during an ongoing page-flip
+    // resolve to the same target already being animated to - i.e. a no-op - making
+    // rapid taps feel like they're being ignored until the prior animation finishes.
     val navigateByOffset: (Int) -> Unit = remember(pagerState, coroutineScope) {
         { offset ->
-            val target = pagerState.currentPage + offset
+            val target = pagerState.targetPage + offset
             if (target >= 0 && target < pagerState.pageCount) {
                 coroutineScope.launch { pagerState.animateScrollToPage(target) }
             }
@@ -124,8 +134,6 @@ fun CalendarScroller(
         topOverlay = {
             CalendarTopBar(
                 currentDateFormatted = currentDateFormatted,
-                onPrevious = onPrevious,
-                onNext = onNext,
                 openDayPicker = openDayPicker,
                 goToToday = goToToday,
                 onMenuClick = onMenuClick,
@@ -147,18 +155,27 @@ fun CalendarScroller(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .pointerInput(Unit) {
-                    awaitEachGesture {
-                        while (true) {
-                            // PointerEventPass.Initial lets this Box see the touch
-                            // BEFORE the horizontal scroll gets a chance to intercept it.
-                            awaitFirstDown(pass = PointerEventPass.Initial)
+                .pointerInput(onPrevious, onNext) {
+                    detectTapGestures(
+                        onPress = {
+                            // Fires on every touch-down, whether it ends up being a tap, a
+                            // long press, or a swipe - tryAwaitRelease suspends until the
+                            // gesture ends however it ends, so playback always resumes.
                             videoPlayerController.temporaryPause()
-
-                            waitForUpOrCancellation(pass = PointerEventPass.Initial)
+                            tryAwaitRelease()
                             videoPlayerController.temporaryResume()
-                        }
-                    }
+                        },
+                        // Providing this makes detectTapGestures distinguish a long press
+                        // from a tap (onTap below then only fires for a genuine tap).
+                        onLongPress = {},
+                        onTap = { offset ->
+                            val width = size.width
+                            when {
+                                offset.x < width * EDGE_TAP_FRACTION -> onPrevious()
+                                offset.x > width * (1f - EDGE_TAP_FRACTION) -> onNext()
+                            }
+                        },
+                    )
                 }
         ) {
             HorizontalPager(
@@ -176,6 +193,22 @@ fun CalendarScroller(
                         onRecordVideoClick(date)
                     },
                     videoPlayerController = videoPlayerController,
+                )
+            }
+
+            // Hosted once here rather than per-page, and kept composed across navigation
+            // (gated on there being a video at all, not on scroll state) so its native
+            // TextureView is never torn down and recreated on a tap/swipe - that recreation
+            // was what left the video area briefly unresponsive to touch. Hidden via alpha
+            // rather than removed from composition, since it doesn't track page-drag offset.
+            val playingVideo = videoPlayerController.playingVideo
+            if (!LocalInspectionMode.current && playingVideo != null) {
+                VideoPlayerExo(
+                    video = playingVideo,
+                    controller = videoPlayerController,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .alpha(if (pagerState.isScrollInProgress) 0f else 1f),
                 )
             }
         }

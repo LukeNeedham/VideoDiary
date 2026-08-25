@@ -19,8 +19,6 @@ import com.lukeneedham.videodiary.ui.feature.common.glass.GlassIconButton
 @Composable
 fun CalendarTopBar(
     currentDateFormatted: String,
-    onPrevious: () -> Unit,
-    onNext: () -> Unit,
     openDayPicker: () -> Unit,
     goToToday: () -> Unit,
     onMenuClick: () -> Unit,
@@ -45,8 +43,6 @@ fun CalendarTopBar(
         ) {
             CalendarDaySelector(
                 currentDate = currentDateFormatted,
-                onPrevious = onPrevious,
-                onNext = onNext,
                 openDayPicker = openDayPicker,
             )
         }
@@ -73,8 +69,6 @@ internal fun PreviewCalendarTopBar() {
     ) {
         CalendarTopBar(
             currentDateFormatted = "30 Nov",
-            onPrevious = {},
-            onNext = {},
             openDayPicker = {},
             goToToday = {},
             onMenuClick = {},
@@ -94,8 +88,6 @@ internal fun PreviewCalendarTopBarToday() {
     ) {
         CalendarTopBar(
             currentDateFormatted = "30 Nov",
-            onPrevious = {},
-            onNext = {},
             openDayPicker = {},
             goToToday = {},
             onMenuClick = {},

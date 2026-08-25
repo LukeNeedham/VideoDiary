@@ -5,6 +5,7 @@ import android.view.ViewGroup
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.net.toUri
 import androidx.media3.common.MediaItem
@@ -19,7 +20,8 @@ import org.koin.compose.getKoin
 @Composable
 fun VideoPlayerExo(
     video: Video,
-    controller: VideoPlayerController
+    controller: VideoPlayerController,
+    modifier: Modifier = Modifier,
 ) {
     val videoPlayerHolder: VideoPlayerHolder = getKoin().get()
 
@@ -64,6 +66,7 @@ fun VideoPlayerExo(
     }
 
     AndroidView(
+        modifier = modifier,
         factory = {
             val view = TextureView(it)
             view.layoutParams = ViewGroup.LayoutParams(
