@@ -38,6 +38,18 @@ class VideosDao(
         refreshVideosState()
     }
 
+    /**
+     * Deletes a freshly recorded video from MediaStore (e.g. one the user chose not to keep,
+     * after comparing it against an existing video for that day).
+     */
+    fun discardMediaStoreVideo(videoContentUri: Uri) {
+        try {
+            context.contentResolver.delete(videoContentUri, null, null)
+        } catch (e: Exception) {
+            Logger.error("Error discarding video", e)
+        }
+    }
+
     fun persistVideo(videoContentUri: Uri, date: LocalDate) {
         try {
             val projection = arrayOf(MediaStore.Video.Media.DATA)

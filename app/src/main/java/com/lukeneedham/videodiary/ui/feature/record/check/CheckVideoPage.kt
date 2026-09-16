@@ -10,9 +10,9 @@ import androidx.compose.ui.graphics.Color
 @Composable
 fun CheckVideoPage(
     viewModel: CheckVideoViewModel,
-    onCancelClick: () -> Unit,
-    onRetakeClick: () -> Unit,
-    onAccepted: () -> Unit,
+    onKeepExisting: () -> Unit,
+    onRetake: () -> Unit,
+    onKeepNew: () -> Unit,
 ) {
     Box(
         modifier = Modifier
@@ -22,14 +22,25 @@ fun CheckVideoPage(
         val videoAspectRatio = viewModel.videoAspectRatio
         if (videoAspectRatio != null) {
             CheckVideoPageContent(
-                onCancelClick = onCancelClick,
-                onRetakeClick = onRetakeClick,
-                onAccepted = {
-                    viewModel.acceptVideo()
-                    onAccepted()
-                },
-                video = viewModel.video,
+                existingVideo = viewModel.existingVideo,
+                newVideo = viewModel.newVideo,
                 videoAspectRatio = videoAspectRatio,
+                onCloseClick = {
+                    viewModel.discardNewVideo()
+                    onKeepExisting()
+                },
+                onRetakeClick = {
+                    viewModel.discardNewVideo()
+                    onRetake()
+                },
+                onExistingVideoSelected = {
+                    viewModel.discardNewVideo()
+                    onKeepExisting()
+                },
+                onNewVideoSelected = {
+                    viewModel.keepNewVideo()
+                    onKeepNew()
+                },
             )
         }
     }

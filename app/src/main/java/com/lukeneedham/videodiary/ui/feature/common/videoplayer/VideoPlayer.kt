@@ -28,6 +28,9 @@ fun VideoPlayer(
     thumbnailFile: File? = null,
     // False when a caller hosts its own persistent VideoPlayerExo elsewhere instead.
     showPlayer: Boolean = true,
+    // True when this video must play simultaneously with another (e.g. a side-by-side
+    // comparison), rather than sharing the single app-wide player.
+    usesDedicatedPlayer: Boolean = false,
     modifier: Modifier = Modifier
 ) {
     Box(
@@ -52,10 +55,17 @@ fun VideoPlayer(
             VideoThumbnail(thumbnailFile)
 
             if (showPlayer && isCurrent) {
-                VideoPlayerExo(
-                    video = video,
-                    controller = controller,
-                )
+                if (usesDedicatedPlayer) {
+                    VideoPlayerExoStandalone(
+                        video = video,
+                        controller = controller,
+                    )
+                } else {
+                    VideoPlayerExo(
+                        video = video,
+                        controller = controller,
+                    )
+                }
             }
         }
     }

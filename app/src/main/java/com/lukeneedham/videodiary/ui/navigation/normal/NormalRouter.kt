@@ -94,11 +94,11 @@ fun NormalRouter(
                     viewModel = koinViewModel {
                         parametersOf(page.date, page.videoContentUri)
                     },
-                    onRetakeClick = {
+                    onRetake = {
                         pop()
                     },
-                    onAccepted = returnToCalendar,
-                    onCancelClick = returnToCalendar,
+                    onKeepExisting = returnToCalendar,
+                    onKeepNew = returnToCalendar,
                 )
             }
 
