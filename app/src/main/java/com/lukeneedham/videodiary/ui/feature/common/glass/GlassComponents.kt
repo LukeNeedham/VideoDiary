@@ -36,6 +36,7 @@ import com.lukeneedham.videodiary.ui.theme.AccentAccept
 import com.lukeneedham.videodiary.ui.theme.AccentRecord
 import com.lukeneedham.videodiary.ui.theme.GlassBorder
 import com.lukeneedham.videodiary.ui.theme.GlassFill
+import com.lukeneedham.videodiary.ui.theme.GlassFillStrong
 
 /**
  * A translucent "glass" panel, intended to float over full-bleed video/camera content.
@@ -44,13 +45,15 @@ import com.lukeneedham.videodiary.ui.theme.GlassFill
 fun GlassSurface(
     modifier: Modifier = Modifier,
     shape: Shape = RoundedCornerShape(20.dp),
+    fill: Color = GlassFill,
+    border: Color = GlassBorder,
     content: @Composable BoxScope.() -> Unit,
 ) {
     Box(
         modifier = modifier
             .clip(shape)
-            .background(GlassFill, shape)
-            .border(width = 1.dp, color = GlassBorder, shape = shape),
+            .background(fill, shape)
+            .border(width = 1.dp, color = border, shape = shape),
         content = content,
     )
 }
@@ -63,11 +66,14 @@ fun GlassIconButton(
     modifier: Modifier = Modifier,
     tint: Color = Color.White,
     enabled: Boolean = true,
+    selected: Boolean = false,
     size: Dp = 50.dp,
     iconSize: Dp = 24.dp,
 ) {
     GlassSurface(
         shape = CircleShape,
+        fill = if (selected) GlassFillStrong else GlassFill,
+        border = if (selected) Color.White.copy(alpha = 0.7f) else GlassBorder,
         modifier = modifier
             .size(size)
             .alpha(if (enabled) 1f else 0.4f)

@@ -8,12 +8,14 @@ import androidx.camera.video.Quality
 import androidx.camera.video.QualitySelector
 import androidx.camera.video.Recorder
 import androidx.camera.video.VideoCapture
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.lifecycle.Observer
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -38,6 +40,8 @@ import com.lukeneedham.videodiary.ui.feature.common.videoplayer.VideoToolbarLayo
 import com.lukeneedham.videodiary.ui.feature.record.film.component.CameraControlSlider
 import com.lukeneedham.videodiary.ui.feature.record.film.component.RecordingCountdownButton
 
+private enum class CameraControlType { BRIGHTNESS, ZOOM }
+
 @Composable
 fun RecordVideoPageContent(
     videoDurationMillis: Long,
@@ -54,6 +58,7 @@ fun RecordVideoPageContent(
     var camera: Camera? by remember { mutableStateOf(null) }
     var brightnessValue by remember { mutableFloatStateOf(Float.NaN) }
     var zoomValue by remember { mutableFloatStateOf(Float.NaN) }
+    var activeControl: CameraControlType? by remember { mutableStateOf(null) }
 
     LaunchedEffect(camera) {
         val cam = camera ?: return@LaunchedEffect
@@ -131,19 +136,9 @@ fun RecordVideoPageContent(
 
     VideoToolbarLayout(
         videoAspectRatio = videoAspectRatio,
-        topOverlay = {
-            GlassIconButton(
-                iconRes = R.drawable.close,
-                contentDescription = "Close",
-                onClick = onBack,
-                modifier = Modifier
-                    .align(Alignment.TopStart)
-                    .padding(16.dp)
-            )
-        },
+        topOverlay = {},
         bottomBar = {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
+            Box(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(horizontal = 8.dp)
@@ -153,8 +148,10 @@ fun RecordVideoPageContent(
                 val exposureRange = exposureState?.exposureCompensationRange
                 val supportsExposure = exposureRange != null
                         && exposureRange.lower < exposureRange.upper
+                        && !brightnessValue.isNaN()
+                val supportsZoom = cam != null && !zoomValue.isNaN()
 
-                if (supportsExposure && !brightnessValue.isNaN() && cam != null && exposureRange != null) {
+                if (activeControl == CameraControlType.BRIGHTNESS && supportsExposure && cam != null && exposureRange != null) {
                     CameraControlSlider(
                         value = brightnessValue,
                         onValueChange = { newValue ->
@@ -165,13 +162,36 @@ fun RecordVideoPageContent(
                         },
                         iconRes = R.drawable.brightness,
                         contentDescription = "Brightness",
-                        modifier = Modifier.weight(1f),
+                        modifier = Modifier
+                            .align(Alignment.TopCenter)
+                            .width(200.dp),
                     )
-                } else {
-                    Spacer(modifier = Modifier.weight(1f))
+                } else if (activeControl == CameraControlType.ZOOM && supportsZoom && cam != null) {
+                    CameraControlSlider(
+                        value = zoomValue,
+                        onValueChange = { newValue ->
+                            zoomValue = newValue
+                            cam.cameraControl.setLinearZoom(newValue)
+                        },
+                        iconRes = R.drawable.zoom,
+                        contentDescription = "Zoom",
+                        modifier = Modifier
+                            .align(Alignment.TopCenter)
+                            .width(200.dp),
+                    )
                 }
 
+                GlassIconButton(
+                    iconRes = R.drawable.close,
+                    contentDescription = "Close",
+                    onClick = onBack,
+                    modifier = Modifier
+                        .align(Alignment.CenterStart)
+                        .padding(horizontal = 8.dp),
+                )
+
                 val centerButtonModifier = Modifier
+                    .align(Alignment.Center)
                     .padding(vertical = 10.dp, horizontal = 5.dp)
                     .fillMaxHeight()
                     .aspectRatio(1f)
@@ -196,19 +216,41 @@ fun RecordVideoPageContent(
                     )
                 }
 
-                if (cam != null && !zoomValue.isNaN()) {
-                    CameraControlSlider(
-                        value = zoomValue,
-                        onValueChange = { newValue ->
-                            zoomValue = newValue
-                            cam.cameraControl.setLinearZoom(newValue)
-                        },
-                        iconRes = R.drawable.zoom,
-                        contentDescription = "Zoom",
-                        modifier = Modifier.weight(1f),
-                    )
-                } else {
-                    Spacer(modifier = Modifier.weight(1f))
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    modifier = Modifier
+                        .align(Alignment.CenterEnd)
+                        .padding(horizontal = 8.dp),
+                ) {
+                    if (supportsExposure) {
+                        GlassIconButton(
+                            iconRes = R.drawable.brightness,
+                            contentDescription = "Brightness",
+                            selected = activeControl == CameraControlType.BRIGHTNESS,
+                            onClick = {
+                                activeControl = if (activeControl == CameraControlType.BRIGHTNESS) {
+                                    null
+                                } else {
+                                    CameraControlType.BRIGHTNESS
+                                }
+                            },
+                        )
+                    }
+
+                    if (supportsZoom) {
+                        GlassIconButton(
+                            iconRes = R.drawable.zoom,
+                            contentDescription = "Zoom",
+                            selected = activeControl == CameraControlType.ZOOM,
+                            onClick = {
+                                activeControl = if (activeControl == CameraControlType.ZOOM) {
+                                    null
+                                } else {
+                                    CameraControlType.ZOOM
+                                }
+                            },
+                        )
+                    }
                 }
             }
         },
