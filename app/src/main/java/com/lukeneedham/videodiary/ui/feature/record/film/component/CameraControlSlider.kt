@@ -6,9 +6,9 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
@@ -25,7 +25,12 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.lukeneedham.videodiary.R
+import com.lukeneedham.videodiary.ui.feature.common.glass.GlassSurface
 
+/**
+ * A floating "glass" panel containing a labelled slider, intended to pop up just above the
+ * bottom bar when the corresponding control button (e.g. brightness/zoom) is toggled on.
+ */
 @Composable
 fun CameraControlSlider(
     value: Float,
@@ -39,65 +44,70 @@ fun CameraControlSlider(
     val touchTargetHeightDp = 44.dp
     val thumbRadiusPx = with(LocalDensity.current) { thumbRadiusDp.toPx() }
 
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
+    GlassSurface(
         modifier = modifier,
     ) {
-        Image(
-            painter = painterResource(iconRes),
-            contentDescription = contentDescription,
-            colorFilter = ColorFilter.tint(Color.White),
-            modifier = Modifier.size(20.dp),
-        )
-
-
-        Canvas(
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
                 .fillMaxWidth()
-                .height(touchTargetHeightDp)
-                .pointerInput(Unit) {
-                    awaitEachGesture {
-                        val down = awaitFirstDown()
-                        val trackLeft = thumbRadiusPx
-                        val trackRight = size.width - thumbRadiusPx
-                        val trackWidth = trackRight - trackLeft
+                .padding(horizontal = 16.dp, vertical = 10.dp),
+        ) {
+            Image(
+                painter = painterResource(iconRes),
+                contentDescription = contentDescription,
+                colorFilter = ColorFilter.tint(Color.White),
+                modifier = Modifier.size(20.dp),
+            )
 
-                        fun valueFromX(x: Float): Float {
-                            return ((x - trackLeft) / trackWidth).coerceIn(0f, 1f)
-                        }
+            Canvas(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(touchTargetHeightDp)
+                    .pointerInput(Unit) {
+                        awaitEachGesture {
+                            val down = awaitFirstDown()
+                            val trackLeft = thumbRadiusPx
+                            val trackRight = size.width - thumbRadiusPx
+                            val trackWidth = trackRight - trackLeft
 
-                        onValueChange(valueFromX(down.position.x))
-                        down.consume()
+                            fun valueFromX(x: Float): Float {
+                                return ((x - trackLeft) / trackWidth).coerceIn(0f, 1f)
+                            }
 
-                        while (true) {
-                            val event = awaitPointerEvent()
-                            val change = event.changes.firstOrNull() ?: break
-                            if (!change.pressed) break
-                            change.consume()
-                            onValueChange(valueFromX(change.position.x))
+                            onValueChange(valueFromX(down.position.x))
+                            down.consume()
+
+                            while (true) {
+                                val event = awaitPointerEvent()
+                                val change = event.changes.firstOrNull() ?: break
+                                if (!change.pressed) break
+                                change.consume()
+                                onValueChange(valueFromX(change.position.x))
+                            }
                         }
                     }
-                }
-        ) {
-            val centerY = size.height / 2
-            val trackLeft = thumbRadiusPx
-            val trackRight = size.width - thumbRadiusPx
-            val trackWidth = trackRight - trackLeft
-            val trackHeightPx = trackHeightDp.toPx()
+            ) {
+                val centerY = size.height / 2
+                val trackLeft = thumbRadiusPx
+                val trackRight = size.width - thumbRadiusPx
+                val trackWidth = trackRight - trackLeft
+                val trackHeightPx = trackHeightDp.toPx()
 
-            drawRoundRect(
-                color = Color.White.copy(alpha = 0.3f),
-                topLeft = Offset(trackLeft, centerY - trackHeightPx / 2),
-                size = Size(trackWidth, trackHeightPx),
-                cornerRadius = CornerRadius(trackHeightPx / 2),
-            )
+                drawRoundRect(
+                    color = Color.White.copy(alpha = 0.3f),
+                    topLeft = Offset(trackLeft, centerY - trackHeightPx / 2),
+                    size = Size(trackWidth, trackHeightPx),
+                    cornerRadius = CornerRadius(trackHeightPx / 2),
+                )
 
-            val thumbX = trackLeft + trackWidth * value
-            drawCircle(
-                color = Color(0xFFDDDDDD),
-                radius = thumbRadiusPx,
-                center = Offset(thumbX, centerY),
-            )
+                val thumbX = trackLeft + trackWidth * value
+                drawCircle(
+                    color = Color(0xFFDDDDDD),
+                    radius = thumbRadiusPx,
+                    center = Offset(thumbX, centerY),
+                )
+            }
         }
     }
 }
@@ -106,7 +116,9 @@ fun CameraControlSlider(
 @Composable
 private fun Preview() {
     Column(
-        modifier = Modifier.background(Color.Black),
+        modifier = Modifier
+            .background(Color.Black)
+            .padding(20.dp),
     ) {
         CameraControlSlider(
             value = 0.5f,
