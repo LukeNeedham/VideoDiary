@@ -13,6 +13,7 @@ import com.lukeneedham.videodiary.ui.feature.exportdiary.progress.ExportDiaryPro
 import com.lukeneedham.videodiary.ui.feature.exportdiary.view.ExportDiaryViewPage
 import com.lukeneedham.videodiary.ui.feature.record.check.CheckVideoPage
 import com.lukeneedham.videodiary.ui.feature.record.film.RecordVideoPage
+import com.lukeneedham.videodiary.ui.feature.record.film.RecordVideoViewModel
 import dev.olshevski.navigation.reimagined.NavBackHandler
 import dev.olshevski.navigation.reimagined.NavHost
 import dev.olshevski.navigation.reimagined.navigate
@@ -62,18 +63,28 @@ fun NormalRouter(
                 share = share,
             )
 
-            is NormalPage.RecordVideo -> RecordVideoPage(
-                viewModel = koinViewModel(),
-                onRecordingFinished = { videoContentUri ->
-                    navigate(
-                        NormalPage.CheckVideo(
-                            date = page.date,
-                            videoContentUri = videoContentUri,
-                        )
-                    )
-                },
-                onBack = onBack,
-            )
+            is NormalPage.RecordVideo -> {
+                val viewModel = koinViewModel<RecordVideoViewModel> {
+                    parametersOf(page.date)
+                }
+                RecordVideoPage(
+                    viewModel = viewModel,
+                    onRecordingFinished = { videoContentUri ->
+                        if (viewModel.hasExistingVideo) {
+                            navigate(
+                                NormalPage.CheckVideo(
+                                    date = page.date,
+                                    videoContentUri = videoContentUri,
+                                )
+                            )
+                        } else {
+                            viewModel.persistVideoDirectly(videoContentUri)
+                            navController.popUpTo { it is NormalPage.Calendar }
+                        }
+                    },
+                    onBack = onBack,
+                )
+            }
 
             is NormalPage.CheckVideo -> {
                 val returnToCalendar: () -> Unit = {

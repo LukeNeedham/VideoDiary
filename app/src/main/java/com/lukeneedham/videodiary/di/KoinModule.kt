@@ -159,10 +159,12 @@ object KoinModule {
                 ioDispatcher = get(KoinQualifier.Dispatcher.io),
             )
         }
-        viewModel {
+        viewModel { (date: LocalDate) ->
             RecordVideoViewModel(
+                date = date,
                 settingsDao = get(),
                 videoResolutionRepository = get(),
+                videosDao = get(),
             )
         }
         viewModel { (date: LocalDate, videoContentUri: Uri) ->
