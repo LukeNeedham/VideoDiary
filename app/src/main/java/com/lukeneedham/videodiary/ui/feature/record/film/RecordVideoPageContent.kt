@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.lifecycle.Observer
@@ -22,22 +23,26 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import com.lukeneedham.videodiary.R
 import com.lukeneedham.videodiary.domain.util.logger.Logger
 import com.lukeneedham.videodiary.ui.feature.common.camera.CameraInput
-import com.lukeneedham.videodiary.ui.feature.common.glass.GlassIconButton
 import com.lukeneedham.videodiary.ui.feature.common.glass.GlassRecordButton
 import com.lukeneedham.videodiary.ui.feature.common.videoplayer.VideoToolbarLayout
 import com.lukeneedham.videodiary.ui.feature.record.film.component.CameraControlSlider
+import com.lukeneedham.videodiary.ui.feature.record.film.component.RecordBarIconButton
 import com.lukeneedham.videodiary.ui.feature.record.film.component.RecordingCountdownButton
 
 private enum class CameraControlType { BRIGHTNESS, ZOOM }
@@ -134,6 +139,10 @@ fun RecordVideoPageContent(
         }
     }
 
+    val density = LocalDensity.current
+    var popupHeightPx by remember { mutableIntStateOf(0) }
+    val popupGapPx = with(density) { 8.dp.roundToPx() }
+
     VideoToolbarLayout(
         videoAspectRatio = videoAspectRatio,
         topOverlay = {},
@@ -151,6 +160,14 @@ fun RecordVideoPageContent(
                         && !brightnessValue.isNaN()
                 val supportsZoom = cam != null && !zoomValue.isNaN()
 
+                // Positioned to float just above the bar, overlapping the video, rather than
+                // inline where it would collide with the buttons below.
+                val popupModifier = Modifier
+                    .align(Alignment.TopCenter)
+                    .offset { IntOffset(0, -(popupHeightPx + popupGapPx)) }
+                    .onSizeChanged { popupHeightPx = it.height }
+                    .width(200.dp)
+
                 if (activeControl == CameraControlType.BRIGHTNESS && supportsExposure && cam != null && exposureRange != null) {
                     CameraControlSlider(
                         value = brightnessValue,
@@ -162,9 +179,7 @@ fun RecordVideoPageContent(
                         },
                         iconRes = R.drawable.brightness,
                         contentDescription = "Brightness",
-                        modifier = Modifier
-                            .align(Alignment.TopCenter)
-                            .width(200.dp),
+                        modifier = popupModifier,
                     )
                 } else if (activeControl == CameraControlType.ZOOM && supportsZoom && cam != null) {
                     CameraControlSlider(
@@ -175,13 +190,11 @@ fun RecordVideoPageContent(
                         },
                         iconRes = R.drawable.zoom,
                         contentDescription = "Zoom",
-                        modifier = Modifier
-                            .align(Alignment.TopCenter)
-                            .width(200.dp),
+                        modifier = popupModifier,
                     )
                 }
 
-                GlassIconButton(
+                RecordBarIconButton(
                     iconRes = R.drawable.close,
                     contentDescription = "Close",
                     onClick = onBack,
@@ -223,7 +236,7 @@ fun RecordVideoPageContent(
                         .padding(horizontal = 8.dp),
                 ) {
                     if (supportsExposure) {
-                        GlassIconButton(
+                        RecordBarIconButton(
                             iconRes = R.drawable.brightness,
                             contentDescription = "Brightness",
                             selected = activeControl == CameraControlType.BRIGHTNESS,
@@ -238,7 +251,7 @@ fun RecordVideoPageContent(
                     }
 
                     if (supportsZoom) {
-                        GlassIconButton(
+                        RecordBarIconButton(
                             iconRes = R.drawable.zoom,
                             contentDescription = "Zoom",
                             selected = activeControl == CameraControlType.ZOOM,
