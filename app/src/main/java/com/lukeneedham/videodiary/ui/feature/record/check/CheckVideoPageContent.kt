@@ -1,7 +1,6 @@
 package com.lukeneedham.videodiary.ui.feature.record.check
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -27,6 +26,7 @@ import com.lukeneedham.videodiary.ui.feature.common.videoplayer.VideoPlayerContr
 import com.lukeneedham.videodiary.ui.feature.record.check.component.CheckVideoTile
 import com.lukeneedham.videodiary.ui.feature.record.check.component.ChooseVideoButton
 import com.lukeneedham.videodiary.ui.feature.record.film.component.RecordBarIconButton
+import com.lukeneedham.videodiary.ui.theme.GlassFillStrong
 import com.lukeneedham.videodiary.ui.theme.Typography
 
 @Composable
@@ -96,7 +96,7 @@ fun CheckVideoPageContent(
                 .fillMaxWidth()
                 .statusBarsPadding()
                 .padding(horizontal = 16.dp)
-                .padding(top = 16.dp, bottom = 8.dp),
+                .padding(top = 32.dp, bottom = 24.dp),
         )
 
         // Each tile keeps the video's true aspect ratio, so side by side they're only half as
@@ -125,70 +125,68 @@ fun CheckVideoPageContent(
             )
         }
 
-        Box(
+        Column(
             modifier = Modifier
                 .weight(1f)
                 .fillMaxWidth()
                 .navigationBarsPadding()
-                .padding(horizontal = 16.dp, vertical = 8.dp),
+                .padding(horizontal = 16.dp)
+                .padding(top = 8.dp),
         ) {
-            Column(
-                verticalArrangement = Arrangement.Center,
-                modifier = Modifier.fillMaxSize(),
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                modifier = Modifier.fillMaxWidth(),
             ) {
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(12.dp),
-                    modifier = Modifier.fillMaxWidth(),
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier.weight(1f),
                 ) {
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        modifier = Modifier.weight(1f),
-                    ) {
-                        val muteIcon =
-                            if (existingController.isVolumeOn) R.drawable.volume_on else R.drawable.volume_off
-                        RecordBarIconButton(
-                            iconRes = muteIcon,
-                            contentDescription = "Toggle existing video sound",
-                            onClick = toggleExistingVolume,
-                        )
-                        Spacer(Modifier.height(4.dp))
-                        ChooseVideoButton(
-                            label = "EXISTING",
-                            onClick = onExistingVideoSelected,
-                            modifier = Modifier.fillMaxWidth(),
-                        )
-                    }
-
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        modifier = Modifier.weight(1f),
-                    ) {
-                        val muteIcon =
-                            if (newController.isVolumeOn) R.drawable.volume_on else R.drawable.volume_off
-                        RecordBarIconButton(
-                            iconRes = muteIcon,
-                            contentDescription = "Toggle new video sound",
-                            onClick = toggleNewVolume,
-                        )
-                        Spacer(Modifier.height(4.dp))
-                        ChooseVideoButton(
-                            label = "NEW",
-                            onClick = onNewVideoSelected,
-                            modifier = Modifier.fillMaxWidth(),
-                        )
-                    }
+                    val muteIcon =
+                        if (existingController.isVolumeOn) R.drawable.volume_on else R.drawable.volume_off
+                    RecordBarIconButton(
+                        iconRes = muteIcon,
+                        contentDescription = "Toggle existing video sound",
+                        onClick = toggleExistingVolume,
+                    )
+                    Spacer(Modifier.height(30.dp))
+                    ChooseVideoButton(
+                        label = "EXISTING",
+                        onClick = onExistingVideoSelected,
+                        modifier = Modifier.fillMaxWidth(),
+                    )
                 }
 
-                Spacer(Modifier.height(12.dp))
-
-                GlassButton(
-                    text = "Retake",
-                    onClick = onRetakeClick,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(56.dp),
-                )
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier.weight(1f),
+                ) {
+                    val muteIcon =
+                        if (newController.isVolumeOn) R.drawable.volume_on else R.drawable.volume_off
+                    RecordBarIconButton(
+                        iconRes = muteIcon,
+                        contentDescription = "Toggle new video sound",
+                        onClick = toggleNewVolume,
+                    )
+                    Spacer(Modifier.height(30.dp))
+                    ChooseVideoButton(
+                        label = "NEW",
+                        onClick = onNewVideoSelected,
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                }
             }
+
+            Spacer(Modifier.height(20.dp))
+
+            GlassButton(
+                text = "Retake",
+                iconRes = R.drawable.retake,
+                containerColor = GlassFillStrong,
+                onClick = onRetakeClick,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(56.dp),
+            )
         }
     }
 }

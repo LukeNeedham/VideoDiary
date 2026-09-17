@@ -12,12 +12,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.lukeneedham.videodiary.ui.feature.common.glass.GlassSurface
+import com.lukeneedham.videodiary.ui.theme.GlassFillStrong
 import com.lukeneedham.videodiary.ui.theme.Typography
 
 /**
  * A two-line "glass" button used to pick which of the two compared videos to keep: a small
- * "CHOOSE" label above the larger [label] naming the video (e.g. "EXISTING"/"NEW").
+ * "Choose" label above the larger [label] naming the video (e.g. "EXISTING"/"NEW").
  */
 @Composable
 fun ChooseVideoButton(
@@ -26,20 +28,21 @@ fun ChooseVideoButton(
     modifier: Modifier = Modifier,
 ) {
     GlassSurface(
-        shape = RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(20.dp),
+        fillColor = GlassFillStrong,
         modifier = modifier.clickable(onClick = onClick),
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
                 .align(Alignment.Center)
-                .padding(vertical = 10.dp, horizontal = 8.dp),
+                .padding(vertical = 14.dp, horizontal = 8.dp),
         ) {
             Text(
-                text = "CHOOSE",
+                text = "Choose",
                 color = Color.White.copy(alpha = 0.7f),
                 fontWeight = FontWeight.SemiBold,
-                fontSize = Typography.Size.extraSmall,
+                fontSize = 11.sp,
             )
             Text(
                 text = label,

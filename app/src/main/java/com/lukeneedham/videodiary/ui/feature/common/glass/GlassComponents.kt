@@ -9,11 +9,13 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Text
@@ -44,12 +46,13 @@ import com.lukeneedham.videodiary.ui.theme.GlassFill
 fun GlassSurface(
     modifier: Modifier = Modifier,
     shape: Shape = RoundedCornerShape(20.dp),
+    fillColor: Color = GlassFill,
     content: @Composable BoxScope.() -> Unit,
 ) {
     Box(
         modifier = modifier
             .clip(shape)
-            .background(GlassFill, shape)
+            .background(fillColor, shape)
             .border(width = 1.dp, color = GlassBorder, shape = shape),
         content = content,
     )
@@ -91,22 +94,38 @@ fun GlassButton(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     contentColor: Color = Color.White,
+    containerColor: Color = GlassFill,
+    iconRes: Int? = null,
 ) {
     GlassSurface(
         shape = RoundedCornerShape(16.dp),
+        fillColor = containerColor,
         modifier = modifier
             .heightIn(min = 48.dp)
             .alpha(if (enabled) 1f else 0.4f)
             .clickable(enabled = enabled, onClick = onClick),
     ) {
-        Text(
-            text = text,
-            color = contentColor,
-            textAlign = TextAlign.Center,
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .align(Alignment.Center)
                 .padding(horizontal = 22.dp, vertical = 12.dp),
-        )
+        ) {
+            if (iconRes != null) {
+                Image(
+                    painter = painterResource(iconRes),
+                    contentDescription = null,
+                    colorFilter = ColorFilter.tint(contentColor),
+                    modifier = Modifier.size(22.dp),
+                )
+                Spacer(modifier = Modifier.width(10.dp))
+            }
+            Text(
+                text = text,
+                color = contentColor,
+                textAlign = TextAlign.Center,
+            )
+        }
     }
 }
 
