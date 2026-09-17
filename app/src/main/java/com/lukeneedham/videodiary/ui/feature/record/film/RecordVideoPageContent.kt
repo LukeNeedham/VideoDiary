@@ -145,7 +145,6 @@ fun RecordVideoPageContent(
 
     VideoToolbarLayout(
         videoAspectRatio = videoAspectRatio,
-        topOverlay = {},
         bottomBar = {
             Box(
                 modifier = Modifier
