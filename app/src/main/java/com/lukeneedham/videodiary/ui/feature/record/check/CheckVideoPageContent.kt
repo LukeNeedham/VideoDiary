@@ -1,103 +1,193 @@
 package com.lukeneedham.videodiary.ui.feature.record.check
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.lukeneedham.videodiary.R
 import com.lukeneedham.videodiary.domain.model.Video
-import com.lukeneedham.videodiary.ui.feature.common.glass.GlassAcceptButton
-import com.lukeneedham.videodiary.ui.feature.common.glass.GlassIconButton
-import com.lukeneedham.videodiary.ui.feature.common.videoplayer.VideoPlayer
+import com.lukeneedham.videodiary.ui.feature.common.glass.GlassButton
 import com.lukeneedham.videodiary.ui.feature.common.videoplayer.VideoPlayerController
-import com.lukeneedham.videodiary.ui.feature.common.videoplayer.VideoToolbarLayout
+import com.lukeneedham.videodiary.ui.feature.record.check.component.CheckVideoTile
+import com.lukeneedham.videodiary.ui.feature.record.check.component.ChooseVideoButton
+import com.lukeneedham.videodiary.ui.feature.record.film.component.RecordBarIconButton
+import com.lukeneedham.videodiary.ui.theme.GlassFillStrong
+import com.lukeneedham.videodiary.ui.theme.Typography
 
 @Composable
 fun CheckVideoPageContent(
-    video: Video,
+    existingVideo: Video,
+    newVideo: Video,
     videoAspectRatio: Float,
-    onCancelClick: () -> Unit,
     onRetakeClick: () -> Unit,
-    onAccepted: () -> Unit,
+    onExistingVideoSelected: () -> Unit,
+    onNewVideoSelected: () -> Unit,
 ) {
-    val videoPlayerController = remember {
-        VideoPlayerController().apply {
-            playingVideo = video
+    val existingController = remember {
+        VideoPlayerController().apply { playingVideo = existingVideo }
+    }
+    val newController = remember {
+        VideoPlayerController().apply { playingVideo = newVideo }
+    }
+
+    // Pressing and holding either video pauses both, so the user can compare a paused frame
+    // without one video racing ahead of the other.
+    val pauseBoth: () -> Unit = remember(existingController, newController) {
+        {
+            existingController.temporaryPause()
+            newController.temporaryPause()
         }
     }
-    VideoToolbarLayout(
-        videoAspectRatio = videoAspectRatio,
-        topOverlay = {
-            GlassIconButton(
-                iconRes = R.drawable.close,
-                contentDescription = "Cancel",
-                onClick = onCancelClick,
-                modifier = Modifier
-                    .align(Alignment.TopStart)
-                    .padding(16.dp)
+    val resumeBoth: () -> Unit = remember(existingController, newController) {
+        {
+            existingController.temporaryResume()
+            newController.temporaryResume()
+        }
+    }
+
+    // Only one video can be audible at a time: unmuting one forcibly mutes the other, but both
+    // can be muted together.
+    val toggleExistingVolume: () -> Unit = remember(existingController, newController) {
+        {
+            if (existingController.isVolumeOn) {
+                existingController.isVolumeOn = false
+            } else {
+                existingController.isVolumeOn = true
+                newController.isVolumeOn = false
+            }
+        }
+    }
+    val toggleNewVolume: () -> Unit = remember(existingController, newController) {
+        {
+            if (newController.isVolumeOn) {
+                newController.isVolumeOn = false
+            } else {
+                newController.isVolumeOn = true
+                existingController.isVolumeOn = false
+            }
+        }
+    }
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize(),
+    ) {
+        Text(
+            text = "Choose the video to keep",
+            color = Color.White,
+            fontSize = Typography.Size.medium,
+            textAlign = TextAlign.Center,
+            modifier = Modifier
+                .fillMaxWidth()
+                .statusBarsPadding()
+                .padding(horizontal = 16.dp)
+                .padding(top = 32.dp, bottom = 24.dp),
+        )
+
+        // Each tile keeps the video's true aspect ratio, so side by side they're only half as
+        // tall as a single full-width video would be - sized to that actual content height
+        // (rather than a full-width video's slot height) so the controls below have room to
+        // breathe.
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(2.dp),
+            modifier = Modifier.fillMaxWidth(),
+        ) {
+            CheckVideoTile(
+                video = existingVideo,
+                controller = existingController,
+                aspectRatio = videoAspectRatio,
+                onPress = pauseBoth,
+                onRelease = resumeBoth,
+                modifier = Modifier.weight(1f),
             )
-        },
-        bottomBar = {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(horizontal = 16.dp)
+            CheckVideoTile(
+                video = newVideo,
+                controller = newController,
+                aspectRatio = videoAspectRatio,
+                onPress = pauseBoth,
+                onRelease = resumeBoth,
+                modifier = Modifier.weight(1f),
+            )
+        }
+
+        Column(
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxWidth()
+                .navigationBarsPadding()
+                .padding(horizontal = 16.dp)
+                .padding(top = 8.dp),
+        ) {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                modifier = Modifier.fillMaxWidth(),
             ) {
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(12.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.align(Alignment.CenterStart)
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier.weight(1f),
                 ) {
                     val muteIcon =
-                        if (videoPlayerController.isVolumeOn) R.drawable.volume_on else R.drawable.volume_off
-                    GlassIconButton(
+                        if (existingController.isVolumeOn) R.drawable.volume_on else R.drawable.volume_off
+                    RecordBarIconButton(
                         iconRes = muteIcon,
-                        contentDescription = "Toggle sound",
-                        onClick = { videoPlayerController.toggleVolumeOn() },
+                        contentDescription = "Toggle existing video sound",
+                        onClick = toggleExistingVolume,
                     )
-
-                    val isPlaying = !videoPlayerController.isTogglePaused
-                    val playIcon = if (isPlaying) R.drawable.pause else R.drawable.play
-                    GlassIconButton(
-                        iconRes = playIcon,
-                        contentDescription = "Play/pause",
-                        onClick = { videoPlayerController.toggleIsPlaying() },
+                    Spacer(Modifier.height(30.dp))
+                    ChooseVideoButton(
+                        label = "EXISTING",
+                        onClick = onExistingVideoSelected,
+                        modifier = Modifier.fillMaxWidth(),
                     )
                 }
 
-                GlassAcceptButton(
-                    onClick = onAccepted,
-                    modifier = Modifier
-                        .align(Alignment.Center)
-                        .padding(vertical = 10.dp)
-                        .fillMaxHeight()
-                        .aspectRatio(1f)
-                )
-
-                GlassIconButton(
-                    iconRes = R.drawable.retake,
-                    contentDescription = "Retake",
-                    onClick = onRetakeClick,
-                    modifier = Modifier.align(Alignment.CenterEnd)
-                )
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier.weight(1f),
+                ) {
+                    val muteIcon =
+                        if (newController.isVolumeOn) R.drawable.volume_on else R.drawable.volume_off
+                    RecordBarIconButton(
+                        iconRes = muteIcon,
+                        contentDescription = "Toggle new video sound",
+                        onClick = toggleNewVolume,
+                    )
+                    Spacer(Modifier.height(30.dp))
+                    ChooseVideoButton(
+                        label = "NEW",
+                        onClick = onNewVideoSelected,
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                }
             }
-        },
-    ) { aspectRatio ->
-        VideoPlayer(
-            video = video,
-            aspectRatio = aspectRatio,
-            controller = videoPlayerController,
-            modifier = Modifier.fillMaxSize(),
-        )
+
+            Spacer(Modifier.height(20.dp))
+
+            GlassButton(
+                text = "Retake",
+                iconRes = R.drawable.retake,
+                containerColor = GlassFillStrong,
+                onClick = onRetakeClick,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(56.dp),
+            )
+        }
     }
 }
 
@@ -105,10 +195,11 @@ fun CheckVideoPageContent(
 @Composable
 internal fun PreviewCheckVideoPageContent() {
     CheckVideoPageContent(
-        video = MockDataCheckVideo.video,
-        videoAspectRatio = 1f,
+        existingVideo = MockDataCheckVideo.existingVideo,
+        newVideo = MockDataCheckVideo.newVideo,
+        videoAspectRatio = 0.5625f,
         onRetakeClick = {},
-        onAccepted = {},
-        onCancelClick = {},
+        onExistingVideoSelected = {},
+        onNewVideoSelected = {},
     )
 }
