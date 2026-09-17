@@ -47,7 +47,6 @@ fun CalendarScroller(
     onRecordVideoClick: (date: LocalDate) -> Unit,
     onDeleteVideoClick: (date: LocalDate) -> Unit,
     openDayPicker: () -> Unit,
-    goToToday: () -> Unit,
     onMenuClick: () -> Unit,
     setCurrentDayIndex: (Int) -> Unit,
     share: (ShareRequest) -> Unit,
@@ -129,12 +128,7 @@ fun CalendarScroller(
 
     VideoToolbarLayout(
         videoAspectRatio = videoAspectRatio,
-        topOverlay = {
-            CalendarTopBar(
-                goToToday = goToToday,
-                isToday = currentDay.isToday,
-            )
-        },
+        topOverlay = {},
         bottomBar = {
             CalendarDayBottomBar(
                 videoPlayerController = videoPlayerController,
@@ -223,7 +217,6 @@ internal fun PreviewCalendarScroller() {
         onRecordVideoClick = {},
         onDeleteVideoClick = {},
         openDayPicker = {},
-        goToToday = {},
         onMenuClick = {},
         setCurrentDayIndex = {},
         currentDayIndex = 0,

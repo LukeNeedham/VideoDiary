@@ -94,7 +94,6 @@ fun CalendarPageContent(
                     },
                     currentDayIndex = currentDayIndex,
                     setCurrentDayIndex = setCurrentDayIndex,
-                    goToToday = { goToDate(LocalDate.now()) },
                     onMenuClick = {
                         coroutineScope.launch { drawerState.open() }
                     },
@@ -117,6 +116,9 @@ fun CalendarPageContent(
                     initialFocusedDate = currentDay.date,
                     onDateSelected = { date ->
                         goToDate(date)
+                    },
+                    onJumpToToday = {
+                        goToDate(LocalDate.now())
                     },
                     onDismiss = {
                         showDayPickerDialog = false
