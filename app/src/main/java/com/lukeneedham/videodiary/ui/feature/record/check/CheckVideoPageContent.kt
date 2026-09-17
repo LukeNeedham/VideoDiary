@@ -1,12 +1,14 @@
 package com.lukeneedham.videodiary.ui.feature.record.check
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material.Text
@@ -22,7 +24,6 @@ import com.lukeneedham.videodiary.R
 import com.lukeneedham.videodiary.domain.model.Video
 import com.lukeneedham.videodiary.ui.feature.common.glass.GlassButton
 import com.lukeneedham.videodiary.ui.feature.common.videoplayer.VideoPlayerController
-import com.lukeneedham.videodiary.ui.feature.common.videoplayer.VideoToolbarLayout
 import com.lukeneedham.videodiary.ui.feature.record.check.component.CheckVideoTile
 import com.lukeneedham.videodiary.ui.feature.record.check.component.ChooseVideoButton
 import com.lukeneedham.videodiary.ui.feature.record.film.component.RecordBarIconButton
@@ -82,27 +83,58 @@ fun CheckVideoPageContent(
         }
     }
 
-    VideoToolbarLayout(
-        videoAspectRatio = videoAspectRatio,
-        topOverlay = {
-            Text(
-                text = "Choose the video to keep",
-                color = Color.White,
-                fontSize = Typography.Size.medium,
-                textAlign = TextAlign.Center,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .statusBarsPadding()
-                    .padding(horizontal = 16.dp)
-                    .padding(top = 16.dp, bottom = 8.dp),
+    Column(
+        modifier = Modifier
+            .fillMaxSize(),
+    ) {
+        Text(
+            text = "Choose the video to keep",
+            color = Color.White,
+            fontSize = Typography.Size.medium,
+            textAlign = TextAlign.Center,
+            modifier = Modifier
+                .fillMaxWidth()
+                .statusBarsPadding()
+                .padding(horizontal = 16.dp)
+                .padding(top = 16.dp, bottom = 8.dp),
+        )
+
+        // Each tile keeps the video's true aspect ratio, so side by side they're only half as
+        // tall as a single full-width video would be - sized to that actual content height
+        // (rather than a full-width video's slot height) so the controls below have room to
+        // breathe.
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(2.dp),
+            modifier = Modifier.fillMaxWidth(),
+        ) {
+            CheckVideoTile(
+                video = existingVideo,
+                controller = existingController,
+                aspectRatio = videoAspectRatio,
+                onPress = pauseBoth,
+                onRelease = resumeBoth,
+                modifier = Modifier.weight(1f),
             )
-        },
-        bottomBar = {
+            CheckVideoTile(
+                video = newVideo,
+                controller = newController,
+                aspectRatio = videoAspectRatio,
+                onPress = pauseBoth,
+                onRelease = resumeBoth,
+                modifier = Modifier.weight(1f),
+            )
+        }
+
+        Box(
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxWidth()
+                .navigationBarsPadding()
+                .padding(horizontal = 16.dp, vertical = 8.dp),
+        ) {
             Column(
                 verticalArrangement = Arrangement.Center,
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(horizontal = 16.dp, vertical = 8.dp),
+                modifier = Modifier.fillMaxSize(),
             ) {
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(12.dp),
@@ -157,32 +189,6 @@ fun CheckVideoPageContent(
                         .height(56.dp),
                 )
             }
-        },
-    ) { aspectRatio ->
-        // Each tile keeps the video's true aspect ratio, so side by side they're only half as
-        // tall as a single full-width video would be - centered here in the same slot height
-        // every other video page reserves, rather than shrinking that slot to fit them.
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(2.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.fillMaxSize(),
-        ) {
-            CheckVideoTile(
-                video = existingVideo,
-                controller = existingController,
-                aspectRatio = aspectRatio,
-                onPress = pauseBoth,
-                onRelease = resumeBoth,
-                modifier = Modifier.weight(1f),
-            )
-            CheckVideoTile(
-                video = newVideo,
-                controller = newController,
-                aspectRatio = aspectRatio,
-                onPress = pauseBoth,
-                onRelease = resumeBoth,
-                modifier = Modifier.weight(1f),
-            )
         }
     }
 }
