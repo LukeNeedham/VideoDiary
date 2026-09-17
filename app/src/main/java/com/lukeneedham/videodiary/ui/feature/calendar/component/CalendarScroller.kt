@@ -128,7 +128,6 @@ fun CalendarScroller(
 
     VideoToolbarLayout(
         videoAspectRatio = videoAspectRatio,
-        topOverlay = {},
         bottomBar = {
             CalendarDayBottomBar(
                 videoPlayerController = videoPlayerController,
