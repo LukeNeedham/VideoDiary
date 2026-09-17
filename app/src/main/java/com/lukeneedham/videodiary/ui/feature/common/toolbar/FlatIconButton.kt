@@ -1,4 +1,4 @@
-package com.lukeneedham.videodiary.ui.feature.record.film.component
+package com.lukeneedham.videodiary.ui.feature.common.toolbar
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -18,12 +18,12 @@ import androidx.compose.ui.unit.dp
 import com.lukeneedham.videodiary.R
 
 /**
- * A plain icon button for the record video page's bottom bar - just the icon, with no glass
- * background/border, matching the bar's flat look. [selected] dims the icon down when off, so an
- * active control (e.g. an open slider popup) reads as brighter/highlighted than the rest.
+ * A plain icon button for video toolbars - just the icon, with no glass background/border,
+ * matching a flat bar's look. [selected] dims the icon down when off, so an active control (e.g.
+ * an open slider popup) reads as brighter/highlighted than the rest.
  */
 @Composable
-fun RecordBarIconButton(
+fun FlatIconButton(
     iconRes: Int,
     contentDescription: String?,
     onClick: () -> Unit,
@@ -53,12 +53,12 @@ private fun Preview() {
     Row(
         modifier = Modifier.background(Color.Black),
     ) {
-        RecordBarIconButton(
+        FlatIconButton(
             iconRes = R.drawable.close,
             contentDescription = "Close",
             onClick = {},
         )
-        RecordBarIconButton(
+        FlatIconButton(
             iconRes = R.drawable.brightness,
             contentDescription = "Brightness",
             selected = true,

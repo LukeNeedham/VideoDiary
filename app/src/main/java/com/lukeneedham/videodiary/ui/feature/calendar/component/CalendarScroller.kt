@@ -22,7 +22,6 @@ import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.tooling.preview.Preview
 import com.lukeneedham.videodiary.domain.model.Day
 import com.lukeneedham.videodiary.domain.model.ShareRequest
-import com.lukeneedham.videodiary.domain.util.date.StandardDateTimeFormatter
 import com.lukeneedham.videodiary.ui.feature.calendar.MockDataCalendar
 import com.lukeneedham.videodiary.ui.feature.calendar.component.day.CalendarDayContent
 import com.lukeneedham.videodiary.ui.feature.calendar.component.day.bottombar.CalendarDayBottomBar
@@ -108,7 +107,6 @@ fun CalendarScroller(
     // Safe fallback: pagerState may briefly lag behind after days grows, but days is
     // guaranteed non-empty (enforced by the require above), so days.last() is safe.
     val currentDay = days.getOrElse(pagerState.currentPage) { days.last() }
-    val currentDateFormatted = currentDay.date.format(StandardDateTimeFormatter.date)
 
     // pagerState.pageCount mirrors days.size dynamically via the pageCount lambda, so
     // these callbacks only need pagerState and coroutineScope as stable remember keys.
@@ -133,10 +131,7 @@ fun CalendarScroller(
         videoAspectRatio = videoAspectRatio,
         topOverlay = {
             CalendarTopBar(
-                currentDateFormatted = currentDateFormatted,
-                openDayPicker = openDayPicker,
                 goToToday = goToToday,
-                onMenuClick = onMenuClick,
                 isToday = currentDay.isToday,
             )
         },
@@ -145,6 +140,8 @@ fun CalendarScroller(
                 videoPlayerController = videoPlayerController,
                 day = currentDay,
                 isEditable = currentDay.isToday || allowEditPastDays,
+                onMenuClick = onMenuClick,
+                openDayPicker = openDayPicker,
                 onRecordVideoClick = { onRecordVideoClick(currentDay.date) },
                 onDeleteVideoClick = { onDeleteVideoClick(currentDay.date) },
                 share = share,

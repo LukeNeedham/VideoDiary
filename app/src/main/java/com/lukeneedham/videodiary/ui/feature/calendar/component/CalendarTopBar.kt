@@ -1,13 +1,13 @@
 package com.lukeneedham.videodiary.ui.feature.calendar.component
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
@@ -18,35 +18,16 @@ import com.lukeneedham.videodiary.ui.feature.common.glass.GlassIconButton
 
 @Composable
 fun CalendarTopBar(
-    currentDateFormatted: String,
-    openDayPicker: () -> Unit,
     goToToday: () -> Unit,
-    onMenuClick: () -> Unit,
     isToday: Boolean,
     modifier: Modifier = Modifier,
 ) {
     Row(
-        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.End,
         modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = 12.dp, vertical = 8.dp)
     ) {
-        GlassIconButton(
-            iconRes = R.drawable.menu,
-            contentDescription = "Menu",
-            onClick = onMenuClick,
-        )
-
-        Box(
-            contentAlignment = Alignment.Center,
-            modifier = Modifier.weight(1f)
-        ) {
-            CalendarDaySelector(
-                currentDate = currentDateFormatted,
-                openDayPicker = openDayPicker,
-            )
-        }
-
         val todayAlpha = if (isToday) 0f else 1f
         GlassIconButton(
             iconRes = R.drawable.calendar_today,
@@ -68,10 +49,7 @@ internal fun PreviewCalendarTopBar() {
             .background(Color.DarkGray)
     ) {
         CalendarTopBar(
-            currentDateFormatted = "30 Nov",
-            openDayPicker = {},
             goToToday = {},
-            onMenuClick = {},
             isToday = false,
         )
     }
@@ -87,10 +65,7 @@ internal fun PreviewCalendarTopBarToday() {
             .background(Color.DarkGray)
     ) {
         CalendarTopBar(
-            currentDateFormatted = "30 Nov",
-            openDayPicker = {},
             goToToday = {},
-            onMenuClick = {},
             isToday = true,
         )
     }
