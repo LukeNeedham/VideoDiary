@@ -1,5 +1,6 @@
 package com.lukeneedham.videodiary.ui.feature.record.check
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -26,6 +27,14 @@ fun CheckVideoPage(
         videoPlayerHolder.player.stop()
     }
 
+    // There's no dedicated close button - backing out (rather than picking a video) keeps the
+    // existing one, same as tapping its choose button, and returns straight to the calendar
+    // rather than the record page (retaking is its own explicit button).
+    BackHandler {
+        viewModel.discardNewVideo()
+        onKeepExisting()
+    }
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -37,10 +46,6 @@ fun CheckVideoPage(
                 existingVideo = viewModel.existingVideo,
                 newVideo = viewModel.newVideo,
                 videoAspectRatio = videoAspectRatio,
-                onCloseClick = {
-                    viewModel.discardNewVideo()
-                    onKeepExisting()
-                },
                 onRetakeClick = {
                     viewModel.discardNewVideo()
                     onRetake()
