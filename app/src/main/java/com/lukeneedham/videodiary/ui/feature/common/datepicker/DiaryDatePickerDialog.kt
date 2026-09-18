@@ -27,8 +27,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import com.lukeneedham.videodiary.R
 import org.koin.compose.koinInject
 import java.time.LocalDate
 
@@ -37,6 +39,7 @@ fun DiaryDatePickerDialog(
     initialFocusedDate: LocalDate,
     onDateSelected: (LocalDate) -> Unit,
     onDismiss: () -> Unit,
+    onJumpToToday: (() -> Unit)? = null,
     viewModel: DiaryDatePickerViewModel = koinInject(),
 ) {
     DisposableEffect(viewModel) {
@@ -88,6 +91,19 @@ fun DiaryDatePickerDialog(
                         text = topBarYear,
                         fontSize = 12.sp,
                         textAlign = TextAlign.Center,
+                    )
+                }
+                if (onJumpToToday != null) {
+                    Icon(
+                        painter = painterResource(R.drawable.calendar_today),
+                        contentDescription = "Jump to today",
+                        modifier = Modifier
+                            .align(Alignment.CenterEnd)
+                            .clickable {
+                                onJumpToToday()
+                                onDismiss()
+                            }
+                            .padding(8.dp)
                     )
                 }
             }

@@ -23,15 +23,17 @@ import com.lukeneedham.videodiary.R
 
 /**
  * Layout shared by full-screen video viewers (calendar day, export view): the video fills the
- * space at the top - full width, with its height driven by [videoAspectRatio] - with [topOverlay]
- * floating "glass" controls over its top edge, and a black toolbar below holding [bottomBar]. The
- * video box (and [video]/[topOverlay] slots) is omitted while [videoAspectRatio] is unknown.
+ * space at the top - full width, with its height driven by [videoAspectRatio] - with an optional
+ * [topOverlay] floating "glass" controls over its top edge (with a scrim behind it for
+ * legibility, omitted entirely when there's no overlay to show), and a black toolbar below holding
+ * [bottomBar]. The video box (and [video]/[topOverlay] slots) is omitted while [videoAspectRatio]
+ * is unknown.
  */
 @Composable
 fun VideoToolbarLayout(
     videoAspectRatio: Float?,
     modifier: Modifier = Modifier,
-    topOverlay: @Composable BoxScope.() -> Unit,
+    topOverlay: (@Composable BoxScope.() -> Unit)? = null,
     bottomBar: @Composable BoxScope.() -> Unit,
     video: @Composable BoxScope.(aspectRatio: Float) -> Unit,
 ) {
@@ -46,20 +48,24 @@ fun VideoToolbarLayout(
                     video(videoAspectRatio)
                 }
 
-                TopScrim(
-                    modifier = Modifier
-                        .align(Alignment.TopCenter)
-                        .height(140.dp),
-                )
+                if (topOverlay != null) {
+                    TopScrim(
+                        modifier = Modifier
+                            .align(Alignment.TopCenter)
+                            .height(140.dp),
+                    )
+                }
             }
 
-            Box(
-                modifier = Modifier
-                    .align(Alignment.TopCenter)
-                    .fillMaxWidth()
-                    .statusBarsPadding(),
-                content = topOverlay,
-            )
+            if (topOverlay != null) {
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.TopCenter)
+                        .fillMaxWidth()
+                        .statusBarsPadding(),
+                    content = topOverlay,
+                )
+            }
         }
 
         Box(

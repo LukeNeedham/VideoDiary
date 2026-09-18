@@ -40,9 +40,9 @@ import com.lukeneedham.videodiary.R
 import com.lukeneedham.videodiary.domain.util.logger.Logger
 import com.lukeneedham.videodiary.ui.feature.common.camera.CameraInput
 import com.lukeneedham.videodiary.ui.feature.common.glass.GlassRecordButton
+import com.lukeneedham.videodiary.ui.feature.common.toolbar.FlatIconButton
 import com.lukeneedham.videodiary.ui.feature.common.videoplayer.VideoToolbarLayout
 import com.lukeneedham.videodiary.ui.feature.record.film.component.CameraControlSlider
-import com.lukeneedham.videodiary.ui.feature.record.film.component.RecordBarIconButton
 import com.lukeneedham.videodiary.ui.feature.record.film.component.RecordingCountdownButton
 
 private enum class CameraControlType { BRIGHTNESS, ZOOM }
@@ -145,7 +145,6 @@ fun RecordVideoPageContent(
 
     VideoToolbarLayout(
         videoAspectRatio = videoAspectRatio,
-        topOverlay = {},
         bottomBar = {
             Box(
                 modifier = Modifier
@@ -194,7 +193,7 @@ fun RecordVideoPageContent(
                     )
                 }
 
-                RecordBarIconButton(
+                FlatIconButton(
                     iconRes = R.drawable.close,
                     contentDescription = "Close",
                     onClick = onBack,
@@ -236,7 +235,7 @@ fun RecordVideoPageContent(
                         .padding(horizontal = 8.dp),
                 ) {
                     if (supportsExposure) {
-                        RecordBarIconButton(
+                        FlatIconButton(
                             iconRes = R.drawable.brightness,
                             contentDescription = "Brightness",
                             selected = activeControl == CameraControlType.BRIGHTNESS,
@@ -251,7 +250,7 @@ fun RecordVideoPageContent(
                     }
 
                     if (supportsZoom) {
-                        RecordBarIconButton(
+                        FlatIconButton(
                             iconRes = R.drawable.zoom,
                             contentDescription = "Zoom",
                             selected = activeControl == CameraControlType.ZOOM,

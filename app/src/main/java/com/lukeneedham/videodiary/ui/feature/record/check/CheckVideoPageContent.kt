@@ -22,10 +22,10 @@ import androidx.compose.ui.unit.dp
 import com.lukeneedham.videodiary.R
 import com.lukeneedham.videodiary.domain.model.Video
 import com.lukeneedham.videodiary.ui.feature.common.glass.GlassButton
+import com.lukeneedham.videodiary.ui.feature.common.toolbar.FlatIconButton
 import com.lukeneedham.videodiary.ui.feature.common.videoplayer.VideoPlayerController
 import com.lukeneedham.videodiary.ui.feature.record.check.component.CheckVideoTile
 import com.lukeneedham.videodiary.ui.feature.record.check.component.ChooseVideoButton
-import com.lukeneedham.videodiary.ui.feature.record.film.component.RecordBarIconButton
 import com.lukeneedham.videodiary.ui.theme.GlassFillStrong
 import com.lukeneedham.videodiary.ui.theme.Typography
 
@@ -143,7 +143,7 @@ fun CheckVideoPageContent(
                 ) {
                     val muteIcon =
                         if (existingController.isVolumeOn) R.drawable.volume_on else R.drawable.volume_off
-                    RecordBarIconButton(
+                    FlatIconButton(
                         iconRes = muteIcon,
                         contentDescription = "Toggle existing video sound",
                         onClick = toggleExistingVolume,
@@ -162,7 +162,7 @@ fun CheckVideoPageContent(
                 ) {
                     val muteIcon =
                         if (newController.isVolumeOn) R.drawable.volume_on else R.drawable.volume_off
-                    RecordBarIconButton(
+                    FlatIconButton(
                         iconRes = muteIcon,
                         contentDescription = "Toggle new video sound",
                         onClick = toggleNewVolume,
