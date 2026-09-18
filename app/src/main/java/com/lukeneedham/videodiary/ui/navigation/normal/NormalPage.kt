@@ -2,8 +2,8 @@ package com.lukeneedham.videodiary.ui.navigation.normal
 
 import android.net.Uri
 import android.os.Parcelable
-import com.lukeneedham.videodiary.domain.model.ExportedVideo
-import com.lukeneedham.videodiary.ui.feature.exportdiary.create.model.ExportRequest
+import com.lukeneedham.videodiary.ui.feature.recap.model.RecapExportRequest
+import com.lukeneedham.videodiary.ui.feature.recap.model.RecapPeriodType
 import kotlinx.parcelize.Parcelize
 import java.time.LocalDate
 
@@ -16,10 +16,16 @@ sealed class NormalPage : Parcelable {
         val videoContentUri: Uri,
     ) : NormalPage()
 
-    data object ExportHub : NormalPage()
-    data object ExportDiaryCreate : NormalPage()
-    data class ExportDiaryProgress(val exportRequest: ExportRequest) : NormalPage()
-    data class ExportDiaryView(val exportedVideo: ExportedVideo) : NormalPage()
+    data object RecapHub : NormalPage()
+    data class RecapCreatePeriodList(val periodType: RecapPeriodType) : NormalPage()
+    data object RecapCreateCustom : NormalPage()
+    data class RecapView(
+        val startDate: LocalDate,
+        val endDate: LocalDate,
+        val name: String,
+        val savedRecapId: String?,
+    ) : NormalPage()
+    data class RecapExportProgress(val request: RecapExportRequest) : NormalPage()
 
     data object Debug : NormalPage()
     data object CrashLog : NormalPage()

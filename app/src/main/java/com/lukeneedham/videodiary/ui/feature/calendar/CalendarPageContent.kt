@@ -45,7 +45,7 @@ fun CalendarPageContent(
     setCurrentDayIndex: (Int) -> Unit,
     share: (ShareRequest) -> Unit,
     videoPlayerController: VideoPlayerController,
-    onExportClick: () -> Unit,
+    onRecapClick: () -> Unit,
     onDebugClick: () -> Unit,
 ) {
     val currentDay = days[currentDayIndex]
@@ -64,9 +64,9 @@ fun CalendarPageContent(
         drawerState = drawerState,
         drawerContent = {
             CalendarSideMenu(
-                onExportClick = {
+                onRecapClick = {
                     coroutineScope.launch { drawerState.close() }
-                    onExportClick()
+                    onRecapClick()
                 },
                 onDebugClick = {
                     coroutineScope.launch { drawerState.close() }
@@ -159,7 +159,7 @@ private fun Preview(
             setCurrentDayIndex = {},
             share = {},
             videoPlayerController = rememberVideoPlayerController(),
-            onExportClick = {},
+            onRecapClick = {},
             onDebugClick = {},
         )
     }

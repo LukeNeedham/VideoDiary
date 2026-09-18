@@ -5,7 +5,7 @@ import com.lukeneedham.videodiary.data.android.PermissionChecker
 import com.lukeneedham.videodiary.data.mapper.ThumbnailFileNameMapper
 import com.lukeneedham.videodiary.data.mapper.VideoFileNameMapper
 import com.lukeneedham.videodiary.data.persistence.CrashLogDao
-import com.lukeneedham.videodiary.data.persistence.SavedExportsDao
+import com.lukeneedham.videodiary.data.persistence.SavedRecapsDao
 import com.lukeneedham.videodiary.data.persistence.SettingsDao
 import com.lukeneedham.videodiary.data.persistence.VideoExportDao
 import com.lukeneedham.videodiary.data.persistence.VideoThumbnailExtractor
@@ -20,12 +20,14 @@ import com.lukeneedham.videodiary.ui.feature.calendar.CalendarViewModel
 import com.lukeneedham.videodiary.ui.feature.common.datepicker.DiaryDatePickerViewModel
 import com.lukeneedham.videodiary.ui.feature.crashlog.CrashLogViewModel
 import com.lukeneedham.videodiary.ui.feature.debug.DebugViewModel
-import com.lukeneedham.videodiary.ui.feature.exportdiary.create.ExportDiaryCreateViewModel
-import com.lukeneedham.videodiary.ui.feature.exportdiary.create.model.ExportRequest
-import com.lukeneedham.videodiary.ui.feature.exportdiary.hub.ExportHubViewModel
-import com.lukeneedham.videodiary.ui.feature.exportdiary.progress.ExportDiaryProgressViewModel
-import com.lukeneedham.videodiary.ui.feature.exportdiary.view.ExportDiaryViewViewModel
 import com.lukeneedham.videodiary.ui.feature.permissions.RequestPermissionsViewModel
+import com.lukeneedham.videodiary.ui.feature.recap.create.RecapCreateCustomViewModel
+import com.lukeneedham.videodiary.ui.feature.recap.create.RecapCreatePeriodListViewModel
+import com.lukeneedham.videodiary.ui.feature.recap.export.RecapExportProgressViewModel
+import com.lukeneedham.videodiary.ui.feature.recap.hub.RecapHubViewModel
+import com.lukeneedham.videodiary.ui.feature.recap.model.RecapExportRequest
+import com.lukeneedham.videodiary.ui.feature.recap.model.RecapPeriodType
+import com.lukeneedham.videodiary.ui.feature.recap.view.RecapViewViewModel
 import com.lukeneedham.videodiary.ui.feature.record.check.CheckVideoViewModel
 import com.lukeneedham.videodiary.ui.feature.record.film.RecordVideoViewModel
 import com.lukeneedham.videodiary.ui.feature.setup.duration.SelectVideoDurationViewModel
@@ -92,9 +94,8 @@ object KoinModule {
             )
         }
         single {
-            SavedExportsDao(
-                context = androidContext(),
-                roomDao = get<AppDatabase>().savedExportDao(),
+            SavedRecapsDao(
+                roomDao = get<AppDatabase>().savedRecapDao(),
             )
         }
         single {
@@ -184,26 +185,37 @@ object KoinModule {
             )
         }
         viewModel {
-            ExportDiaryCreateViewModel(
+            RecapCreateCustomViewModel(
+                calendarRepository = get(),
+                savedRecapsDao = get(),
+            )
+        }
+        viewModel { (periodType: RecapPeriodType) ->
+            RecapCreatePeriodListViewModel(
+                periodType = periodType,
                 calendarRepository = get(),
             )
         }
-        viewModel { (exportRequest: ExportRequest) ->
-            ExportDiaryProgressViewModel(
-                exportRequest = exportRequest,
-                videoExportDao = get(),
-                savedExportsDao = get(),
-                ioDispatcher = get(KoinQualifier.Dispatcher.io),
-            )
-        }
-        viewModel {
-            ExportDiaryViewViewModel(
+        viewModel { (startDate: LocalDate, endDate: LocalDate, name: String, savedRecapId: String?) ->
+            RecapViewViewModel(
+                startDate = startDate,
+                endDate = endDate,
+                name = name,
+                initialSavedRecapId = savedRecapId,
+                calendarRepository = get(),
+                savedRecapsDao = get(),
                 videoResolutionRepository = get(),
             )
         }
+        viewModel { (request: RecapExportRequest) ->
+            RecapExportProgressViewModel(
+                request = request,
+                videoExportDao = get(),
+            )
+        }
         viewModel {
-            ExportHubViewModel(
-                savedExportsDao = get(),
+            RecapHubViewModel(
+                savedRecapsDao = get(),
                 videosDao = get(),
                 videoResolutionRepository = get(),
             )
