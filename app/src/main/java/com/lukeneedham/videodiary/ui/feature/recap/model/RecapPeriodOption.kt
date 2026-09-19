@@ -10,5 +10,5 @@ data class RecapPeriodOption(
     /** A compact rendering of [startDate]..[endDate], e.g. "10 - 30 September". */
     val dateRangeText: String,
     val suggestedName: String,
-    val hasVideos: Boolean,
+    val videoCount: Int,
 )

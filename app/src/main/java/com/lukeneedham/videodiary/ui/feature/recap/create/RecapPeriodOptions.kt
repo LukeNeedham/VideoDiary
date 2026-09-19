@@ -14,10 +14,10 @@ import java.util.Locale
 
 /**
  * Builds the list of whole months/weeks/years the user can jump straight into a recap of,
- * most-recent-first. A period that hasn't fully elapsed yet (e.g. the current month) is left out
+ * oldest-first. A period that hasn't fully elapsed yet (e.g. the current month) is left out
  * entirely - e.g. September isn't offered until the 1st of October. A period that has fully
- * elapsed but has no recorded videos is still included, marked via [RecapPeriodOption.hasVideos]
- * so the UI can show it as an unselectable, greyed-out option.
+ * elapsed but has no recorded videos is still included (with [RecapPeriodOption.videoCount] of
+ * 0) so the UI can show it as an unselectable, greyed-out option.
  *
  * These are purely a UI convenience for picking a date range - the resulting [RecapPeriodOption]
  * only carries a suggested name and a date range, and nothing about "this was a month/week/year
@@ -31,13 +31,11 @@ object RecapPeriodOptions {
         val today = days.lastOrNull()?.date ?: return emptyList()
         val recordedDates = days.filter { it.videoFile != null }.map { it.date }
 
-        val options = when (periodType) {
+        return when (periodType) {
             RecapPeriodType.MONTH -> buildMonths(diaryStart, today, recordedDates)
             RecapPeriodType.WEEK -> buildWeeks(diaryStart, today, recordedDates)
             RecapPeriodType.YEAR -> buildYears(diaryStart, today, recordedDates)
         }
-
-        return options.reversed()
     }
 
     private fun buildMonths(
@@ -65,7 +63,7 @@ object RecapPeriodOptions {
                     endDate = naturalEnd,
                     dateRangeText = formatDateRange(startDate, naturalEnd),
                     suggestedName = "$label recap",
-                    hasVideos = recordedDates.any { it in startDate..naturalEnd },
+                    videoCount = recordedDates.count { it in startDate..naturalEnd },
                 )
             )
             yearMonth = yearMonth.plusMonths(1)
@@ -100,7 +98,7 @@ object RecapPeriodOptions {
                     endDate = naturalEnd,
                     dateRangeText = formatDateRange(startDate, naturalEnd),
                     suggestedName = "$label recap",
-                    hasVideos = recordedDates.any { it in startDate..naturalEnd },
+                    videoCount = recordedDates.count { it in startDate..naturalEnd },
                 )
             )
             weekStart = weekStart.plusWeeks(1)
@@ -128,7 +126,7 @@ object RecapPeriodOptions {
                     endDate = naturalEnd,
                     dateRangeText = formatDateRange(startDate, naturalEnd),
                     suggestedName = "$label recap",
-                    hasVideos = recordedDates.any { it in startDate..naturalEnd },
+                    videoCount = recordedDates.count { it in startDate..naturalEnd },
                 )
             )
             year = year.plusYears(1)

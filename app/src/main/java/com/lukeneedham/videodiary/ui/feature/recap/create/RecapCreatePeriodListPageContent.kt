@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Text
@@ -60,17 +61,16 @@ fun RecapCreatePeriodListPageContent(
         } else if (options.isEmpty()) {
             NoPeriodsYet(periodType = periodType)
         } else {
-            // `options` is latest-first. With reverseLayout, whichever pair fills the grid's
-            // first row ends up at the bottom of the screen - so keeping that pair's most recent
-            // item first gives the correct top-to-bottom (oldest-to-latest) row order, landing the
-            // page scrolled to the latest one at the bottom, with older ones revealed by scrolling
-            // up. reverseLayout only flips row order, not left-to-right order within a row, so
-            // each pair is reversed here too - otherwise the more recent (list-first) item of each
-            // pair would render on the left, reading newest-to-oldest left-to-right.
-            val gridOptions = options.chunked(2).flatMap { it.reversed() }
+            // `options` is oldest-first, laid out normally (oldest top-left, latest at the
+            // bottom-right) so rows read left-to-right in chronological order. The grid's initial
+            // scroll position is set to the last item so the page opens already scrolled to the
+            // latest one, with older ones revealed by scrolling up.
+            val gridState = rememberLazyGridState(
+                initialFirstVisibleItemIndex = (options.size - 1).coerceAtLeast(0),
+            )
             LazyVerticalGrid(
                 columns = GridCells.Fixed(2),
-                reverseLayout = true,
+                state = gridState,
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp),
                 modifier = Modifier
@@ -78,7 +78,7 @@ fun RecapCreatePeriodListPageContent(
                     .fillMaxWidth()
                     .padding(16.dp)
             ) {
-                items(gridOptions, key = { it.label + it.startDate }) { option ->
+                items(options, key = { it.label + it.startDate }) { option ->
                     RecapPeriodOptionCard(option = option, onClick = { onOptionClick(option) })
                 }
             }
@@ -128,7 +128,7 @@ private fun RecapPeriodOptionCard(
     option: RecapPeriodOption,
     onClick: () -> Unit,
 ) {
-    val hasVideos = option.hasVideos
+    val hasVideos = option.videoCount > 0
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -148,11 +148,12 @@ private fun RecapPeriodOptionCard(
             overflow = TextOverflow.Ellipsis,
         )
         Spacer(modifier = Modifier.height(4.dp))
-        // The subtitle always reserves 2 lines - the date range, then a second line only used
-        // for the "No videos" note - so every card is the same height regardless of its content,
-        // without hardcoding a dp height (which wouldn't respect font scaling).
+        // The subtitle always reserves 2 lines - the date range, then the video count - so every
+        // card is the same height regardless of its content, without hardcoding a dp height
+        // (which wouldn't respect font scaling).
+        val videoCountText = if (option.videoCount == 1) "1 video" else "${option.videoCount} videos"
         Text(
-            text = "${option.dateRangeText}\n${if (hasVideos) "" else "No videos"}",
+            text = "${option.dateRangeText}\n$videoCountText",
             color = Color.White.copy(alpha = 0.6f),
             fontSize = Typography.Size.extraSmall,
             minLines = 2,
@@ -169,12 +170,12 @@ private fun PreviewRecapCreatePeriodListPageContent() {
         periodType = RecapPeriodType.MONTH,
         options = listOf(
             RecapPeriodOption(
-                label = "March 2024",
-                startDate = LocalDate.of(2024, 3, 1),
-                endDate = LocalDate.of(2024, 3, 31),
-                dateRangeText = "1 - 31 March",
-                suggestedName = "March 2024 recap",
-                hasVideos = true,
+                label = "January 2024",
+                startDate = LocalDate.of(2024, 1, 1),
+                endDate = LocalDate.of(2024, 1, 31),
+                dateRangeText = "1 - 31 January",
+                suggestedName = "January 2024 recap",
+                videoCount = 12,
             ),
             RecapPeriodOption(
                 label = "February 2024",
@@ -182,15 +183,15 @@ private fun PreviewRecapCreatePeriodListPageContent() {
                 endDate = LocalDate.of(2024, 2, 29),
                 dateRangeText = "1 - 29 February",
                 suggestedName = "February 2024 recap",
-                hasVideos = false,
+                videoCount = 0,
             ),
             RecapPeriodOption(
-                label = "January 2024",
-                startDate = LocalDate.of(2024, 1, 1),
-                endDate = LocalDate.of(2024, 1, 31),
-                dateRangeText = "1 - 31 January",
-                suggestedName = "January 2024 recap",
-                hasVideos = true,
+                label = "March 2024",
+                startDate = LocalDate.of(2024, 3, 1),
+                endDate = LocalDate.of(2024, 3, 31),
+                dateRangeText = "1 - 31 March",
+                suggestedName = "March 2024 recap",
+                videoCount = 1,
             ),
         ),
         isLoaded = true,
