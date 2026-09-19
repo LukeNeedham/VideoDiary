@@ -16,7 +16,7 @@ import androidx.media3.transformer.ExportResult
 import androidx.media3.transformer.ProgressHolder
 import androidx.media3.transformer.Transformer
 import com.lukeneedham.videodiary.domain.util.date.StandardDateTimeFormatter
-import com.lukeneedham.videodiary.ui.feature.exportdiary.create.model.ExportDay
+import com.lukeneedham.videodiary.ui.feature.recap.model.RecapDay
 import com.lukeneedham.videodiary.util.ext.toOverlayEffect
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
@@ -53,7 +53,7 @@ class VideoExporter(
 
     @OptIn(UnstableApi::class)
     fun export(
-        inputVideos: List<ExportDay>,
+        inputVideos: List<RecapDay>,
         outputFile: File,
         exportIncludeDateStamp: Boolean,
     ): Flow<VideoExportState> {

@@ -1,16 +1,18 @@
 package com.lukeneedham.videodiary.ui.navigation.normal
 
 import androidx.compose.runtime.Composable
-import com.lukeneedham.videodiary.domain.model.ExportedVideo
 import com.lukeneedham.videodiary.domain.model.ShareRequest
 import com.lukeneedham.videodiary.domain.util.logger.Logger
 import com.lukeneedham.videodiary.ui.feature.calendar.CalendarPage
 import com.lukeneedham.videodiary.ui.feature.crashlog.CrashLogPage
 import com.lukeneedham.videodiary.ui.feature.debug.DebugPage
-import com.lukeneedham.videodiary.ui.feature.exportdiary.create.ExportDiaryCreatePage
-import com.lukeneedham.videodiary.ui.feature.exportdiary.hub.ExportHubPage
-import com.lukeneedham.videodiary.ui.feature.exportdiary.progress.ExportDiaryProgressPage
-import com.lukeneedham.videodiary.ui.feature.exportdiary.view.ExportDiaryViewPage
+import com.lukeneedham.videodiary.ui.feature.recap.create.RecapCreateCustomPage
+import com.lukeneedham.videodiary.ui.feature.recap.create.RecapCreatePeriodListPage
+import com.lukeneedham.videodiary.ui.feature.recap.create.RecapCreateTypePage
+import com.lukeneedham.videodiary.ui.feature.recap.export.RecapExportProgressPage
+import com.lukeneedham.videodiary.ui.feature.recap.hub.RecapHubPage
+import com.lukeneedham.videodiary.ui.feature.recap.model.RecapPeriodType
+import com.lukeneedham.videodiary.ui.feature.recap.view.RecapViewPage
 import com.lukeneedham.videodiary.ui.feature.record.check.CheckVideoPage
 import com.lukeneedham.videodiary.ui.feature.record.film.RecordVideoPage
 import com.lukeneedham.videodiary.ui.feature.record.film.RecordVideoViewModel
@@ -54,8 +56,8 @@ fun NormalRouter(
                 onRecordVideoClick = { date ->
                     navigate(NormalPage.RecordVideo(date))
                 },
-                onExportClick = {
-                    navigate(NormalPage.ExportHub)
+                onRecapClick = {
+                    navigate(NormalPage.RecapHub)
                 },
                 onDebugClick = {
                     navigate(NormalPage.Debug)
@@ -102,53 +104,96 @@ fun NormalRouter(
                 )
             }
 
-            is NormalPage.ExportHub -> ExportHubPage(
+            is NormalPage.RecapHub -> RecapHubPage(
                 viewModel = koinViewModel(),
                 canGoBack = canGoBack,
                 onBack = onBack,
-                onCreateExportClick = {
-                    navigate(NormalPage.ExportDiaryCreate)
+                onCreateRecapClick = {
+                    navigate(NormalPage.RecapCreateType)
                 },
-                onExportClick = { savedExport ->
-                    val exportedVideo = ExportedVideo(
-                        videoFile = savedExport.videoFile,
-                        name = savedExport.name,
-                        startDate = savedExport.startDate,
-                        endDate = savedExport.endDate,
-                        dayVideoCount = savedExport.dayVideoCount,
+                onRecapClick = { savedRecap ->
+                    navigate(
+                        NormalPage.RecapView(
+                            startDate = savedRecap.startDate,
+                            endDate = savedRecap.endDate,
+                            name = savedRecap.name,
+                            savedRecapId = savedRecap.id,
+                        )
                     )
-                    navigate(NormalPage.ExportDiaryView(exportedVideo))
                 },
             )
 
-            is NormalPage.ExportDiaryCreate -> ExportDiaryCreatePage(
+            is NormalPage.RecapCreateType -> RecapCreateTypePage(
+                canGoBack = canGoBack,
+                onBack = onBack,
+                onCreateMonthClick = {
+                    navigate(NormalPage.RecapCreatePeriodList(RecapPeriodType.MONTH))
+                },
+                onCreateWeekClick = {
+                    navigate(NormalPage.RecapCreatePeriodList(RecapPeriodType.WEEK))
+                },
+                onCreateYearClick = {
+                    navigate(NormalPage.RecapCreatePeriodList(RecapPeriodType.YEAR))
+                },
+                onCreateCustomClick = {
+                    navigate(NormalPage.RecapCreateCustom)
+                },
+            )
+
+            is NormalPage.RecapCreatePeriodList -> RecapCreatePeriodListPage(
+                viewModel = koinViewModel {
+                    parametersOf(page.periodType)
+                },
+                canGoBack = canGoBack,
+                onBack = onBack,
+                onOptionClick = { option ->
+                    navigate(
+                        NormalPage.RecapView(
+                            startDate = option.startDate,
+                            endDate = option.endDate,
+                            name = option.suggestedName,
+                            savedRecapId = null,
+                        )
+                    )
+                },
+            )
+
+            is NormalPage.RecapCreateCustom -> RecapCreateCustomPage(
                 viewModel = koinViewModel(),
                 canGoBack = canGoBack,
                 onBack = onBack,
-                onExportRequested = { exportRequest ->
-                    navigate(NormalPage.ExportDiaryProgress(exportRequest))
-                }
+                onRecapCreated = { startDate, endDate, name, savedRecapId ->
+                    navController.popUpTo { it is NormalPage.RecapHub }
+                    navigate(
+                        NormalPage.RecapView(
+                            startDate = startDate,
+                            endDate = endDate,
+                            name = name,
+                            savedRecapId = savedRecapId,
+                        )
+                    )
+                },
             )
 
-            is NormalPage.ExportDiaryProgress -> ExportDiaryProgressPage(
+            is NormalPage.RecapView -> RecapViewPage(
                 viewModel = koinViewModel {
-                    parametersOf(page.exportRequest)
+                    parametersOf(page.startDate, page.endDate, page.name, page.savedRecapId)
                 },
-                onExported = { exportedVideo ->
-                    navController.popUpTo { it is NormalPage.ExportDiaryCreate }
-                    navigate(NormalPage.ExportDiaryView(exportedVideo))
+                canGoBack = canGoBack,
+                onBack = onBack,
+                onExportRequested = { request ->
+                    navigate(NormalPage.RecapExportProgress(request))
                 },
+            )
+
+            is NormalPage.RecapExportProgress -> RecapExportProgressPage(
+                viewModel = koinViewModel {
+                    parametersOf(page.request)
+                },
+                share = share,
                 onExit = {
                     pop()
                 },
-            )
-
-            is NormalPage.ExportDiaryView -> ExportDiaryViewPage(
-                viewModel = koinViewModel(),
-                share = share,
-                canGoBack = canGoBack,
-                onBack = onBack,
-                exportedVideo = page.exportedVideo,
             )
 
             is NormalPage.Debug -> DebugPage(

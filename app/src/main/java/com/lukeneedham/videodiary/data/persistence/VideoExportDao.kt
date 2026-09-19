@@ -3,7 +3,7 @@ package com.lukeneedham.videodiary.data.persistence
 import android.content.Context
 import com.lukeneedham.videodiary.data.persistence.export.VideoExportState
 import com.lukeneedham.videodiary.data.persistence.export.VideoExporter
-import com.lukeneedham.videodiary.ui.feature.exportdiary.create.model.ExportDay
+import com.lukeneedham.videodiary.ui.feature.recap.model.RecapDay
 import kotlinx.coroutines.flow.Flow
 import java.io.File
 
@@ -16,7 +16,7 @@ class VideoExportDao(
     }
     private val outputFile = File(outputDir, outputFileName)
 
-    fun export(videos: List<ExportDay>, exportIncludeDateStamp: Boolean): Flow<VideoExportState> =
+    fun export(videos: List<RecapDay>, exportIncludeDateStamp: Boolean): Flow<VideoExportState> =
         videoExporter.export(videos, outputFile, exportIncludeDateStamp)
 
     fun cancel() = videoExporter.cancel()
