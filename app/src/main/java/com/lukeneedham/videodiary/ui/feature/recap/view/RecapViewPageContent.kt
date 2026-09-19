@@ -10,6 +10,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Checkbox
 import androidx.compose.material.CheckboxDefaults
 import androidx.compose.material.Text
@@ -59,6 +61,10 @@ fun RecapViewPageContent(
 
     VideoToolbarLayout(
         videoAspectRatio = videoAspectRatio,
+        // This screen's bottom bar is unusually tall (thumbnails, controls, checkbox, two
+        // buttons) - a tall/portrait video must leave it a fair share of the screen instead of
+        // shrinking it to a sliver.
+        maxVideoHeightFraction = 0.6f,
         topOverlay = {
             RecapViewToolbar(
                 name = name,
@@ -69,10 +75,14 @@ fun RecapViewPageContent(
             )
         },
         bottomBar = {
+            // A tall (portrait) video can leave very little room below it, especially with the
+            // thumbnail row, controls, and both buttons all stacked here - scrolling keeps
+            // everything reachable instead of it being clipped off the bottom of the screen.
             Column(
                 modifier = Modifier
                     .align(Alignment.Center)
                     .fillMaxWidth()
+                    .verticalScroll(rememberScrollState())
                     .padding(12.dp)
             ) {
                 if (dayThumbnails.isNotEmpty()) {
