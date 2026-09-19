@@ -17,11 +17,11 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.lukeneedham.videodiary.domain.util.date.StandardDateTimeFormatter
 import com.lukeneedham.videodiary.ui.feature.common.toolbar.GenericToolbar
 import com.lukeneedham.videodiary.ui.feature.recap.model.RecapPeriodOption
 import com.lukeneedham.videodiary.ui.feature.recap.model.RecapPeriodType
@@ -81,38 +81,34 @@ private fun RecapPeriodOptionRow(
     option: RecapPeriodOption,
     onClick: () -> Unit,
 ) {
-    val contentAlpha = if (option.hasVideos) 1f else 0.4f
+    val hasVideos = option.hasVideos
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(12.dp))
-            .background(AppSurfaceVariant.copy(alpha = contentAlpha))
-            .let {
-                if (option.hasVideos) it.clickable(onClick = onClick) else it
-            }
-            .padding(20.dp)
+            // alpha must precede background/content so the whole card fades as one unit,
+            // rather than compounding with the text colors' own alpha below.
+            .alpha(if (hasVideos) 1f else 0.65f)
+            .background(AppSurfaceVariant)
+            .let { if (hasVideos) it.clickable(onClick = onClick) else it }
+            .padding(horizontal = 20.dp, vertical = if (hasVideos) 20.dp else 12.dp)
     ) {
         Text(
             text = option.label,
-            color = Color.White.copy(alpha = contentAlpha),
-            fontSize = Typography.Size.medium,
+            color = Color.White,
+            fontSize = if (hasVideos) Typography.Size.medium else Typography.Size.small,
         )
         Spacer(modifier = Modifier.height(4.dp))
-        val start = option.startDate.format(StandardDateTimeFormatter.date)
-        val end = option.endDate.format(StandardDateTimeFormatter.date)
+        val subtitle = if (hasVideos) {
+            option.dateRangeText
+        } else {
+            "${option.dateRangeText} · No videos"
+        }
         Text(
-            text = "$start to $end",
-            color = Color.White.copy(alpha = 0.6f * contentAlpha),
+            text = subtitle,
+            color = Color.White.copy(alpha = 0.6f),
             fontSize = Typography.Size.extraSmall,
         )
-        if (!option.hasVideos) {
-            Spacer(modifier = Modifier.height(4.dp))
-            Text(
-                text = "No videos recorded in this period",
-                color = Color.White.copy(alpha = 0.6f * contentAlpha),
-                fontSize = Typography.Size.extraSmall,
-            )
-        }
     }
 }
 
@@ -126,6 +122,7 @@ private fun PreviewRecapCreatePeriodListPageContent() {
                 label = "March 2024",
                 startDate = LocalDate.of(2024, 3, 1),
                 endDate = LocalDate.of(2024, 3, 31),
+                dateRangeText = "1 - 31 March",
                 suggestedName = "March 2024 recap",
                 hasVideos = true,
             ),
@@ -133,6 +130,7 @@ private fun PreviewRecapCreatePeriodListPageContent() {
                 label = "February 2024",
                 startDate = LocalDate.of(2024, 2, 1),
                 endDate = LocalDate.of(2024, 2, 29),
+                dateRangeText = "1 - 29 February",
                 suggestedName = "February 2024 recap",
                 hasVideos = false,
             ),

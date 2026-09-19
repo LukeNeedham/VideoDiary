@@ -1,6 +1,7 @@
 package com.lukeneedham.videodiary.ui.feature.recap.create
 
 import com.lukeneedham.videodiary.domain.model.Day
+import com.lukeneedham.videodiary.domain.util.date.StandardDateTimeFormatter
 import com.lukeneedham.videodiary.ui.feature.recap.model.RecapPeriodOption
 import com.lukeneedham.videodiary.ui.feature.recap.model.RecapPeriodType
 import java.time.DayOfWeek
@@ -52,12 +53,17 @@ object RecapPeriodOptions {
 
             val startDate = maxOf(yearMonth.atDay(1), diaryStart)
             val monthName = yearMonth.month.getDisplayName(TextStyle.FULL, Locale.getDefault())
-            val label = "$monthName ${yearMonth.year}"
+            val label = if (yearMonth.year == today.year) {
+                monthName
+            } else {
+                "$monthName ${yearMonth.year}"
+            }
             options.add(
                 RecapPeriodOption(
                     label = label,
                     startDate = startDate,
                     endDate = naturalEnd,
+                    dateRangeText = formatDateRange(startDate, naturalEnd),
                     suggestedName = "$label recap",
                     hasVideos = recordedDates.any { it in startDate..naturalEnd },
                 )
@@ -73,6 +79,7 @@ object RecapPeriodOptions {
         recordedDates: List<LocalDate>,
     ): List<RecapPeriodOption> {
         val options = mutableListOf<RecapPeriodOption>()
+        val currentWeekYear = today.get(weekFields.weekBasedYear())
         var weekStart = diaryStart.with(DayOfWeek.MONDAY)
         while (true) {
             val naturalEnd = weekStart.plusDays(6)
@@ -80,12 +87,18 @@ object RecapPeriodOptions {
 
             val startDate = maxOf(weekStart, diaryStart)
             val weekNumber = weekStart.get(weekFields.weekOfWeekBasedYear())
-            val label = "Week $weekNumber"
+            val weekYear = weekStart.get(weekFields.weekBasedYear())
+            val label = if (weekYear == currentWeekYear) {
+                "Week $weekNumber"
+            } else {
+                "Week $weekNumber, $weekYear"
+            }
             options.add(
                 RecapPeriodOption(
                     label = label,
                     startDate = startDate,
                     endDate = naturalEnd,
+                    dateRangeText = formatDateRange(startDate, naturalEnd),
                     suggestedName = "$label recap",
                     hasVideos = recordedDates.any { it in startDate..naturalEnd },
                 )
@@ -113,6 +126,7 @@ object RecapPeriodOptions {
                     label = label,
                     startDate = startDate,
                     endDate = naturalEnd,
+                    dateRangeText = formatDateRange(startDate, naturalEnd),
                     suggestedName = "$label recap",
                     hasVideos = recordedDates.any { it in startDate..naturalEnd },
                 )
@@ -120,5 +134,34 @@ object RecapPeriodOptions {
             year = year.plusYears(1)
         }
         return options
+    }
+
+    /**
+     * A compact rendering of a date range, omitting whatever's implied by the other date -
+     * e.g. "10 - 30 September" (year and month both dropped from the start date since they're
+     * shared with the end date), or "29 Dec - 4 Jan" / "29 Dec 2025 - 4 Jan 2026" as the shared
+     * parts narrow.
+     */
+    private fun formatDateRange(startDate: LocalDate, endDate: LocalDate): String {
+        val startDay = startDate.format(StandardDateTimeFormatter.dayOfMonth)
+        val endDay = endDate.format(StandardDateTimeFormatter.dayOfMonth)
+        return when {
+            startDate.year == endDate.year && startDate.month == endDate.month -> {
+                val month = endDate.format(StandardDateTimeFormatter.monthFull)
+                "$startDay - $endDay $month"
+            }
+
+            startDate.year == endDate.year -> {
+                val startMonth = startDate.format(StandardDateTimeFormatter.monthShort)
+                val endMonth = endDate.format(StandardDateTimeFormatter.monthShort)
+                "$startDay $startMonth - $endDay $endMonth"
+            }
+
+            else -> {
+                val startMonth = startDate.format(StandardDateTimeFormatter.monthShort)
+                val endMonth = endDate.format(StandardDateTimeFormatter.monthShort)
+                "$startDay $startMonth ${startDate.year} - $endDay $endMonth ${endDate.year}"
+            }
+        }
     }
 }
