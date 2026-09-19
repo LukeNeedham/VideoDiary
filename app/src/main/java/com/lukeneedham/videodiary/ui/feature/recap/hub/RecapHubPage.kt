@@ -8,10 +8,7 @@ fun RecapHubPage(
     viewModel: RecapHubViewModel,
     canGoBack: Boolean,
     onBack: () -> Unit,
-    onCreateMonthClick: () -> Unit,
-    onCreateWeekClick: () -> Unit,
-    onCreateYearClick: () -> Unit,
-    onCreateCustomClick: () -> Unit,
+    onCreateRecapClick: () -> Unit,
     onRecapClick: (SavedRecap) -> Unit,
 ) {
     RecapHubPageContent(
@@ -19,10 +16,7 @@ fun RecapHubPage(
         videoAspectRatio = viewModel.videoAspectRatio,
         canGoBack = canGoBack,
         onBack = onBack,
-        onCreateMonthClick = onCreateMonthClick,
-        onCreateWeekClick = onCreateWeekClick,
-        onCreateYearClick = onCreateYearClick,
-        onCreateCustomClick = onCreateCustomClick,
+        onCreateRecapClick = onCreateRecapClick,
         onRecapClick = onRecapClick,
         onDeleteClick = viewModel::deleteRecap,
     )

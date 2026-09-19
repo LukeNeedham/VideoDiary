@@ -8,4 +8,5 @@ data class RecapPeriodOption(
     val startDate: LocalDate,
     val endDate: LocalDate,
     val suggestedName: String,
+    val hasVideos: Boolean,
 )

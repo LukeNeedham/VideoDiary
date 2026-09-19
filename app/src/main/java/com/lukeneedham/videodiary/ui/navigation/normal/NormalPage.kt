@@ -17,6 +17,7 @@ sealed class NormalPage : Parcelable {
     ) : NormalPage()
 
     data object RecapHub : NormalPage()
+    data object RecapCreateType : NormalPage()
     data class RecapCreatePeriodList(val periodType: RecapPeriodType) : NormalPage()
     data object RecapCreateCustom : NormalPage()
     data class RecapView(

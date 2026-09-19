@@ -45,10 +45,7 @@ fun RecapHubPageContent(
     videoAspectRatio: Float?,
     canGoBack: Boolean,
     onBack: () -> Unit,
-    onCreateMonthClick: () -> Unit,
-    onCreateWeekClick: () -> Unit,
-    onCreateYearClick: () -> Unit,
-    onCreateCustomClick: () -> Unit,
+    onCreateRecapClick: () -> Unit,
     onRecapClick: (SavedRecap) -> Unit,
     onDeleteClick: (String) -> Unit,
 ) {
@@ -71,40 +68,11 @@ fun RecapHubPageContent(
                 .padding(16.dp)
         ) {
             item {
-                Text(
-                    text = "Create a recap",
-                    color = Color.White.copy(alpha = 0.6f),
-                    fontSize = Typography.Size.extraSmall,
-                    modifier = Modifier.padding(bottom = 8.dp),
+                CreateRecapOptionRow(
+                    title = "Create a recap",
+                    description = "Make a recap of a month, week, year, or your own custom dates",
+                    onClick = onCreateRecapClick,
                 )
-            }
-
-            item {
-                Column {
-                    CreateRecapOptionRow(
-                        title = "Month recap",
-                        description = "Every day recorded in a chosen month",
-                        onClick = onCreateMonthClick,
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    CreateRecapOptionRow(
-                        title = "Week recap",
-                        description = "Every day recorded in a chosen week",
-                        onClick = onCreateWeekClick,
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    CreateRecapOptionRow(
-                        title = "Year recap",
-                        description = "Every day recorded in a chosen year",
-                        onClick = onCreateYearClick,
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    CreateRecapOptionRow(
-                        title = "Custom recap",
-                        description = "Pick your own dates and give it a name",
-                        onClick = onCreateCustomClick,
-                    )
-                }
                 Spacer(modifier = Modifier.height(24.dp))
             }
 
@@ -200,10 +168,7 @@ private fun PreviewEmpty() {
         videoAspectRatio = 9f / 16f,
         canGoBack = true,
         onBack = {},
-        onCreateMonthClick = {},
-        onCreateWeekClick = {},
-        onCreateYearClick = {},
-        onCreateCustomClick = {},
+        onCreateRecapClick = {},
         onRecapClick = {},
         onDeleteClick = {},
     )
@@ -238,10 +203,7 @@ private fun PreviewWithItems() {
         videoAspectRatio = 9f / 16f,
         canGoBack = true,
         onBack = {},
-        onCreateMonthClick = {},
-        onCreateWeekClick = {},
-        onCreateYearClick = {},
-        onCreateCustomClick = {},
+        onCreateRecapClick = {},
         onRecapClick = {},
         onDeleteClick = {},
     )

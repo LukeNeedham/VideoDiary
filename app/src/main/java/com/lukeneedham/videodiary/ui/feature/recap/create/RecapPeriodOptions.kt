@@ -13,7 +13,10 @@ import java.util.Locale
 
 /**
  * Builds the list of whole months/weeks/years the user can jump straight into a recap of,
- * most-recent-first, skipping any period with no recorded videos at all.
+ * most-recent-first. A period that hasn't fully elapsed yet (e.g. the current month) is left out
+ * entirely - e.g. September isn't offered until the 1st of October. A period that has fully
+ * elapsed but has no recorded videos is still included, marked via [RecapPeriodOption.hasVideos]
+ * so the UI can show it as an unselectable, greyed-out option.
  *
  * These are purely a UI convenience for picking a date range - the resulting [RecapPeriodOption]
  * only carries a suggested name and a date range, and nothing about "this was a month/week/year
@@ -26,34 +29,37 @@ object RecapPeriodOptions {
         val diaryStart = days.firstOrNull()?.date ?: return emptyList()
         val today = days.lastOrNull()?.date ?: return emptyList()
         val recordedDates = days.filter { it.videoFile != null }.map { it.date }
-        if (recordedDates.isEmpty()) return emptyList()
 
         val options = when (periodType) {
-            RecapPeriodType.MONTH -> buildMonths(diaryStart, today)
-            RecapPeriodType.WEEK -> buildWeeks(diaryStart, today)
-            RecapPeriodType.YEAR -> buildYears(diaryStart, today)
+            RecapPeriodType.MONTH -> buildMonths(diaryStart, today, recordedDates)
+            RecapPeriodType.WEEK -> buildWeeks(diaryStart, today, recordedDates)
+            RecapPeriodType.YEAR -> buildYears(diaryStart, today, recordedDates)
         }
 
-        return options
-            .filter { option -> recordedDates.any { it in option.startDate..option.endDate } }
-            .reversed()
+        return options.reversed()
     }
 
-    private fun buildMonths(diaryStart: LocalDate, today: LocalDate): List<RecapPeriodOption> {
+    private fun buildMonths(
+        diaryStart: LocalDate,
+        today: LocalDate,
+        recordedDates: List<LocalDate>,
+    ): List<RecapPeriodOption> {
         val options = mutableListOf<RecapPeriodOption>()
         var yearMonth = YearMonth.from(diaryStart)
-        val lastYearMonth = YearMonth.from(today)
-        while (!yearMonth.isAfter(lastYearMonth)) {
+        while (true) {
+            val naturalEnd = yearMonth.atEndOfMonth()
+            if (!naturalEnd.isBefore(today)) break
+
             val startDate = maxOf(yearMonth.atDay(1), diaryStart)
-            val endDate = minOf(yearMonth.atEndOfMonth(), today)
             val monthName = yearMonth.month.getDisplayName(TextStyle.FULL, Locale.getDefault())
             val label = "$monthName ${yearMonth.year}"
             options.add(
                 RecapPeriodOption(
                     label = label,
                     startDate = startDate,
-                    endDate = endDate,
+                    endDate = naturalEnd,
                     suggestedName = "$label recap",
+                    hasVideos = recordedDates.any { it in startDate..naturalEnd },
                 )
             )
             yearMonth = yearMonth.plusMonths(1)
@@ -61,22 +67,27 @@ object RecapPeriodOptions {
         return options
     }
 
-    private fun buildWeeks(diaryStart: LocalDate, today: LocalDate): List<RecapPeriodOption> {
+    private fun buildWeeks(
+        diaryStart: LocalDate,
+        today: LocalDate,
+        recordedDates: List<LocalDate>,
+    ): List<RecapPeriodOption> {
         val options = mutableListOf<RecapPeriodOption>()
         var weekStart = diaryStart.with(DayOfWeek.MONDAY)
-        val lastWeekStart = today.with(DayOfWeek.MONDAY)
-        while (!weekStart.isAfter(lastWeekStart)) {
-            val weekEnd = weekStart.plusDays(6)
+        while (true) {
+            val naturalEnd = weekStart.plusDays(6)
+            if (!naturalEnd.isBefore(today)) break
+
             val startDate = maxOf(weekStart, diaryStart)
-            val endDate = minOf(weekEnd, today)
             val weekNumber = weekStart.get(weekFields.weekOfWeekBasedYear())
             val label = "Week $weekNumber"
             options.add(
                 RecapPeriodOption(
                     label = label,
                     startDate = startDate,
-                    endDate = endDate,
+                    endDate = naturalEnd,
                     suggestedName = "$label recap",
+                    hasVideos = recordedDates.any { it in startDate..naturalEnd },
                 )
             )
             weekStart = weekStart.plusWeeks(1)
@@ -84,20 +95,26 @@ object RecapPeriodOptions {
         return options
     }
 
-    private fun buildYears(diaryStart: LocalDate, today: LocalDate): List<RecapPeriodOption> {
+    private fun buildYears(
+        diaryStart: LocalDate,
+        today: LocalDate,
+        recordedDates: List<LocalDate>,
+    ): List<RecapPeriodOption> {
         val options = mutableListOf<RecapPeriodOption>()
         var year = Year.from(diaryStart)
-        val lastYear = Year.from(today)
-        while (!year.isAfter(lastYear)) {
+        while (true) {
+            val naturalEnd = year.atMonth(12).atEndOfMonth()
+            if (!naturalEnd.isBefore(today)) break
+
             val startDate = maxOf(year.atDay(1), diaryStart)
-            val endDate = minOf(year.atMonth(12).atEndOfMonth(), today)
             val label = "${year.value}"
             options.add(
                 RecapPeriodOption(
                     label = label,
                     startDate = startDate,
-                    endDate = endDate,
+                    endDate = naturalEnd,
                     suggestedName = "$label recap",
+                    hasVideos = recordedDates.any { it in startDate..naturalEnd },
                 )
             )
             year = year.plusYears(1)

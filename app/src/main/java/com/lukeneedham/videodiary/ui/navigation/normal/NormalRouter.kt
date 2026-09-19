@@ -8,6 +8,7 @@ import com.lukeneedham.videodiary.ui.feature.crashlog.CrashLogPage
 import com.lukeneedham.videodiary.ui.feature.debug.DebugPage
 import com.lukeneedham.videodiary.ui.feature.recap.create.RecapCreateCustomPage
 import com.lukeneedham.videodiary.ui.feature.recap.create.RecapCreatePeriodListPage
+import com.lukeneedham.videodiary.ui.feature.recap.create.RecapCreateTypePage
 import com.lukeneedham.videodiary.ui.feature.recap.export.RecapExportProgressPage
 import com.lukeneedham.videodiary.ui.feature.recap.hub.RecapHubPage
 import com.lukeneedham.videodiary.ui.feature.recap.model.RecapPeriodType
@@ -107,6 +108,24 @@ fun NormalRouter(
                 viewModel = koinViewModel(),
                 canGoBack = canGoBack,
                 onBack = onBack,
+                onCreateRecapClick = {
+                    navigate(NormalPage.RecapCreateType)
+                },
+                onRecapClick = { savedRecap ->
+                    navigate(
+                        NormalPage.RecapView(
+                            startDate = savedRecap.startDate,
+                            endDate = savedRecap.endDate,
+                            name = savedRecap.name,
+                            savedRecapId = savedRecap.id,
+                        )
+                    )
+                },
+            )
+
+            is NormalPage.RecapCreateType -> RecapCreateTypePage(
+                canGoBack = canGoBack,
+                onBack = onBack,
                 onCreateMonthClick = {
                     navigate(NormalPage.RecapCreatePeriodList(RecapPeriodType.MONTH))
                 },
@@ -118,16 +137,6 @@ fun NormalRouter(
                 },
                 onCreateCustomClick = {
                     navigate(NormalPage.RecapCreateCustom)
-                },
-                onRecapClick = { savedRecap ->
-                    navigate(
-                        NormalPage.RecapView(
-                            startDate = savedRecap.startDate,
-                            endDate = savedRecap.endDate,
-                            name = savedRecap.name,
-                            savedRecapId = savedRecap.id,
-                        )
-                    )
                 },
             )
 

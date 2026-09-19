@@ -81,17 +81,20 @@ private fun RecapPeriodOptionRow(
     option: RecapPeriodOption,
     onClick: () -> Unit,
 ) {
+    val contentAlpha = if (option.hasVideos) 1f else 0.4f
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(12.dp))
-            .background(AppSurfaceVariant)
-            .clickable(onClick = onClick)
+            .background(AppSurfaceVariant.copy(alpha = contentAlpha))
+            .let {
+                if (option.hasVideos) it.clickable(onClick = onClick) else it
+            }
             .padding(20.dp)
     ) {
         Text(
             text = option.label,
-            color = Color.White,
+            color = Color.White.copy(alpha = contentAlpha),
             fontSize = Typography.Size.medium,
         )
         Spacer(modifier = Modifier.height(4.dp))
@@ -99,9 +102,17 @@ private fun RecapPeriodOptionRow(
         val end = option.endDate.format(StandardDateTimeFormatter.date)
         Text(
             text = "$start to $end",
-            color = Color.White.copy(alpha = 0.6f),
+            color = Color.White.copy(alpha = 0.6f * contentAlpha),
             fontSize = Typography.Size.extraSmall,
         )
+        if (!option.hasVideos) {
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(
+                text = "No videos recorded in this period",
+                color = Color.White.copy(alpha = 0.6f * contentAlpha),
+                fontSize = Typography.Size.extraSmall,
+            )
+        }
     }
 }
 
@@ -116,12 +127,14 @@ private fun PreviewRecapCreatePeriodListPageContent() {
                 startDate = LocalDate.of(2024, 3, 1),
                 endDate = LocalDate.of(2024, 3, 31),
                 suggestedName = "March 2024 recap",
+                hasVideos = true,
             ),
             RecapPeriodOption(
                 label = "February 2024",
                 startDate = LocalDate.of(2024, 2, 1),
                 endDate = LocalDate.of(2024, 2, 29),
                 suggestedName = "February 2024 recap",
+                hasVideos = false,
             ),
         ),
         isLoaded = true,
