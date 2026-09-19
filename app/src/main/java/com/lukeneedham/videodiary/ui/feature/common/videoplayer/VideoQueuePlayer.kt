@@ -76,8 +76,11 @@ private fun VideoQueuePlayerExo(
         player.addListener(listener)
         onDispose {
             player.removeListener(listener)
-            // Restore the default mode expected by single-video playback (e.g. the calendar
-            // day view) elsewhere in the app, since this is the single app-wide player.
+            // This is the single app-wide player, so leaving this screen must stop it (otherwise
+            // it keeps playing - audio and all - behind whatever's navigated to next), and restore
+            // the default mode expected by single-video playback elsewhere in the app (e.g. the
+            // calendar day view).
+            player.pause()
             player.repeatMode = Player.REPEAT_MODE_ONE
         }
     }

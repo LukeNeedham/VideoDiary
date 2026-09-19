@@ -54,15 +54,15 @@ fun RecapCreateTypePageContent(
                 .padding(16.dp)
         ) {
             CreateRecapTypeRow(
-                title = "Month recap",
-                description = "Every day recorded in a chosen month",
-                onClick = onCreateMonthClick,
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            CreateRecapTypeRow(
                 title = "Week recap",
                 description = "Every day recorded in a chosen week",
                 onClick = onCreateWeekClick,
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            CreateRecapTypeRow(
+                title = "Month recap",
+                description = "Every day recorded in a chosen month",
+                onClick = onCreateMonthClick,
             )
             Spacer(modifier = Modifier.height(8.dp))
             CreateRecapTypeRow(

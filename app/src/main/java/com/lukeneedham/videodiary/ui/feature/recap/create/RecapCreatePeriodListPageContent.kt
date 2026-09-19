@@ -148,16 +148,20 @@ private fun RecapPeriodOptionCard(
             overflow = TextOverflow.Ellipsis,
         )
         Spacer(modifier = Modifier.height(4.dp))
-        // The subtitle always reserves 2 lines - the date range, then the video count - so every
-        // card is the same height regardless of its content, without hardcoding a dp height
-        // (which wouldn't respect font scaling).
-        val videoCountText = if (option.videoCount == 1) "1 video" else "${option.videoCount} videos"
         Text(
-            text = "${option.dateRangeText}\n$videoCountText",
+            text = option.dateRangeText,
             color = Color.White.copy(alpha = 0.6f),
             fontSize = Typography.Size.extraSmall,
-            minLines = 2,
-            maxLines = 2,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+        )
+        Spacer(modifier = Modifier.height(2.dp))
+        val videoCountText = if (option.videoCount == 1) "1 video" else "${option.videoCount} videos"
+        Text(
+            text = videoCountText,
+            color = Color.White.copy(alpha = 0.6f),
+            fontSize = Typography.Size.extraSmall,
+            maxLines = 1,
             overflow = TextOverflow.Ellipsis,
         )
     }
