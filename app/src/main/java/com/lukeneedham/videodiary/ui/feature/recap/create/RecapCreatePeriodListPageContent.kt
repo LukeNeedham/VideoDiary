@@ -23,6 +23,7 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.lukeneedham.videodiary.ui.feature.common.toolbar.GenericToolbar
@@ -59,9 +60,14 @@ fun RecapCreatePeriodListPageContent(
         } else if (options.isEmpty()) {
             NoPeriodsYet(periodType = periodType)
         } else {
-            // Options are ordered latest-first; combined with reverseLayout, the latest one ends
-            // up at the bottom - so opening the page lands you on it, and scrolling up reveals
-            // progressively older ones (oldest at the very top).
+            // `options` is latest-first. With reverseLayout, whichever pair fills the grid's
+            // first row ends up at the bottom of the screen - so keeping that pair's most recent
+            // item first gives the correct top-to-bottom (oldest-to-latest) row order, landing the
+            // page scrolled to the latest one at the bottom, with older ones revealed by scrolling
+            // up. reverseLayout only flips row order, not left-to-right order within a row, so
+            // each pair is reversed here too - otherwise the more recent (list-first) item of each
+            // pair would render on the left, reading newest-to-oldest left-to-right.
+            val gridOptions = options.chunked(2).flatMap { it.reversed() }
             LazyVerticalGrid(
                 columns = GridCells.Fixed(2),
                 reverseLayout = true,
@@ -72,7 +78,7 @@ fun RecapCreatePeriodListPageContent(
                     .fillMaxWidth()
                     .padding(16.dp)
             ) {
-                items(options, key = { it.label + it.startDate }) { option ->
+                items(gridOptions, key = { it.label + it.startDate }) { option ->
                     RecapPeriodOptionCard(option = option, onClick = { onOptionClick(option) })
                 }
             }
@@ -132,23 +138,26 @@ private fun RecapPeriodOptionCard(
             .alpha(if (hasVideos) 1f else 0.65f)
             .background(AppSurfaceVariant)
             .let { if (hasVideos) it.clickable(onClick = onClick) else it }
-            .padding(horizontal = 16.dp, vertical = if (hasVideos) 16.dp else 10.dp)
+            .padding(16.dp)
     ) {
         Text(
             text = option.label,
             color = Color.White,
-            fontSize = if (hasVideos) Typography.Size.medium else Typography.Size.small,
+            fontSize = Typography.Size.medium,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
         )
         Spacer(modifier = Modifier.height(4.dp))
-        val subtitle = if (hasVideos) {
-            option.dateRangeText
-        } else {
-            "${option.dateRangeText} · No videos"
-        }
+        // The subtitle always reserves 2 lines - the date range, then a second line only used
+        // for the "No videos" note - so every card is the same height regardless of its content,
+        // without hardcoding a dp height (which wouldn't respect font scaling).
         Text(
-            text = subtitle,
+            text = "${option.dateRangeText}\n${if (hasVideos) "" else "No videos"}",
             color = Color.White.copy(alpha = 0.6f),
             fontSize = Typography.Size.extraSmall,
+            minLines = 2,
+            maxLines = 2,
+            overflow = TextOverflow.Ellipsis,
         )
     }
 }
