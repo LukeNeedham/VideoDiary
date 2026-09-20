@@ -9,16 +9,13 @@ import androidx.lifecycle.viewModelScope
 import com.lukeneedham.videodiary.data.persistence.SavedRecapsDao
 import com.lukeneedham.videodiary.data.repository.CalendarRepository
 import com.lukeneedham.videodiary.data.repository.VideoResolutionRepository
-import com.lukeneedham.videodiary.ui.feature.recap.model.RecapDay
-import com.lukeneedham.videodiary.ui.feature.recap.model.RecapDayThumbnail
-import com.lukeneedham.videodiary.ui.feature.recap.model.RecapExportRequest
 import kotlinx.coroutines.launch
 import java.io.File
 import java.time.LocalDate
 
 class RecapViewViewModel(
-    val startDate: LocalDate,
-    val endDate: LocalDate,
+    private val startDate: LocalDate,
+    private val endDate: LocalDate,
     val name: String,
     initialSavedRecapId: String?,
     private val calendarRepository: CalendarRepository,
@@ -28,14 +25,8 @@ class RecapViewViewModel(
     var videoAspectRatio: Float? by mutableStateOf(null)
         private set
 
-    private var days: List<RecapDay> by mutableStateOf(emptyList())
-
-    var dayThumbnails: List<RecapDayThumbnail> by mutableStateOf(emptyList())
+    var videoFiles: List<File> by mutableStateOf(emptyList())
         private set
-
-    val videoFiles: List<File> by derivedStateOf {
-        days.map { it.video }
-    }
 
     var savedRecapId: String? by mutableStateOf(initialSavedRecapId)
         private set
@@ -44,30 +35,14 @@ class RecapViewViewModel(
         savedRecapId != null
     }
 
-    var includeDateStamp: Boolean by mutableStateOf(true)
-
-    val exportRequest: RecapExportRequest? by derivedStateOf {
-        val days = days
-        if (days.isEmpty()) return@derivedStateOf null
-        RecapExportRequest(
-            days = days,
-            startDate = startDate,
-            endDate = endDate,
-            includeDateStamp = includeDateStamp,
-            name = name,
-        )
-    }
-
     init {
         viewModelScope.launch {
             videoAspectRatio = videoResolutionRepository.getAspectRatio()
         }
         viewModelScope.launch {
             calendarRepository.allDays.collect { allDays ->
-                val inRange = allDays.filter { it.date in startDate..endDate && it.videoFile != null }
-                days = inRange.map { day -> RecapDay(date = day.date, video = day.videoFile!!) }
-                dayThumbnails = inRange.map { day ->
-                    RecapDayThumbnail(date = day.date, thumbnailFile = day.thumbnailFile)
+                videoFiles = allDays.mapNotNull { day ->
+                    if (day.date in startDate..endDate) day.videoFile else null
                 }
             }
         }

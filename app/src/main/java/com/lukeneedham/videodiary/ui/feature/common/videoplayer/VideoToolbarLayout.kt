@@ -3,13 +3,11 @@ package com.lukeneedham.videodiary.ui.feature.common.videoplayer
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material.Text
@@ -25,65 +23,59 @@ import com.lukeneedham.videodiary.R
 
 /**
  * Layout shared by full-screen video viewers (calendar day, export view): the video fills the
- * space at the top - full width, with its height driven by [videoAspectRatio] (capped to at most
- * [maxVideoHeightFraction] of the available height, so a tall/portrait video can't crowd out a
- * sizeable [bottomBar] - it pillarboxes instead) - with an optional [topOverlay] floating "glass"
- * controls over its top edge (with a scrim behind it for legibility, omitted entirely when
- * there's no overlay to show), and a black toolbar below holding [bottomBar]. The video box (and
- * [video]/[topOverlay] slots) is omitted while [videoAspectRatio] is unknown.
+ * space at the top - full width, with its height driven by [videoAspectRatio] - with an optional
+ * [topOverlay] floating "glass" controls over its top edge (with a scrim behind it for
+ * legibility, omitted entirely when there's no overlay to show), and a black toolbar below holding
+ * [bottomBar]. The video box (and [video]/[topOverlay] slots) is omitted while [videoAspectRatio]
+ * is unknown.
  */
 @Composable
 fun VideoToolbarLayout(
     videoAspectRatio: Float?,
     modifier: Modifier = Modifier,
-    maxVideoHeightFraction: Float = 1f,
     topOverlay: (@Composable BoxScope.() -> Unit)? = null,
     bottomBar: @Composable BoxScope.() -> Unit,
     video: @Composable BoxScope.(aspectRatio: Float) -> Unit,
 ) {
-    BoxWithConstraints(modifier = modifier.fillMaxSize()) {
-        val maxVideoHeight = maxHeight * maxVideoHeightFraction
-        Column(modifier = Modifier.fillMaxSize()) {
-            Box(modifier = Modifier.fillMaxWidth()) {
-                if (videoAspectRatio != null) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .heightIn(max = maxVideoHeight)
-                            .aspectRatio(videoAspectRatio),
-                    ) {
-                        video(videoAspectRatio)
-                    }
-
-                    if (topOverlay != null) {
-                        TopScrim(
-                            modifier = Modifier
-                                .align(Alignment.TopCenter)
-                                .height(140.dp),
-                        )
-                    }
+    Column(modifier = modifier.fillMaxSize()) {
+        Box(modifier = Modifier.fillMaxWidth()) {
+            if (videoAspectRatio != null) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .aspectRatio(videoAspectRatio),
+                ) {
+                    video(videoAspectRatio)
                 }
 
                 if (topOverlay != null) {
-                    Box(
+                    TopScrim(
                         modifier = Modifier
                             .align(Alignment.TopCenter)
-                            .fillMaxWidth()
-                            .statusBarsPadding(),
-                        content = topOverlay,
+                            .height(140.dp),
                     )
                 }
             }
 
-            Box(
-                modifier = Modifier
-                    .weight(1f)
-                    .fillMaxWidth()
-                    .background(Color.Black)
-                    .navigationBarsPadding(),
-                content = bottomBar,
-            )
+            if (topOverlay != null) {
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.TopCenter)
+                        .fillMaxWidth()
+                        .statusBarsPadding(),
+                    content = topOverlay,
+                )
+            }
         }
+
+        Box(
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxWidth()
+                .background(Color.Black)
+                .navigationBarsPadding(),
+            content = bottomBar,
+        )
     }
 }
 
