@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.lukeneedham.videodiary.data.persistence.VideoExportDao
 import com.lukeneedham.videodiary.data.persistence.export.VideoExportState
 import com.lukeneedham.videodiary.domain.model.ShareRequest
+import com.lukeneedham.videodiary.ui.feature.recap.model.RecapExportOptions
 import com.lukeneedham.videodiary.ui.feature.recap.model.RecapShareRequest
 import com.lukeneedham.videodiary.ui.feature.recap.share.model.RecapShareState
 import kotlinx.coroutines.channels.BufferOverflow
@@ -20,8 +21,14 @@ class RecapShareViewModel(
     private val videoExportDao: VideoExportDao,
 ) : ViewModel() {
 
+    // Each export option gets its own backing property here (bound to its own control on the
+    // options screen), folded together into `options` below - the single thing actually passed
+    // to the exporter/cache, so adding a new option only means adding it in these two places.
     var includeDateStamp: Boolean by mutableStateOf(false)
         private set
+
+    private val options: RecapExportOptions
+        get() = RecapExportOptions(includeDateStamp = includeDateStamp)
 
     var state: RecapShareState by mutableStateOf(stateForCurrentOptions())
         private set
@@ -39,7 +46,7 @@ class RecapShareViewModel(
     }
 
     fun startExport() {
-        val existing = videoExportDao.getExistingExport(request.startDate, request.endDate, includeDateStamp)
+        val existing = videoExportDao.getExistingExport(request.startDate, request.endDate, options)
         if (existing != null) {
             state = RecapShareState.Ready(existing)
             return
@@ -47,7 +54,7 @@ class RecapShareViewModel(
 
         state = RecapShareState.InProgress(0f)
         viewModelScope.launch {
-            videoExportDao.export(request.days, request.startDate, request.endDate, includeDateStamp).collect { exportState ->
+            videoExportDao.export(request.days, request.startDate, request.endDate, options).collect { exportState ->
                 state = when (exportState) {
                     is VideoExportState.InProgress -> RecapShareState.InProgress(exportState.progressFraction)
                     is VideoExportState.Success -> RecapShareState.Ready(exportState.outputFile)
@@ -86,7 +93,7 @@ class RecapShareViewModel(
     /** A previously-exported file for the current options, ready to share immediately - or, if
      * none exists yet, the options screen so the user can create one. */
     private fun stateForCurrentOptions(): RecapShareState {
-        val existing = videoExportDao.getExistingExport(request.startDate, request.endDate, includeDateStamp)
+        val existing = videoExportDao.getExistingExport(request.startDate, request.endDate, options)
         return if (existing != null) RecapShareState.Ready(existing) else RecapShareState.SelectingOptions
     }
 
