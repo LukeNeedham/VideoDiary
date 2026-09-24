@@ -23,7 +23,7 @@ class RecapShareViewModel(
     var includeDateStamp: Boolean by mutableStateOf(false)
         private set
 
-    var state: RecapShareState by mutableStateOf(RecapShareState.SelectingOptions)
+    var state: RecapShareState by mutableStateOf(stateForCurrentOptions())
         private set
 
     private val onShareMutable = MutableSharedFlow<ShareRequest>(
@@ -34,12 +34,20 @@ class RecapShareViewModel(
 
     fun onIncludeDateStampChange(value: Boolean) {
         includeDateStamp = value
+        // Switching options might point at a combination that's already been exported before.
+        state = stateForCurrentOptions()
     }
 
     fun startExport() {
+        val existing = videoExportDao.getExistingExport(request.startDate, request.endDate, includeDateStamp)
+        if (existing != null) {
+            state = RecapShareState.Ready(existing)
+            return
+        }
+
         state = RecapShareState.InProgress(0f)
         viewModelScope.launch {
-            videoExportDao.export(request.days, includeDateStamp).collect { exportState ->
+            videoExportDao.export(request.days, request.startDate, request.endDate, includeDateStamp).collect { exportState ->
                 state = when (exportState) {
                     is VideoExportState.InProgress -> RecapShareState.InProgress(exportState.progressFraction)
                     is VideoExportState.Success -> RecapShareState.Ready(exportState.outputFile)
@@ -73,6 +81,13 @@ class RecapShareViewModel(
                 )
             )
         }
+    }
+
+    /** A previously-exported file for the current options, ready to share immediately - or, if
+     * none exists yet, the options screen so the user can create one. */
+    private fun stateForCurrentOptions(): RecapShareState {
+        val existing = videoExportDao.getExistingExport(request.startDate, request.endDate, includeDateStamp)
+        return if (existing != null) RecapShareState.Ready(existing) else RecapShareState.SelectingOptions
     }
 
     override fun onCleared() {

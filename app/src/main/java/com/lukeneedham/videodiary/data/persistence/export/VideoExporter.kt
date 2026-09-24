@@ -111,6 +111,8 @@ class VideoExporter(
 
                     error != null -> {
                         isFlowing = false
+                        // Clean up any partial output so it's never mistaken for a valid cached export.
+                        outputFile.delete()
                         VideoExportState.Failure(error)
                     }
 
