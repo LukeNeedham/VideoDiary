@@ -9,7 +9,7 @@ import com.lukeneedham.videodiary.ui.feature.debug.DebugPage
 import com.lukeneedham.videodiary.ui.feature.recap.create.RecapCreateCustomPage
 import com.lukeneedham.videodiary.ui.feature.recap.create.RecapCreatePeriodListPage
 import com.lukeneedham.videodiary.ui.feature.recap.create.RecapCreateTypePage
-import com.lukeneedham.videodiary.ui.feature.recap.export.RecapExportProgressPage
+import com.lukeneedham.videodiary.ui.feature.recap.share.RecapSharePage
 import com.lukeneedham.videodiary.ui.feature.recap.hub.RecapHubPage
 import com.lukeneedham.videodiary.ui.feature.recap.model.RecapPeriodType
 import com.lukeneedham.videodiary.ui.feature.recap.view.RecapViewPage
@@ -181,19 +181,18 @@ fun NormalRouter(
                 },
                 canGoBack = canGoBack,
                 onBack = onBack,
-                onExportRequested = { request ->
-                    navigate(NormalPage.RecapExportProgress(request))
+                onShareRequested = { request ->
+                    navigate(NormalPage.RecapShare(request))
                 },
             )
 
-            is NormalPage.RecapExportProgress -> RecapExportProgressPage(
+            is NormalPage.RecapShare -> RecapSharePage(
                 viewModel = koinViewModel {
                     parametersOf(page.request)
                 },
+                canGoBack = canGoBack,
+                onBack = onBack,
                 share = share,
-                onExit = {
-                    pop()
-                },
             )
 
             is NormalPage.Debug -> DebugPage(

@@ -23,10 +23,10 @@ import com.lukeneedham.videodiary.ui.feature.debug.DebugViewModel
 import com.lukeneedham.videodiary.ui.feature.permissions.RequestPermissionsViewModel
 import com.lukeneedham.videodiary.ui.feature.recap.create.RecapCreateCustomViewModel
 import com.lukeneedham.videodiary.ui.feature.recap.create.RecapCreatePeriodListViewModel
-import com.lukeneedham.videodiary.ui.feature.recap.export.RecapExportProgressViewModel
 import com.lukeneedham.videodiary.ui.feature.recap.hub.RecapHubViewModel
-import com.lukeneedham.videodiary.ui.feature.recap.model.RecapExportRequest
 import com.lukeneedham.videodiary.ui.feature.recap.model.RecapPeriodType
+import com.lukeneedham.videodiary.ui.feature.recap.model.RecapShareRequest
+import com.lukeneedham.videodiary.ui.feature.recap.share.RecapShareViewModel
 import com.lukeneedham.videodiary.ui.feature.recap.view.RecapViewViewModel
 import com.lukeneedham.videodiary.ui.feature.record.check.CheckVideoViewModel
 import com.lukeneedham.videodiary.ui.feature.record.film.RecordVideoViewModel
@@ -207,8 +207,8 @@ object KoinModule {
                 videoResolutionRepository = get(),
             )
         }
-        viewModel { (request: RecapExportRequest) ->
-            RecapExportProgressViewModel(
+        viewModel { (request: RecapShareRequest) ->
+            RecapShareViewModel(
                 request = request,
                 videoExportDao = get(),
             )

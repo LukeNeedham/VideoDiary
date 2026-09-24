@@ -10,7 +10,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.lukeneedham.videodiary.ui.feature.common.videoplayer.VideoPlayerController
 import com.lukeneedham.videodiary.ui.feature.common.videoplayer.VideoQueuePlayer
 import com.lukeneedham.videodiary.ui.feature.common.videoplayer.VideoToolbarLayout
-import com.lukeneedham.videodiary.ui.feature.recap.view.component.RecapViewBottomSheet
+import com.lukeneedham.videodiary.ui.feature.recap.view.component.RecapViewBottomBar
 import java.io.File
 
 @Composable
@@ -20,8 +20,6 @@ fun RecapViewPageContent(
     videoFiles: List<File>,
     isSaved: Boolean,
     onToggleSavedClick: () -> Unit,
-    includeDateStamp: Boolean,
-    onIncludeDateStampChange: (Boolean) -> Unit,
     onShareClick: () -> Unit,
     canGoBack: Boolean,
     onBack: () -> Unit,
@@ -35,11 +33,9 @@ fun RecapViewPageContent(
     VideoToolbarLayout(
         videoAspectRatio = videoAspectRatio,
         bottomBar = {
-            RecapViewBottomSheet(
+            RecapViewBottomBar(
                 name = name,
                 isSaved = isSaved,
-                includeDateStamp = includeDateStamp,
-                onIncludeDateStampChange = onIncludeDateStampChange,
                 canGoBack = canGoBack,
                 onBack = onBack,
                 onToggleSavedClick = onToggleSavedClick,
@@ -70,8 +66,6 @@ private fun PreviewPortrait() {
             videoFiles = MockDataRecapView.videoFiles,
             isSaved = false,
             onToggleSavedClick = {},
-            includeDateStamp = false,
-            onIncludeDateStampChange = {},
             onShareClick = {},
             canGoBack = true,
             onBack = {},
@@ -92,8 +86,6 @@ private fun PreviewSaved() {
             videoFiles = MockDataRecapView.videoFiles,
             isSaved = true,
             onToggleSavedClick = {},
-            includeDateStamp = true,
-            onIncludeDateStampChange = {},
             onShareClick = {},
             canGoBack = true,
             onBack = {},

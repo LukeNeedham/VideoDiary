@@ -1,14 +1,14 @@
 package com.lukeneedham.videodiary.ui.feature.recap.view
 
 import androidx.compose.runtime.Composable
-import com.lukeneedham.videodiary.ui.feature.recap.model.RecapExportRequest
+import com.lukeneedham.videodiary.ui.feature.recap.model.RecapShareRequest
 
 @Composable
 fun RecapViewPage(
     viewModel: RecapViewViewModel,
     canGoBack: Boolean,
     onBack: () -> Unit,
-    onExportRequested: (RecapExportRequest) -> Unit,
+    onShareRequested: (RecapShareRequest) -> Unit,
 ) {
     RecapViewPageContent(
         name = viewModel.name,
@@ -16,9 +16,7 @@ fun RecapViewPage(
         videoFiles = viewModel.videoFiles,
         isSaved = viewModel.isSaved,
         onToggleSavedClick = viewModel::toggleSaved,
-        includeDateStamp = viewModel.includeDateStamp,
-        onIncludeDateStampChange = viewModel::onIncludeDateStampChange,
-        onShareClick = { onExportRequested(viewModel.buildExportRequest()) },
+        onShareClick = { onShareRequested(viewModel.buildShareRequest()) },
         canGoBack = canGoBack,
         onBack = onBack,
     )

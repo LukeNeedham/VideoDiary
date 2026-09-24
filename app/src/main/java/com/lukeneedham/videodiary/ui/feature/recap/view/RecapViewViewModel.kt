@@ -10,7 +10,7 @@ import com.lukeneedham.videodiary.data.persistence.SavedRecapsDao
 import com.lukeneedham.videodiary.data.repository.CalendarRepository
 import com.lukeneedham.videodiary.data.repository.VideoResolutionRepository
 import com.lukeneedham.videodiary.ui.feature.recap.model.RecapDay
-import com.lukeneedham.videodiary.ui.feature.recap.model.RecapExportRequest
+import com.lukeneedham.videodiary.ui.feature.recap.model.RecapShareRequest
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 
@@ -39,9 +39,6 @@ class RecapViewViewModel(
     val isSaved: Boolean by derivedStateOf {
         savedRecapId != null
     }
-
-    var includeDateStamp: Boolean by mutableStateOf(false)
-        private set
 
     init {
         viewModelScope.launch {
@@ -73,15 +70,10 @@ class RecapViewViewModel(
         }
     }
 
-    fun onIncludeDateStampChange(value: Boolean) {
-        includeDateStamp = value
-    }
-
-    fun buildExportRequest(): RecapExportRequest = RecapExportRequest(
+    fun buildShareRequest(): RecapShareRequest = RecapShareRequest(
         days = days,
         startDate = startDate,
         endDate = endDate,
-        includeDateStamp = includeDateStamp,
         name = name,
     )
 }
