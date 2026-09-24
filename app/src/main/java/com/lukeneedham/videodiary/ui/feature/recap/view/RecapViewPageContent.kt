@@ -40,7 +40,7 @@ fun RecapViewPageContent(
                 onBack = onBack,
                 onToggleSavedClick = onToggleSavedClick,
                 onShareClick = onShareClick,
-                modifier = Modifier.align(Alignment.BottomCenter),
+                modifier = Modifier.align(Alignment.Center),
             )
         },
     ) { aspectRatio ->
