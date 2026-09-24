@@ -181,6 +181,9 @@ fun NormalRouter(
                 },
                 canGoBack = canGoBack,
                 onBack = onBack,
+                onExportRequested = { request ->
+                    navigate(NormalPage.RecapExportProgress(request))
+                },
             )
 
             is NormalPage.RecapExportProgress -> RecapExportProgressPage(

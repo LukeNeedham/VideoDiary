@@ -9,8 +9,9 @@ import androidx.lifecycle.viewModelScope
 import com.lukeneedham.videodiary.data.persistence.SavedRecapsDao
 import com.lukeneedham.videodiary.data.repository.CalendarRepository
 import com.lukeneedham.videodiary.data.repository.VideoResolutionRepository
+import com.lukeneedham.videodiary.ui.feature.recap.model.RecapDay
+import com.lukeneedham.videodiary.ui.feature.recap.model.RecapExportRequest
 import kotlinx.coroutines.launch
-import java.io.File
 import java.time.LocalDate
 
 class RecapViewViewModel(
@@ -25,8 +26,12 @@ class RecapViewViewModel(
     var videoAspectRatio: Float? by mutableStateOf(null)
         private set
 
-    var videoFiles: List<File> by mutableStateOf(emptyList())
+    var days: List<RecapDay> by mutableStateOf(emptyList())
         private set
+
+    val videoFiles by derivedStateOf {
+        days.map { it.video }
+    }
 
     var savedRecapId: String? by mutableStateOf(initialSavedRecapId)
         private set
@@ -35,14 +40,22 @@ class RecapViewViewModel(
         savedRecapId != null
     }
 
+    var includeDateStamp: Boolean by mutableStateOf(false)
+        private set
+
     init {
         viewModelScope.launch {
             videoAspectRatio = videoResolutionRepository.getAspectRatio()
         }
         viewModelScope.launch {
             calendarRepository.allDays.collect { allDays ->
-                videoFiles = allDays.mapNotNull { day ->
-                    if (day.date in startDate..endDate) day.videoFile else null
+                days = allDays.mapNotNull { day ->
+                    val videoFile = day.videoFile
+                    if (day.date in startDate..endDate && videoFile != null) {
+                        RecapDay(day.date, videoFile)
+                    } else {
+                        null
+                    }
                 }
             }
         }
@@ -59,4 +72,16 @@ class RecapViewViewModel(
             }
         }
     }
+
+    fun onIncludeDateStampChange(value: Boolean) {
+        includeDateStamp = value
+    }
+
+    fun buildExportRequest(): RecapExportRequest = RecapExportRequest(
+        days = days,
+        startDate = startDate,
+        endDate = endDate,
+        includeDateStamp = includeDateStamp,
+        name = name,
+    )
 }
