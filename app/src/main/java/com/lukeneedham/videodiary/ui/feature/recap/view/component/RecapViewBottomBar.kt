@@ -1,29 +1,26 @@
 package com.lukeneedham.videodiary.ui.feature.recap.view.component
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.lukeneedham.videodiary.R
 import com.lukeneedham.videodiary.ui.feature.common.toolbar.FlatIconButton
-import com.lukeneedham.videodiary.ui.theme.AppSurfaceVariant
 import com.lukeneedham.videodiary.ui.theme.Typography
 
 /**
  * A recap's static bottom bar: a borderless back button, the (wrapping, truly-centered) recap
- * name, and save/share icon buttons.
+ * name, and save/share icon buttons - plain, on the same black bar every other video toolbar
+ * uses (no surface color/rounded corners of its own).
  */
 @Composable
 fun RecapViewBottomBar(
@@ -39,9 +36,7 @@ fun RecapViewBottomBar(
         verticalAlignment = Alignment.CenterVertically,
         modifier = modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp))
-            .background(AppSurfaceVariant)
-            .padding(horizontal = 14.dp, vertical = 14.dp),
+            .padding(horizontal = 8.dp, vertical = 8.dp),
     ) {
         Box(
             contentAlignment = Alignment.CenterStart,
