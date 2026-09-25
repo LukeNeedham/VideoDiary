@@ -14,6 +14,7 @@ import com.lukeneedham.videodiary.ui.feature.exportdiary.view.ExportDiaryViewPag
 import com.lukeneedham.videodiary.ui.feature.record.check.CheckVideoPage
 import com.lukeneedham.videodiary.ui.feature.record.film.RecordVideoPage
 import com.lukeneedham.videodiary.ui.feature.record.film.RecordVideoViewModel
+import com.lukeneedham.videodiary.ui.feature.storage.VideoStoragePage
 import dev.olshevski.navigation.reimagined.NavBackHandler
 import dev.olshevski.navigation.reimagined.NavHost
 import dev.olshevski.navigation.reimagined.navigate
@@ -56,6 +57,9 @@ fun NormalRouter(
                 },
                 onExportClick = {
                     navigate(NormalPage.ExportHub)
+                },
+                onStorageClick = {
+                    navigate(NormalPage.VideoStorage)
                 },
                 onDebugClick = {
                     navigate(NormalPage.Debug)
@@ -119,6 +123,12 @@ fun NormalRouter(
                     )
                     navigate(NormalPage.ExportDiaryView(exportedVideo))
                 },
+            )
+
+            is NormalPage.VideoStorage -> VideoStoragePage(
+                viewModel = koinViewModel(),
+                canGoBack = canGoBack,
+                onBack = onBack,
             )
 
             is NormalPage.ExportDiaryCreate -> ExportDiaryCreatePage(

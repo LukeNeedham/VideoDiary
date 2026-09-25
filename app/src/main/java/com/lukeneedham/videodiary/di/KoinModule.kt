@@ -75,6 +75,7 @@ object KoinModule {
         single {
             VideosDao(
                 context = androidContext(),
+                settingsDao = get(),
                 videoFileNameMapper = get(),
                 thumbnailFileNameMapper = get(),
                 videoThumbnailExtractor = get(),
@@ -181,6 +182,13 @@ object KoinModule {
                 videoResolutionRepository = get(),
                 videosDao = get(),
                 settingsDao = get(),
+            )
+        }
+        viewModel {
+            com.lukeneedham.videodiary.ui.feature.storage.VideoStorageViewModel(
+                settingsDao = get(),
+                videosDao = get(),
+                ioDispatcher = get(KoinQualifier.Dispatcher.io),
             )
         }
         viewModel {
