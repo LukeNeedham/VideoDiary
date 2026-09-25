@@ -30,7 +30,10 @@ class RecapShareViewModel(
     private val options: RecapExportOptions
         get() = RecapExportOptions(includeDateStamp = includeDateStamp)
 
-    var state: RecapShareState by mutableStateOf(stateForCurrentOptions())
+    // Always starts on the options screen, even if a previous export happens to already match
+    // the default options - the user picks options first, and only then (in startExport) do we
+    // check whether that exact combination is already cached.
+    var state: RecapShareState by mutableStateOf(RecapShareState.SelectingOptions)
         private set
 
     private val onShareMutable = MutableSharedFlow<ShareRequest>(
@@ -41,8 +44,6 @@ class RecapShareViewModel(
 
     fun onIncludeDateStampChange(value: Boolean) {
         includeDateStamp = value
-        // Switching options might point at a combination that's already been exported before.
-        state = stateForCurrentOptions()
     }
 
     fun startExport() {
@@ -88,13 +89,6 @@ class RecapShareViewModel(
                 )
             )
         }
-    }
-
-    /** A previously-exported file for the current options, ready to share immediately - or, if
-     * none exists yet, the options screen so the user can create one. */
-    private fun stateForCurrentOptions(): RecapShareState {
-        val existing = videoExportDao.getExistingExport(request.startDate, request.endDate, options)
-        return if (existing != null) RecapShareState.Ready(existing) else RecapShareState.SelectingOptions
     }
 
     override fun onCleared() {
