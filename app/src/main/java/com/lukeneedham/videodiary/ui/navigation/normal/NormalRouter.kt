@@ -25,6 +25,7 @@ import com.lukeneedham.videodiary.ui.feature.recap.view.RecapViewPage
 import com.lukeneedham.videodiary.ui.feature.record.check.CheckVideoPage
 import com.lukeneedham.videodiary.ui.feature.record.film.RecordVideoPage
 import com.lukeneedham.videodiary.ui.feature.record.film.RecordVideoViewModel
+import com.lukeneedham.videodiary.ui.feature.storage.VideoStoragePage
 import dev.olshevski.navigation.reimagined.NavBackHandler
 import dev.olshevski.navigation.reimagined.NavHost
 import dev.olshevski.navigation.reimagined.navigate
@@ -95,10 +96,26 @@ fun NormalRouter(
 
     NavBackHandler(navController)
 
-    // Registered after the NavBackHandler so that it takes priority while the sheet is open
-    BackHandler(enabled = hubSheetState.isVisible) {
-        coroutineScope.launch { hubSheetState.hide() }
-    }
+    NavHost(
+        controller = navController,
+    ) { page ->
+        when (page) {
+            is NormalPage.Calendar -> CalendarPage(
+                viewModel = koinViewModel(),
+                onRecordVideoClick = { date ->
+                    navigate(NormalPage.RecordVideo(date))
+                },
+                onExportClick = {
+                    navigate(NormalPage.ExportHub)
+                },
+                onStorageClick = {
+                    navigate(NormalPage.VideoStorage)
+                },
+                onDebugClick = {
+                    navigate(NormalPage.Debug)
+                },
+                share = share,
+            )
 
     ModalBottomSheetLayout(
         sheetState = hubSheetState,
@@ -258,6 +275,92 @@ fun NormalRouter(
                     onBack = onBack,
                 )
             }
+
+            is NormalPage.CheckVideo -> {
+                val returnToCalendar: () -> Unit = {
+                    navController.popUpTo { it is NormalPage.Calendar }
+                }
+                CheckVideoPage(
+                    viewModel = koinViewModel {
+                        parametersOf(page.date, page.videoContentUri)
+                    },
+                    onRetake = {
+                        pop()
+                    },
+                    onKeepExisting = returnToCalendar,
+                    onKeepNew = returnToCalendar,
+                )
+            }
+
+            is NormalPage.ExportHub -> ExportHubPage(
+                viewModel = koinViewModel(),
+                canGoBack = canGoBack,
+                onBack = onBack,
+                onCreateExportClick = {
+                    navigate(NormalPage.ExportDiaryCreate)
+                },
+                onExportClick = { savedExport ->
+                    val exportedVideo = ExportedVideo(
+                        videoFile = savedExport.videoFile,
+                        name = savedExport.name,
+                        startDate = savedExport.startDate,
+                        endDate = savedExport.endDate,
+                        dayVideoCount = savedExport.dayVideoCount,
+                    )
+                    navigate(NormalPage.ExportDiaryView(exportedVideo))
+                },
+            )
+
+            is NormalPage.VideoStorage -> VideoStoragePage(
+                viewModel = koinViewModel(),
+                canGoBack = canGoBack,
+                onBack = onBack,
+            )
+
+            is NormalPage.ExportDiaryCreate -> ExportDiaryCreatePage(
+                viewModel = koinViewModel(),
+                canGoBack = canGoBack,
+                onBack = onBack,
+                onExportRequested = { exportRequest ->
+                    navigate(NormalPage.ExportDiaryProgress(exportRequest))
+                }
+            )
+
+            is NormalPage.ExportDiaryProgress -> ExportDiaryProgressPage(
+                viewModel = koinViewModel {
+                    parametersOf(page.exportRequest)
+                },
+                onExported = { exportedVideo ->
+                    navController.popUpTo { it is NormalPage.ExportDiaryCreate }
+                    navigate(NormalPage.ExportDiaryView(exportedVideo))
+                },
+                onExit = {
+                    pop()
+                },
+            )
+
+            is NormalPage.ExportDiaryView -> ExportDiaryViewPage(
+                viewModel = koinViewModel(),
+                share = share,
+                canGoBack = canGoBack,
+                onBack = onBack,
+                exportedVideo = page.exportedVideo,
+            )
+
+            is NormalPage.Debug -> DebugPage(
+                viewModel = koinViewModel(),
+                canGoBack = canGoBack,
+                onBack = onBack,
+                onCrashLogClick = {
+                    navigate(NormalPage.CrashLog)
+                },
+            )
+
+            is NormalPage.CrashLog -> CrashLogPage(
+                viewModel = koinViewModel(),
+                canGoBack = canGoBack,
+                onBack = onBack,
+            )
         }
     }
 }

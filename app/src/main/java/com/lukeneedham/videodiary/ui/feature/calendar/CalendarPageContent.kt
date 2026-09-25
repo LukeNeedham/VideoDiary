@@ -38,58 +38,76 @@ fun CalendarPageContent(
     setCurrentDayIndex: (Int) -> Unit,
     share: (ShareRequest) -> Unit,
     videoPlayerController: VideoPlayerController,
-    onMenuClick: () -> Unit,
+    onExportClick: () -> Unit,
+    onStorageClick: () -> Unit,
+    onDebugClick: () -> Unit,
 ) {
     val currentDay = days[currentDayIndex]
 
     var showDayPickerDialog by remember { mutableStateOf(false) }
     var pendingDateToDelete: LocalDate? by remember { mutableStateOf(null) }
 
-    // Pause the video while the date picker sheet is open, and resume it when it closes
-    val isDayPickerOpen = showDayPickerDialog
-    DisposableEffect(isDayPickerOpen) {
-        if (isDayPickerOpen) {
-            videoPlayerController.temporaryPause()
-        }
-        onDispose {
-            if (isDayPickerOpen) {
-                videoPlayerController.temporaryResume()
-            }
-        }
+    val drawerState = rememberDrawerState(DrawerValue.Closed)
+    val coroutineScope = rememberCoroutineScope()
+
+    BackHandler(enabled = drawerState.isOpen) {
+        coroutineScope.launch { drawerState.close() }
     }
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(AppBackground)
-    ) {
-        if (days.isNotEmpty()) {
-            CalendarScroller(
-                days = days,
-                allowEditPastDays = allowEditPastDays,
-                onRecordVideoClick = onRecordVideoClick,
-                onDeleteVideoClick = {
-                    pendingDateToDelete = it
+    ModalDrawer(
+        drawerState = drawerState,
+        drawerContent = {
+            CalendarSideMenu(
+                onExportClick = {
+                    coroutineScope.launch { drawerState.close() }
+                    onExportClick()
                 },
-                openDayPicker = {
-                    showDayPickerDialog = true
+                onStorageClick = {
+                    coroutineScope.launch { drawerState.close() }
+                    onStorageClick()
                 },
-                currentDayIndex = currentDayIndex,
-                setCurrentDayIndex = setCurrentDayIndex,
-                onMenuClick = onMenuClick,
-                share = share,
-                videoPlayerController = videoPlayerController,
+                onDebugClick = {
+                    coroutineScope.launch { drawerState.close() }
+                    onDebugClick()
+                },
             )
-        } else {
-            Box(
-                contentAlignment = Alignment.Center,
-                modifier = Modifier.fillMaxSize()
-            ) {
-                CircularProgressIndicator(
-                    modifier = Modifier.size(50.dp)
+        },
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(AppBackground)
+        ) {
+            if (days.isNotEmpty() && videoAspectRatio != null) {
+                CalendarScroller(
+                    days = days,
+                    videoAspectRatio = videoAspectRatio,
+                    allowEditPastDays = allowEditPastDays,
+                    onRecordVideoClick = onRecordVideoClick,
+                    onDeleteVideoClick = {
+                        pendingDateToDelete = it
+                    },
+                    openDayPicker = {
+                        showDayPickerDialog = true
+                    },
+                    currentDayIndex = currentDayIndex,
+                    setCurrentDayIndex = setCurrentDayIndex,
+                    onMenuClick = {
+                        coroutineScope.launch { drawerState.open() }
+                    },
+                    share = share,
+                    videoPlayerController = videoPlayerController,
                 )
+            } else {
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(50.dp)
+                    )
+                }
             }
-        }
 
         if (showDayPickerDialog) {
             DiaryDatePickerSheet(
@@ -137,7 +155,9 @@ private fun Preview(
             setCurrentDayIndex = {},
             share = {},
             videoPlayerController = rememberVideoPlayerController(),
-            onMenuClick = {},
+            onExportClick = {},
+            onStorageClick = {},
+            onDebugClick = {},
         )
     }
 }

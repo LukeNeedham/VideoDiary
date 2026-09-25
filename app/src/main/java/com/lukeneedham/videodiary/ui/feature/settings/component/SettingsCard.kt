@@ -26,8 +26,41 @@ import com.lukeneedham.videodiary.ui.theme.Typography
 
 /** A clickable settings card showing an icon and a name. */
 @Composable
-fun SettingsCard(
-    title: String,
+fun CalendarSideMenu(
+    onExportClick: () -> Unit,
+    onStorageClick: () -> Unit,
+    onDebugClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        modifier = modifier
+            .fillMaxHeight()
+            .background(AppSurface)
+            .padding(vertical = 24.dp)
+    ) {
+        CalendarSideMenuItem(
+            iconRes = R.drawable.movie,
+            text = "Export",
+            onClick = onExportClick,
+        )
+        CalendarSideMenuItem(
+            iconRes = R.drawable.movie,
+            text = "Video storage",
+            onClick = onStorageClick,
+        )
+
+        if (BuildConfig.DEBUG) {
+            CalendarSideMenuItem(
+                iconRes = R.drawable.bug,
+                text = "Debug",
+                onClick = onDebugClick,
+            )
+        }
+    }
+}
+
+@Composable
+private fun CalendarSideMenuItem(
     iconRes: Int,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -58,10 +91,11 @@ fun SettingsCard(
 
 @Preview
 @Composable
-private fun PreviewSettingsCard() {
-    SettingsCard(
-        title = "Debug settings",
-        iconRes = R.drawable.bug,
-        onClick = {},
+private fun PreviewCalendarSideMenu() {
+    CalendarSideMenu(
+        onExportClick = {},
+        onStorageClick = {},
+        onDebugClick = {},
+        modifier = Modifier.width(280.dp),
     )
 }
