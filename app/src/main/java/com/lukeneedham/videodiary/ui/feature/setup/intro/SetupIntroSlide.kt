@@ -37,8 +37,8 @@ val setupIntroSlides = listOf(
     SetupIntroSlide(
         iconRes = R.drawable.share,
         accentColor = AccentHighlight,
-        title = "Export your story",
-        description = "At any point, export your diary into a single video - a full recap " +
-            "of your life so far!",
+        title = "Recap your story",
+        description = "At any point, create a recap of a month, week, year, or your own custom " +
+            "dates - then export it as a single video to share.",
     ),
 )

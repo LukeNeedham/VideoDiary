@@ -16,7 +16,8 @@ import androidx.media3.transformer.ExportResult
 import androidx.media3.transformer.ProgressHolder
 import androidx.media3.transformer.Transformer
 import com.lukeneedham.videodiary.domain.util.date.StandardDateTimeFormatter
-import com.lukeneedham.videodiary.ui.feature.exportdiary.create.model.ExportDay
+import com.lukeneedham.videodiary.ui.feature.recap.model.RecapDay
+import com.lukeneedham.videodiary.ui.feature.recap.model.RecapExportOptions
 import com.lukeneedham.videodiary.util.ext.toOverlayEffect
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
@@ -53,9 +54,9 @@ class VideoExporter(
 
     @OptIn(UnstableApi::class)
     fun export(
-        inputVideos: List<ExportDay>,
+        inputVideos: List<RecapDay>,
         outputFile: File,
-        exportIncludeDateStamp: Boolean,
+        options: RecapExportOptions,
     ): Flow<VideoExportState> {
         // Delete existing export if it exists -
         // there should be at most 1 export file at any time, to avoid clutter
@@ -69,7 +70,7 @@ class VideoExporter(
             val mediaItem = MediaItem.fromUri(input.video.toUri())
 
             val date = input.date
-            val dateOverlay = if (exportIncludeDateStamp) {
+            val dateOverlay = if (options.includeDateStamp) {
                 createTextOverlay(text = date.format(StandardDateTimeFormatter.date))
             } else {
                 null
@@ -111,6 +112,8 @@ class VideoExporter(
 
                     error != null -> {
                         isFlowing = false
+                        // Clean up any partial output so it's never mistaken for a valid cached export.
+                        outputFile.delete()
                         VideoExportState.Failure(error)
                     }
 
