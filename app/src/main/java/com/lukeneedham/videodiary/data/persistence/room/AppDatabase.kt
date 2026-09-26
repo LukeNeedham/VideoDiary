@@ -16,9 +16,7 @@ abstract class AppDatabase : RoomDatabase() {
                 AppDatabase::class.java,
                 "video_diary_db"
             )
-                // The saved-export table was replaced by saved-recap (a plain date range,
-                // no video file); there's no meaningful migration from the old shape.
-                .fallbackToDestructiveMigration()
+                .addMigrations(MIGRATION_1_2)
                 .build()
     }
 }
