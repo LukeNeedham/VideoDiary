@@ -42,6 +42,8 @@ class SettingsDao(
     private val allowEditPastDays = booleanPreferencesKey("debugAllowRetakeForPastDays")
 
     private val videoStorageLocationKey = stringPreferencesKey("videoStorageLocation")
+    private val customVideoStorageUriKey = stringPreferencesKey("customVideoStorageUri")
+    private val customVideoStorageNameKey = stringPreferencesKey("customVideoStorageName")
 
     suspend fun setResolution(resolution: Size) {
         val components = listOf(resolution.width, resolution.height)
@@ -117,15 +119,43 @@ class SettingsDao(
 
     suspend fun setVideoStorageLocation(location: VideoStorageLocation) {
         updatePrefs {
-            set(videoStorageLocationKey, location.name)
+            when (location) {
+                VideoStorageLocation.Internal -> {
+                    set(videoStorageLocationKey, "Internal")
+                }
+                VideoStorageLocation.RemovableStorage -> {
+                    set(videoStorageLocationKey, "RemovableStorage")
+                }
+                is VideoStorageLocation.Custom -> {
+                    set(videoStorageLocationKey, "Custom")
+                    set(customVideoStorageUriKey, location.uriString)
+                    if (location.displayName != null) {
+                        set(customVideoStorageNameKey, location.displayName)
+                    } else {
+                        remove(customVideoStorageNameKey)
+                    }
+                }
+            }
         }
     }
 
     fun getVideoStorageLocationFlow(): Flow<VideoStorageLocation> {
         return context.dataStore.data.map { prefs ->
-            prefs[videoStorageLocationKey]
-                ?.let { id -> VideoStorageLocation.entries.firstOrNull { it.name == id } }
-                ?: VideoStorageLocation.Internal
+            when (prefs[videoStorageLocationKey]) {
+                "RemovableStorage" -> VideoStorageLocation.RemovableStorage
+                "Custom" -> {
+                    val uri = prefs[customVideoStorageUriKey]
+                    if (uri != null) {
+                        VideoStorageLocation.Custom(
+                            uriString = uri,
+                            displayName = prefs[customVideoStorageNameKey]
+                        )
+                    } else {
+                        VideoStorageLocation.Internal
+                    }
+                }
+                else -> VideoStorageLocation.Internal
+            }
         }
     }
 
