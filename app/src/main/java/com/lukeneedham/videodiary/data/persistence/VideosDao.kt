@@ -195,6 +195,49 @@ class VideosDao(
                     Environment.getExternalStorageState(directory) == Environment.MEDIA_MOUNTED
             }
             ?.let { File(it, "videos") }
+        is VideoStorageLocation.Custom -> {
+            val uri = Uri.parse(location.uriString)
+            getFileFromUri(context, uri)
+        }
+    }
+
+    private fun getFileFromUri(context: Context, uri: Uri): File? {
+        if (uri.scheme == "file") {
+            return uri.path?.let { File(it) }
+        }
+        if (uri.scheme == "content") {
+            val docId = try {
+                android.provider.DocumentsContract.getTreeDocumentId(uri)
+            } catch (e: Exception) {
+                try {
+                    android.provider.DocumentsContract.getDocumentId(uri)
+                } catch (e: Exception) {
+                    null
+                }
+            }
+            if (docId != null) {
+                val split = docId.split(":")
+                val type = split[0]
+                val relativePath = if (split.size > 1) split[1] else ""
+
+                if ("primary".equals(type, ignoreCase = true)) {
+                    return File(Environment.getExternalStorageDirectory(), relativePath)
+                } else {
+                    val externalDirs = context.getExternalFilesDirs(null)
+                    for (dir in externalDirs) {
+                        if (dir != null) {
+                            val path = dir.absolutePath
+                            val volumePath = path.substringBefore("/Android/data/")
+                            if (volumePath.contains(type, ignoreCase = true)) {
+                                return File(volumePath, relativePath)
+                            }
+                        }
+                    }
+                    return File("/storage/$type/$relativePath")
+                }
+            }
+        }
+        return null
     }
 
     private fun getVideoFileName(date: LocalDate) = videoFileNameMapper.dateToName(date)
