@@ -4,5 +4,4 @@ package com.lukeneedham.videodiary.domain.model
 sealed interface VideoStorageLocation {
     data object Internal : VideoStorageLocation
     data object RemovableStorage : VideoStorageLocation
-    data class Custom(val uriString: String, val displayName: String? = null) : VideoStorageLocation
 }
