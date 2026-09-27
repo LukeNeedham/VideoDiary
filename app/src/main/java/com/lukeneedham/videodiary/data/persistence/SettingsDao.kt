@@ -13,6 +13,7 @@ import androidx.datastore.preferences.preferencesDataStore
 import com.lukeneedham.videodiary.data.persistence.model.OrientationPersistence
 import com.lukeneedham.videodiary.domain.model.CameraResolutionRotation
 import com.lukeneedham.videodiary.domain.model.Orientation
+import com.lukeneedham.videodiary.domain.model.VideoStorageLocation
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
@@ -39,6 +40,8 @@ class SettingsDao(
 
     /** Debug setting: whether the user is allowed to retake the video for a past day */
     private val allowEditPastDays = booleanPreferencesKey("debugAllowRetakeForPastDays")
+
+    private val videoStorageLocationKey = stringPreferencesKey("videoStorageLocation")
 
     suspend fun setResolution(resolution: Size) {
         val components = listOf(resolution.width, resolution.height)
@@ -109,6 +112,28 @@ class SettingsDao(
     fun getAllowEditPastDaysFlow(): Flow<Boolean> {
         return context.dataStore.data.map { prefs ->
             prefs[allowEditPastDays] ?: false
+        }
+    }
+
+    suspend fun setVideoStorageLocation(location: VideoStorageLocation) {
+        updatePrefs {
+            when (location) {
+                VideoStorageLocation.Internal -> {
+                    set(videoStorageLocationKey, "Internal")
+                }
+                VideoStorageLocation.RemovableStorage -> {
+                    set(videoStorageLocationKey, "RemovableStorage")
+                }
+            }
+        }
+    }
+
+    fun getVideoStorageLocationFlow(): Flow<VideoStorageLocation> {
+        return context.dataStore.data.map { prefs ->
+            when (prefs[videoStorageLocationKey]) {
+                "RemovableStorage" -> VideoStorageLocation.RemovableStorage
+                else -> VideoStorageLocation.Internal
+            }
         }
     }
 
