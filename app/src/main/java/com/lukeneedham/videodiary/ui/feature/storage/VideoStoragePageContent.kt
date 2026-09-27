@@ -29,7 +29,6 @@ fun VideoStoragePageContent(
     isChangingLocation: Boolean,
     error: String?,
     onLocationSelected: (VideoStorageLocation) -> Unit,
-    onSelectCustomFolder: () -> Unit,
     canGoBack: Boolean,
     onBack: () -> Unit,
 ) {
@@ -65,19 +64,6 @@ fun VideoStoragePageContent(
                 selected = location == VideoStorageLocation.RemovableStorage,
                 enabled = isRemovableStorageAvailable && !isChangingLocation,
                 onClick = { onLocationSelected(VideoStorageLocation.RemovableStorage) },
-            )
-            val isCustomSelected = location is VideoStorageLocation.Custom
-            val customDescription = if (location is VideoStorageLocation.Custom) {
-                "Current folder: ${location.displayName ?: location.uriString}"
-            } else {
-                "Select a custom folder on your device to store diary videos."
-            }
-            StorageOption(
-                title = "Custom folder",
-                description = customDescription,
-                selected = isCustomSelected,
-                enabled = !isChangingLocation,
-                onClick = onSelectCustomFolder,
             )
             if (isChangingLocation) {
                 Spacer(modifier = Modifier.height(16.dp))
@@ -129,7 +115,6 @@ private fun PreviewVideoStoragePageContent() {
         isChangingLocation = false,
         error = null,
         onLocationSelected = {},
-        onSelectCustomFolder = {},
         canGoBack = true,
         onBack = {},
     )

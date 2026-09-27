@@ -55,15 +55,46 @@ class VideosDao(
         destinationDir.mkdirs()
         check(destinationDir.isDirectory) { "Could not create destination directory" }
         val sourceFiles = videosDir.listFiles()?.toList().orEmpty()
-        sourceFiles.forEach { source ->
-            source.copyTo(File(destinationDir, source.name), overwrite = true)
+        val temporaryFiles = mutableListOf<File>()
+        val deletedSources = mutableListOf<File>()
+        try {
+            sourceFiles.forEach { source ->
+                val destination = File(destinationDir, source.name)
+                check(!destination.exists()) {
+                    "A video named ${source.name} already exists in the destination"
+                }
+                val temporary = File(destinationDir, ".${source.name}.moving")
+                check(!temporary.exists()) {
+                    "A previous move for ${source.name} has not completed"
+                }
+                source.copyTo(temporary)
+                check(temporary.length() == source.length()) {
+                    "Copied video ${source.name} has an unexpected size"
+                }
+                temporaryFiles += temporary
+            }
+
+            sourceFiles.forEach { source ->
+                check(source.delete()) { "Could not remove ${source.name} from the old location" }
+                deletedSources += source
+            }
+            temporaryFiles.forEach { temporary ->
+                val destination = File(destinationDir, temporary.name.removePrefix(".").removeSuffix(".moving"))
+                check(temporary.renameTo(destination)) { "Could not finish moving ${destination.name}" }
+            }
+            videosDir = destinationDir
+            removableStorageAvailableMutable.value = isRemovableStorageAvailable()
+            refreshVideosState()
+        } catch (error: Exception) {
+            deletedSources.forEach { source ->
+                val temporary = temporaryFiles.firstOrNull {
+                    it.name == ".${source.name}.moving"
+                }
+                temporary?.copyTo(source, overwrite = true)
+            }
+            temporaryFiles.forEach { it.delete() }
+            throw error
         }
-        sourceFiles.forEach { source ->
-            check(source.delete()) { "Could not remove ${source.name} from the old location" }
-        }
-        videosDir = destinationDir
-        removableStorageAvailableMutable.value = isRemovableStorageAvailable()
-        refreshVideosState()
     }
 
     fun deleteVideo(date: LocalDate) {
@@ -195,49 +226,6 @@ class VideosDao(
                     Environment.getExternalStorageState(directory) == Environment.MEDIA_MOUNTED
             }
             ?.let { File(it, "videos") }
-        is VideoStorageLocation.Custom -> {
-            val uri = Uri.parse(location.uriString)
-            getFileFromUri(context, uri)
-        }
-    }
-
-    private fun getFileFromUri(context: Context, uri: Uri): File? {
-        if (uri.scheme == "file") {
-            return uri.path?.let { File(it) }
-        }
-        if (uri.scheme == "content") {
-            val docId = try {
-                android.provider.DocumentsContract.getTreeDocumentId(uri)
-            } catch (e: Exception) {
-                try {
-                    android.provider.DocumentsContract.getDocumentId(uri)
-                } catch (e: Exception) {
-                    null
-                }
-            }
-            if (docId != null) {
-                val split = docId.split(":")
-                val type = split[0]
-                val relativePath = if (split.size > 1) split[1] else ""
-
-                if ("primary".equals(type, ignoreCase = true)) {
-                    return File(Environment.getExternalStorageDirectory(), relativePath)
-                } else {
-                    val externalDirs = context.getExternalFilesDirs(null)
-                    for (dir in externalDirs) {
-                        if (dir != null) {
-                            val path = dir.absolutePath
-                            val volumePath = path.substringBefore("/Android/data/")
-                            if (volumePath.contains(type, ignoreCase = true)) {
-                                return File(volumePath, relativePath)
-                            }
-                        }
-                    }
-                    return File("/storage/$type/$relativePath")
-                }
-            }
-        }
-        return null
     }
 
     private fun getVideoFileName(date: LocalDate) = videoFileNameMapper.dateToName(date)
