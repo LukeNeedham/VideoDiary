@@ -24,11 +24,8 @@ import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.composed
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.layout
-import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
@@ -52,13 +49,6 @@ private val SheetContentHeight: Dp = 230.dp
  * Its content area is a fixed height regardless of [state], so switching between
  * options/progress/ready/failed never changes the sheet's own size - only an explicit user drag
  * does.
- *
- * Root.kt pads the whole app away from the system bars before this (or any other screen) is ever
- * composed, which would otherwise leave ModalBottomSheetLayout's "hidden" resting position just
- * above the navigation bar rather than fully below the true screen edge - [fullWindowHeight]
- * works around that by measuring it against the real window height instead. The sheet's own
- * [navigationBarsPadding] keeps the *visible* position exactly where it already was, since it
- * grows the sheet's own content by the same amount this adds to the available height.
  */
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -79,7 +69,7 @@ fun RecapShareSheet(
         sheetBackgroundColor = AppSurfaceVariant,
         sheetShape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp),
         scrimColor = Color.Black.copy(alpha = 0.5f),
-        modifier = modifier.fullWindowHeight(),
+        modifier = modifier,
         sheetContent = {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -213,24 +203,6 @@ fun RecapShareSheet(
         },
         content = content,
     )
-}
-
-/**
- * Measures as if the incoming height constraint were the true window height, ignoring any
- * reduction from insets padding applied higher up the tree (Root.kt pads the whole app away from
- * the system bars before this is ever composed). Anything downstream that reads the *available*
- * height - like ModalBottomSheetLayout's hidden/expanded anchor math - sees the real screen
- * height instead of the already-reduced one.
- */
-private fun Modifier.fullWindowHeight(): Modifier = composed {
-    val view = LocalView.current
-    this.layout { measurable, constraints ->
-        val trueHeight = view.height.coerceAtLeast(constraints.maxHeight)
-        val placeable = measurable.measure(constraints.copy(minHeight = trueHeight, maxHeight = trueHeight))
-        layout(placeable.width, placeable.height) {
-            placeable.place(0, 0)
-        }
-    }
 }
 
 /** Purely visual - the whole sheet is already swipe-to-dismiss, this just signals it. */
