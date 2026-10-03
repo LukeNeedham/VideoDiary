@@ -93,28 +93,22 @@ class RecapShareViewModel(
         state = RecapShareState.SelectingOptions
     }
 
-    /** Re-opens the system share sheet for the already-exported file - the same thing that
-     * happens automatically the moment the export completes. */
+    /** Opens the system share sheet for the already-exported file. */
     fun shareClicked() {
         val readyState = state as? RecapShareState.Ready ?: return
-        emitShare(readyState.outputFile)
-    }
-
-    private fun markReady(file: File) {
-        state = RecapShareState.Ready(file)
-        emitShare(file)
-    }
-
-    private fun emitShare(file: File) {
         viewModelScope.launch {
             onShareMutable.emit(
                 ShareRequest(
                     title = name,
                     text = name,
-                    video = file,
+                    video = readyState.outputFile,
                 )
             )
         }
+    }
+
+    private fun markReady(file: File) {
+        state = RecapShareState.Ready(file)
     }
 
     override fun onCleared() {
