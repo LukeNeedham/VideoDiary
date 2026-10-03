@@ -1,17 +1,8 @@
 package com.lukeneedham.videodiary.ui.feature.recap.share
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
@@ -20,13 +11,17 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Checkbox
 import androidx.compose.material.CheckboxDefaults
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.LinearProgressIndicator
+import androidx.compose.material.ModalBottomSheetLayout
+import androidx.compose.material.ModalBottomSheetState
+import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.Text
+import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -37,15 +32,19 @@ import com.lukeneedham.videodiary.ui.feature.common.toolbar.FlatIconButton
 import com.lukeneedham.videodiary.ui.feature.recap.share.model.RecapShareState
 import com.lukeneedham.videodiary.ui.theme.AppSurfaceVariant
 import com.lukeneedham.videodiary.ui.theme.Typography
+import kotlinx.coroutines.launch
 
 /**
- * The whole share flow (pick options, create the export, share it) as a single bottom sheet
- * docked over a recap's video, rather than a separate page - closing it just hides it, it doesn't
- * cancel an in-progress export or lose a finished one.
+ * The whole share flow (pick options, create the export, share it) as a real Material bottom
+ * sheet docked over a recap's video, rather than a separate page. [sheetState] is hoisted to the
+ * caller so the share button (which lives in [content], not here) can call `.show()` on it -
+ * hiding the sheet (close button, scrim tap, swipe-down or back) doesn't cancel an in-progress
+ * export or lose a finished one, since that state all lives outside this composable.
  */
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun RecapShareSheet(
-    visible: Boolean,
+    sheetState: ModalBottomSheetState,
     state: RecapShareState,
     includeDateStamp: Boolean,
     onIncludeDateStampChange: (Boolean) -> Unit,
@@ -53,37 +52,20 @@ fun RecapShareSheet(
     onCancelClick: () -> Unit,
     onRetryClick: () -> Unit,
     onShareClick: () -> Unit,
-    onDismiss: () -> Unit,
     modifier: Modifier = Modifier,
+    content: @Composable () -> Unit,
 ) {
-    AnimatedVisibility(
-        visible = visible,
-        enter = fadeIn(),
-        exit = fadeOut(),
+    val coroutineScope = rememberCoroutineScope()
+
+    ModalBottomSheetLayout(
+        sheetState = sheetState,
+        sheetBackgroundColor = AppSurfaceVariant,
+        sheetShape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp),
+        scrimColor = Color.Black.copy(alpha = 0.5f),
         modifier = modifier,
-    ) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Color.Black.copy(alpha = 0.5f))
-                .clickable(
-                    interactionSource = remember { MutableInteractionSource() },
-                    indication = null,
-                    onClick = onDismiss,
-                ),
-        ) {
+        sheetContent = {
             Column(
                 modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp))
-                    .background(AppSurfaceVariant)
-                    // Swallow taps so they don't fall through to the scrim's dismiss handler.
-                    .clickable(
-                        interactionSource = remember { MutableInteractionSource() },
-                        indication = null,
-                        onClick = {},
-                    )
                     .navigationBarsPadding()
                     .padding(20.dp),
             ) {
@@ -92,7 +74,7 @@ fun RecapShareSheet(
                     FlatIconButton(
                         iconRes = R.drawable.close,
                         contentDescription = "Close",
-                        onClick = onDismiss,
+                        onClick = { coroutineScope.launch { sheetState.hide() } },
                         selected = true,
                         size = 32.dp,
                         iconSize = 18.dp,
@@ -207,15 +189,17 @@ fun RecapShareSheet(
                     }
                 }
             }
-        }
-    }
+        },
+        content = content,
+    )
 }
 
+@OptIn(ExperimentalMaterialApi::class)
 @Preview
 @Composable
 private fun PreviewSelectingOptions() {
     RecapShareSheet(
-        visible = true,
+        sheetState = rememberModalBottomSheetState(ModalBottomSheetValue.Expanded),
         state = RecapShareState.SelectingOptions,
         includeDateStamp = false,
         onIncludeDateStampChange = {},
@@ -223,15 +207,16 @@ private fun PreviewSelectingOptions() {
         onCancelClick = {},
         onRetryClick = {},
         onShareClick = {},
-        onDismiss = {},
+        content = {},
     )
 }
 
+@OptIn(ExperimentalMaterialApi::class)
 @Preview
 @Composable
 private fun PreviewInProgress() {
     RecapShareSheet(
-        visible = true,
+        sheetState = rememberModalBottomSheetState(ModalBottomSheetValue.Expanded),
         state = MockDataRecapShare.inProgress,
         includeDateStamp = false,
         onIncludeDateStampChange = {},
@@ -239,15 +224,16 @@ private fun PreviewInProgress() {
         onCancelClick = {},
         onRetryClick = {},
         onShareClick = {},
-        onDismiss = {},
+        content = {},
     )
 }
 
+@OptIn(ExperimentalMaterialApi::class)
 @Preview
 @Composable
 private fun PreviewReady() {
     RecapShareSheet(
-        visible = true,
+        sheetState = rememberModalBottomSheetState(ModalBottomSheetValue.Expanded),
         state = MockDataRecapShare.ready,
         includeDateStamp = false,
         onIncludeDateStampChange = {},
@@ -255,15 +241,16 @@ private fun PreviewReady() {
         onCancelClick = {},
         onRetryClick = {},
         onShareClick = {},
-        onDismiss = {},
+        content = {},
     )
 }
 
+@OptIn(ExperimentalMaterialApi::class)
 @Preview
 @Composable
 private fun PreviewFailed() {
     RecapShareSheet(
-        visible = true,
+        sheetState = rememberModalBottomSheetState(ModalBottomSheetValue.Expanded),
         state = MockDataRecapShare.failed,
         includeDateStamp = false,
         onIncludeDateStampChange = {},
@@ -271,6 +258,6 @@ private fun PreviewFailed() {
         onCancelClick = {},
         onRetryClick = {},
         onShareClick = {},
-        onDismiss = {},
+        content = {},
     )
 }

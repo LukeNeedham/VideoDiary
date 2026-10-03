@@ -2,11 +2,12 @@ package com.lukeneedham.videodiary.ui.feature.recap.view
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.ModalBottomSheetValue
+import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -17,8 +18,10 @@ import com.lukeneedham.videodiary.ui.feature.recap.share.MockDataRecapShare
 import com.lukeneedham.videodiary.ui.feature.recap.share.RecapShareSheet
 import com.lukeneedham.videodiary.ui.feature.recap.share.model.RecapShareState
 import com.lukeneedham.videodiary.ui.feature.recap.view.component.RecapViewBottomBar
+import kotlinx.coroutines.launch
 import java.io.File
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun RecapViewPageContent(
     name: String,
@@ -42,9 +45,19 @@ fun RecapViewPageContent(
         }
     }
 
-    var isShareSheetVisible by remember { mutableStateOf(false) }
+    val sheetState = rememberModalBottomSheetState(ModalBottomSheetValue.Hidden)
+    val coroutineScope = rememberCoroutineScope()
 
-    Box(modifier = Modifier.fillMaxSize()) {
+    RecapShareSheet(
+        sheetState = sheetState,
+        state = shareState,
+        includeDateStamp = includeDateStamp,
+        onIncludeDateStampChange = onIncludeDateStampChange,
+        onCreateClick = onCreateExportClick,
+        onCancelClick = onCancelExportClick,
+        onRetryClick = onRetryAfterFailureClick,
+        onShareClick = onManualShareClick,
+    ) {
         VideoToolbarLayout(
             videoAspectRatio = videoAspectRatio,
             bottomBar = {
@@ -54,7 +67,7 @@ fun RecapViewPageContent(
                     canGoBack = canGoBack,
                     onBack = onBack,
                     onToggleSavedClick = onToggleSavedClick,
-                    onShareClick = { isShareSheetVisible = true },
+                    onShareClick = { coroutineScope.launch { sheetState.show() } },
                     modifier = Modifier.align(Alignment.Center),
                 )
             },
@@ -66,18 +79,6 @@ fun RecapViewPageContent(
                 modifier = Modifier.fillMaxSize(),
             )
         }
-
-        RecapShareSheet(
-            visible = isShareSheetVisible,
-            state = shareState,
-            includeDateStamp = includeDateStamp,
-            onIncludeDateStampChange = onIncludeDateStampChange,
-            onCreateClick = onCreateExportClick,
-            onCancelClick = onCancelExportClick,
-            onRetryClick = onRetryAfterFailureClick,
-            onShareClick = onManualShareClick,
-            onDismiss = { isShareSheetVisible = false },
-        )
     }
 }
 
