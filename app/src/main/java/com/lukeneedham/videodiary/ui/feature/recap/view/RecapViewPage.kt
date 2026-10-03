@@ -39,7 +39,7 @@ fun RecapViewPage(
         onIncludeDateStampChange = shareViewModel::onIncludeDateStampChange,
         onCreateExportClick = shareViewModel::startExport,
         onCancelExportClick = shareViewModel::cancelExport,
-        onRetryAfterFailureClick = shareViewModel::retryAfterFailure,
+        onBackToOptionsClick = shareViewModel::backToOptions,
         onManualShareClick = shareViewModel::shareClicked,
     )
 }

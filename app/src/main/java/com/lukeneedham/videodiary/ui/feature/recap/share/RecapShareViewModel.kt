@@ -87,7 +87,9 @@ class RecapShareViewModel(
         videoExportDao.cancel()
     }
 
-    fun retryAfterFailure() {
+    /** Back to the options screen - used both to retry after a failure and, from the ready
+     * screen, to pick different options and potentially make a new export. */
+    fun backToOptions() {
         state = RecapShareState.SelectingOptions
     }
 

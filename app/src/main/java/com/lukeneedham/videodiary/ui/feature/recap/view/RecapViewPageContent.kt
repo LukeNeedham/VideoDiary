@@ -36,7 +36,7 @@ fun RecapViewPageContent(
     onIncludeDateStampChange: (Boolean) -> Unit,
     onCreateExportClick: () -> Unit,
     onCancelExportClick: () -> Unit,
-    onRetryAfterFailureClick: () -> Unit,
+    onBackToOptionsClick: () -> Unit,
     onManualShareClick: () -> Unit,
 ) {
     val controller = remember {
@@ -55,7 +55,7 @@ fun RecapViewPageContent(
         onIncludeDateStampChange = onIncludeDateStampChange,
         onCreateClick = onCreateExportClick,
         onCancelClick = onCancelExportClick,
-        onRetryClick = onRetryAfterFailureClick,
+        onBackToOptionsClick = onBackToOptionsClick,
         onShareClick = onManualShareClick,
     ) {
         VideoToolbarLayout(
@@ -102,7 +102,7 @@ private fun PreviewPortrait() {
             onIncludeDateStampChange = {},
             onCreateExportClick = {},
             onCancelExportClick = {},
-            onRetryAfterFailureClick = {},
+            onBackToOptionsClick = {},
             onManualShareClick = {},
         )
     }
@@ -128,7 +128,7 @@ private fun PreviewSaved() {
             onIncludeDateStampChange = {},
             onCreateExportClick = {},
             onCancelExportClick = {},
-            onRetryAfterFailureClick = {},
+            onBackToOptionsClick = {},
             onManualShareClick = {},
         )
     }
