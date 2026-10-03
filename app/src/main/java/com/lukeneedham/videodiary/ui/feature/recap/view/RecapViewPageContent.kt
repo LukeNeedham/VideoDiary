@@ -1,5 +1,6 @@
 package com.lukeneedham.videodiary.ui.feature.recap.view
 
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.ExperimentalMaterialApi
@@ -45,7 +46,16 @@ fun RecapViewPageContent(
         }
     }
 
-    val sheetState = rememberModalBottomSheetState(ModalBottomSheetValue.Hidden)
+    // A tween (rather than the default spring) settles - and flips sheetState.currentValue -
+    // right when the sheet visually stops moving. The default spring's long, barely-visible
+    // settle tail left currentValue (and so RecapShareSheet's hidden-content gating) lagging
+    // behind by about a second, during which the sheet's content was still fully mounted and
+    // sitting in the - unclipped, since Root pads the whole app away from the system bars -
+    // navigation bar's area.
+    val sheetState = rememberModalBottomSheetState(
+        initialValue = ModalBottomSheetValue.Hidden,
+        animationSpec = tween(durationMillis = 250),
+    )
     val coroutineScope = rememberCoroutineScope()
 
     RecapShareSheet(
