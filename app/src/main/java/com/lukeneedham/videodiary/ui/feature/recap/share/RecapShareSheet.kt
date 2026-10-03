@@ -24,8 +24,11 @@ import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.composed
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.layout
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
@@ -46,12 +49,16 @@ private val SheetContentHeight: Dp = 230.dp
  * hiding the sheet (drag handle swipe-down, scrim tap or back) doesn't cancel an in-progress
  * export or lose a finished one, since that state all lives outside this composable.
  *
- * The sheet body - handle included - is only composed once the sheet is visible or about to
- * become visible ([ModalBottomSheetState.targetValue]/[ModalBottomSheetState.isVisible]); while
- * fully hidden it renders nothing at all, so there's never anything left to peek out at the
- * bottom of the screen. Its content area is a fixed height regardless of [state], so switching
- * between options/progress/ready/failed never changes the sheet's own size - only an explicit
- * user drag does.
+ * Its content area is a fixed height regardless of [state], so switching between
+ * options/progress/ready/failed never changes the sheet's own size - only an explicit user drag
+ * does.
+ *
+ * Root.kt pads the whole app away from the system bars before this (or any other screen) is ever
+ * composed, which would otherwise leave ModalBottomSheetLayout's "hidden" resting position just
+ * above the navigation bar rather than fully below the true screen edge - [fullWindowHeight]
+ * works around that by measuring it against the real window height instead. The sheet's own
+ * [navigationBarsPadding] keeps the *visible* position exactly where it already was, since it
+ * grows the sheet's own content by the same amount this adds to the available height.
  */
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -72,134 +79,132 @@ fun RecapShareSheet(
         sheetBackgroundColor = AppSurfaceVariant,
         sheetShape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp),
         scrimColor = Color.Black.copy(alpha = 0.5f),
-        modifier = modifier,
+        modifier = modifier.fullWindowHeight(),
         sheetContent = {
-            if (sheetState.isVisible || sheetState.targetValue != ModalBottomSheetValue.Hidden) {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .navigationBarsPadding()
+                    .padding(bottom = 20.dp),
+            ) {
+                Spacer(modifier = Modifier.height(10.dp))
+                DragHandle()
+
+                Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .navigationBarsPadding()
-                        .padding(bottom = 20.dp),
+                        .height(SheetContentHeight)
+                        .padding(horizontal = 20.dp, vertical = 16.dp),
+                    contentAlignment = Alignment.TopCenter,
                 ) {
-                    Spacer(modifier = Modifier.height(10.dp))
-                    DragHandle()
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        when (state) {
+                            RecapShareState.SelectingOptions -> {
+                                Text(
+                                    text = "Share recap",
+                                    color = Color.White,
+                                    fontSize = Typography.Size.big,
+                                    textAlign = TextAlign.Center,
+                                )
 
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(SheetContentHeight)
-                            .padding(horizontal = 20.dp, vertical = 16.dp),
-                        contentAlignment = Alignment.TopCenter,
-                    ) {
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            when (state) {
-                                RecapShareState.SelectingOptions -> {
-                                    Text(
-                                        text = "Share recap",
-                                        color = Color.White,
-                                        fontSize = Typography.Size.big,
-                                        textAlign = TextAlign.Center,
+                                Spacer(modifier = Modifier.height(24.dp))
+
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Checkbox(
+                                        checked = includeDateStamp,
+                                        onCheckedChange = onIncludeDateStampChange,
+                                        colors = CheckboxDefaults.colors(
+                                            checkedColor = Color.White,
+                                            uncheckedColor = Color.White.copy(alpha = 0.4f),
+                                            checkmarkColor = Color.Black,
+                                        ),
                                     )
-
-                                    Spacer(modifier = Modifier.height(24.dp))
-
-                                    Row(verticalAlignment = Alignment.CenterVertically) {
-                                        Checkbox(
-                                            checked = includeDateStamp,
-                                            onCheckedChange = onIncludeDateStampChange,
-                                            colors = CheckboxDefaults.colors(
-                                                checkedColor = Color.White,
-                                                uncheckedColor = Color.White.copy(alpha = 0.4f),
-                                                checkmarkColor = Color.Black,
-                                            ),
-                                        )
-                                        Spacer(modifier = Modifier.width(8.dp))
-                                        Text(
-                                            text = "Date stamp on each clip",
-                                            color = Color.White,
-                                            fontSize = Typography.Size.extraSmall,
-                                        )
-                                    }
-
-                                    Spacer(modifier = Modifier.height(30.dp))
-
-                                    Button(
-                                        text = "Create video",
-                                        onClick = onCreateClick,
-                                        backgroundColor = Color.White,
-                                        foregroundColor = Color.Black,
-                                        modifier = Modifier.fillMaxWidth(),
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                    Text(
+                                        text = "Date stamp on each clip",
+                                        color = Color.White,
+                                        fontSize = Typography.Size.extraSmall,
                                     )
                                 }
 
-                                is RecapShareState.InProgress -> {
-                                    Text(
-                                        text = "Preparing your recap...",
-                                        color = Color.White,
-                                        fontSize = Typography.Size.medium,
-                                        textAlign = TextAlign.Center,
-                                    )
+                                Spacer(modifier = Modifier.height(30.dp))
 
-                                    Spacer(modifier = Modifier.height(20.dp))
+                                Button(
+                                    text = "Create video",
+                                    onClick = onCreateClick,
+                                    backgroundColor = Color.White,
+                                    foregroundColor = Color.Black,
+                                    modifier = Modifier.fillMaxWidth(),
+                                )
+                            }
 
-                                    LinearProgressIndicator(
-                                        progress = state.progressFraction,
-                                        color = Color.White,
-                                        modifier = Modifier.fillMaxWidth(),
-                                    )
+                            is RecapShareState.InProgress -> {
+                                Text(
+                                    text = "Preparing your recap...",
+                                    color = Color.White,
+                                    fontSize = Typography.Size.medium,
+                                    textAlign = TextAlign.Center,
+                                )
 
-                                    Spacer(modifier = Modifier.height(30.dp))
+                                Spacer(modifier = Modifier.height(20.dp))
 
-                                    Button(
-                                        text = "Cancel",
-                                        onClick = onCancelClick,
-                                        modifier = Modifier.fillMaxWidth(),
-                                    )
-                                }
+                                LinearProgressIndicator(
+                                    progress = state.progressFraction,
+                                    color = Color.White,
+                                    modifier = Modifier.fillMaxWidth(),
+                                )
 
-                                is RecapShareState.Ready -> {
-                                    Text(
-                                        text = "Your recap is ready to share",
-                                        color = Color.White,
-                                        fontSize = Typography.Size.medium,
-                                        textAlign = TextAlign.Center,
-                                    )
+                                Spacer(modifier = Modifier.height(30.dp))
 
-                                    Spacer(modifier = Modifier.height(24.dp))
+                                Button(
+                                    text = "Cancel",
+                                    onClick = onCancelClick,
+                                    modifier = Modifier.fillMaxWidth(),
+                                )
+                            }
 
-                                    Button(
-                                        text = "Share",
-                                        onClick = onShareClick,
-                                        backgroundColor = Color.White,
-                                        foregroundColor = Color.Black,
-                                        modifier = Modifier.fillMaxWidth(),
-                                    )
+                            is RecapShareState.Ready -> {
+                                Text(
+                                    text = "Your recap is ready to share",
+                                    color = Color.White,
+                                    fontSize = Typography.Size.medium,
+                                    textAlign = TextAlign.Center,
+                                )
 
-                                    Spacer(modifier = Modifier.height(12.dp))
+                                Spacer(modifier = Modifier.height(24.dp))
 
-                                    Button(
-                                        text = "New export",
-                                        onClick = onBackToOptionsClick,
-                                        modifier = Modifier.fillMaxWidth(),
-                                    )
-                                }
+                                Button(
+                                    text = "Share",
+                                    onClick = onShareClick,
+                                    backgroundColor = Color.White,
+                                    foregroundColor = Color.Black,
+                                    modifier = Modifier.fillMaxWidth(),
+                                )
 
-                                is RecapShareState.Failed -> {
-                                    Text(
-                                        text = "Something went wrong while preparing your recap: ${state.error}",
-                                        color = Color.White,
-                                        textAlign = TextAlign.Center,
-                                    )
+                                Spacer(modifier = Modifier.height(12.dp))
 
-                                    Spacer(modifier = Modifier.height(20.dp))
+                                Button(
+                                    text = "New export",
+                                    onClick = onBackToOptionsClick,
+                                    modifier = Modifier.fillMaxWidth(),
+                                )
+                            }
 
-                                    Button(
-                                        text = "Try again",
-                                        onClick = onBackToOptionsClick,
-                                        modifier = Modifier.fillMaxWidth(),
-                                    )
-                                }
+                            is RecapShareState.Failed -> {
+                                Text(
+                                    text = "Something went wrong while preparing your recap: ${state.error}",
+                                    color = Color.White,
+                                    textAlign = TextAlign.Center,
+                                )
+
+                                Spacer(modifier = Modifier.height(20.dp))
+
+                                Button(
+                                    text = "Try again",
+                                    onClick = onBackToOptionsClick,
+                                    modifier = Modifier.fillMaxWidth(),
+                                )
                             }
                         }
                     }
@@ -208,6 +213,24 @@ fun RecapShareSheet(
         },
         content = content,
     )
+}
+
+/**
+ * Measures as if the incoming height constraint were the true window height, ignoring any
+ * reduction from insets padding applied higher up the tree (Root.kt pads the whole app away from
+ * the system bars before this is ever composed). Anything downstream that reads the *available*
+ * height - like ModalBottomSheetLayout's hidden/expanded anchor math - sees the real screen
+ * height instead of the already-reduced one.
+ */
+private fun Modifier.fullWindowHeight(): Modifier = composed {
+    val view = LocalView.current
+    this.layout { measurable, constraints ->
+        val trueHeight = view.height.coerceAtLeast(constraints.maxHeight)
+        val placeable = measurable.measure(constraints.copy(minHeight = trueHeight, maxHeight = trueHeight))
+        layout(placeable.width, placeable.height) {
+            placeable.place(0, 0)
+        }
+    }
 }
 
 /** Purely visual - the whole sheet is already swipe-to-dismiss, this just signals it. */
