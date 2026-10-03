@@ -10,13 +10,12 @@ import com.lukeneedham.videodiary.data.persistence.SavedRecapsDao
 import com.lukeneedham.videodiary.data.repository.CalendarRepository
 import com.lukeneedham.videodiary.data.repository.VideoResolutionRepository
 import com.lukeneedham.videodiary.ui.feature.recap.model.RecapDay
-import com.lukeneedham.videodiary.ui.feature.recap.model.RecapShareRequest
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 
 class RecapViewViewModel(
-    private val startDate: LocalDate,
-    private val endDate: LocalDate,
+    val startDate: LocalDate,
+    val endDate: LocalDate,
     val name: String,
     initialSavedRecapId: String?,
     private val calendarRepository: CalendarRepository,
@@ -70,10 +69,4 @@ class RecapViewViewModel(
         }
     }
 
-    fun buildShareRequest(): RecapShareRequest = RecapShareRequest(
-        days = days,
-        startDate = startDate,
-        endDate = endDate,
-        name = name,
-    )
 }

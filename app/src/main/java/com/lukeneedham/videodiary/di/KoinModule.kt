@@ -25,7 +25,6 @@ import com.lukeneedham.videodiary.ui.feature.recap.create.RecapCreateCustomViewM
 import com.lukeneedham.videodiary.ui.feature.recap.create.RecapCreatePeriodListViewModel
 import com.lukeneedham.videodiary.ui.feature.recap.hub.RecapHubViewModel
 import com.lukeneedham.videodiary.ui.feature.recap.model.RecapPeriodType
-import com.lukeneedham.videodiary.ui.feature.recap.model.RecapShareRequest
 import com.lukeneedham.videodiary.ui.feature.recap.share.RecapShareViewModel
 import com.lukeneedham.videodiary.ui.feature.recap.view.RecapViewViewModel
 import com.lukeneedham.videodiary.ui.feature.record.check.CheckVideoViewModel
@@ -207,9 +206,11 @@ object KoinModule {
                 videoResolutionRepository = get(),
             )
         }
-        viewModel { (request: RecapShareRequest) ->
+        viewModel { (startDate: LocalDate, endDate: LocalDate, name: String) ->
             RecapShareViewModel(
-                request = request,
+                startDate = startDate,
+                endDate = endDate,
+                name = name,
                 videoExportDao = get(),
             )
         }
