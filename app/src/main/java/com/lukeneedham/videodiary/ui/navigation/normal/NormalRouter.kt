@@ -19,7 +19,6 @@ import com.lukeneedham.videodiary.ui.feature.debug.DebugPage
 import com.lukeneedham.videodiary.ui.feature.settings.SettingsHubPage
 import com.lukeneedham.videodiary.ui.feature.recap.create.RecapCreateCustomPage
 import com.lukeneedham.videodiary.ui.feature.recap.create.RecapCreatePeriodListPage
-import com.lukeneedham.videodiary.ui.feature.recap.create.RecapCreateTypePage
 import com.lukeneedham.videodiary.ui.feature.recap.hub.RecapHubPage
 import com.lukeneedham.videodiary.ui.feature.recap.model.RecapPeriodType
 import com.lukeneedham.videodiary.ui.feature.recap.view.RecapViewPage
@@ -169,8 +168,17 @@ fun NormalRouter(
                 is NormalPage.RecapHub -> RecapHubPage(
                     viewModel = koinViewModel(),
                     onMenuClick = openHubSwitcher,
-                    onCreateRecapClick = {
-                        navigate(NormalPage.RecapCreateType)
+                    onCreateWeekClick = {
+                        navigate(NormalPage.RecapCreatePeriodList(RecapPeriodType.WEEK))
+                    },
+                    onCreateMonthClick = {
+                        navigate(NormalPage.RecapCreatePeriodList(RecapPeriodType.MONTH))
+                    },
+                    onCreateYearClick = {
+                        navigate(NormalPage.RecapCreatePeriodList(RecapPeriodType.YEAR))
+                    },
+                    onCreateCustomClick = {
+                        navigate(NormalPage.RecapCreateCustom)
                     },
                     onRecapClick = { savedRecap ->
                         navigate(
@@ -181,23 +189,6 @@ fun NormalRouter(
                                 savedRecapId = savedRecap.id,
                             )
                         )
-                    },
-                )
-
-                is NormalPage.RecapCreateType -> RecapCreateTypePage(
-                    canGoBack = canGoBack,
-                    onBack = onBack,
-                    onCreateMonthClick = {
-                        navigate(NormalPage.RecapCreatePeriodList(RecapPeriodType.MONTH))
-                    },
-                    onCreateWeekClick = {
-                        navigate(NormalPage.RecapCreatePeriodList(RecapPeriodType.WEEK))
-                    },
-                    onCreateYearClick = {
-                        navigate(NormalPage.RecapCreatePeriodList(RecapPeriodType.YEAR))
-                    },
-                    onCreateCustomClick = {
-                        navigate(NormalPage.RecapCreateCustom)
                     },
                 )
 
