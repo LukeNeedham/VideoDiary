@@ -1,17 +1,13 @@
 package com.lukeneedham.videodiary.ui.feature.recap.share
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Checkbox
 import androidx.compose.material.CheckboxDefaults
 import androidx.compose.material.ExperimentalMaterialApi
@@ -22,18 +18,20 @@ import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.Text
 import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.lukeneedham.videodiary.ui.feature.common.Button
+import com.lukeneedham.videodiary.ui.feature.common.sheet.SheetDefaults
+import com.lukeneedham.videodiary.ui.feature.common.sheet.SheetLayout
 import com.lukeneedham.videodiary.ui.feature.recap.share.model.RecapShareState
-import com.lukeneedham.videodiary.ui.theme.AppSurfaceVariant
 import com.lukeneedham.videodiary.ui.theme.Typography
+import kotlinx.coroutines.launch
 
 // Big enough for the tallest state's content (SelectingOptions) - every state's content area
 // uses this same height, so switching between them never resizes the sheet.
@@ -64,23 +62,18 @@ fun RecapShareSheet(
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit,
 ) {
+    val scope = rememberCoroutineScope()
     ModalBottomSheetLayout(
         sheetState = sheetState,
-        sheetBackgroundColor = AppSurfaceVariant,
-        sheetShape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp),
-        scrimColor = Color.Black.copy(alpha = 0.5f),
+        sheetBackgroundColor = SheetDefaults.containerColor,
+        sheetShape = SheetDefaults.shape,
+        scrimColor = SheetDefaults.scrimColor,
         modifier = modifier,
         sheetContent = {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .navigationBarsPadding()
-                    .padding(bottom = 20.dp),
+            SheetLayout(
+                onClose = { scope.launch { sheetState.hide() } },
+                modifier = Modifier.padding(bottom = 20.dp),
             ) {
-                Spacer(modifier = Modifier.height(10.dp))
-                DragHandle()
-
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -202,18 +195,6 @@ fun RecapShareSheet(
             }
         },
         content = content,
-    )
-}
-
-/** Purely visual - the whole sheet is already swipe-to-dismiss, this just signals it. */
-@Composable
-private fun DragHandle() {
-    Spacer(
-        modifier = Modifier
-            .padding(vertical = 10.dp)
-            .size(width = 36.dp, height = 4.dp)
-            .clip(RoundedCornerShape(2.dp))
-            .background(Color.White.copy(alpha = 0.3f)),
     )
 }
 

@@ -1,13 +1,8 @@
 package com.lukeneedham.videodiary.ui.feature.common.datepicker
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.navigationBarsPadding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.ui.draw.clip
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -33,7 +28,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.res.painterResource
 import com.lukeneedham.videodiary.R
-import com.lukeneedham.videodiary.ui.theme.AppSurface
+import com.lukeneedham.videodiary.ui.feature.common.sheet.SheetDefaults
+import com.lukeneedham.videodiary.ui.feature.common.sheet.SheetLayout
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
 import java.time.LocalDate
@@ -74,15 +70,16 @@ fun DiaryDatePickerSheet(
     ModalBottomSheet(
         onDismissRequest = onDismiss,
         sheetState = sheetState,
-        containerColor = AppSurface,
-        contentColor = Color.White,
-        shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp),
-        scrimColor = Color.Black.copy(alpha = 0.5f),
-        dragHandle = { DragHandle() },
-        // The sheet handles the nav bar inset itself (see navigationBarsPadding below), rather than the
-        // sheet window, so that the sheet can animate fully out without getting stuck under the nav bar.
+        containerColor = SheetDefaults.containerColor,
+        contentColor = SheetDefaults.contentColor,
+        shape = SheetDefaults.shape,
+        scrimColor = SheetDefaults.scrimColor,
+        dragHandle = null,
+        // SheetLayout handles the nav bar inset itself, rather than the sheet window, so that the
+        // sheet can animate fully out without getting stuck under the nav bar.
         windowInsets = WindowInsets(0, 0, 0, 0),
     ) {
+        SheetLayout(onClose = { hideThen {} }) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -118,11 +115,11 @@ fun DiaryDatePickerSheet(
                 // Side margins narrow the cells, which also makes the (aspect ratio sized) sheet shorter
                 modifier = Modifier
                     .fillMaxWidth()
-                    .navigationBarsPadding()
                     .padding(start = CalendarSideMargin, end = CalendarSideMargin, bottom = 8.dp)
             )
         } else {
-            Spacer(modifier = Modifier.navigationBarsPadding().height(200.dp))
+            Spacer(modifier = Modifier.height(200.dp))
+        }
         }
     }
 }
@@ -138,13 +135,3 @@ private fun MonthTitle(title: () -> String, modifier: Modifier = Modifier) {
     )
 }
 
-@Composable
-private fun DragHandle() {
-    Spacer(
-        modifier = Modifier
-            .padding(vertical = 10.dp)
-            .size(width = 36.dp, height = 4.dp)
-            .clip(RoundedCornerShape(2.dp))
-            .background(Color.White.copy(alpha = 0.3f)),
-    )
-}

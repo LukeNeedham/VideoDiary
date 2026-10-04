@@ -8,14 +8,12 @@ import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.withFrameNanos
-import androidx.compose.ui.graphics.Color
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.ui.unit.dp
 import com.lukeneedham.videodiary.domain.model.ShareRequest
 import com.lukeneedham.videodiary.domain.util.logger.Logger
 import com.lukeneedham.videodiary.ui.feature.calendar.CalendarPage
 import com.lukeneedham.videodiary.ui.feature.common.hub.Hub
 import com.lukeneedham.videodiary.ui.feature.common.hub.HubSwitcherSheet
+import com.lukeneedham.videodiary.ui.feature.common.sheet.SheetDefaults
 import com.lukeneedham.videodiary.ui.feature.crashlog.CrashLogPage
 import com.lukeneedham.videodiary.ui.feature.debug.DebugPage
 import com.lukeneedham.videodiary.ui.feature.settings.SettingsHubPage
@@ -35,7 +33,6 @@ import dev.olshevski.navigation.reimagined.pop
 import dev.olshevski.navigation.reimagined.popUpTo
 import dev.olshevski.navigation.reimagined.rememberNavController
 import org.koin.compose.viewmodel.koinViewModel
-import com.lukeneedham.videodiary.ui.theme.AppSurface
 import kotlinx.coroutines.launch
 import org.koin.core.parameter.parametersOf
 
@@ -103,13 +100,14 @@ fun NormalRouter(
 
     ModalBottomSheetLayout(
         sheetState = hubSheetState,
-        sheetBackgroundColor = AppSurface,
-        sheetShape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp),
-        scrimColor = Color.Black.copy(alpha = 0.5f),
+        sheetBackgroundColor = SheetDefaults.containerColor,
+        sheetShape = SheetDefaults.shape,
+        scrimColor = SheetDefaults.scrimColor,
         sheetContent = {
             HubSwitcherSheet(
                 currentHub = currentHub,
                 onHubClick = ::switchToHub,
+                onClose = { coroutineScope.launch { hubSheetState.hide() } },
             )
         },
     ) {
