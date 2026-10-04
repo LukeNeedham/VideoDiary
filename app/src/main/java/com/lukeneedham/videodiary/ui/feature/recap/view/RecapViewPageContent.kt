@@ -26,6 +26,7 @@ import java.io.File
 @Composable
 fun RecapViewPageContent(
     name: String,
+    onNameChange: (String) -> Unit,
     videoFiles: List<File>,
     isSaved: Boolean,
     onToggleSavedClick: () -> Unit,
@@ -71,6 +72,7 @@ fun RecapViewPageContent(
             bottomBar = {
                 RecapViewBottomBar(
                     name = name,
+                    onNameChange = onNameChange,
                     isSaved = isSaved,
                     canGoBack = canGoBack,
                     onBack = onBack,
@@ -99,6 +101,7 @@ private fun PreviewPortrait() {
     ) {
         RecapViewPageContent(
             name = MockDataRecapView.name,
+            onNameChange = {},
             videoFiles = MockDataRecapView.videoFiles,
             isSaved = false,
             onToggleSavedClick = {},
@@ -124,6 +127,7 @@ private fun PreviewSaved() {
     ) {
         RecapViewPageContent(
             name = MockDataRecapView.name,
+            onNameChange = {},
             videoFiles = MockDataRecapView.videoFiles,
             isSaved = true,
             onToggleSavedClick = {},

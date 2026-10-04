@@ -18,6 +18,10 @@ fun RecapViewPage(
         parametersOf(viewModel.startDate, viewModel.endDate, viewModel.name)
     }
 
+    LaunchedEffect(shareViewModel, viewModel.name) {
+        shareViewModel.name = viewModel.name
+    }
+
     LaunchedEffect(shareViewModel, viewModel.days) {
         shareViewModel.updateDays(viewModel.days)
     }
@@ -28,6 +32,7 @@ fun RecapViewPage(
 
     RecapViewPageContent(
         name = viewModel.name,
+        onNameChange = viewModel::rename,
         videoFiles = viewModel.videoFiles,
         isSaved = viewModel.isSaved,
         onToggleSavedClick = viewModel::toggleSaved,

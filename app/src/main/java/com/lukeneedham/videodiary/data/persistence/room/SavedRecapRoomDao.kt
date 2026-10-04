@@ -14,6 +14,9 @@ interface SavedRecapRoomDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(entity: SavedRecapEntity)
 
+    @Query("UPDATE saved_recaps SET name = :name WHERE id = :id")
+    suspend fun updateName(id: String, name: String)
+
     @Query("DELETE FROM saved_recaps WHERE id = :id")
     suspend fun deleteById(id: String)
 }

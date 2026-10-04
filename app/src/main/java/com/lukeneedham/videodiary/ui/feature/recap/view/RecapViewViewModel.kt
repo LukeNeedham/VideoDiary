@@ -15,11 +15,14 @@ import java.time.LocalDate
 class RecapViewViewModel(
     val startDate: LocalDate,
     val endDate: LocalDate,
-    val name: String,
+    initialName: String,
     initialSavedRecapId: String?,
     private val calendarRepository: CalendarRepository,
     private val savedRecapsDao: SavedRecapsDao,
 ) : ViewModel() {
+    var name: String by mutableStateOf(initialName)
+        private set
+
     var days: List<RecapDay> by mutableStateOf(emptyList())
         private set
 
@@ -46,6 +49,17 @@ class RecapViewViewModel(
                     }
                 }
             }
+        }
+    }
+
+    /** Renames the recap, including its saved copy if it has been saved. */
+    fun rename(newName: String) {
+        val trimmed = newName.trim()
+        if (trimmed.isEmpty()) return
+        name = trimmed
+        val id = savedRecapId ?: return
+        viewModelScope.launch {
+            savedRecapsDao.renameSavedRecap(id, trimmed)
         }
     }
 

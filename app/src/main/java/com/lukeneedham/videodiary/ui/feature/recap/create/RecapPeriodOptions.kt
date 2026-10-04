@@ -140,7 +140,7 @@ object RecapPeriodOptions {
      * shared with the end date), or "29 Dec - 4 Jan" / "29 Dec 2025 - 4 Jan 2026" as the shared
      * parts narrow.
      */
-    private fun formatDateRange(startDate: LocalDate, endDate: LocalDate): String {
+    fun formatDateRange(startDate: LocalDate, endDate: LocalDate): String {
         val startDay = startDate.format(StandardDateTimeFormatter.dayOfMonth)
         val endDay = endDate.format(StandardDateTimeFormatter.dayOfMonth)
         return when {
