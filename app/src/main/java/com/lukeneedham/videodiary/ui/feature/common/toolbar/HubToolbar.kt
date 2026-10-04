@@ -1,6 +1,7 @@
 package com.lukeneedham.videodiary.ui.feature.common.toolbar
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
@@ -10,17 +11,28 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.lukeneedham.videodiary.R
 
-/** Toolbar content for hub pages: a menu button, aligned left, which opens the hub switcher. */
+/**
+ * Toolbar content for hub pages: a menu button, aligned left, which opens the hub switcher.
+ * Optionally, [centerContent] is shown in the center of the bar.
+ */
 @Composable
 fun HubToolbar(
     onMenuClick: () -> Unit,
     modifier: Modifier = Modifier,
+    centerContent: (@Composable BoxScope.() -> Unit)? = null,
 ) {
     Box(modifier = modifier.fillMaxSize()) {
         HubMenuButton(
             onClick = onMenuClick,
             modifier = Modifier.align(Alignment.CenterStart),
         )
+        if (centerContent != null) {
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier.align(Alignment.Center),
+                content = centerContent,
+            )
+        }
     }
 }
 
