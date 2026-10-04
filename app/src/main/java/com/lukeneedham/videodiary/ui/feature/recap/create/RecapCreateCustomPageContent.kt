@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -35,6 +36,7 @@ fun RecapCreateCustomPageContent(
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .navigationBarsPadding()
     ) {
         GenericToolbar(
             canGoBack = canGoBack, onBack = onBack,
