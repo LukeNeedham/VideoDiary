@@ -18,6 +18,7 @@ import com.lukeneedham.videodiary.ui.feature.common.hub.Hub
 import com.lukeneedham.videodiary.ui.feature.common.hub.HubSwitcherSheet
 import com.lukeneedham.videodiary.ui.feature.crashlog.CrashLogPage
 import com.lukeneedham.videodiary.ui.feature.debug.DebugPage
+import com.lukeneedham.videodiary.ui.feature.settings.SettingsHubPage
 import com.lukeneedham.videodiary.ui.feature.recap.create.RecapCreateCustomPage
 import com.lukeneedham.videodiary.ui.feature.recap.create.RecapCreatePeriodListPage
 import com.lukeneedham.videodiary.ui.feature.recap.create.RecapCreateTypePage
@@ -82,7 +83,7 @@ fun NormalRouter(
             when (hub) {
                 Hub.Calendar -> Unit
                 Hub.Recap -> navController.navigate(NormalPage.RecapHub)
-                Hub.Debug -> navController.navigate(NormalPage.Debug)
+                Hub.Settings -> navController.navigate(NormalPage.SettingsHub)
             }
         }
         coroutineScope.launch {
@@ -243,9 +244,17 @@ fun NormalRouter(
                     share = share,
                 )
 
+                is NormalPage.SettingsHub -> SettingsHubPage(
+                    onMenuClick = openHubSwitcher,
+                    onDebugClick = {
+                        navigate(NormalPage.Debug)
+                    },
+                )
+
                 is NormalPage.Debug -> DebugPage(
                     viewModel = koinViewModel(),
-                    onMenuClick = openHubSwitcher,
+                    canGoBack = canGoBack,
+                    onBack = onBack,
                     onCrashLogClick = {
                         navigate(NormalPage.CrashLog)
                     },
