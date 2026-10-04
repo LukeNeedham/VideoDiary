@@ -9,11 +9,12 @@ import com.lukeneedham.videodiary.R
  */
 enum class Hub(
     val title: String,
+    val description: String,
     val iconRes: Int,
 ) {
-    Calendar(title = "Calendar", iconRes = R.drawable.calendar_today),
-    Recap(title = "Recap", iconRes = R.drawable.movie),
-    Debug(title = "Debug", iconRes = R.drawable.bug);
+    Calendar(title = "Calendar", description = "Record and browse your daily videos", iconRes = R.drawable.calendar_today),
+    Recap(title = "Recap", description = "Make and view recap videos", iconRes = R.drawable.movie),
+    Debug(title = "Debug", description = "Developer tools", iconRes = R.drawable.bug);
 
     companion object {
         /** The hubs that can be chosen in the hub switcher in this build. */
