@@ -12,6 +12,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -26,11 +27,14 @@ fun DiaryDatePickerDay(
     day: Day,
     videoAspectRatio: Float,
     onClick: () -> Unit,
+    /** If true, the day is drawn faded, to show that it is not part of the month being viewed */
+    dimmed: Boolean = false,
 ) {
     val date = day.date
 
     Box(
         modifier = Modifier
+            .alpha(if (dimmed) 0.35f else 1f)
             .fillMaxWidth()
             .aspectRatio(videoAspectRatio)
             .background(Color.Black)

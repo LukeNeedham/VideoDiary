@@ -1,7 +1,11 @@
 package com.lukeneedham.videodiary.ui.feature.common.datepicker
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.draw.clip
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -30,6 +34,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.res.painterResource
 import com.lukeneedham.videodiary.R
+import com.lukeneedham.videodiary.ui.theme.AppSurface
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
 import java.time.LocalDate
@@ -66,7 +71,11 @@ fun DiaryDatePickerSheet(
     ModalBottomSheet(
         onDismissRequest = onDismiss,
         sheetState = sheetState,
-        containerColor = Color.White,
+        containerColor = AppSurface,
+        contentColor = Color.White,
+        shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp),
+        scrimColor = Color.Black.copy(alpha = 0.5f),
+        dragHandle = { DragHandle() },
     ) {
         Box(
             modifier = Modifier
@@ -87,11 +96,13 @@ fun DiaryDatePickerSheet(
             ) {
                 Text(
                     text = topBarMonthName,
+                    color = Color.White,
                     fontWeight = FontWeight.Bold,
                     textAlign = TextAlign.Center,
                 )
                 Text(
                     text = topBarYear,
+                    color = Color.White,
                     fontSize = 12.sp,
                     textAlign = TextAlign.Center,
                 )
@@ -126,4 +137,15 @@ fun DiaryDatePickerSheet(
             Spacer(modifier = Modifier.height(200.dp))
         }
     }
+}
+
+@Composable
+private fun DragHandle() {
+    Spacer(
+        modifier = Modifier
+            .padding(vertical = 10.dp)
+            .size(width = 36.dp, height = 4.dp)
+            .clip(RoundedCornerShape(2.dp))
+            .background(Color.White.copy(alpha = 0.3f)),
+    )
 }
