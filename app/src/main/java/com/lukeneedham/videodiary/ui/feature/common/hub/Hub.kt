@@ -14,11 +14,11 @@ enum class Hub(
 ) {
     Calendar(title = "Calendar", description = "Record and browse your daily videos", iconRes = R.drawable.calendar_today),
     Recap(title = "Recap", description = "Make and view recap videos", iconRes = R.drawable.movie),
-    Debug(title = "Debug", description = "Developer tools", iconRes = R.drawable.bug);
+    Settings(title = "Settings", description = "App settings and developer tools", iconRes = R.drawable.settings);
 
     companion object {
         /** The hubs that can be chosen in the hub switcher in this build. */
         val available: List<Hub>
-            get() = entries.filter { it != Debug || BuildConfig.DEBUG }
+            get() = entries.filter { it != Settings || BuildConfig.DEBUG }
     }
 }

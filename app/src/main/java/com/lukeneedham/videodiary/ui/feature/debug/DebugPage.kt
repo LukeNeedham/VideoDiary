@@ -7,7 +7,8 @@ import androidx.compose.runtime.getValue
 @Composable
 fun DebugPage(
     viewModel: DebugViewModel,
-    onMenuClick: () -> Unit,
+    canGoBack: Boolean,
+    onBack: () -> Unit,
     onCrashLogClick: () -> Unit,
 ) {
     val allowRetakeForPastDays by viewModel.allowRetakeForPastDays.collectAsState()
@@ -18,6 +19,7 @@ fun DebugPage(
         onAllowRetakeForPastDaysChange = viewModel::setAllowRetakeForPastDays,
         onResyncThumbnailsClick = viewModel::resyncThumbnails,
         onCrashLogClick = onCrashLogClick,
-        onMenuClick = onMenuClick,
+        canGoBack = canGoBack,
+        onBack = onBack,
     )
 }

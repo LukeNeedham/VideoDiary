@@ -20,7 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.lukeneedham.videodiary.ui.feature.common.toolbar.HubToolbar
+import com.lukeneedham.videodiary.ui.feature.common.toolbar.SubpageToolbar
 import com.lukeneedham.videodiary.ui.feature.common.toolbar.ToolbarPageLayout
 import com.lukeneedham.videodiary.ui.theme.Typography
 
@@ -31,10 +31,11 @@ fun DebugPageContent(
     onAllowRetakeForPastDaysChange: (Boolean) -> Unit,
     onResyncThumbnailsClick: () -> Unit,
     onCrashLogClick: () -> Unit,
-    onMenuClick: () -> Unit,
+    canGoBack: Boolean,
+    onBack: () -> Unit,
 ) {
     ToolbarPageLayout(
-        bottomBar = { HubToolbar(onMenuClick = onMenuClick) },
+        bottomBar = { SubpageToolbar(canGoBack = canGoBack, onBack = onBack) },
     ) {
         Column(
             modifier = Modifier
@@ -152,6 +153,7 @@ internal fun PreviewDebugPageContent() {
         onAllowRetakeForPastDaysChange = {},
         onResyncThumbnailsClick = {},
         onCrashLogClick = {},
-        onMenuClick = {},
+        canGoBack = true,
+        onBack = {},
     )
 }
