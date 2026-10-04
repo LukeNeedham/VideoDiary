@@ -50,7 +50,7 @@ fun RecapCreateCustomPageContent(
                         backgroundColor = AccentHighlight,
                         foregroundColor = Color.Black,
                         shape = CircleShape,
-                        contentPadding = PaddingValues(horizontal = 20.dp, vertical = 10.dp),
+                        contentPadding = PaddingValues(horizontal = 40.dp, vertical = 10.dp),
                     )
                 },
             )
