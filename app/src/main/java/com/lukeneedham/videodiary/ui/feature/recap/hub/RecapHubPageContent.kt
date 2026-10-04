@@ -3,18 +3,15 @@ package com.lukeneedham.videodiary.ui.feature.recap.hub
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -52,7 +49,12 @@ fun RecapHubPageContent(
     var pendingIdToDelete: String? by remember { mutableStateOf(null) }
 
     ToolbarPageLayout(
-        bottomBar = { HubToolbar(onMenuClick = onMenuClick) },
+        bottomBar = {
+            HubToolbar(
+                onMenuClick = onMenuClick,
+                centerContent = { CreateRecapButton(onClick = onCreateRecapClick) },
+            )
+        },
     ) {
         LazyColumn(
             modifier = Modifier
@@ -60,15 +62,6 @@ fun RecapHubPageContent(
                 .background(AppBackground)
                 .padding(16.dp)
         ) {
-            item {
-                CreateRecapOptionRow(
-                    title = "Create a recap",
-                    description = "Make a recap of a month, week, year, or your own custom dates",
-                    onClick = onCreateRecapClick,
-                )
-                Spacer(modifier = Modifier.height(24.dp))
-            }
-
             item {
                 Text(
                     text = "Saved recaps",
@@ -117,39 +110,21 @@ fun RecapHubPageContent(
 }
 
 @Composable
-private fun CreateRecapOptionRow(
-    title: String,
-    description: String,
-    onClick: () -> Unit,
-) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
+private fun CreateRecapButton(onClick: () -> Unit) {
+    Box(
+        contentAlignment = Alignment.Center,
         modifier = Modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(12.dp))
+            .size(48.dp)
+            .clip(CircleShape)
             .background(AppSurfaceVariant)
-            .clickable(onClick = onClick)
-            .padding(20.dp)
+            .clickable(onClick = onClick),
     ) {
         Image(
             painter = painterResource(R.drawable.add),
-            contentDescription = null,
+            contentDescription = "Create a recap",
             colorFilter = ColorFilter.tint(Color.White),
             modifier = Modifier.size(28.dp),
         )
-        Spacer(modifier = Modifier.width(16.dp))
-        Column {
-            Text(
-                text = title,
-                color = Color.White,
-                fontSize = Typography.Size.medium,
-            )
-            Text(
-                text = description,
-                color = Color.White.copy(alpha = 0.6f),
-                fontSize = Typography.Size.extraSmall,
-            )
-        }
     }
 }
 
