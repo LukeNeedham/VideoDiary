@@ -136,7 +136,13 @@ fun RecapCreateCustomPageReady(
                     }
 
                     if (!selectedDayThumbnails.isNullOrEmpty()) {
-                        RecapSection(title = "Videos to include") {
+                        RecapSection(
+                            title = if (selectedVideoCount != null) {
+                                "Videos to include ($selectedVideoCount of $totalVideoCount)"
+                            } else {
+                                "Videos to include"
+                            }
+                        ) {
                             RecapThumbnailRow(thumbnails = selectedDayThumbnails)
                         }
                     }
@@ -144,19 +150,15 @@ fun RecapCreateCustomPageReady(
 
                 Spacer(modifier = Modifier.height(12.dp))
 
-                Text(
-                    text = if (selectedVideoCount == 0) {
-                        "Cannot create recap - please select at least one video"
-                    } else {
-                        "Recap will include $selectedVideoCount of your $totalVideoCount diary videos"
-                    },
-                    textAlign = TextAlign.Center,
-                    color = Color.White.copy(alpha = 0.7f),
-                    fontSize = Typography.Size.extraSmall,
-                    modifier = Modifier.fillMaxWidth()
-                )
-
-                if (selectedVideoCount != 0) {
+                if (selectedVideoCount == 0) {
+                    Text(
+                        text = "Cannot create recap - please select at least one video",
+                        textAlign = TextAlign.Center,
+                        color = Color.White.copy(alpha = 0.7f),
+                        fontSize = Typography.Size.extraSmall,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                } else {
                     Spacer(modifier = Modifier.height(12.dp))
 
                     Button(
