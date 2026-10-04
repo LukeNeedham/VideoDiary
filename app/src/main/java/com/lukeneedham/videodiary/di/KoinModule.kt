@@ -19,6 +19,7 @@ import com.lukeneedham.videodiary.data.repository.VideoResolutionRepository
 import com.lukeneedham.videodiary.ui.feature.calendar.CalendarViewModel
 import com.lukeneedham.videodiary.ui.feature.common.datepicker.DiaryDatePickerViewModel
 import com.lukeneedham.videodiary.ui.feature.crashlog.CrashLogViewModel
+import com.lukeneedham.videodiary.ui.feature.common.toolbar.VideoAspectRatioViewModel
 import com.lukeneedham.videodiary.ui.feature.debug.DebugViewModel
 import com.lukeneedham.videodiary.ui.feature.permissions.RequestPermissionsViewModel
 import com.lukeneedham.videodiary.ui.feature.recap.create.RecapCreateCustomViewModel
@@ -218,6 +219,11 @@ object KoinModule {
             RecapHubViewModel(
                 savedRecapsDao = get(),
                 videosDao = get(),
+                videoResolutionRepository = get(),
+            )
+        }
+        viewModel {
+            VideoAspectRatioViewModel(
                 videoResolutionRepository = get(),
             )
         }

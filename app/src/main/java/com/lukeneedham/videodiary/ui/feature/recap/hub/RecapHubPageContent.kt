@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -33,7 +32,7 @@ import androidx.compose.ui.unit.dp
 import com.lukeneedham.videodiary.R
 import com.lukeneedham.videodiary.domain.model.SavedRecap
 import com.lukeneedham.videodiary.ui.feature.common.DeleteConfirmDialog
-import com.lukeneedham.videodiary.ui.feature.common.toolbar.GenericToolbar
+import com.lukeneedham.videodiary.ui.feature.common.toolbar.ToolbarPageLayout
 import com.lukeneedham.videodiary.ui.theme.AppBackground
 import com.lukeneedham.videodiary.ui.theme.AppSurfaceVariant
 import com.lukeneedham.videodiary.ui.theme.Typography
@@ -52,21 +51,15 @@ fun RecapHubPageContent(
 ) {
     var pendingIdToDelete: String? by remember { mutableStateOf(null) }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(AppBackground)
-            .navigationBarsPadding()
+    ToolbarPageLayout(
+        videoAspectRatio = videoAspectRatio,
+        canGoBack = canGoBack,
+        onBack = onBack,
     ) {
-        GenericToolbar(
-            canGoBack = canGoBack,
-            onBack = onBack,
-        )
-
         LazyColumn(
             modifier = Modifier
-                .weight(1f)
-                .fillMaxWidth()
+                .fillMaxSize()
+                .background(AppBackground)
                 .padding(16.dp)
         ) {
             item {
