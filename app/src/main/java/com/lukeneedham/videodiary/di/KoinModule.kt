@@ -172,7 +172,6 @@ object KoinModule {
                 date = date,
                 videoContentUri = videoContentUri,
                 videosDao = get(),
-                videoResolutionRepository = get(),
             )
         }
         viewModel {
