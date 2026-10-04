@@ -31,7 +31,6 @@ import dev.olshevski.navigation.reimagined.NavHost
 import dev.olshevski.navigation.reimagined.navigate
 import dev.olshevski.navigation.reimagined.pop
 import dev.olshevski.navigation.reimagined.popUpTo
-import dev.olshevski.navigation.reimagined.replaceAll
 import dev.olshevski.navigation.reimagined.rememberNavController
 import org.koin.compose.viewmodel.koinViewModel
 import com.lukeneedham.videodiary.ui.theme.AppSurface
@@ -74,12 +73,14 @@ fun NormalRouter(
         coroutineScope.launch { hubSheetState.hide() }
         if (hub == currentHub) return
         Logger.debug("Switching to hub: $hub")
-        // Calendar is the home hub, so it stays under every other hub, so that back from
-        // another hub's root page returns to it.
+        // The calendar hub is always the bottom entry of the backstack and is never removed, so
+        // it keeps its state. Switching hub drops everything above it, then opens the new hub
+        // on top. Back from another hub's root page returns to the calendar.
+        navController.popUpTo { it is NormalPage.Calendar }
         when (hub) {
-            Hub.Calendar -> navController.replaceAll(NormalPage.Calendar)
-            Hub.Recap -> navController.replaceAll(listOf(NormalPage.Calendar, NormalPage.RecapHub))
-            Hub.Debug -> navController.replaceAll(listOf(NormalPage.Calendar, NormalPage.Debug))
+            Hub.Calendar -> Unit
+            Hub.Recap -> navController.navigate(NormalPage.RecapHub)
+            Hub.Debug -> navController.navigate(NormalPage.Debug)
         }
     }
 
