@@ -1,4 +1,4 @@
-package com.lukeneedham.videodiary.ui.feature.calendar.component
+package com.lukeneedham.videodiary.ui.feature.common.hub
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -6,8 +6,8 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -20,60 +20,56 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.lukeneedham.videodiary.BuildConfig
-import com.lukeneedham.videodiary.R
 import com.lukeneedham.videodiary.ui.theme.AppSurface
+import com.lukeneedham.videodiary.ui.theme.AppSurfaceVariant
 
+/** The content of the hub switcher bottom sheet: lists all hubs, highlighting the [currentHub]. */
 @Composable
-fun CalendarSideMenu(
-    onRecapClick: () -> Unit,
-    onDebugClick: () -> Unit,
+fun HubSwitcherSheet(
+    currentHub: Hub?,
+    onHubClick: (Hub) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
         modifier = modifier
-            .fillMaxHeight()
+            .fillMaxWidth()
             .background(AppSurface)
-            .padding(vertical = 24.dp)
+            .navigationBarsPadding()
+            .padding(vertical = 16.dp)
     ) {
-        CalendarSideMenuItem(
-            iconRes = R.drawable.movie,
-            text = "Recap",
-            onClick = onRecapClick,
-        )
-
-        if (BuildConfig.DEBUG) {
-            CalendarSideMenuItem(
-                iconRes = R.drawable.bug,
-                text = "Debug",
-                onClick = onDebugClick,
+        Hub.available.forEach { hub ->
+            HubSwitcherItem(
+                hub = hub,
+                isCurrent = hub == currentHub,
+                onClick = { onHubClick(hub) },
             )
         }
     }
 }
 
 @Composable
-private fun CalendarSideMenuItem(
-    iconRes: Int,
-    text: String,
+private fun HubSwitcherItem(
+    hub: Hub,
+    isCurrent: Boolean,
     onClick: () -> Unit,
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { onClick() }
+            .background(if (isCurrent) AppSurfaceVariant else Color.Transparent)
+            .clickable(onClick = onClick)
             .padding(horizontal = 20.dp, vertical = 16.dp)
     ) {
         Image(
-            painter = painterResource(iconRes),
+            painter = painterResource(hub.iconRes),
             contentDescription = null,
             colorFilter = ColorFilter.tint(Color.White),
             modifier = Modifier.size(24.dp),
         )
         Spacer(modifier = Modifier.width(20.dp))
         Text(
-            text = text,
+            text = hub.title,
             color = Color.White,
         )
     }
@@ -81,10 +77,9 @@ private fun CalendarSideMenuItem(
 
 @Preview
 @Composable
-private fun PreviewCalendarSideMenu() {
-    CalendarSideMenu(
-        onRecapClick = {},
-        onDebugClick = {},
-        modifier = Modifier.width(280.dp),
+private fun PreviewHubSwitcherSheet() {
+    HubSwitcherSheet(
+        currentHub = Hub.Calendar,
+        onHubClick = {},
     )
 }
