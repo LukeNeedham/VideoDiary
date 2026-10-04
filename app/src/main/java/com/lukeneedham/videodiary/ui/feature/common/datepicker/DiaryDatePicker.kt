@@ -95,7 +95,7 @@ fun DiaryDatePicker(
             state = pagerState,
             // Compose the neighbouring months ahead of time, so swiping to them doesn't have to
             // compose a whole month grid in the middle of the gesture
-            beyondViewportPageCount = 1,
+            beyondBoundsPageCount = 1,
             key = { page -> months[page].first().date },
             modifier = Modifier.weight(1f, fill = false)
         ) { page ->
