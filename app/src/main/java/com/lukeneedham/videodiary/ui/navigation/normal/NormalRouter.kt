@@ -7,6 +7,7 @@ import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.graphics.Color
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.unit.dp
@@ -69,19 +70,26 @@ fun NormalRouter(
     val currentHub = (navController.backstack.entries.lastOrNull()?.destination as? NormalPage)
         ?.hub
 
-    // The sheet is hosted here, outside the pages, and isn't closed when a hub is chosen: it
-    // stays open over the new hub's page, and is dismissed by the user.
+    // The sheet is hosted here, outside the pages. When a hub is chosen the page behind it is
+    // switched first, and the sheet then animates closed over the new page.
     fun switchToHub(hub: Hub) {
-        if (hub == currentHub) return
-        Logger.debug("Switching to hub: $hub")
-        // The calendar hub is always the bottom entry of the backstack and is never removed, so
-        // it keeps its state. Switching hub drops everything above it, then opens the new hub
-        // on top. Back from another hub's root page returns to the calendar.
-        navController.popUpTo { it is NormalPage.Calendar }
-        when (hub) {
-            Hub.Calendar -> Unit
-            Hub.Recap -> navController.navigate(NormalPage.RecapHub)
-            Hub.Debug -> navController.navigate(NormalPage.Debug)
+        if (hub != currentHub) {
+            Logger.debug("Switching to hub: $hub")
+            // The calendar hub is always the bottom entry of the backstack and is never removed,
+            // so it keeps its state. Switching hub drops everything above it, then opens the new
+            // hub on top. Back from another hub's root page returns to the calendar.
+            navController.popUpTo { it is NormalPage.Calendar }
+            when (hub) {
+                Hub.Calendar -> Unit
+                Hub.Recap -> navController.navigate(NormalPage.RecapHub)
+                Hub.Debug -> navController.navigate(NormalPage.Debug)
+            }
+        }
+        coroutineScope.launch {
+            // Wait for the new page to be composed and drawn before closing the sheet
+            withFrameNanos { }
+            withFrameNanos { }
+            hubSheetState.hide()
         }
     }
 
