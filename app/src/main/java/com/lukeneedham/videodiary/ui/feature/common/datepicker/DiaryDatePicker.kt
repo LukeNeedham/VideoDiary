@@ -1,5 +1,6 @@
 package com.lukeneedham.videodiary.ui.feature.common.datepicker
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -35,6 +36,7 @@ private const val DAYS_PER_WEEK = 7
  *
  * @param months each item is all of the [Day]s in one calendar month, ordered chronologically
  */
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun DiaryDatePicker(
     initialFocusedDate: LocalDate,
