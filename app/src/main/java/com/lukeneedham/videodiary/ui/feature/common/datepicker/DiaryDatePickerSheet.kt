@@ -3,6 +3,8 @@ package com.lukeneedham.videodiary.ui.feature.common.datepicker
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.draw.clip
@@ -75,6 +77,9 @@ fun DiaryDatePickerSheet(
         shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp),
         scrimColor = Color.Black.copy(alpha = 0.5f),
         dragHandle = { DragHandle() },
+        // The sheet handles the nav bar inset itself (see navigationBarsPadding below), rather than the
+        // sheet window, so that the sheet can animate fully out without getting stuck under the nav bar.
+        windowInsets = WindowInsets(0, 0, 0, 0),
     ) {
         Box(
             modifier = Modifier
@@ -114,10 +119,11 @@ fun DiaryDatePickerSheet(
                 // Side margins narrow the cells, which also makes the (aspect ratio sized) sheet shorter
                 modifier = Modifier
                     .fillMaxWidth()
+                    .navigationBarsPadding()
                     .padding(start = CalendarSideMargin, end = CalendarSideMargin, bottom = 8.dp)
             )
         } else {
-            Spacer(modifier = Modifier.height(200.dp))
+            Spacer(modifier = Modifier.navigationBarsPadding().height(200.dp))
         }
     }
 }
