@@ -26,7 +26,14 @@ fun RecapCreateCustomPage(
         selectedVideoCount = viewModel.selectedVideoCount,
         selectedDayThumbnails = viewModel.selectedDayThumbnails,
         diaryStartDate = viewModel.diaryStartDate,
-        onStartDateSelected = { viewModel.recapStartDate = it },
+        onStartDateSelected = { start ->
+            viewModel.recapStartDate = start
+            // Keep the range valid if the new start date is after the current end date
+            val end = viewModel.recapEndDate
+            if (start != null && end != null && end < start) {
+                viewModel.recapEndDate = start
+            }
+        },
         onEndDateSelected = { viewModel.recapEndDate = it },
         recapName = viewModel.recapName,
         onRecapNameChange = { viewModel.recapName = it },

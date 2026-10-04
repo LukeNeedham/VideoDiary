@@ -21,9 +21,12 @@ import java.time.LocalDate
 class RecapShareViewModel(
     private val startDate: LocalDate,
     private val endDate: LocalDate,
-    private val name: String,
+    initialName: String,
     private val videoExportDao: VideoExportDao,
 ) : ViewModel() {
+
+    // Kept in sync with RecapViewViewModel.name by the page hosting this sheet, as the recap can be renamed.
+    var name: String = initialName
 
     // Kept in sync with RecapViewViewModel.days by the page hosting this sheet - it's not known
     // yet when this ViewModel is first created, so it's pushed in rather than taken as a

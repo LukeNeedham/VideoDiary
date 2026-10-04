@@ -6,11 +6,11 @@ import androidx.compose.runtime.setValue
 import com.lukeneedham.videodiary.data.repository.CalendarRepository
 import com.lukeneedham.videodiary.data.repository.VideoResolutionRepository
 import com.lukeneedham.videodiary.domain.model.Day
-import com.lukeneedham.videodiary.domain.util.date.CalendarUtil
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
+import java.time.YearMonth
 
 class DiaryDatePickerViewModel(
     private val calendarRepository: CalendarRepository,
@@ -19,7 +19,8 @@ class DiaryDatePickerViewModel(
 ) {
     private val scope = CoroutineScope(mainDispatcher)
 
-    var weeks by mutableStateOf<List<List<Day>>>(emptyList())
+    /** All days of the diary, grouped by calendar month in chronological order */
+    var months by mutableStateOf<List<List<Day>>>(emptyList())
         private set
 
     var videoAspectRatio by mutableStateOf<Float?>(null)
@@ -28,10 +29,11 @@ class DiaryDatePickerViewModel(
     init {
         scope.launch {
             calendarRepository.allDays.collect { allDays ->
-                weeks = CalendarUtil.chunkIntoWeeks(
-                    items = allDays,
-                    getDate = { it.date }
-                )
+                months = allDays
+                    .groupBy { YearMonth.from(it.date) }
+                    .toSortedMap()
+                    .values
+                    .toList()
             }
         }
         scope.launch {

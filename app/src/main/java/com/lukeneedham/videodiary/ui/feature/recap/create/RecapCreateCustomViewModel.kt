@@ -77,7 +77,7 @@ class RecapCreateCustomViewModel(
     }
 
     val canSave: Boolean by derivedStateOf {
-        recapName.isNotBlank() && (selectedVideoCount ?: 0) > 0
+        (selectedVideoCount ?: 0) > 0
     }
 
     private val onSavedMutable = MutableSharedFlow<RecapCreatedArgs>(
@@ -104,7 +104,10 @@ class RecapCreateCustomViewModel(
         if (!canSave) return
         val startDate = recapStartDate ?: return
         val endDate = recapEndDate ?: return
-        val name = recapName.trim()
+        // With no name given, the name is generated from the selected dates
+        val name = recapName.trim().ifBlank {
+            RecapPeriodOptions.formatDateRange(startDate, endDate)
+        }
 
         viewModelScope.launch {
             val id = savedRecapsDao.saveRecap(name, startDate, endDate)

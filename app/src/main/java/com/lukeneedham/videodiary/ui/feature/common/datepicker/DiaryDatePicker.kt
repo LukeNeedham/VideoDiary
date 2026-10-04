@@ -1,204 +1,202 @@
 package com.lukeneedham.videodiary.ui.feature.common.datepicker
 
-import androidx.compose.foundation.background
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.pluralStringResource
-import androidx.compose.ui.semantics.contentDescription
-import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.lukeneedham.videodiary.R
+import androidx.compose.ui.unit.sp
 import com.lukeneedham.videodiary.domain.model.Day
-import com.lukeneedham.videodiary.ui.theme.Typography
 import java.time.DayOfWeek
 import java.time.LocalDate
+import java.time.YearMonth
 import java.time.format.TextStyle
 import java.util.Locale
 
+private const val DAYS_PER_WEEK = 7
+
+/** The gap between day cells, both horizontally and vertically */
+private val CELL_SPACING = 5.dp
+
+/** The most rows a month can span when weeks start on Monday */
+private const val MAX_WEEKS_PER_MONTH = 6
+
+/**
+ * A traditional calendar: one page per month, with 7 days per row, and horizontal swiping between months.
+ *
+ * @param allMonths each item is all of the [Day]s in one calendar month, ordered chronologically
+ */
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun DiaryDatePicker(
     initialFocusedDate: LocalDate,
-    weeks: List<List<Day>>,
+    allMonths: List<List<Day>>,
     videoAspectRatio: Float,
     onDateSelected: (LocalDate) -> Unit,
-    onFirstVisibleMonthChanged: (monthName: String, year: String) -> Unit,
-    modifier: Modifier = Modifier
+    onVisibleMonthChanged: (monthName: String, year: String) -> Unit,
+    modifier: Modifier = Modifier,
+    /** If set, days before this date are shown but can't be selected, and earlier months are not shown */
+    minDate: LocalDate? = null,
 ) {
-    val weekDays = weeks.map { week ->
-        val weekStartsOn = DayOfWeek.MONDAY
-        val weekEndsOn = DayOfWeek.SUNDAY
-
-        val missingDaysStart = week.first().date.dayOfWeek.value - weekStartsOn.value
-        val missingDaysEnd = weekEndsOn.value - week.last().date.dayOfWeek.value
-
-        val placeholderDaysStart = List(missingDaysStart) { Weekday.Empty }
-        val placeholderDaysEnd = List(missingDaysEnd) { Weekday.Empty }
-
-        placeholderDaysStart + week.map { Weekday.Value(it) } + placeholderDaysEnd
+    val months = remember(allMonths, minDate) {
+        if (minDate == null) allMonths else allMonths.filter { it.last().date >= minDate }
     }
+    if (months.isEmpty()) return
 
-    val today = LocalDate.now()
-    val rows = buildList<WeekRow> {
-        weekDays.forEach { week ->
-            val isCurrentWeek = week.any { it is Weekday.Value && it.day.date == today }
-            val isEmpty = week.none { it is Weekday.Value && it.day.videoFile != null }
-            if (!isCurrentWeek && isEmpty) {
-                val previous = lastOrNull()
-                if (previous is WeekRow.Collapsed) {
-                    this[lastIndex] = WeekRow.Collapsed(previous.weekCount + 1, previous.firstDate)
-                } else {
-                    val firstDate = week.filterIsInstance<Weekday.Value>().first().day.date
-                    add(WeekRow.Collapsed(weekCount = 1, firstDate = firstDate))
-                }
-            } else {
-                add(WeekRow.Normal(week))
-            }
+    val initialPage = remember {
+        val index = months.indexOfFirst { month ->
+            val date = month.first().date
+            date.year == initialFocusedDate.year && date.month == initialFocusedDate.month
         }
+        // If the date is before the first month (due to minDate), fall back to the first month
+        if (index == -1) (if (initialFocusedDate < months.first().first().date) 0 else months.lastIndex) else index
     }
-
-    val firstVisibleWeekIndex = remember {
-        val res = rows.indexOfFirst { row ->
-            row is WeekRow.Normal && row.week.any { it is Weekday.Value && it.day.date == initialFocusedDate }
-        }
-        if (res == -1) 0 else res
+    val daysByDate = remember(months, minDate) {
+        months.flatten()
+            .filter { minDate == null || it.date >= minDate }
+            .associateBy { it.date }
     }
+    val pagerState = rememberPagerState(initialPage = initialPage) { months.size }
 
-    val state = rememberLazyListState(
-        initialFirstVisibleItemIndex = firstVisibleWeekIndex,
-    )
-
-    LaunchedEffect(firstVisibleWeekIndex) {
-        state.scrollToItem(firstVisibleWeekIndex)
-    }
-
-    LaunchedEffect(rows) {
-        snapshotFlow { state.firstVisibleItemIndex }
-            .collect { index ->
-                if (index in rows.indices) {
-                    val date = when (val row = rows[index]) {
-                        is WeekRow.Normal -> {
-                            row.week.filterIsInstance<Weekday.Value>()
-                                .firstOrNull()?.day?.date
-                        }
-                        is WeekRow.Collapsed -> row.firstDate
-                    }
-                    if (date != null) {
-                        val monthName = date.month.getDisplayName(
-                            TextStyle.FULL, Locale.getDefault()
-                        )
-                        onFirstVisibleMonthChanged(monthName, date.year.toString())
-                    }
-                }
+    val currentOnVisibleMonthChanged by rememberUpdatedState(onVisibleMonthChanged)
+    LaunchedEffect(months) {
+        snapshotFlow { pagerState.currentPage }
+            .collect { page ->
+                val date = months.getOrNull(page)?.firstOrNull()?.date ?: return@collect
+                val monthName = date.month.getDisplayName(TextStyle.FULL, Locale.getDefault())
+                currentOnVisibleMonthChanged(monthName, date.year.toString())
             }
     }
 
-    LazyColumn(
-        state = state,
-        verticalArrangement = Arrangement.spacedBy(2.dp),
-        modifier = modifier.padding(horizontal = 2.dp)
-    ) {
-        items(rows) { row ->
-            when (row) {
-                is WeekRow.Normal -> {
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(2.dp),
-                        modifier = Modifier.fillParentMaxWidth()
-                    ) {
-                        row.week.forEach { weekday ->
-                            Box(
-                                modifier = Modifier
-                                    .weight(1f)
-                            ) {
-                                when (weekday) {
-                                    is Weekday.Empty -> {
-                                        // Nothing
-                                    }
-
-                                    is Weekday.Value -> {
-                                        val day = weekday.day
-                                        DiaryDatePickerDay(
-                                            day = day,
-                                            videoAspectRatio = videoAspectRatio,
-                                            onClick = {
-                                                onDateSelected(day.date)
-                                            }
-                                        )
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-
-                is WeekRow.Collapsed -> {
-                    val weekCount = row.weekCount
-                    val collapsedDescription = pluralStringResource(
-                        R.plurals.date_picker_collapsed_weeks_description,
-                        weekCount,
-                        weekCount,
-                    )
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(6.dp, Alignment.CenterHorizontally),
-                        modifier = Modifier
-                            .fillParentMaxWidth()
-                            .padding(vertical = 6.dp)
-                            .semantics { contentDescription = collapsedDescription }
-                    ) {
-                        CollapsedWeeksEllipsis()
-                        Text(
-                            text = pluralStringResource(
-                                R.plurals.date_picker_collapsed_weeks_count,
-                                weekCount,
-                                weekCount,
-                            ),
-                            color = Color.Black.copy(alpha = 0.4f),
-                            fontSize = Typography.Size.extraSmall,
-                        )
-                    }
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun CollapsedWeeksEllipsis() {
-    Row(horizontalArrangement = Arrangement.spacedBy(3.dp)) {
-        repeat(3) {
-            Box(
-                modifier = Modifier
-                    .size(4.dp)
-                    .background(color = Color.Black.copy(alpha = 0.4f), shape = CircleShape)
+    Column(modifier = modifier) {
+        WeekdayHeader(modifier = Modifier.padding(horizontal = 2.dp))
+        HorizontalPager(
+            state = pagerState,
+            // Compose the neighbouring months ahead of time, so swiping to them doesn't have to
+            // compose a whole month grid in the middle of the gesture
+            beyondBoundsPageCount = 1,
+            key = { page -> months[page].first().date },
+            modifier = Modifier.weight(1f, fill = false)
+        ) { page ->
+            MonthGrid(
+                month = YearMonth.from(months[page].first().date),
+                daysByDate = daysByDate,
+                videoAspectRatio = videoAspectRatio,
+                onDateSelected = onDateSelected,
             )
         }
     }
 }
 
-private sealed interface Weekday {
-    data class Value(val day: Day) : Weekday
-    data object Empty : Weekday
+@Composable
+private fun WeekdayHeader(modifier: Modifier = Modifier) {
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(CELL_SPACING),
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp)
+    ) {
+        DayOfWeek.values().forEach { dayOfWeek ->
+            Text(
+                text = dayOfWeek.getDisplayName(TextStyle.SHORT, Locale.getDefault()),
+                color = Color.White.copy(alpha = 0.6f),
+                fontSize = 10.sp,
+                textAlign = TextAlign.Center,
+                maxLines = 1,
+                modifier = Modifier.weight(1f)
+            )
+        }
+    }
 }
 
-private sealed interface WeekRow {
-    data class Normal(val week: List<Weekday>) : WeekRow
-    data class Collapsed(val weekCount: Int, val firstDate: LocalDate) : WeekRow
+@Composable
+private fun MonthGrid(
+    month: YearMonth,
+    daysByDate: Map<LocalDate, Day>,
+    videoAspectRatio: Float,
+    onDateSelected: (LocalDate) -> Unit,
+) {
+    val today = LocalDate.now()
+    // Weeks start on Monday
+    val leadingDays = month.atDay(1).dayOfWeek.value - DayOfWeek.MONDAY.value
+    val gridStart = month.atDay(1).minusDays(leadingDays.toLong())
+
+    // Always show the worst case number of rows, so that every month has the same height
+    Column(
+        verticalArrangement = Arrangement.spacedBy(CELL_SPACING),
+        modifier = Modifier
+            .verticalScroll(rememberScrollState())
+            .padding(horizontal = 2.dp)
+    ) {
+        repeat(MAX_WEEKS_PER_MONTH) { weekIndex ->
+            Row(horizontalArrangement = Arrangement.spacedBy(CELL_SPACING)) {
+                repeat(DAYS_PER_WEEK) { dayIndex ->
+                    val date = gridStart.plusDays((weekIndex * DAYS_PER_WEEK + dayIndex).toLong())
+                    val isInMonth = YearMonth.from(date) == month
+                    val day = daysByDate[date]
+                    Box(modifier = Modifier.weight(1f)) {
+                        when {
+                            date.isAfter(today) -> {
+                                // Never show the future. Keep the cell's size so the row height is stable.
+                                Spacer(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .aspectRatio(videoAspectRatio)
+                                )
+                            }
+
+                            day != null -> {
+                                DiaryDatePickerDay(
+                                    day = day,
+                                    videoAspectRatio = videoAspectRatio,
+                                    dimmed = !isInMonth,
+                                    onClick = { onDateSelected(date) },
+                                )
+                            }
+
+                            else -> {
+                                // Before the diary began
+                                Box(
+                                    contentAlignment = Alignment.BottomCenter,
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .aspectRatio(videoAspectRatio)
+                                ) {
+                                    Text(
+                                        text = date.dayOfMonth.toString(),
+                                        color = Color.White.copy(alpha = 0.3f),
+                                        fontSize = 10.sp,
+                                        modifier = Modifier.padding(vertical = 1.dp)
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
 
 @Preview
@@ -206,9 +204,9 @@ private sealed interface WeekRow {
 private fun Preview() {
     DiaryDatePicker(
         initialFocusedDate = MockDataDiaryDatePicker.endDate,
-        weeks = MockDataDiaryDatePicker.weeks,
+        allMonths = MockDataDiaryDatePicker.months,
         videoAspectRatio = MockDataDiaryDatePicker.videoAspectRatio,
         onDateSelected = {},
-        onFirstVisibleMonthChanged = { _, _ -> },
+        onVisibleMonthChanged = { _, _ -> },
     )
 }

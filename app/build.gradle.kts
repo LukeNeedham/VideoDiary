@@ -84,6 +84,7 @@ dependencies {
     implementation(deps.libs.compose.uiGraphics)
     implementation(deps.libs.compose.tooling.preview)
     implementation(deps.libs.compose.material)
+    implementation(deps.libs.compose.material3)
 
     // Navigation
     implementation(deps.libs.navigation.compose)

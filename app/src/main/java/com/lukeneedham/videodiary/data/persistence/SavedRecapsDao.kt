@@ -32,6 +32,10 @@ class SavedRecapsDao(
         return id
     }
 
+    suspend fun renameSavedRecap(id: String, name: String) {
+        roomDao.updateName(id, name)
+    }
+
     suspend fun deleteSavedRecap(id: String) {
         roomDao.deleteById(id)
     }

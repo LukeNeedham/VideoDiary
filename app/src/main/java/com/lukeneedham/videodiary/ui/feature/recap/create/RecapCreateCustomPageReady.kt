@@ -26,7 +26,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.lukeneedham.videodiary.ui.feature.common.datepicker.DiaryDatePickerDialog
+import androidx.compose.ui.unit.em
+import androidx.compose.ui.unit.sp
+import com.lukeneedham.videodiary.ui.feature.common.Button
+import com.lukeneedham.videodiary.ui.feature.common.datepicker.DiaryDatePickerSheet
 import com.lukeneedham.videodiary.ui.feature.recap.create.component.RecapCreateEmpty
 import com.lukeneedham.videodiary.ui.feature.recap.create.component.RecapDatePicker
 import com.lukeneedham.videodiary.ui.feature.recap.create.component.RecapThumbnailRow
@@ -153,15 +156,17 @@ fun RecapCreateCustomPageReady(
             }
         }
         if (showStartDatePicker) {
-            DiaryDatePickerDialog(
+            DiaryDatePickerSheet(
                 onDateSelected = onStartDateSelected,
                 initialFocusedDate = recapStartDate,
                 onDismiss = { showStartDatePicker = false },
             )
         }
         if (showEndDatePicker) {
-            DiaryDatePickerDialog(
+            DiaryDatePickerSheet(
                 initialFocusedDate = recapEndDate,
+                // The recap can't end before it starts
+                minDate = recapStartDate,
                 onDateSelected = onEndDateSelected,
                 onDismiss = { showEndDatePicker = false },
             )

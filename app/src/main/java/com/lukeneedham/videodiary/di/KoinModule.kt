@@ -197,7 +197,7 @@ object KoinModule {
             RecapViewViewModel(
                 startDate = startDate,
                 endDate = endDate,
-                name = name,
+                initialName = name,
                 initialSavedRecapId = savedRecapId,
                 calendarRepository = get(),
                 savedRecapsDao = get(),
@@ -207,7 +207,7 @@ object KoinModule {
             RecapShareViewModel(
                 startDate = startDate,
                 endDate = endDate,
-                name = name,
+                initialName = name,
                 videoExportDao = get(),
             )
         }

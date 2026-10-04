@@ -1,5 +1,6 @@
 package com.lukeneedham.videodiary.ui.feature.recap.view.component
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -17,10 +18,16 @@ import com.lukeneedham.videodiary.R
 import com.lukeneedham.videodiary.ui.feature.common.toolbar.FlatIconButton
 import com.lukeneedham.videodiary.ui.theme.Typography
 
+// The minimum interactive size
+private val ButtonSize = 48.dp
+
 /**
- * A recap's static bottom bar: a borderless back button, the (wrapping, truly-centered) recap
- * name, and save/share icon buttons - plain, on the same black bar every other video toolbar
- * uses (no surface color/rounded corners of its own).
+ * A recap's static bottom bar: a borderless back button, the (wrapping) recap name, and
+ * details/save/share icon buttons - plain, on the same black bar every other video toolbar uses
+ * (no surface color/rounded corners of its own). All buttons are at least the minimum
+ * interactive size, which leaves the name a little off-center.
+ *
+ * Clicking the name or the details button opens the recap's details sheet.
  */
 @Composable
 fun RecapViewBottomBar(
@@ -28,6 +35,7 @@ fun RecapViewBottomBar(
     isSaved: Boolean,
     canGoBack: Boolean,
     onBack: () -> Unit,
+    onInfoClick: () -> Unit,
     onToggleSavedClick: () -> Unit,
     onShareClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -40,7 +48,7 @@ fun RecapViewBottomBar(
     ) {
         Box(
             contentAlignment = Alignment.CenterStart,
-            modifier = Modifier.width(96.dp),
+            modifier = Modifier.width(ButtonSize),
         ) {
             if (canGoBack) {
                 FlatIconButton(
@@ -48,7 +56,7 @@ fun RecapViewBottomBar(
                     contentDescription = "Back",
                     onClick = onBack,
                     selected = true,
-                    size = 44.dp,
+                    size = ButtonSize,
                 )
             }
         }
@@ -60,19 +68,28 @@ fun RecapViewBottomBar(
             fontSize = Typography.Size.medium,
             modifier = Modifier
                 .weight(1f)
+                .clickable(onClick = onInfoClick)
                 .padding(vertical = 4.dp),
         )
 
         Row(
             horizontalArrangement = Arrangement.End,
-            modifier = Modifier.width(96.dp),
+            modifier = Modifier.width(ButtonSize * 3),
         ) {
+            FlatIconButton(
+                iconRes = R.drawable.info,
+                contentDescription = "Recap details",
+                onClick = onInfoClick,
+                selected = true,
+                size = ButtonSize,
+                iconSize = 20.dp,
+            )
             FlatIconButton(
                 iconRes = if (isSaved) R.drawable.heart_filled else R.drawable.heart_outline,
                 contentDescription = if (isSaved) "Saved" else "Save",
                 onClick = onToggleSavedClick,
                 selected = true,
-                size = 44.dp,
+                size = ButtonSize,
                 iconSize = 20.dp,
             )
             FlatIconButton(
@@ -80,7 +97,7 @@ fun RecapViewBottomBar(
                 contentDescription = "Share",
                 onClick = onShareClick,
                 selected = true,
-                size = 44.dp,
+                size = ButtonSize,
                 iconSize = 20.dp,
             )
         }
