@@ -1,15 +1,15 @@
 package com.lukeneedham.videodiary.ui.feature.recap.create
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.appendInlineContent
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
@@ -21,21 +21,19 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.Placeholder
-import androidx.compose.ui.text.PlaceholderVerticalAlign
-import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.em
-import androidx.compose.ui.unit.sp
-import com.lukeneedham.videodiary.ui.feature.common.Button
 import com.lukeneedham.videodiary.ui.feature.common.datepicker.DiaryDatePickerDialog
 import com.lukeneedham.videodiary.ui.feature.recap.create.component.RecapCreateEmpty
 import com.lukeneedham.videodiary.ui.feature.recap.create.component.RecapDatePicker
 import com.lukeneedham.videodiary.ui.feature.recap.create.component.RecapThumbnailRow
 import com.lukeneedham.videodiary.ui.feature.recap.model.RecapDayThumbnail
+import com.lukeneedham.videodiary.ui.theme.AccentHighlight
+import com.lukeneedham.videodiary.ui.theme.AppSurface
+import com.lukeneedham.videodiary.ui.theme.AppSurfaceVariant
 import com.lukeneedham.videodiary.ui.theme.Typography
 import java.time.LocalDate
 
@@ -50,173 +48,147 @@ fun RecapCreateCustomPageReady(
     onEndDateSelected: (LocalDate?) -> Unit,
     recapName: String,
     onRecapNameChange: (String) -> Unit,
-    canSave: Boolean,
-    onSaveClick: () -> Unit,
 ) {
     var showStartDatePicker by remember { mutableStateOf(false) }
     var showEndDatePicker by remember { mutableStateOf(false) }
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-    ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier
-                .fillMaxSize()
-        ) {
+    Box(modifier = Modifier.fillMaxSize()) {
+        if (totalVideoCount == 0) {
+            RecapCreateEmpty()
+        } else {
             Column(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f)
-                    .padding(20.dp)
+                    .fillMaxSize()
+                    .padding(16.dp)
             ) {
-                if (totalVideoCount == 0) {
-                    RecapCreateEmpty()
-                } else {
-                    Column(
-                        modifier = Modifier
-                            .weight(1f)
-                            .verticalScroll(rememberScrollState())
-                    ) {
-                        val startDateId = "startDate"
-                        val endDateId = "endDate"
-
-                        val annotatedString = buildAnnotatedString {
-                            append("Recap from ")
-                            appendInlineContent(startDateId)
-                            append(" up to and including ")
-                            appendInlineContent(endDateId)
-                        }
-
-                        val datePlaceholder = Placeholder(
-                            width = 7.5.em,
-                            height = 2.em,
-                            placeholderVerticalAlign = PlaceholderVerticalAlign.Center,
-                        )
-
-                        val inlineContent = mapOf(
-                            startDateId to androidx.compose.foundation.text.InlineTextContent(
-                                placeholder = datePlaceholder,
-                            ) {
-                                RecapDatePicker(
-                                    date = recapStartDate,
-                                    onClick = { showStartDatePicker = true },
-                                )
-                            },
-                            endDateId to androidx.compose.foundation.text.InlineTextContent(
-                                placeholder = datePlaceholder,
-                            ) {
-                                RecapDatePicker(
-                                    date = recapEndDate,
-                                    onClick = { showEndDatePicker = true },
-                                )
-                            },
-                        )
-
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                    modifier = Modifier
+                        .weight(1f)
+                        .verticalScroll(rememberScrollState())
+                ) {
+                    Column {
                         Text(
-                            text = annotatedString,
-                            inlineContent = inlineContent,
-                            color = Color.Black,
-                            fontSize = Typography.Size.small,
-                            lineHeight = 44.sp,
-                        )
-
-                        Spacer(modifier = Modifier.height(30.dp))
-
-                        Text(
-                            text = "Recap name",
-                            color = Color.Black,
-                            fontSize = Typography.Size.small,
+                            text = "Custom recap",
+                            color = Color.White,
+                            fontSize = Typography.Size.big,
+                            fontWeight = FontWeight.Bold,
                         )
                         Text(
-                            text = "Give your recap a name",
-                            color = Color.Black,
+                            text = "Choose the dates to include and name your recap",
+                            color = Color.White.copy(alpha = 0.6f),
                             fontSize = Typography.Size.extraSmall,
                         )
+                    }
 
-                        Spacer(modifier = Modifier.height(8.dp))
+                    RecapSection(title = "Date range") {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(10.dp),
+                        ) {
+                            RecapDatePicker(
+                                label = "From",
+                                date = recapStartDate,
+                                onClick = { showStartDatePicker = true },
+                                modifier = Modifier.weight(1f),
+                            )
+                            Text(
+                                text = "→",
+                                color = Color.White.copy(alpha = 0.6f),
+                                fontSize = Typography.Size.big,
+                            )
+                            RecapDatePicker(
+                                label = "To",
+                                date = recapEndDate,
+                                onClick = { showEndDatePicker = true },
+                                modifier = Modifier.weight(1f),
+                            )
+                        }
+                    }
 
+                    RecapSection(title = "Name") {
                         TextField(
                             value = recapName,
                             onValueChange = onRecapNameChange,
                             placeholder = {
                                 Text(
                                     text = "e.g. Summer 2024",
-                                    color = Color.Black.copy(alpha = 0.4f),
+                                    color = Color.White.copy(alpha = 0.4f),
                                 )
                             },
                             singleLine = true,
                             colors = TextFieldDefaults.textFieldColors(
-                                textColor = Color.Black,
-                                backgroundColor = Color.White,
-                                cursorColor = Color.Black,
-                                focusedIndicatorColor = Color.Black,
-                                unfocusedIndicatorColor = Color.Black.copy(alpha = 0.3f),
+                                textColor = Color.White,
+                                backgroundColor = AppSurfaceVariant,
+                                cursorColor = AccentHighlight,
+                                focusedIndicatorColor = Color.Transparent,
+                                unfocusedIndicatorColor = Color.Transparent,
                             ),
-                            shape = RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp),
+                            shape = RoundedCornerShape(12.dp),
                             modifier = Modifier.fillMaxWidth(),
                         )
+                    }
 
-                        if (!selectedDayThumbnails.isNullOrEmpty()) {
-                            Spacer(modifier = Modifier.height(20.dp))
-
-                            Text(
-                                text = "Videos to include:",
-                                color = Color.Black,
-                                fontSize = Typography.Size.small,
-                            )
-
-                            Spacer(modifier = Modifier.height(10.dp))
-
-                            RecapThumbnailRow(
-                                thumbnails = selectedDayThumbnails,
-                            )
+                    if (selectedVideoCount == 0 || !selectedDayThumbnails.isNullOrEmpty()) {
+                        RecapSection(
+                            title = if (selectedVideoCount != null) {
+                                "$selectedVideoCount ${if (selectedVideoCount == 1) "video" else "videos"} included"
+                            } else {
+                                "Videos to include"
+                            }
+                        ) {
+                            if (selectedDayThumbnails.isNullOrEmpty()) {
+                                Text(
+                                    text = "None",
+                                    color = Color.White.copy(alpha = 0.6f),
+                                    fontSize = Typography.Size.extraSmall,
+                                )
+                            } else {
+                                RecapThumbnailRow(thumbnails = selectedDayThumbnails)
+                            }
                         }
                     }
-                    Spacer(modifier = Modifier.height(10.dp))
-
-                    Text(
-                        text = "Recap will include $selectedVideoCount of your $totalVideoCount diary videos",
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier.fillMaxWidth()
-                    )
-
-                    Spacer(modifier = Modifier.height(15.dp))
-
-                    if (selectedVideoCount == 0) {
-                        Text(
-                            text = "Cannot create recap - please select at least one video",
-                        )
-                    } else {
-                        Button(
-                            text = "Save recap",
-                            onClick = onSaveClick,
-                            enabled = canSave,
-                            modifier = Modifier.fillMaxWidth()
-                        )
-                    }
                 }
+
             }
         }
         if (showStartDatePicker) {
             DiaryDatePickerDialog(
                 onDateSelected = onStartDateSelected,
                 initialFocusedDate = recapStartDate,
-                onDismiss = {
-                    showStartDatePicker = false
-                },
+                onDismiss = { showStartDatePicker = false },
             )
         }
         if (showEndDatePicker) {
             DiaryDatePickerDialog(
                 initialFocusedDate = recapEndDate,
                 onDateSelected = onEndDateSelected,
-                onDismiss = {
-                    showEndDatePicker = false
-                },
+                onDismiss = { showEndDatePicker = false },
             )
         }
+    }
+}
+
+@Composable
+private fun RecapSection(
+    title: String,
+    content: @Composable () -> Unit,
+) {
+    Column(
+        verticalArrangement = Arrangement.spacedBy(10.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(16.dp))
+            .background(AppSurface)
+            .padding(16.dp)
+    ) {
+        Text(
+            text = title,
+            color = Color.White,
+            fontSize = Typography.Size.medium,
+            fontWeight = FontWeight.SemiBold,
+        )
+        content()
     }
 }
 
@@ -233,7 +205,5 @@ internal fun PreviewRecapCreateCustomPageReady() {
         onEndDateSelected = {},
         recapName = "",
         onRecapNameChange = {},
-        canSave = false,
-        onSaveClick = {},
     )
 }

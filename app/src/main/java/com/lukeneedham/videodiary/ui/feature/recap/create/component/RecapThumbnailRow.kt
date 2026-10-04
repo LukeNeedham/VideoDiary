@@ -1,7 +1,11 @@
 package com.lukeneedham.videodiary.ui.feature.recap.create.component
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
@@ -16,7 +20,7 @@ fun RecapThumbnailRow(
     modifier: Modifier = Modifier,
 ) {
     LazyRow(
-        horizontalArrangement = Arrangement.spacedBy(2.dp),
+        horizontalArrangement = Arrangement.spacedBy(6.dp),
         modifier = modifier,
     ) {
         items(thumbnails, key = { it.date }) { item ->
@@ -34,8 +38,11 @@ private fun RecapThumbnailItem(
         AsyncImage(
             model = item.thumbnailFile,
             contentDescription = null,
+            contentScale = ContentScale.Crop,
             modifier = modifier
-                .height(90.dp),
+                .height(96.dp)
+                .aspectRatio(9f / 16f)
+                .clip(RoundedCornerShape(8.dp)),
         )
     }
 }
