@@ -18,16 +18,13 @@ import com.lukeneedham.videodiary.R
 import com.lukeneedham.videodiary.ui.feature.common.toolbar.FlatIconButton
 import com.lukeneedham.videodiary.ui.theme.Typography
 
-private val ButtonSize = 40.dp
-
-// Both sides are the same width (room for the three icon buttons on the right), so the name
-// stays truly centered
-private val SideWidth = ButtonSize * 3
+// The minimum interactive size
+private val ButtonSize = 48.dp
 
 /**
- * A recap's static bottom bar: a borderless back button, the (wrapping, truly-centered) recap
- * name, and details/save/share icon buttons - plain, on the same black bar every other video
- * toolbar uses (no surface color/rounded corners of its own).
+ * A recap's static bottom bar: a borderless back button, the (wrapping) recap name, and details/save/share icon buttons - plain, on the same black bar every other video
+ * toolbar uses (no surface color/rounded corners of its own). All buttons are at least the
+ * minimum interactive size, which leaves the name a little off-center.
  *
  * Clicking the name or the details button opens the recap's details sheet.
  */
@@ -50,7 +47,7 @@ fun RecapViewBottomBar(
     ) {
         Box(
             contentAlignment = Alignment.CenterStart,
-            modifier = Modifier.width(SideWidth),
+            modifier = Modifier.width(ButtonSize),
         ) {
             if (canGoBack) {
                 FlatIconButton(
@@ -76,7 +73,7 @@ fun RecapViewBottomBar(
 
         Row(
             horizontalArrangement = Arrangement.End,
-            modifier = Modifier.width(SideWidth),
+            modifier = Modifier.width(ButtonSize * 3),
         ) {
             FlatIconButton(
                 iconRes = R.drawable.info,

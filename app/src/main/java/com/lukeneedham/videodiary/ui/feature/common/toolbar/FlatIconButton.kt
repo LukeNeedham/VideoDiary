@@ -17,6 +17,9 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.lukeneedham.videodiary.R
 
+/** The smallest size a button's clickable area may be (the Material minimum touch target) */
+private val MinInteractiveSize = 48.dp
+
 /**
  * A plain icon button for video toolbars - just the icon, with no glass background/border,
  * matching a flat bar's look. [selected] dims the icon down when off, so an active control (e.g.
@@ -35,7 +38,8 @@ fun FlatIconButton(
     Box(
         contentAlignment = Alignment.Center,
         modifier = modifier
-            .size(size)
+            // Never smaller than the minimum interactive size, whatever the requested size
+            .size(size.coerceAtLeast(MinInteractiveSize))
             .clickable(onClick = onClick),
     ) {
         Image(
