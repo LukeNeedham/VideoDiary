@@ -8,7 +8,7 @@ import java.time.LocalDate
 fun CalendarPage(
     viewModel: CalendarViewModel,
     onRecordVideoClick: (date: LocalDate) -> Unit,
-    onExportClick: () -> Unit,
+    onRecapClick: () -> Unit,
     onDebugClick: () -> Unit,
     share: (ShareRequest) -> Unit,
 ) {
@@ -23,7 +23,7 @@ fun CalendarPage(
         setCurrentDayIndex = viewModel::setCurrentDay,
         share = share,
         videoPlayerController = viewModel.videoPlayerController,
-        onExportClick = onExportClick,
+        onRecapClick = onRecapClick,
         onDebugClick = onDebugClick,
     )
 }

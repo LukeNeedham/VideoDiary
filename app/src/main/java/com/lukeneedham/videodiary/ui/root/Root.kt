@@ -3,7 +3,7 @@ package com.lukeneedham.videodiary.ui.root
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.systemBarsPadding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -46,9 +46,11 @@ fun Root(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            // Black system bars
+            // Black status bar. The bottom nav bar inset is each screen's own responsibility
+            // (not handled here), so screens that need the full window height - like
+            // RecapShareSheet's ModalBottomSheetLayout - aren't shrunk by space they don't use.
             .background(Color.Black)
-            .systemBarsPadding()
+            .statusBarsPadding()
             .background(Color.White)
     ) {
         VideoDiaryTheme {

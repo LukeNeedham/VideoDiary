@@ -5,9 +5,9 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 
-@Database(entities = [SavedExportEntity::class], version = 1, exportSchema = false)
+@Database(entities = [SavedRecapEntity::class], version = 2, exportSchema = false)
 abstract class AppDatabase : RoomDatabase() {
-    abstract fun savedExportDao(): SavedExportRoomDao
+    abstract fun savedRecapDao(): SavedRecapRoomDao
 
     companion object {
         fun create(context: Context): AppDatabase =
@@ -15,6 +15,8 @@ abstract class AppDatabase : RoomDatabase() {
                 context,
                 AppDatabase::class.java,
                 "video_diary_db"
-            ).build()
+            )
+                .addMigrations(MIGRATION_1_2)
+                .build()
     }
 }

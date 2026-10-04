@@ -13,6 +13,9 @@ object StandardDateTimeFormatter {
     /** Short month name, e.g. "Jan" */
     val monthShort = DateTimeFormatter.ofPattern("MMM")
 
+    /** Full month name, e.g. "January" */
+    val monthFull = DateTimeFormatter.ofPattern("MMMM")
+
     /** Full year, e.g. "2024" */
     val year = DateTimeFormatter.ofPattern("yyyy")
 }
