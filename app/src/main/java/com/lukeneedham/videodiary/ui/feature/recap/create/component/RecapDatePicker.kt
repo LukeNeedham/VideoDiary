@@ -43,7 +43,7 @@ fun RecapDatePicker(
             fontSize = Typography.Size.extraSmall,
         )
         Text(
-            text = date.format(StandardDateTimeFormatter.date),
+            text = date.format(StandardDateTimeFormatter.dateLong),
             color = Color.White,
             fontSize = Typography.Size.small,
         )

@@ -16,7 +16,9 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -43,18 +45,23 @@ private const val MAX_WEEKS_PER_MONTH = 6
 /**
  * A traditional calendar: one page per month, with 7 days per row, and horizontal swiping between months.
  *
- * @param months each item is all of the [Day]s in one calendar month, ordered chronologically
+ * @param allMonths each item is all of the [Day]s in one calendar month, ordered chronologically
  */
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun DiaryDatePicker(
     initialFocusedDate: LocalDate,
-    months: List<List<Day>>,
+    allMonths: List<List<Day>>,
     videoAspectRatio: Float,
     onDateSelected: (LocalDate) -> Unit,
     onVisibleMonthChanged: (monthName: String, year: String) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    /** If set, days before this date are shown but can't be selected, and earlier months are not shown */
+    minDate: LocalDate? = null,
 ) {
+    val months = remember(allMonths, minDate) {
+        if (minDate == null) allMonths else allMonths.filter { it.last().date >= minDate }
+    }
     if (months.isEmpty()) return
 
     val initialPage = remember {
@@ -62,17 +69,23 @@ fun DiaryDatePicker(
             val date = month.first().date
             date.year == initialFocusedDate.year && date.month == initialFocusedDate.month
         }
-        if (index == -1) months.lastIndex else index
+        // If the date is before the first month (due to minDate), fall back to the first month
+        if (index == -1) (if (initialFocusedDate < months.first().first().date) 0 else months.lastIndex) else index
     }
-    val daysByDate = remember(months) { months.flatten().associateBy { it.date } }
+    val daysByDate = remember(months, minDate) {
+        months.flatten()
+            .filter { minDate == null || it.date >= minDate }
+            .associateBy { it.date }
+    }
     val pagerState = rememberPagerState(initialPage = initialPage) { months.size }
 
+    val currentOnVisibleMonthChanged by rememberUpdatedState(onVisibleMonthChanged)
     LaunchedEffect(months) {
         snapshotFlow { pagerState.currentPage }
             .collect { page ->
                 val date = months.getOrNull(page)?.firstOrNull()?.date ?: return@collect
                 val monthName = date.month.getDisplayName(TextStyle.FULL, Locale.getDefault())
-                onVisibleMonthChanged(monthName, date.year.toString())
+                currentOnVisibleMonthChanged(monthName, date.year.toString())
             }
     }
 
@@ -80,6 +93,10 @@ fun DiaryDatePicker(
         WeekdayHeader(modifier = Modifier.padding(horizontal = 2.dp))
         HorizontalPager(
             state = pagerState,
+            // Compose the neighbouring months ahead of time, so swiping to them doesn't have to
+            // compose a whole month grid in the middle of the gesture
+            beyondViewportPageCount = 1,
+            key = { page -> months[page].first().date },
             modifier = Modifier.weight(1f, fill = false)
         ) { page ->
             MonthGrid(
@@ -187,7 +204,7 @@ private fun MonthGrid(
 private fun Preview() {
     DiaryDatePicker(
         initialFocusedDate = MockDataDiaryDatePicker.endDate,
-        months = MockDataDiaryDatePicker.months,
+        allMonths = MockDataDiaryDatePicker.months,
         videoAspectRatio = MockDataDiaryDatePicker.videoAspectRatio,
         onDateSelected = {},
         onVisibleMonthChanged = { _, _ -> },

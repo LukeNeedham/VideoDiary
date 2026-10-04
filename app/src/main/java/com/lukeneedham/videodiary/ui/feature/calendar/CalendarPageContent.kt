@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -43,6 +44,19 @@ fun CalendarPageContent(
 
     var showDayPickerDialog by remember { mutableStateOf(false) }
     var pendingDateToDelete: LocalDate? by remember { mutableStateOf(null) }
+
+    // Pause the video while the date picker sheet is open, and resume it when it closes
+    val isDayPickerOpen = showDayPickerDialog
+    DisposableEffect(isDayPickerOpen) {
+        if (isDayPickerOpen) {
+            videoPlayerController.temporaryPause()
+        }
+        onDispose {
+            if (isDayPickerOpen) {
+                videoPlayerController.temporaryResume()
+            }
+        }
+    }
 
     Box(
         modifier = Modifier

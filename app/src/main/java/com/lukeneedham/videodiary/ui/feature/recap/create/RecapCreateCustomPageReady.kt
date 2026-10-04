@@ -165,6 +165,8 @@ fun RecapCreateCustomPageReady(
         if (showEndDatePicker) {
             DiaryDatePickerSheet(
                 initialFocusedDate = recapEndDate,
+                // The recap can't end before it starts
+                minDate = recapStartDate,
                 onDateSelected = onEndDateSelected,
                 onDismiss = { showEndDatePicker = false },
             )

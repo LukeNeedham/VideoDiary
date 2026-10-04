@@ -47,6 +47,8 @@ fun DiaryDatePickerSheet(
     onDateSelected: (LocalDate) -> Unit,
     onDismiss: () -> Unit,
     onJumpToToday: (() -> Unit)? = null,
+    /** If set, days before this date are shown but can't be selected */
+    minDate: LocalDate? = null,
     viewModel: DiaryDatePickerViewModel = koinInject(),
 ) {
     DisposableEffect(viewModel) {
@@ -55,8 +57,8 @@ fun DiaryDatePickerSheet(
         }
     }
 
-    var topBarMonthName by remember { mutableStateOf("") }
-    var topBarYear by remember { mutableStateOf("") }
+    // Only read inside MonthTitle, so that swiping between months doesn't recompose the whole sheet
+    val monthTitle = remember { mutableStateOf("") }
 
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val scope = rememberCoroutineScope()
@@ -86,11 +88,8 @@ fun DiaryDatePickerSheet(
                 .fillMaxWidth()
                 .padding(horizontal = 4.dp)
         ) {
-            Text(
-                text = "$topBarMonthName $topBarYear",
-                color = Color.White,
-                fontWeight = FontWeight.Bold,
-                textAlign = TextAlign.Center,
+            MonthTitle(
+                title = { monthTitle.value },
                 modifier = Modifier.align(Alignment.Center)
             )
             if (onJumpToToday != null) {
@@ -109,12 +108,12 @@ fun DiaryDatePickerSheet(
         if (videoAspectRatio != null) {
             DiaryDatePicker(
                 initialFocusedDate = initialFocusedDate,
-                months = viewModel.months,
+                allMonths = viewModel.months,
                 videoAspectRatio = videoAspectRatio,
                 onDateSelected = { hideThen { onDateSelected(it) } },
+                minDate = minDate,
                 onVisibleMonthChanged = { monthName, year ->
-                    topBarMonthName = monthName
-                    topBarYear = year
+                    monthTitle.value = "$monthName $year"
                 },
                 // Side margins narrow the cells, which also makes the (aspect ratio sized) sheet shorter
                 modifier = Modifier
@@ -126,6 +125,17 @@ fun DiaryDatePickerSheet(
             Spacer(modifier = Modifier.navigationBarsPadding().height(200.dp))
         }
     }
+}
+
+@Composable
+private fun MonthTitle(title: () -> String, modifier: Modifier = Modifier) {
+    Text(
+        text = title(),
+        color = Color.White,
+        fontWeight = FontWeight.Bold,
+        textAlign = TextAlign.Center,
+        modifier = modifier,
+    )
 }
 
 @Composable
