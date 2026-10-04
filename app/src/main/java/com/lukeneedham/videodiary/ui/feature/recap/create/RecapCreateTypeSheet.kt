@@ -83,13 +83,13 @@ fun RecapCreateTypeSheet(
                     Text(
                         text = "Create a recap",
                         color = Color.White,
-                        fontSize = Typography.Size.big,
+                        fontSize = Typography.Size.medium,
                         fontWeight = FontWeight.Bold,
                     )
                     Text(
                         text = "Combine your daily videos into a single video. Choose the period to include.",
                         color = Color.White.copy(alpha = 0.7f),
-                        fontSize = Typography.Size.small,
+                        fontSize = Typography.Size.extraSmall,
                     )
                 }
                 RecapCreateType.entries.chunked(GRID_COLUMNS).forEach { rowTypes ->
