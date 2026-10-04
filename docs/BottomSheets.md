@@ -43,4 +43,4 @@ Material 2 `ModalBottomSheetLayout`: pass `SheetDefaults` to `sheetBackgroundCol
 
 ## Existing sheets
 
-`DiaryDatePickerSheet`, `RecapInfoSheet`, `RecapShareSheet`, `HubSwitcherSheet` (hosted in `NormalRouter`).
+`DiaryDatePickerSheet`, `RecapInfoSheet`, `RecapShareSheet`, `RecapCreateTypeSheet`, `HubSwitcherSheet` (hosted in `NormalRouter`).
