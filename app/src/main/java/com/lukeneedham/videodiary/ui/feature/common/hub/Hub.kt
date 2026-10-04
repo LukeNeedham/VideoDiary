@@ -13,5 +13,5 @@ enum class Hub(
 ) {
     Calendar(title = "Calendar", description = "Record and browse your daily videos", iconRes = R.drawable.calendar_today),
     Recap(title = "Recap", description = "Make and view recap videos", iconRes = R.drawable.movie),
-    Settings(title = "Settings", description = "App settings and developer tools", iconRes = R.drawable.settings)
+    Settings(title = "Settings", description = "App settings", iconRes = R.drawable.settings)
 }
