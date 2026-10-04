@@ -28,7 +28,6 @@ fun RecapViewPage(
 
     RecapViewPageContent(
         name = viewModel.name,
-        videoAspectRatio = viewModel.videoAspectRatio,
         videoFiles = viewModel.videoFiles,
         isSaved = viewModel.isSaved,
         onToggleSavedClick = viewModel::toggleSaved,

@@ -52,7 +52,6 @@ fun RecordVideoPageContent(
     videoDurationMillis: Long,
     resolution: Size,
     quality: Quality,
-    videoAspectRatio: Float,
     onRecordingFinished: (videoContentUri: Uri) -> Unit,
     onBack: () -> Unit,
 ) {
@@ -144,7 +143,6 @@ fun RecordVideoPageContent(
     val popupGapPx = with(density) { 8.dp.roundToPx() }
 
     VideoToolbarLayout(
-        videoAspectRatio = videoAspectRatio,
         bottomBar = {
             Box(
                 modifier = Modifier
@@ -288,7 +286,6 @@ internal fun PreviewRecordVideoPage() {
     RecordVideoPageContent(
         quality = Quality.HD,
         resolution = Size(100, 300),
-        videoAspectRatio = 100f / 300f,
         onRecordingFinished = {},
         videoDurationMillis = 3000,
         onBack = {},

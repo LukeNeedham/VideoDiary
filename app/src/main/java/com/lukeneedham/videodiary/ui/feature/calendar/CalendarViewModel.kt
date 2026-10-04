@@ -10,7 +10,6 @@ import androidx.lifecycle.viewModelScope
 import com.lukeneedham.videodiary.data.persistence.SettingsDao
 import com.lukeneedham.videodiary.data.persistence.VideosDao
 import com.lukeneedham.videodiary.data.repository.CalendarRepository
-import com.lukeneedham.videodiary.data.repository.VideoResolutionRepository
 import com.lukeneedham.videodiary.domain.model.Day
 import com.lukeneedham.videodiary.ui.feature.common.videoplayer.VideoPlayerController
 import kotlinx.coroutines.launch
@@ -18,7 +17,6 @@ import java.time.LocalDate
 
 class CalendarViewModel(
     private val calendarRepository: CalendarRepository,
-    private val videoResolutionRepository: VideoResolutionRepository,
     private val videosDao: VideosDao,
     private val settingsDao: SettingsDao,
 ) : ViewModel() {
@@ -28,9 +26,6 @@ class CalendarViewModel(
      * This allows playback settings (like muted state) to persist across days.
      */
     val videoPlayerController = VideoPlayerController()
-
-    var videoAspectRatio: Float? by mutableStateOf(null)
-        private set
 
     var days by mutableStateOf<List<Day>>(emptyList())
         private set
@@ -60,9 +55,6 @@ class CalendarViewModel(
                     currentDayIndex = newDays.lastIndex
                 }
             }
-        }
-        viewModelScope.launch {
-            videoAspectRatio = videoResolutionRepository.getAspectRatio()
         }
     }
 

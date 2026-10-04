@@ -9,14 +9,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.lukeneedham.videodiary.data.persistence.SettingsDao
 import com.lukeneedham.videodiary.data.persistence.VideosDao
-import com.lukeneedham.videodiary.data.repository.VideoResolutionRepository
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 
 class RecordVideoViewModel(
     private val date: LocalDate,
     private val settingsDao: SettingsDao,
-    private val videoResolutionRepository: VideoResolutionRepository,
     private val videosDao: VideosDao,
 ) : ViewModel() {
     /** Whether [date] already has a video, before this recording. */
@@ -28,9 +26,6 @@ class RecordVideoViewModel(
     var videoDurationMillis: Long? by mutableStateOf(null)
         private set
 
-    var videoAspectRatio: Float? by mutableStateOf(null)
-        private set
-
     init {
         viewModelScope.launch {
             resolution = settingsDao.getResolution()
@@ -40,9 +35,6 @@ class RecordVideoViewModel(
             videoDurationMillis = settingsDao.getVideoDuration()?.inWholeMilliseconds
         }
 
-        viewModelScope.launch {
-            videoAspectRatio = videoResolutionRepository.getAspectRatio()
-        }
     }
 
     /** Persists [videoContentUri] as the video for [date], skipping the review step. */

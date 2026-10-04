@@ -35,13 +35,11 @@ fun RecordVideoPage(
     ) {
         val qualityLocal = quality
         val videoDurationMillis = viewModel.videoDurationMillis
-        val videoAspectRatio = viewModel.videoAspectRatio
-        if (qualityLocal != null && resolution != null && videoDurationMillis != null && videoAspectRatio != null) {
+        if (qualityLocal != null && resolution != null && videoDurationMillis != null) {
             RecordVideoPageContent(
                 videoDurationMillis = videoDurationMillis,
                 quality = qualityLocal,
                 resolution = resolution,
-                videoAspectRatio = videoAspectRatio,
                 onRecordingFinished = onRecordingFinished,
                 onBack = onBack,
             )

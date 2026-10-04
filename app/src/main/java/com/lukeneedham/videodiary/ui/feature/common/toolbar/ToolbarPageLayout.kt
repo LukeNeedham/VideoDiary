@@ -29,10 +29,10 @@ import org.koin.compose.koinInject
 private const val PREVIEW_ASPECT_RATIO = 9f / 16f
 
 /**
- * Layout for pages that don't show a video, but still share the video pages' proportions: the
- * [content] fills the space at the top - full width, with its height driven by the video aspect
- * ratio exactly as a video's would be - and the black toolbar (with the back button) fills the
- * space below, so the toolbar sits in the same place on every page.
+ * Shared page layout: the [content] fills the space at the top - full width, with its height
+ * driven by the video aspect ratio - and a black toolbar holding [bottomBar] fills the space
+ * below, so the toolbar sits in the same place on every page, whether or not the page shows a
+ * video. [content] is given the aspect ratio, for pages that show a video in it.
  *
  * The layout looks up the aspect ratio itself (from [VideoResolutionRepository]), so pages don't
  * need to know about it. Nothing is rendered until the aspect ratio is known (normally from the
@@ -40,10 +40,9 @@ private const val PREVIEW_ASPECT_RATIO = 9f / 16f
  */
 @Composable
 fun ToolbarPageLayout(
-    canGoBack: Boolean,
-    onBack: () -> Unit,
     modifier: Modifier = Modifier,
-    content: @Composable BoxScope.() -> Unit,
+    bottomBar: @Composable BoxScope.() -> Unit,
+    content: @Composable BoxScope.(aspectRatio: Float) -> Unit,
 ) {
     val videoAspectRatio = rememberVideoAspectRatio() ?: return
 
@@ -52,8 +51,9 @@ fun ToolbarPageLayout(
             modifier = Modifier
                 .fillMaxWidth()
                 .aspectRatio(videoAspectRatio),
-            content = content,
-        )
+        ) {
+            content(videoAspectRatio)
+        }
 
         Box(
             modifier = Modifier
@@ -61,7 +61,22 @@ fun ToolbarPageLayout(
                 .fillMaxWidth()
                 .background(Color.Black)
                 .navigationBarsPadding(),
-        ) {
+            content = bottomBar,
+        )
+    }
+}
+
+/** A [ToolbarPageLayout] whose black toolbar holds just a back button (if [canGoBack]). */
+@Composable
+fun ToolbarPageLayout(
+    canGoBack: Boolean,
+    onBack: () -> Unit,
+    modifier: Modifier = Modifier,
+    content: @Composable BoxScope.(aspectRatio: Float) -> Unit,
+) {
+    ToolbarPageLayout(
+        modifier = modifier,
+        bottomBar = {
             if (canGoBack) {
                 FlatIconButton(
                     iconRes = R.drawable.back,
@@ -74,8 +89,9 @@ fun ToolbarPageLayout(
                         .padding(horizontal = 8.dp, vertical = 8.dp),
                 )
             }
-        }
-    }
+        },
+        content = content,
+    )
 }
 
 @Preview

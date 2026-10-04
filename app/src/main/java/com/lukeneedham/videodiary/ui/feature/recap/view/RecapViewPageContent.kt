@@ -26,7 +26,6 @@ import java.io.File
 @Composable
 fun RecapViewPageContent(
     name: String,
-    videoAspectRatio: Float?,
     videoFiles: List<File>,
     isSaved: Boolean,
     onToggleSavedClick: () -> Unit,
@@ -69,7 +68,6 @@ fun RecapViewPageContent(
         onShareClick = onManualShareClick,
     ) {
         VideoToolbarLayout(
-            videoAspectRatio = videoAspectRatio,
             bottomBar = {
                 RecapViewBottomBar(
                     name = name,
@@ -101,7 +99,6 @@ private fun PreviewPortrait() {
     ) {
         RecapViewPageContent(
             name = MockDataRecapView.name,
-            videoAspectRatio = 1f,
             videoFiles = MockDataRecapView.videoFiles,
             isSaved = false,
             onToggleSavedClick = {},
@@ -127,7 +124,6 @@ private fun PreviewSaved() {
     ) {
         RecapViewPageContent(
             name = MockDataRecapView.name,
-            videoAspectRatio = 1f,
             videoFiles = MockDataRecapView.videoFiles,
             isSaved = true,
             onToggleSavedClick = {},
