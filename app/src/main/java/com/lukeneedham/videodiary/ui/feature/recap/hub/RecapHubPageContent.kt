@@ -32,7 +32,7 @@ import androidx.compose.ui.unit.dp
 import com.lukeneedham.videodiary.R
 import com.lukeneedham.videodiary.domain.model.SavedRecap
 import com.lukeneedham.videodiary.ui.feature.common.DeleteConfirmDialog
-import com.lukeneedham.videodiary.ui.feature.common.toolbar.SubpageToolbar
+import com.lukeneedham.videodiary.ui.feature.common.toolbar.HubToolbar
 import com.lukeneedham.videodiary.ui.feature.common.toolbar.ToolbarPageLayout
 import com.lukeneedham.videodiary.ui.theme.AppBackground
 import com.lukeneedham.videodiary.ui.theme.AppSurfaceVariant
@@ -44,8 +44,7 @@ import java.time.LocalDate
 fun RecapHubPageContent(
     savedRecaps: List<SavedRecapWithThumbnails>,
     videoAspectRatio: Float?,
-    canGoBack: Boolean,
-    onBack: () -> Unit,
+    onMenuClick: () -> Unit,
     onCreateRecapClick: () -> Unit,
     onRecapClick: (SavedRecap) -> Unit,
     onDeleteClick: (String) -> Unit,
@@ -53,7 +52,7 @@ fun RecapHubPageContent(
     var pendingIdToDelete: String? by remember { mutableStateOf(null) }
 
     ToolbarPageLayout(
-        bottomBar = { SubpageToolbar(canGoBack = canGoBack, onBack = onBack) },
+        bottomBar = { HubToolbar(onMenuClick = onMenuClick) },
     ) {
         LazyColumn(
             modifier = Modifier
@@ -160,8 +159,7 @@ private fun PreviewEmpty() {
     RecapHubPageContent(
         savedRecaps = emptyList(),
         videoAspectRatio = 9f / 16f,
-        canGoBack = true,
-        onBack = {},
+        onMenuClick = {},
         onCreateRecapClick = {},
         onRecapClick = {},
         onDeleteClick = {},
@@ -195,8 +193,7 @@ private fun PreviewWithItems() {
             ),
         ),
         videoAspectRatio = 9f / 16f,
-        canGoBack = true,
-        onBack = {},
+        onMenuClick = {},
         onCreateRecapClick = {},
         onRecapClick = {},
         onDeleteClick = {},

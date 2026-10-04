@@ -6,16 +6,14 @@ import com.lukeneedham.videodiary.domain.model.SavedRecap
 @Composable
 fun RecapHubPage(
     viewModel: RecapHubViewModel,
-    canGoBack: Boolean,
-    onBack: () -> Unit,
+    onMenuClick: () -> Unit,
     onCreateRecapClick: () -> Unit,
     onRecapClick: (SavedRecap) -> Unit,
 ) {
     RecapHubPageContent(
         savedRecaps = viewModel.savedRecaps,
         videoAspectRatio = viewModel.videoAspectRatio,
-        canGoBack = canGoBack,
-        onBack = onBack,
+        onMenuClick = onMenuClick,
         onCreateRecapClick = onCreateRecapClick,
         onRecapClick = onRecapClick,
         onDeleteClick = viewModel::deleteRecap,
