@@ -14,7 +14,7 @@ sealed class NormalPage : Parcelable {
         get() = when (this) {
             is Calendar -> Hub.Calendar
             is RecapHub -> Hub.Recap
-            is Debug -> Hub.Debug
+            is SettingsHub -> Hub.Settings
             else -> null
         }
 
@@ -36,6 +36,7 @@ sealed class NormalPage : Parcelable {
         val savedRecapId: String?,
     ) : NormalPage()
 
+    data object SettingsHub : NormalPage()
     data object Debug : NormalPage()
     data object CrashLog : NormalPage()
 }
