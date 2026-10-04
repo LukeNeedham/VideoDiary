@@ -69,8 +69,9 @@ fun NormalRouter(
     val currentHub = (navController.backstack.entries.lastOrNull()?.destination as? NormalPage)
         ?.hub
 
+    // The sheet is hosted here, outside the pages, and isn't closed when a hub is chosen: it
+    // stays open over the new hub's page, and is dismissed by the user.
     fun switchToHub(hub: Hub) {
-        coroutineScope.launch { hubSheetState.hide() }
         if (hub == currentHub) return
         Logger.debug("Switching to hub: $hub")
         // The calendar hub is always the bottom entry of the backstack and is never removed, so
