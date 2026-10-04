@@ -5,8 +5,8 @@ import java.time.format.DateTimeFormatter
 object StandardDateTimeFormatter {
     /** Used throughout the UI as the standard way of formatting dates */
     val date = DateTimeFormatter.ofPattern("dd-MM-yyyy")
-    /** Date with the full month name, e.g. "30 July 2026" */
-    val dateLong = DateTimeFormatter.ofPattern("d MMMM yyyy")
+    /** Date with the short month name, e.g. "30 Jul 2026" */
+    val dateLong = DateTimeFormatter.ofPattern("d MMM yyyy")
     val time = DateTimeFormatter.ofPattern("HH:ss")
 
     /** Day-of-month with no leading zero, e.g. "1".."31" */
