@@ -1,7 +1,6 @@
 package com.lukeneedham.videodiary.ui.feature.recap.view.component
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -11,11 +10,9 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -28,10 +25,10 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
@@ -50,8 +47,10 @@ import com.lukeneedham.videodiary.domain.util.date.StandardDateTimeFormatter
 import com.lukeneedham.videodiary.ui.feature.recap.create.component.RecapThumbnailRow
 import com.lukeneedham.videodiary.ui.feature.recap.model.RecapDayThumbnail
 import com.lukeneedham.videodiary.ui.theme.AccentHighlight
-import com.lukeneedham.videodiary.ui.theme.AppSurface
+import com.lukeneedham.videodiary.ui.feature.common.sheet.SheetDefaults
+import com.lukeneedham.videodiary.ui.feature.common.sheet.SheetLayout
 import com.lukeneedham.videodiary.ui.theme.Typography
+import kotlinx.coroutines.launch
 import java.time.LocalDate
 
 /**
@@ -68,22 +67,28 @@ fun RecapInfoSheet(
     thumbnails: List<RecapDayThumbnail>,
     onDismiss: () -> Unit,
 ) {
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val scope = rememberCoroutineScope()
     ModalBottomSheet(
         onDismissRequest = onDismiss,
-        sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
-        containerColor = AppSurface,
-        contentColor = Color.White,
-        shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp),
-        scrimColor = Color.Black.copy(alpha = 0.5f),
-        dragHandle = { DragHandle() },
-        // Handled by the content below, so that the sheet can animate fully out
+        sheetState = sheetState,
+        containerColor = SheetDefaults.containerColor,
+        contentColor = SheetDefaults.contentColor,
+        shape = SheetDefaults.shape,
+        scrimColor = SheetDefaults.scrimColor,
+        dragHandle = null,
+        // Handled by SheetLayout, so that the sheet can animate fully out
         windowInsets = WindowInsets(0, 0, 0, 0),
     ) {
+        SheetLayout(
+            onClose = {
+                scope.launch { sheetState.hide() }.invokeOnCompletion { onDismiss() }
+            },
+        ) {
         Column(
             verticalArrangement = Arrangement.spacedBy(16.dp),
             modifier = Modifier
                 .fillMaxWidth()
-                .navigationBarsPadding()
                 .imePadding()
                 .padding(start = 20.dp, end = 20.dp, bottom = 20.dp),
         ) {
@@ -106,6 +111,7 @@ fun RecapInfoSheet(
                 thumbnails = thumbnails,
                 modifier = Modifier.fillMaxWidth(),
             )
+        }
         }
     }
 }
@@ -179,17 +185,6 @@ private fun EditableName(
             )
         }
     }
-}
-
-@Composable
-private fun DragHandle() {
-    Spacer(
-        modifier = Modifier
-            .padding(vertical = 10.dp)
-            .size(width = 36.dp, height = 4.dp)
-            .clip(RoundedCornerShape(2.dp))
-            .background(Color.White.copy(alpha = 0.3f)),
-    )
 }
 
 @Preview

@@ -113,6 +113,12 @@ All DI wiring lives in `di/KoinModule.kt`, grouped into module functions:
 - Built on Reimagined Navigation (`rememberNavController`, `NavHost`, `NavBackHandler`, `navigate`/`pop`/`popUpTo`).
 - Log navigation events via `Logger.debug("Navigating to: $to")` (existing convention in both routers).
 
+### Bottom sheets
+
+- **All bottom sheets must use `SheetLayout` and `SheetDefaults`** (`ui/feature/common/sheet/SheetLayout.kt`).
+  Never write a custom drag handle or style a sheet container by hand. When adding a new sheet, or
+  touching an existing one, make sure it follows this. See [docs/BottomSheets.md](docs/BottomSheets.md).
+
 ### Logging
 
 - **Always use `Logger` (`domain/util/logger/Logger.kt`)** — never call Android's `Log` directly
@@ -176,5 +182,6 @@ See [docs/Release.md](docs/Release.md) for the full F-Droid release checklist (c
 - Add new domain models to `domain/model/`, keeping them free of Android framework types where possible.
 - Wire any new injectable class into `di/KoinModule.kt` in the appropriate module function.
 - Prefer `Logger` over print/`Log` statements.
+- Any new bottom sheet must use the common `SheetLayout` (see "Bottom sheets" above).
 - Keep landscape/portrait-specific UI in `component/landscape/` and `component/portrait/`
   subpackages, mirroring the calendar feature's structure.

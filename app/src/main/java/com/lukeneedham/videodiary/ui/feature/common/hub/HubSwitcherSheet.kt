@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -27,7 +26,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.lukeneedham.videodiary.ui.theme.AppSurface
+import com.lukeneedham.videodiary.ui.feature.common.sheet.SheetLayout
 import com.lukeneedham.videodiary.ui.theme.Typography
 
 private const val GRID_COLUMNS = 3
@@ -40,16 +39,16 @@ private val ActiveBackground = Color.White
 fun HubSwitcherSheet(
     currentHub: Hub?,
     onHubClick: (Hub) -> Unit,
+    onClose: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Column(
+    SheetLayout(onClose = onClose, modifier = modifier) {
+      Column(
         verticalArrangement = Arrangement.spacedBy(12.dp),
-        modifier = modifier
+        modifier = Modifier
             .fillMaxWidth()
-            .background(AppSurface)
-            .navigationBarsPadding()
-            .padding(16.dp)
-    ) {
+            .padding(start = 16.dp, end = 16.dp, bottom = 16.dp)
+      ) {
         Hub.entries.chunked(GRID_COLUMNS).forEach { rowHubs ->
             Row(
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
@@ -70,6 +69,7 @@ fun HubSwitcherSheet(
                 }
             }
         }
+      }
     }
 }
 
@@ -119,5 +119,6 @@ private fun PreviewHubSwitcherSheet() {
     HubSwitcherSheet(
         currentHub = Hub.Calendar,
         onHubClick = {},
+        onClose = {},
     )
 }
