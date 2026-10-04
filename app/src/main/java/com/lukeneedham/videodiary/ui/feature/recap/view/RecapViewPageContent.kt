@@ -7,7 +7,10 @@ import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -20,13 +23,19 @@ import com.lukeneedham.videodiary.ui.feature.recap.share.RecapShareSheet
 import com.lukeneedham.videodiary.ui.feature.recap.share.model.RecapShareState
 import com.lukeneedham.videodiary.ui.feature.recap.view.component.RecapViewBottomBar
 import kotlinx.coroutines.launch
+import com.lukeneedham.videodiary.ui.feature.recap.model.RecapDayThumbnail
+import com.lukeneedham.videodiary.ui.feature.recap.view.component.RecapInfoSheet
 import java.io.File
+import java.time.LocalDate
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun RecapViewPageContent(
     name: String,
     onNameChange: (String) -> Unit,
+    startDate: LocalDate,
+    endDate: LocalDate,
+    thumbnails: List<RecapDayThumbnail>,
     videoFiles: List<File>,
     isSaved: Boolean,
     onToggleSavedClick: () -> Unit,
@@ -57,6 +66,7 @@ fun RecapViewPageContent(
         animationSpec = tween(durationMillis = 250),
     )
     val coroutineScope = rememberCoroutineScope()
+    var showInfoSheet by remember { mutableStateOf(false) }
 
     RecapShareSheet(
         sheetState = sheetState,
@@ -72,7 +82,7 @@ fun RecapViewPageContent(
             bottomBar = {
                 RecapViewBottomBar(
                     name = name,
-                    onNameChange = onNameChange,
+                    onInfoClick = { showInfoSheet = true },
                     isSaved = isSaved,
                     canGoBack = canGoBack,
                     onBack = onBack,
@@ -90,6 +100,17 @@ fun RecapViewPageContent(
             )
         }
     }
+
+    if (showInfoSheet) {
+        RecapInfoSheet(
+            name = name,
+            onNameChange = onNameChange,
+            startDate = startDate,
+            endDate = endDate,
+            thumbnails = thumbnails,
+            onDismiss = { showInfoSheet = false },
+        )
+    }
 }
 
 @Preview
@@ -102,6 +123,9 @@ private fun PreviewPortrait() {
         RecapViewPageContent(
             name = MockDataRecapView.name,
             onNameChange = {},
+            startDate = LocalDate.of(2026, 3, 1),
+            endDate = LocalDate.of(2026, 5, 31),
+            thumbnails = emptyList(),
             videoFiles = MockDataRecapView.videoFiles,
             isSaved = false,
             onToggleSavedClick = {},
@@ -128,6 +152,9 @@ private fun PreviewSaved() {
         RecapViewPageContent(
             name = MockDataRecapView.name,
             onNameChange = {},
+            startDate = LocalDate.of(2026, 3, 1),
+            endDate = LocalDate.of(2026, 5, 31),
+            thumbnails = emptyList(),
             videoFiles = MockDataRecapView.videoFiles,
             isSaved = true,
             onToggleSavedClick = {},

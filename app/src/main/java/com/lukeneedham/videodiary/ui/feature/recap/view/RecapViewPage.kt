@@ -33,6 +33,9 @@ fun RecapViewPage(
     RecapViewPageContent(
         name = viewModel.name,
         onNameChange = viewModel::rename,
+        startDate = viewModel.startDate,
+        endDate = viewModel.endDate,
+        thumbnails = viewModel.thumbnails,
         videoFiles = viewModel.videoFiles,
         isSaved = viewModel.isSaved,
         onToggleSavedClick = viewModel::toggleSaved,

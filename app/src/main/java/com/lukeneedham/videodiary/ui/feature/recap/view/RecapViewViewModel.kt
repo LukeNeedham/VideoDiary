@@ -9,6 +9,7 @@ import androidx.lifecycle.viewModelScope
 import com.lukeneedham.videodiary.data.persistence.SavedRecapsDao
 import com.lukeneedham.videodiary.data.repository.CalendarRepository
 import com.lukeneedham.videodiary.ui.feature.recap.model.RecapDay
+import com.lukeneedham.videodiary.ui.feature.recap.model.RecapDayThumbnail
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 
@@ -26,6 +27,9 @@ class RecapViewViewModel(
     var days: List<RecapDay> by mutableStateOf(emptyList())
         private set
 
+    var thumbnails: List<RecapDayThumbnail> by mutableStateOf(emptyList())
+        private set
+
     val videoFiles by derivedStateOf {
         days.map { it.video }
     }
@@ -40,6 +44,13 @@ class RecapViewViewModel(
     init {
         viewModelScope.launch {
             calendarRepository.allDays.collect { allDays ->
+                thumbnails = allDays.mapNotNull { day ->
+                    if (day.date in startDate..endDate && day.videoFile != null) {
+                        RecapDayThumbnail(day.date, day.thumbnailFile)
+                    } else {
+                        null
+                    }
+                }
                 days = allDays.mapNotNull { day ->
                     val videoFile = day.videoFile
                     if (day.date in startDate..endDate && videoFile != null) {
