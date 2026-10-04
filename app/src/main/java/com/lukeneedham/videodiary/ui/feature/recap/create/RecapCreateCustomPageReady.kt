@@ -137,7 +137,7 @@ fun RecapCreateCustomPageReady(
                     if (selectedVideoCount == 0 || !selectedDayThumbnails.isNullOrEmpty()) {
                         RecapSection(
                             title = if (selectedVideoCount != null) {
-                                "Videos to include ($selectedVideoCount of $totalVideoCount)"
+                                "Videos to include ($selectedVideoCount)"
                             } else {
                                 "Videos to include"
                             }
