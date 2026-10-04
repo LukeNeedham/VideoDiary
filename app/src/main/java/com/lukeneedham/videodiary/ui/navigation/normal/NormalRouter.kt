@@ -71,7 +71,10 @@ fun NormalRouter(
     // The sheet is hosted here, outside the pages. When a hub is chosen the page behind it is
     // switched first, and the sheet then animates closed over the new page.
     fun switchToHub(hub: Hub) {
-        if (hub != currentHub) {
+        // Read the live backstack rather than the composed currentHub, which can be stale by the
+        // time the click lands
+        val liveHub = (navController.backstack.entries.lastOrNull()?.destination as? NormalPage)?.hub
+        if (hub != liveHub) {
             Logger.debug("Switching to hub: $hub")
             // The calendar hub is always the bottom entry of the backstack and is never removed,
             // so it keeps its state. Switching hub drops everything above it, then opens the new

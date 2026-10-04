@@ -70,10 +70,7 @@ fun RecapShareSheet(
         scrimColor = SheetDefaults.scrimColor,
         modifier = modifier,
         sheetContent = {
-            SheetLayout(
-                onClose = { scope.launch { sheetState.hide() } },
-                modifier = Modifier.padding(bottom = 20.dp),
-            ) {
+            SheetLayout(onClose = { scope.launch { sheetState.hide() } }) {
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
