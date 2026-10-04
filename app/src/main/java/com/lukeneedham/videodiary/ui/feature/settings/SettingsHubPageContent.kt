@@ -12,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.lukeneedham.videodiary.BuildConfig
 import com.lukeneedham.videodiary.ui.feature.common.toolbar.HubToolbar
 import com.lukeneedham.videodiary.ui.feature.common.toolbar.ToolbarPageLayout
 import com.lukeneedham.videodiary.ui.theme.Typography
@@ -30,15 +31,17 @@ fun SettingsHubPageContent(
                 .background(Color.White)
                 .padding(20.dp)
         ) {
-            Text(
-                text = "Debug settings",
-                color = Color.Black,
-                fontSize = Typography.Size.small,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable { onDebugClick() }
-                    .padding(vertical = 10.dp),
-            )
+            if (BuildConfig.DEBUG) {
+                Text(
+                    text = "Debug settings",
+                    color = Color.Black,
+                    fontSize = Typography.Size.small,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { onDebugClick() }
+                        .padding(vertical = 10.dp),
+                )
+            }
         }
     }
 }

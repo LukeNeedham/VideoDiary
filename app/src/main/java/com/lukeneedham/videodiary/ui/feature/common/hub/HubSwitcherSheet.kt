@@ -50,7 +50,7 @@ fun HubSwitcherSheet(
             .navigationBarsPadding()
             .padding(16.dp)
     ) {
-        Hub.available.chunked(GRID_COLUMNS).forEach { rowHubs ->
+        Hub.entries.chunked(GRID_COLUMNS).forEach { rowHubs ->
             Row(
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
                 modifier = Modifier
