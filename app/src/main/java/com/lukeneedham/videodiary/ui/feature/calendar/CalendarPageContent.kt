@@ -20,7 +20,7 @@ import com.lukeneedham.videodiary.domain.model.ShareRequest
 import com.lukeneedham.videodiary.domain.util.logger.Logger
 import com.lukeneedham.videodiary.ui.feature.calendar.component.CalendarDeleteConfirmDialog
 import com.lukeneedham.videodiary.ui.feature.calendar.component.CalendarScroller
-import com.lukeneedham.videodiary.ui.feature.common.datepicker.DiaryDatePickerDialog
+import com.lukeneedham.videodiary.ui.feature.common.datepicker.DiaryDatePickerSheet
 import com.lukeneedham.videodiary.ui.feature.common.videoplayer.VideoPlayerController
 import com.lukeneedham.videodiary.ui.feature.common.videoplayer.rememberVideoPlayerController
 import com.lukeneedham.videodiary.ui.theme.AppBackground
@@ -78,7 +78,7 @@ fun CalendarPageContent(
         }
 
         if (showDayPickerDialog) {
-            DiaryDatePickerDialog(
+            DiaryDatePickerSheet(
                 initialFocusedDate = currentDay.date,
                 onDateSelected = { date ->
                     goToDate(date)

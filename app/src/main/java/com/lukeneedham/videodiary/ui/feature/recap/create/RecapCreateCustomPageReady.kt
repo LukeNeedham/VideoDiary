@@ -31,7 +31,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 import com.lukeneedham.videodiary.ui.feature.common.Button
-import com.lukeneedham.videodiary.ui.feature.common.datepicker.DiaryDatePickerDialog
+import com.lukeneedham.videodiary.ui.feature.common.datepicker.DiaryDatePickerSheet
 import com.lukeneedham.videodiary.ui.feature.recap.create.component.RecapCreateEmpty
 import com.lukeneedham.videodiary.ui.feature.recap.create.component.RecapDatePicker
 import com.lukeneedham.videodiary.ui.feature.recap.create.component.RecapThumbnailRow
@@ -200,7 +200,7 @@ fun RecapCreateCustomPageReady(
             }
         }
         if (showStartDatePicker) {
-            DiaryDatePickerDialog(
+            DiaryDatePickerSheet(
                 onDateSelected = onStartDateSelected,
                 initialFocusedDate = recapStartDate,
                 onDismiss = {
@@ -209,7 +209,7 @@ fun RecapCreateCustomPageReady(
             )
         }
         if (showEndDatePicker) {
-            DiaryDatePickerDialog(
+            DiaryDatePickerSheet(
                 initialFocusedDate = recapEndDate,
                 onDateSelected = onEndDateSelected,
                 onDismiss = {

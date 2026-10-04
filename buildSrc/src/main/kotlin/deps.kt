@@ -53,6 +53,7 @@ object deps {
             val ui = "androidx.compose.ui:ui"
             val uiGraphics = "androidx.compose.ui:ui-graphics"
             val material = "androidx.compose.material:material"
+            val material3 = "androidx.compose.material3:material3"
 
             object tooling {
                 val core = "androidx.compose.ui:ui-tooling"

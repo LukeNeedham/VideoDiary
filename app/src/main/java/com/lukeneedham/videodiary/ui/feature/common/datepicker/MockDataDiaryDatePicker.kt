@@ -2,6 +2,7 @@ package com.lukeneedham.videodiary.ui.feature.common.datepicker
 
 import com.lukeneedham.videodiary.domain.model.Day
 import com.lukeneedham.videodiary.domain.util.date.CalendarUtil
+import java.time.YearMonth
 import java.time.LocalDate
 
 object MockDataDiaryDatePicker {
@@ -17,7 +18,7 @@ object MockDataDiaryDatePicker {
             date = it, videoFile = null,
         )
     }
-    val weeks = CalendarUtil.chunkIntoWeeks(days) { it.date }
+    val months = days.groupBy { YearMonth.from(it.date) }.toSortedMap().values.toList()
 
     val videoAspectRatio = 9f / 16f
 }
