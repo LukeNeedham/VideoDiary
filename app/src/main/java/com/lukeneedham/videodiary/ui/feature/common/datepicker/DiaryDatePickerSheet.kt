@@ -29,7 +29,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.res.painterResource
 import com.lukeneedham.videodiary.R
 import com.lukeneedham.videodiary.ui.theme.AppSurface
@@ -37,7 +36,7 @@ import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
 import java.time.LocalDate
 
-private val CalendarSideMargin = 40.dp
+private val CalendarSideMargin = 20.dp
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -82,23 +81,13 @@ fun DiaryDatePickerSheet(
                 .fillMaxWidth()
                 .padding(horizontal = 4.dp)
         ) {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
+            Text(
+                text = "$topBarMonthName $topBarYear",
+                color = Color.White,
+                fontWeight = FontWeight.Bold,
+                textAlign = TextAlign.Center,
                 modifier = Modifier.align(Alignment.Center)
-            ) {
-                Text(
-                    text = topBarMonthName,
-                    color = Color.White,
-                    fontWeight = FontWeight.Bold,
-                    textAlign = TextAlign.Center,
-                )
-                Text(
-                    text = topBarYear,
-                    color = Color.White,
-                    fontSize = 12.sp,
-                    textAlign = TextAlign.Center,
-                )
-            }
+            )
             if (onJumpToToday != null) {
                 Icon(
                     painter = painterResource(R.drawable.calendar_today),

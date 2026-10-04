@@ -26,7 +26,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.lukeneedham.videodiary.domain.model.Day
-import com.lukeneedham.videodiary.ui.theme.Typography
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.YearMonth
@@ -102,7 +101,7 @@ private fun WeekdayHeader(modifier: Modifier = Modifier) {
             Text(
                 text = dayOfWeek.getDisplayName(TextStyle.SHORT, Locale.getDefault()),
                 color = Color.White.copy(alpha = 0.6f),
-                fontSize = Typography.Size.extraSmall,
+                fontSize = 10.sp,
                 textAlign = TextAlign.Center,
                 maxLines = 1,
                 modifier = Modifier.weight(1f)
