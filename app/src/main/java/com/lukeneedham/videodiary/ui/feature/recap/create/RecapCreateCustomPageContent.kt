@@ -16,7 +16,6 @@ import java.time.LocalDate
 
 @Composable
 fun RecapCreateCustomPageContent(
-    videoAspectRatio: Float?,
     canGoBack: Boolean,
     onBack: () -> Unit,
     totalVideoCount: Int?,
@@ -33,7 +32,6 @@ fun RecapCreateCustomPageContent(
     onSaveClick: () -> Unit,
 ) {
     ToolbarPageLayout(
-        videoAspectRatio = videoAspectRatio,
         canGoBack = canGoBack,
         onBack = onBack,
     ) {
@@ -72,7 +70,6 @@ internal fun PreviewRecapCreateCustomPageContent() {
         modifier = Modifier.background(Color.White)
     ) {
         RecapCreateCustomPageContent(
-            videoAspectRatio = 9f / 16f,
             canGoBack = true,
             onBack = {},
             totalVideoCount = 10,

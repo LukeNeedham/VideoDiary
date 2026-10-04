@@ -33,7 +33,6 @@ import com.lukeneedham.videodiary.ui.theme.Typography
 
 @Composable
 fun RecapCreateTypePageContent(
-    videoAspectRatio: Float?,
     canGoBack: Boolean,
     onBack: () -> Unit,
     onCreateMonthClick: () -> Unit,
@@ -42,7 +41,6 @@ fun RecapCreateTypePageContent(
     onCreateCustomClick: () -> Unit,
 ) {
     ToolbarPageLayout(
-        videoAspectRatio = videoAspectRatio,
         canGoBack = canGoBack,
         onBack = onBack,
     ) {
@@ -121,7 +119,6 @@ private fun CreateRecapTypeRow(
 @Composable
 private fun PreviewRecapCreateTypePageContent() {
     RecapCreateTypePageContent(
-        videoAspectRatio = 9f / 16f,
         canGoBack = true,
         onBack = {},
         onCreateMonthClick = {},

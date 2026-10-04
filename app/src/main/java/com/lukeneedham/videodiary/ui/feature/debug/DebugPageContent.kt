@@ -25,7 +25,6 @@ import com.lukeneedham.videodiary.ui.theme.Typography
 
 @Composable
 fun DebugPageContent(
-    videoAspectRatio: Float?,
     onFillWithMockDataClick: () -> Unit,
     allowRetakeForPastDays: Boolean,
     onAllowRetakeForPastDaysChange: (Boolean) -> Unit,
@@ -35,7 +34,6 @@ fun DebugPageContent(
     onBack: () -> Unit,
 ) {
     ToolbarPageLayout(
-        videoAspectRatio = videoAspectRatio,
         canGoBack = canGoBack,
         onBack = onBack,
     ) {
@@ -150,7 +148,6 @@ private fun DebugCheckboxOption(
 @Composable
 internal fun PreviewDebugPageContent() {
     DebugPageContent(
-        videoAspectRatio = 9f / 16f,
         onFillWithMockDataClick = {},
         allowRetakeForPastDays = false,
         onAllowRetakeForPastDaysChange = {},

@@ -14,7 +14,6 @@ fun DebugPage(
     val allowRetakeForPastDays by viewModel.allowRetakeForPastDays.collectAsState()
 
     DebugPageContent(
-        videoAspectRatio = viewModel.videoAspectRatio,
         onFillWithMockDataClick = viewModel::fillWithMockData,
         allowRetakeForPastDays = allowRetakeForPastDays,
         onAllowRetakeForPastDaysChange = viewModel::setAllowRetakeForPastDays,

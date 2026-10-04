@@ -4,7 +4,6 @@ import androidx.compose.runtime.Composable
 
 @Composable
 fun RecapCreateTypePage(
-    viewModel: RecapCreateTypeViewModel,
     canGoBack: Boolean,
     onBack: () -> Unit,
     onCreateMonthClick: () -> Unit,
@@ -13,7 +12,6 @@ fun RecapCreateTypePage(
     onCreateCustomClick: () -> Unit,
 ) {
     RecapCreateTypePageContent(
-        videoAspectRatio = viewModel.videoAspectRatio,
         canGoBack = canGoBack,
         onBack = onBack,
         onCreateMonthClick = onCreateMonthClick,

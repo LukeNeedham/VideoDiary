@@ -37,7 +37,6 @@ import java.time.LocalDate
 
 @Composable
 fun RecapCreatePeriodListPageContent(
-    videoAspectRatio: Float?,
     periodType: RecapPeriodType,
     options: List<RecapPeriodOption>,
     isLoaded: Boolean,
@@ -46,7 +45,6 @@ fun RecapCreatePeriodListPageContent(
     onOptionClick: (RecapPeriodOption) -> Unit,
 ) {
     ToolbarPageLayout(
-        videoAspectRatio = videoAspectRatio,
         canGoBack = canGoBack,
         onBack = onBack,
     ) {
@@ -168,7 +166,6 @@ private fun RecapPeriodOptionCard(
 @Composable
 private fun PreviewRecapCreatePeriodListPageContent() {
     RecapCreatePeriodListPageContent(
-        videoAspectRatio = 9f / 16f,
         periodType = RecapPeriodType.MONTH,
         options = listOf(
             RecapPeriodOption(
@@ -207,7 +204,6 @@ private fun PreviewRecapCreatePeriodListPageContent() {
 @Composable
 private fun PreviewRecapCreatePeriodListPageContentEmpty() {
     RecapCreatePeriodListPageContent(
-        videoAspectRatio = 9f / 16f,
         periodType = RecapPeriodType.YEAR,
         options = emptyList(),
         isLoaded = true,

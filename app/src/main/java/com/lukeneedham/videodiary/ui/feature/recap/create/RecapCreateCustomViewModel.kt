@@ -8,7 +8,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.lukeneedham.videodiary.data.persistence.SavedRecapsDao
 import com.lukeneedham.videodiary.data.repository.CalendarRepository
-import com.lukeneedham.videodiary.data.repository.VideoResolutionRepository
 import com.lukeneedham.videodiary.domain.model.Day
 import com.lukeneedham.videodiary.ui.feature.recap.model.RecapDayThumbnail
 import kotlinx.coroutines.channels.BufferOverflow
@@ -27,11 +26,7 @@ data class RecapCreatedArgs(
 class RecapCreateCustomViewModel(
     private val calendarRepository: CalendarRepository,
     private val savedRecapsDao: SavedRecapsDao,
-    private val videoResolutionRepository: VideoResolutionRepository,
 ) : ViewModel() {
-    var videoAspectRatio: Float? by mutableStateOf(null)
-        private set
-
     private var allDays: List<Day> by mutableStateOf(emptyList())
 
     val totalVideoCount: Int? by derivedStateOf {
@@ -92,9 +87,6 @@ class RecapCreateCustomViewModel(
     val onSavedFlow = onSavedMutable.asSharedFlow()
 
     init {
-        viewModelScope.launch {
-            videoAspectRatio = videoResolutionRepository.getAspectRatio()
-        }
         viewModelScope.launch {
             calendarRepository.allDays.collect { days ->
                 allDays = days

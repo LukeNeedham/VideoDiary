@@ -123,7 +123,6 @@ fun NormalRouter(
             )
 
             is NormalPage.RecapCreateType -> RecapCreateTypePage(
-                viewModel = koinViewModel(),
                 canGoBack = canGoBack,
                 onBack = onBack,
                 onCreateMonthClick = {

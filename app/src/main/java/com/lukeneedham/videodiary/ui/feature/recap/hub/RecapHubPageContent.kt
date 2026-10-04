@@ -52,7 +52,6 @@ fun RecapHubPageContent(
     var pendingIdToDelete: String? by remember { mutableStateOf(null) }
 
     ToolbarPageLayout(
-        videoAspectRatio = videoAspectRatio,
         canGoBack = canGoBack,
         onBack = onBack,
     ) {

@@ -18,7 +18,6 @@ fun RecapCreateCustomPage(
     }
 
     RecapCreateCustomPageContent(
-        videoAspectRatio = viewModel.videoAspectRatio,
         canGoBack = canGoBack,
         onBack = onBack,
         totalVideoCount = viewModel.totalVideoCount,

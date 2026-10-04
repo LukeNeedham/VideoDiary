@@ -11,7 +11,6 @@ fun RecapCreatePeriodListPage(
     onOptionClick: (RecapPeriodOption) -> Unit,
 ) {
     RecapCreatePeriodListPageContent(
-        videoAspectRatio = viewModel.videoAspectRatio,
         periodType = viewModel.periodType,
         options = viewModel.options,
         isLoaded = viewModel.isLoaded,
