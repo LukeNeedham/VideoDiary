@@ -35,7 +35,8 @@ private const val PREVIEW_ASPECT_RATIO = 9f / 16f
  * space below, so the toolbar sits in the same place on every page.
  *
  * The layout looks up the aspect ratio itself (from [VideoResolutionRepository]), so pages don't
- * need to know about it. [content] is omitted while the aspect ratio is loading.
+ * need to know about it. Nothing is rendered until the aspect ratio is known (normally from the
+ * first frame, since it's cached at startup), so the layout never shifts as it loads.
  */
 @Composable
 fun ToolbarPageLayout(
@@ -44,27 +45,15 @@ fun ToolbarPageLayout(
     modifier: Modifier = Modifier,
     content: @Composable BoxScope.() -> Unit,
 ) {
-    val isPreview = LocalInspectionMode.current
-    var videoAspectRatio: Float? by remember {
-        mutableStateOf(if (isPreview) PREVIEW_ASPECT_RATIO else null)
-    }
-    if (!isPreview) {
-        val videoResolutionRepository = koinInject<VideoResolutionRepository>()
-        LaunchedEffect(videoResolutionRepository) {
-            videoAspectRatio = videoResolutionRepository.getAspectRatio()
-        }
-    }
+    val videoAspectRatio = rememberVideoAspectRatio() ?: return
 
     Column(modifier = modifier.fillMaxSize()) {
-        val aspectRatio = videoAspectRatio
-        if (aspectRatio != null) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .aspectRatio(aspectRatio),
-                content = content,
-            )
-        }
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .aspectRatio(videoAspectRatio),
+            content = content,
+        )
 
         Box(
             modifier = Modifier
@@ -98,4 +87,18 @@ private fun PreviewToolbarPageLayout() {
     ) {
         Text(text = "Content", modifier = Modifier.align(Alignment.Center))
     }
+}
+
+@Composable
+private fun rememberVideoAspectRatio(): Float? {
+    if (LocalInspectionMode.current) return PREVIEW_ASPECT_RATIO
+
+    val repository = koinInject<VideoResolutionRepository>()
+    var aspectRatio: Float? by remember { mutableStateOf(repository.cachedAspectRatio) }
+    if (aspectRatio == null) {
+        LaunchedEffect(repository) {
+            aspectRatio = repository.getAspectRatio()
+        }
+    }
+    return aspectRatio
 }

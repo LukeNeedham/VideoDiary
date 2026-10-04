@@ -3,6 +3,7 @@ package com.lukeneedham.videodiary.ui.feature.setup.resolution
 import android.util.Size
 import androidx.lifecycle.ViewModel
 import com.lukeneedham.videodiary.data.persistence.SettingsDao
+import com.lukeneedham.videodiary.data.repository.VideoResolutionRepository
 import com.lukeneedham.videodiary.domain.model.CameraResolutionRotation
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
@@ -15,6 +16,7 @@ import kotlinx.coroutines.launch
 
 class SetupSelectResolutionViewModel(
     private val settingsDao: SettingsDao,
+    private val videoResolutionRepository: VideoResolutionRepository,
     ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
     private val saveSettingsScope = CoroutineScope(ioDispatcher)
@@ -31,6 +33,7 @@ class SetupSelectResolutionViewModel(
                 async { settingsDao.setResolution(resolution) },
                 async { settingsDao.setResolutionRotation(rotation) },
             ).awaitAll()
+            videoResolutionRepository.clearCache()
             onSavedEventMutable.emit(Unit)
         }
     }

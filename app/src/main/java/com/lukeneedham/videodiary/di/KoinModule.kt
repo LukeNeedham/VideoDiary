@@ -115,7 +115,7 @@ object KoinModule {
                 currentDateRepository = get(),
             )
         }
-        factory {
+        single {
             VideoResolutionRepository(
                 settingsDao = get(),
             )
@@ -144,6 +144,7 @@ object KoinModule {
         viewModel {
             SetupSelectResolutionViewModel(
                 settingsDao = get(),
+                videoResolutionRepository = get(),
                 ioDispatcher = get(KoinQualifier.Dispatcher.io),
             )
         }
