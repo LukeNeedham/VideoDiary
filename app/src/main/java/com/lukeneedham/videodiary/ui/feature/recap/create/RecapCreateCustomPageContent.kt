@@ -2,12 +2,17 @@ package com.lukeneedham.videodiary.ui.feature.recap.create
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.tooling.preview.Preview
+import com.lukeneedham.videodiary.ui.feature.common.Button
 import com.lukeneedham.videodiary.ui.feature.common.toolbar.SubpageToolbar
 import com.lukeneedham.videodiary.ui.feature.common.toolbar.ToolbarPageLayout
 import com.lukeneedham.videodiary.ui.feature.recap.model.RecapDayThumbnail
@@ -33,7 +38,27 @@ fun RecapCreateCustomPageContent(
     onSaveClick: () -> Unit,
 ) {
     ToolbarPageLayout(
-        bottomBar = { SubpageToolbar(canGoBack = canGoBack, onBack = onBack) },
+        bottomBar = {
+            SubpageToolbar(
+                canGoBack = canGoBack,
+                onBack = onBack,
+                centerContent = if (totalVideoCount != null && totalVideoCount > 0) {
+                    {
+                        Button(
+                            text = "Create",
+                            onClick = onSaveClick,
+                            enabled = canSave,
+                            backgroundColor = AccentHighlight,
+                            foregroundColor = Color.Black,
+                            shape = CircleShape,
+                            contentPadding = PaddingValues(horizontal = 20.dp, vertical = 10.dp),
+                        )
+                    }
+                } else {
+                    null
+                },
+            )
+        },
     ) {
         Box(
             modifier = Modifier
@@ -56,8 +81,6 @@ fun RecapCreateCustomPageContent(
                     onEndDateSelected = onEndDateSelected,
                     recapName = recapName,
                     onRecapNameChange = onRecapNameChange,
-                    canSave = canSave,
-                    onSaveClick = onSaveClick,
                 )
             }
         }

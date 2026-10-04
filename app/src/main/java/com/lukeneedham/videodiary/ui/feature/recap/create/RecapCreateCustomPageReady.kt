@@ -5,10 +5,8 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -28,7 +26,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.lukeneedham.videodiary.ui.feature.common.Button
 import com.lukeneedham.videodiary.ui.feature.common.datepicker.DiaryDatePickerDialog
 import com.lukeneedham.videodiary.ui.feature.recap.create.component.RecapCreateEmpty
 import com.lukeneedham.videodiary.ui.feature.recap.create.component.RecapDatePicker
@@ -51,8 +48,6 @@ fun RecapCreateCustomPageReady(
     onEndDateSelected: (LocalDate?) -> Unit,
     recapName: String,
     onRecapNameChange: (String) -> Unit,
-    canSave: Boolean,
-    onSaveClick: () -> Unit,
 ) {
     var showStartDatePicker by remember { mutableStateOf(false) }
     var showEndDatePicker by remember { mutableStateOf(false) }
@@ -155,16 +150,6 @@ fun RecapCreateCustomPageReady(
                     }
                 }
 
-                Spacer(modifier = Modifier.height(12.dp))
-
-                Button(
-                    text = "Save recap",
-                    onClick = onSaveClick,
-                    enabled = canSave,
-                    backgroundColor = AccentHighlight,
-                    foregroundColor = Color.Black,
-                    modifier = Modifier.fillMaxWidth()
-                )
             }
         }
         if (showStartDatePicker) {
@@ -220,7 +205,5 @@ internal fun PreviewRecapCreateCustomPageReady() {
         onEndDateSelected = {},
         recapName = "",
         onRecapNameChange = {},
-        canSave = false,
-        onSaveClick = {},
     )
 }
