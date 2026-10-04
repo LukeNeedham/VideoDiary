@@ -34,6 +34,9 @@ import java.util.Locale
 
 private const val DAYS_PER_WEEK = 7
 
+/** The gap between day cells, both horizontally and vertically */
+private val CELL_SPACING = 5.dp
+
 /** The most rows a month can span when weeks start on Monday */
 private const val MAX_WEEKS_PER_MONTH = 6
 
@@ -92,7 +95,7 @@ fun DiaryDatePicker(
 @Composable
 private fun WeekdayHeader(modifier: Modifier = Modifier) {
     Row(
-        horizontalArrangement = Arrangement.spacedBy(2.dp),
+        horizontalArrangement = Arrangement.spacedBy(CELL_SPACING),
         modifier = modifier
             .fillMaxWidth()
             .padding(vertical = 4.dp)
@@ -124,13 +127,13 @@ private fun MonthGrid(
 
     // Always show the worst case number of rows, so that every month has the same height
     Column(
-        verticalArrangement = Arrangement.spacedBy(2.dp),
+        verticalArrangement = Arrangement.spacedBy(CELL_SPACING),
         modifier = Modifier
             .verticalScroll(rememberScrollState())
             .padding(horizontal = 2.dp)
     ) {
         repeat(MAX_WEEKS_PER_MONTH) { weekIndex ->
-            Row(horizontalArrangement = Arrangement.spacedBy(2.dp)) {
+            Row(horizontalArrangement = Arrangement.spacedBy(CELL_SPACING)) {
                 repeat(DAYS_PER_WEEK) { dayIndex ->
                     val date = gridStart.plusDays((weekIndex * DAYS_PER_WEEK + dayIndex).toLong())
                     val isInMonth = YearMonth.from(date) == month
