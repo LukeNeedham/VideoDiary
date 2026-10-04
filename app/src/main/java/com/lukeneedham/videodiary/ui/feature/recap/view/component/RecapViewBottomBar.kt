@@ -22,9 +22,10 @@ import com.lukeneedham.videodiary.ui.theme.Typography
 private val ButtonSize = 48.dp
 
 /**
- * A recap's static bottom bar: a borderless back button, the (wrapping) recap name, and details/save/share icon buttons - plain, on the same black bar every other video
- * toolbar uses (no surface color/rounded corners of its own). All buttons are at least the
- * minimum interactive size, which leaves the name a little off-center.
+ * A recap's static bottom bar: a borderless back button, the (wrapping) recap name, and
+ * details/save/share icon buttons - plain, on the same black bar every other video toolbar uses
+ * (no surface color/rounded corners of its own). All buttons are at least the minimum
+ * interactive size, which leaves the name a little off-center.
  *
  * Clicking the name or the details button opens the recap's details sheet.
  */
