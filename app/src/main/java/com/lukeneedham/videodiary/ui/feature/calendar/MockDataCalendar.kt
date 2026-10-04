@@ -21,5 +21,4 @@ object MockDataCalendar {
         dayWithoutVideo,
     )
 
-    val videoAspectRatio = 1f
 }

@@ -14,7 +14,6 @@ fun CalendarPage(
 ) {
     CalendarPageContent(
         days = viewModel.days,
-        videoAspectRatio = viewModel.videoAspectRatio,
         currentDayIndex = viewModel.currentDayIndex,
         allowEditPastDays = viewModel.allowEditPastDays,
         onRecordVideoClick = onRecordVideoClick,

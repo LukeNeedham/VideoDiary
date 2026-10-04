@@ -1,5 +1,6 @@
 package com.lukeneedham.videodiary.ui.feature.record.check
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -7,9 +8,9 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -23,6 +24,8 @@ import com.lukeneedham.videodiary.R
 import com.lukeneedham.videodiary.domain.model.Video
 import com.lukeneedham.videodiary.ui.feature.common.glass.GlassButton
 import com.lukeneedham.videodiary.ui.feature.common.toolbar.FlatIconButton
+import com.lukeneedham.videodiary.ui.feature.common.toolbar.SubpageToolbar
+import com.lukeneedham.videodiary.ui.feature.common.toolbar.ToolbarPageLayout
 import com.lukeneedham.videodiary.ui.feature.common.videoplayer.VideoPlayerController
 import com.lukeneedham.videodiary.ui.feature.record.check.component.CheckVideoTile
 import com.lukeneedham.videodiary.ui.feature.record.check.component.ChooseVideoButton
@@ -33,7 +36,7 @@ import com.lukeneedham.videodiary.ui.theme.Typography
 fun CheckVideoPageContent(
     existingVideo: Video,
     newVideo: Video,
-    videoAspectRatio: Float,
+    onBack: () -> Unit,
     onRetakeClick: () -> Unit,
     onExistingVideoSelected: () -> Unit,
     onNewVideoSelected: () -> Unit,
@@ -83,110 +86,114 @@ fun CheckVideoPageContent(
         }
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize(),
-    ) {
-        Text(
-            text = "Choose the video to keep",
-            color = Color.White,
-            fontSize = Typography.Size.medium,
-            textAlign = TextAlign.Center,
-            modifier = Modifier
-                .fillMaxWidth()
-                .statusBarsPadding()
-                .padding(horizontal = 16.dp)
-                .padding(top = 32.dp, bottom = 24.dp),
-        )
-
-        // Each tile keeps the video's true aspect ratio, so side by side they're only half as
-        // tall as a single full-width video would be - sized to that actual content height
-        // (rather than a full-width video's slot height) so the controls below have room to
-        // breathe.
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(2.dp),
-            modifier = Modifier.fillMaxWidth(),
-        ) {
-            CheckVideoTile(
-                video = existingVideo,
-                controller = existingController,
-                aspectRatio = videoAspectRatio,
-                onPress = pauseBoth,
-                onRelease = resumeBoth,
-                modifier = Modifier.weight(1f),
-            )
-            CheckVideoTile(
-                video = newVideo,
-                controller = newController,
-                aspectRatio = videoAspectRatio,
-                onPress = pauseBoth,
-                onRelease = resumeBoth,
-                modifier = Modifier.weight(1f),
-            )
-        }
-
+    ToolbarPageLayout(
+        bottomBar = { SubpageToolbar(canGoBack = true, onBack = onBack) },
+    ) { videoAspectRatio ->
         Column(
             modifier = Modifier
-                .weight(1f)
-                .fillMaxWidth()
-                .navigationBarsPadding()
-                .padding(horizontal = 16.dp)
-                .padding(top = 8.dp),
+                .fillMaxSize()
+                .background(Color.Black),
         ) {
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
-                modifier = Modifier.fillMaxWidth(),
-            ) {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = Modifier.weight(1f),
-                ) {
-                    val muteIcon =
-                        if (existingController.isVolumeOn) R.drawable.volume_on else R.drawable.volume_off
-                    FlatIconButton(
-                        iconRes = muteIcon,
-                        contentDescription = "Toggle existing video sound",
-                        onClick = toggleExistingVolume,
-                    )
-                    Spacer(Modifier.height(30.dp))
-                    ChooseVideoButton(
-                        label = "EXISTING",
-                        onClick = onExistingVideoSelected,
-                        modifier = Modifier.fillMaxWidth(),
-                    )
-                }
-
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = Modifier.weight(1f),
-                ) {
-                    val muteIcon =
-                        if (newController.isVolumeOn) R.drawable.volume_on else R.drawable.volume_off
-                    FlatIconButton(
-                        iconRes = muteIcon,
-                        contentDescription = "Toggle new video sound",
-                        onClick = toggleNewVolume,
-                    )
-                    Spacer(Modifier.height(30.dp))
-                    ChooseVideoButton(
-                        label = "NEW",
-                        onClick = onNewVideoSelected,
-                        modifier = Modifier.fillMaxWidth(),
-                    )
-                }
-            }
-
-            Spacer(Modifier.height(20.dp))
-
-            GlassButton(
-                text = "Retake",
-                iconRes = R.drawable.retake,
-                containerColor = GlassFillStrong,
-                onClick = onRetakeClick,
+            Text(
+                text = "Choose the video to keep",
+                color = Color.White,
+                fontSize = Typography.Size.medium,
+                textAlign = TextAlign.Center,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(56.dp),
+                    .padding(horizontal = 16.dp)
+                    .padding(top = 16.dp, bottom = 16.dp),
             )
+
+            // Each tile keeps the video's true aspect ratio, so side by side they're only half as
+            // tall as a single full-width video would be - sized to that actual content height
+            // (rather than a full-width video's slot height) so the controls below have room to
+            // breathe.
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(2.dp),
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                CheckVideoTile(
+                    video = existingVideo,
+                    controller = existingController,
+                    aspectRatio = videoAspectRatio,
+                    onPress = pauseBoth,
+                    onRelease = resumeBoth,
+                    modifier = Modifier.weight(1f),
+                )
+                CheckVideoTile(
+                    video = newVideo,
+                    controller = newController,
+                    aspectRatio = videoAspectRatio,
+                    onPress = pauseBoth,
+                    onRelease = resumeBoth,
+                    modifier = Modifier.weight(1f),
+                )
+            }
+
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth()
+                    .verticalScroll(rememberScrollState())
+                    .padding(horizontal = 16.dp)
+                    .padding(top = 8.dp),
+            ) {
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        modifier = Modifier.weight(1f),
+                    ) {
+                        val muteIcon =
+                            if (existingController.isVolumeOn) R.drawable.volume_on else R.drawable.volume_off
+                        FlatIconButton(
+                            iconRes = muteIcon,
+                            contentDescription = "Toggle existing video sound",
+                            onClick = toggleExistingVolume,
+                        )
+                        Spacer(Modifier.height(30.dp))
+                        ChooseVideoButton(
+                            label = "EXISTING",
+                            onClick = onExistingVideoSelected,
+                            modifier = Modifier.fillMaxWidth(),
+                        )
+                    }
+
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        modifier = Modifier.weight(1f),
+                    ) {
+                        val muteIcon =
+                            if (newController.isVolumeOn) R.drawable.volume_on else R.drawable.volume_off
+                        FlatIconButton(
+                            iconRes = muteIcon,
+                            contentDescription = "Toggle new video sound",
+                            onClick = toggleNewVolume,
+                        )
+                        Spacer(Modifier.height(30.dp))
+                        ChooseVideoButton(
+                            label = "NEW",
+                            onClick = onNewVideoSelected,
+                            modifier = Modifier.fillMaxWidth(),
+                        )
+                    }
+                }
+
+                Spacer(Modifier.height(20.dp))
+
+                GlassButton(
+                    text = "Retake",
+                    iconRes = R.drawable.retake,
+                    containerColor = GlassFillStrong,
+                    onClick = onRetakeClick,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(56.dp),
+                )
+            }
         }
     }
 }
@@ -197,7 +204,7 @@ internal fun PreviewCheckVideoPageContent() {
     CheckVideoPageContent(
         existingVideo = MockDataCheckVideo.existingVideo,
         newVideo = MockDataCheckVideo.newVideo,
-        videoAspectRatio = 0.5625f,
+        onBack = {},
         onRetakeClick = {},
         onExistingVideoSelected = {},
         onNewVideoSelected = {},

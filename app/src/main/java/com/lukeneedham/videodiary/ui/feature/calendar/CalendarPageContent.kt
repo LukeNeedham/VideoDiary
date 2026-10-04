@@ -36,7 +36,6 @@ import java.time.LocalDate
 @Composable
 fun CalendarPageContent(
     days: List<Day>,
-    videoAspectRatio: Float?,
     currentDayIndex: Int,
     allowEditPastDays: Boolean,
     onRecordVideoClick: (date: LocalDate) -> Unit,
@@ -80,10 +79,9 @@ fun CalendarPageContent(
                 .fillMaxSize()
                 .background(AppBackground)
         ) {
-            if (days.isNotEmpty() && videoAspectRatio != null) {
+            if (days.isNotEmpty()) {
                 CalendarScroller(
                     days = days,
-                    videoAspectRatio = videoAspectRatio,
                     allowEditPastDays = allowEditPastDays,
                     onRecordVideoClick = onRecordVideoClick,
                     onDeleteVideoClick = {
@@ -150,7 +148,6 @@ private fun Preview(
     ) {
         CalendarPageContent(
             days = MockDataCalendar.days,
-            videoAspectRatio = MockDataCalendar.videoAspectRatio,
             currentDayIndex = currentDayIndex,
             allowEditPastDays = false,
             onRecordVideoClick = {},

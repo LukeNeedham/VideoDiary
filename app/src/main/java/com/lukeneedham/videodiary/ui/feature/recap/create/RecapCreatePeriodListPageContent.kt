@@ -14,7 +14,6 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Text
@@ -28,7 +27,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.lukeneedham.videodiary.ui.feature.common.toolbar.GenericToolbar
+import com.lukeneedham.videodiary.ui.feature.common.toolbar.SubpageToolbar
+import com.lukeneedham.videodiary.ui.feature.common.toolbar.ToolbarPageLayout
 import com.lukeneedham.videodiary.ui.feature.recap.model.RecapPeriodOption
 import com.lukeneedham.videodiary.ui.feature.recap.model.RecapPeriodType
 import com.lukeneedham.videodiary.ui.theme.AppBackground
@@ -45,19 +45,11 @@ fun RecapCreatePeriodListPageContent(
     onBack: () -> Unit,
     onOptionClick: (RecapPeriodOption) -> Unit,
 ) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(AppBackground)
-            .navigationBarsPadding()
+    ToolbarPageLayout(
+        bottomBar = { SubpageToolbar(canGoBack = canGoBack, onBack = onBack) },
     ) {
-        GenericToolbar(
-            canGoBack = canGoBack,
-            onBack = onBack,
-        )
-
         if (!isLoaded) {
-            Box(modifier = Modifier.fillMaxSize()) {
+            Box(modifier = Modifier.fillMaxSize().background(AppBackground)) {
                 CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
             }
         } else if (options.isEmpty()) {
@@ -76,8 +68,8 @@ fun RecapCreatePeriodListPageContent(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp),
                 modifier = Modifier
-                    .weight(1f)
-                    .fillMaxWidth()
+                    .fillMaxSize()
+                    .background(AppBackground)
                     .padding(16.dp)
             ) {
                 items(options, key = { it.label + it.startDate }) { option ->
@@ -103,6 +95,7 @@ private fun NoPeriodsYet(periodType: RecapPeriodType) {
     Box(
         modifier = Modifier
             .fillMaxSize()
+            .background(AppBackground)
             .padding(32.dp),
         contentAlignment = Alignment.Center,
     ) {

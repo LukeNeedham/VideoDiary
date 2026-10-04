@@ -190,20 +190,6 @@ fun GlassAcceptButton(
     }
 }
 
-/** Gradient scrim fading to black at the top edge, keeping overlay controls legible over bright video. */
-@Composable
-fun TopScrim(modifier: Modifier = Modifier) {
-    Box(
-        modifier = modifier
-            .fillMaxWidth()
-            .background(
-                Brush.verticalGradient(
-                    colors = listOf(Color.Black.copy(alpha = 0.6f), Color.Transparent),
-                )
-            )
-    )
-}
-
 /** Gradient scrim fading to black at the bottom edge, keeping overlay controls legible over bright video. */
 @Composable
 fun BottomScrim(modifier: Modifier = Modifier) {

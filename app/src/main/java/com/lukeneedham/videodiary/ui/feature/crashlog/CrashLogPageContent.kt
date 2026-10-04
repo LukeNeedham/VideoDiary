@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -21,7 +20,8 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.lukeneedham.videodiary.domain.model.CrashLog
-import com.lukeneedham.videodiary.ui.feature.common.toolbar.GenericToolbar
+import com.lukeneedham.videodiary.ui.feature.common.toolbar.SubpageToolbar
+import com.lukeneedham.videodiary.ui.feature.common.toolbar.ToolbarPageLayout
 import com.lukeneedham.videodiary.ui.theme.AppBackground
 import com.lukeneedham.videodiary.ui.theme.AppSurfaceVariant
 import com.lukeneedham.videodiary.ui.theme.Typography
@@ -37,29 +37,24 @@ fun CrashLogPageContent(
     canGoBack: Boolean,
     onBack: () -> Unit,
 ) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(AppBackground)
-            .navigationBarsPadding()
+    ToolbarPageLayout(
+        bottomBar = { SubpageToolbar(canGoBack = canGoBack, onBack = onBack) },
     ) {
-        GenericToolbar(
-            canGoBack = canGoBack,
-            onBack = onBack,
-        )
-
         if (crashLogs.isEmpty()) {
             Text(
                 text = "No crash logs recorded",
                 color = Color.White.copy(alpha = 0.4f),
                 fontSize = Typography.Size.extraSmall,
-                modifier = Modifier.padding(16.dp),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(AppBackground)
+                    .padding(16.dp),
             )
         } else {
             LazyColumn(
                 modifier = Modifier
-                    .weight(1f)
-                    .fillMaxWidth()
+                    .fillMaxSize()
+                    .background(AppBackground)
                     .padding(16.dp)
             ) {
                 items(crashLogs, key = { it.timestamp.toEpochMilli() }) { crashLog ->

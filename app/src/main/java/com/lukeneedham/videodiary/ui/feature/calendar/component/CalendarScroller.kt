@@ -42,7 +42,6 @@ private const val EDGE_TAP_FRACTION = 0.25f
 fun CalendarScroller(
     days: List<Day>,
     currentDayIndex: Int,
-    videoAspectRatio: Float,
     allowEditPastDays: Boolean,
     onRecordVideoClick: (date: LocalDate) -> Unit,
     onDeleteVideoClick: (date: LocalDate) -> Unit,
@@ -127,7 +126,6 @@ fun CalendarScroller(
     val onNext: () -> Unit = remember(navigateByOffset) { { navigateByOffset(1) } }
 
     VideoToolbarLayout(
-        videoAspectRatio = videoAspectRatio,
         bottomBar = {
             CalendarDayBottomBar(
                 videoPlayerController = videoPlayerController,
@@ -211,7 +209,6 @@ fun CalendarScroller(
 internal fun PreviewCalendarScroller() {
     CalendarScroller(
         days = MockDataCalendar.days,
-        videoAspectRatio = 1f,
         allowEditPastDays = false,
         onRecordVideoClick = {},
         onDeleteVideoClick = {},

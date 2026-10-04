@@ -1,13 +1,8 @@
 package com.lukeneedham.videodiary.ui.feature.record.check
 
 import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import com.lukeneedham.videodiary.ui.media.VideoPlayerHolder
 import org.koin.compose.getKoin
 
@@ -27,38 +22,30 @@ fun CheckVideoPage(
         videoPlayerHolder.player.stop()
     }
 
-    // There's no dedicated close button - backing out (rather than picking a video) keeps the
-    // existing one, same as tapping its choose button, and returns straight to the calendar
-    // rather than the record page (retaking is its own explicit button).
-    BackHandler {
+    // Backing out (rather than picking a video) keeps the existing one, same as tapping its
+    // choose button, and returns straight to the calendar rather than the record page (retaking
+    // is its own explicit button). Used by both the system back and the toolbar's back button.
+    val onBack = {
         viewModel.discardNewVideo()
         onKeepExisting()
     }
+    BackHandler(onBack = onBack)
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(color = Color.Black)
-    ) {
-        val videoAspectRatio = viewModel.videoAspectRatio
-        if (videoAspectRatio != null) {
-            CheckVideoPageContent(
-                existingVideo = viewModel.existingVideo,
-                newVideo = viewModel.newVideo,
-                videoAspectRatio = videoAspectRatio,
-                onRetakeClick = {
-                    viewModel.discardNewVideo()
-                    onRetake()
-                },
-                onExistingVideoSelected = {
-                    viewModel.discardNewVideo()
-                    onKeepExisting()
-                },
-                onNewVideoSelected = {
-                    viewModel.keepNewVideo()
-                    onKeepNew()
-                },
-            )
-        }
-    }
+    CheckVideoPageContent(
+        existingVideo = viewModel.existingVideo,
+        newVideo = viewModel.newVideo,
+        onBack = onBack,
+        onRetakeClick = {
+            viewModel.discardNewVideo()
+            onRetake()
+        },
+        onExistingVideoSelected = {
+            viewModel.discardNewVideo()
+            onKeepExisting()
+        },
+        onNewVideoSelected = {
+            viewModel.keepNewVideo()
+            onKeepNew()
+        },
+    )
 }

@@ -115,7 +115,7 @@ object KoinModule {
                 currentDateRepository = get(),
             )
         }
-        factory {
+        single {
             VideoResolutionRepository(
                 settingsDao = get(),
             )
@@ -144,6 +144,7 @@ object KoinModule {
         viewModel {
             SetupSelectResolutionViewModel(
                 settingsDao = get(),
+                videoResolutionRepository = get(),
                 ioDispatcher = get(KoinQualifier.Dispatcher.io),
             )
         }
@@ -163,7 +164,6 @@ object KoinModule {
             RecordVideoViewModel(
                 date = date,
                 settingsDao = get(),
-                videoResolutionRepository = get(),
                 videosDao = get(),
             )
         }
@@ -172,13 +172,11 @@ object KoinModule {
                 date = date,
                 videoContentUri = videoContentUri,
                 videosDao = get(),
-                videoResolutionRepository = get(),
             )
         }
         viewModel {
             CalendarViewModel(
                 calendarRepository = get(),
-                videoResolutionRepository = get(),
                 videosDao = get(),
                 settingsDao = get(),
             )
@@ -203,7 +201,6 @@ object KoinModule {
                 initialSavedRecapId = savedRecapId,
                 calendarRepository = get(),
                 savedRecapsDao = get(),
-                videoResolutionRepository = get(),
             )
         }
         viewModel { (startDate: LocalDate, endDate: LocalDate, name: String) ->
