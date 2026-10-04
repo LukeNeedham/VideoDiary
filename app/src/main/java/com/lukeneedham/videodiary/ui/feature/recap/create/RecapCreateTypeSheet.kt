@@ -23,6 +23,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -75,6 +76,22 @@ fun RecapCreateTypeSheet(
                     .fillMaxWidth()
                     .padding(start = 16.dp, end = 16.dp, bottom = 16.dp),
             ) {
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(4.dp),
+                    modifier = Modifier.padding(bottom = 4.dp),
+                ) {
+                    Text(
+                        text = "Create a recap",
+                        color = Color.White,
+                        fontSize = Typography.Size.big,
+                        fontWeight = FontWeight.Bold,
+                    )
+                    Text(
+                        text = "Combine your daily videos into a single video. Choose the period to include.",
+                        color = Color.White.copy(alpha = 0.7f),
+                        fontSize = Typography.Size.small,
+                    )
+                }
                 RecapCreateType.entries.chunked(GRID_COLUMNS).forEach { rowTypes ->
                     Row(
                         horizontalArrangement = Arrangement.spacedBy(12.dp),
