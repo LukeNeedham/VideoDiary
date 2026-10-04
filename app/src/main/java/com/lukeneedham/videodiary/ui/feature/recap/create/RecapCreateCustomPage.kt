@@ -2,8 +2,6 @@ package com.lukeneedham.videodiary.ui.feature.recap.create
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import com.lukeneedham.videodiary.ui.feature.common.toolbar.VideoAspectRatioViewModel
-import org.koin.compose.viewmodel.koinViewModel
 import java.time.LocalDate
 
 @Composable
@@ -13,8 +11,6 @@ fun RecapCreateCustomPage(
     onBack: () -> Unit,
     onRecapCreated: (startDate: LocalDate, endDate: LocalDate, name: String, savedRecapId: String) -> Unit,
 ) {
-    val aspectRatioViewModel = koinViewModel<VideoAspectRatioViewModel>()
-
     LaunchedEffect(viewModel) {
         viewModel.onSavedFlow.collect { args ->
             onRecapCreated(args.startDate, args.endDate, args.name, args.savedRecapId)
@@ -22,7 +18,7 @@ fun RecapCreateCustomPage(
     }
 
     RecapCreateCustomPageContent(
-        videoAspectRatio = aspectRatioViewModel.videoAspectRatio,
+        videoAspectRatio = viewModel.videoAspectRatio,
         canGoBack = canGoBack,
         onBack = onBack,
         totalVideoCount = viewModel.totalVideoCount,

@@ -1,11 +1,10 @@
 package com.lukeneedham.videodiary.ui.feature.recap.create
 
 import androidx.compose.runtime.Composable
-import com.lukeneedham.videodiary.ui.feature.common.toolbar.VideoAspectRatioViewModel
-import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun RecapCreateTypePage(
+    viewModel: RecapCreateTypeViewModel,
     canGoBack: Boolean,
     onBack: () -> Unit,
     onCreateMonthClick: () -> Unit,
@@ -13,10 +12,8 @@ fun RecapCreateTypePage(
     onCreateYearClick: () -> Unit,
     onCreateCustomClick: () -> Unit,
 ) {
-    val aspectRatioViewModel = koinViewModel<VideoAspectRatioViewModel>()
-
     RecapCreateTypePageContent(
-        videoAspectRatio = aspectRatioViewModel.videoAspectRatio,
+        videoAspectRatio = viewModel.videoAspectRatio,
         canGoBack = canGoBack,
         onBack = onBack,
         onCreateMonthClick = onCreateMonthClick,

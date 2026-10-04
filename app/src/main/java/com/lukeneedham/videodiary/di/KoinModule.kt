@@ -19,11 +19,11 @@ import com.lukeneedham.videodiary.data.repository.VideoResolutionRepository
 import com.lukeneedham.videodiary.ui.feature.calendar.CalendarViewModel
 import com.lukeneedham.videodiary.ui.feature.common.datepicker.DiaryDatePickerViewModel
 import com.lukeneedham.videodiary.ui.feature.crashlog.CrashLogViewModel
-import com.lukeneedham.videodiary.ui.feature.common.toolbar.VideoAspectRatioViewModel
 import com.lukeneedham.videodiary.ui.feature.debug.DebugViewModel
 import com.lukeneedham.videodiary.ui.feature.permissions.RequestPermissionsViewModel
 import com.lukeneedham.videodiary.ui.feature.recap.create.RecapCreateCustomViewModel
 import com.lukeneedham.videodiary.ui.feature.recap.create.RecapCreatePeriodListViewModel
+import com.lukeneedham.videodiary.ui.feature.recap.create.RecapCreateTypeViewModel
 import com.lukeneedham.videodiary.ui.feature.recap.hub.RecapHubViewModel
 import com.lukeneedham.videodiary.ui.feature.recap.model.RecapPeriodType
 import com.lukeneedham.videodiary.ui.feature.recap.share.RecapShareViewModel
@@ -185,15 +185,22 @@ object KoinModule {
             )
         }
         viewModel {
+            RecapCreateTypeViewModel(
+                videoResolutionRepository = get(),
+            )
+        }
+        viewModel {
             RecapCreateCustomViewModel(
                 calendarRepository = get(),
                 savedRecapsDao = get(),
+                videoResolutionRepository = get(),
             )
         }
         viewModel { (periodType: RecapPeriodType) ->
             RecapCreatePeriodListViewModel(
                 periodType = periodType,
                 calendarRepository = get(),
+                videoResolutionRepository = get(),
             )
         }
         viewModel { (startDate: LocalDate, endDate: LocalDate, name: String, savedRecapId: String?) ->
@@ -223,15 +230,11 @@ object KoinModule {
             )
         }
         viewModel {
-            VideoAspectRatioViewModel(
-                videoResolutionRepository = get(),
-            )
-        }
-        viewModel {
             DebugViewModel(
                 mockDataRepository = get(),
                 settingsDao = get(),
                 videosDao = get(),
+                videoResolutionRepository = get(),
                 ioDispatcher = get(KoinQualifier.Dispatcher.io),
             )
         }

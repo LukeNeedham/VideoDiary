@@ -1,4 +1,4 @@
-package com.lukeneedham.videodiary.ui.feature.common.toolbar
+package com.lukeneedham.videodiary.ui.feature.recap.create
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -8,8 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.lukeneedham.videodiary.data.repository.VideoResolutionRepository
 import kotlinx.coroutines.launch
 
-/** Supplies the video aspect ratio that sizes [ToolbarPageLayout] on pages with no other need for it. */
-class VideoAspectRatioViewModel(
+class RecapCreateTypeViewModel(
     private val videoResolutionRepository: VideoResolutionRepository,
 ) : ViewModel() {
     var videoAspectRatio: Float? by mutableStateOf(null)

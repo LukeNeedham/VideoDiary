@@ -3,8 +3,6 @@ package com.lukeneedham.videodiary.ui.feature.debug
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import com.lukeneedham.videodiary.ui.feature.common.toolbar.VideoAspectRatioViewModel
-import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun DebugPage(
@@ -15,10 +13,8 @@ fun DebugPage(
 ) {
     val allowRetakeForPastDays by viewModel.allowRetakeForPastDays.collectAsState()
 
-    val aspectRatioViewModel = koinViewModel<VideoAspectRatioViewModel>()
-
     DebugPageContent(
-        videoAspectRatio = aspectRatioViewModel.videoAspectRatio,
+        videoAspectRatio = viewModel.videoAspectRatio,
         onFillWithMockDataClick = viewModel::fillWithMockData,
         allowRetakeForPastDays = allowRetakeForPastDays,
         onAllowRetakeForPastDaysChange = viewModel::setAllowRetakeForPastDays,
