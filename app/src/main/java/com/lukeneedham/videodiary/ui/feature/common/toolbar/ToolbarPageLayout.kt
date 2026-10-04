@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -21,8 +20,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import com.lukeneedham.videodiary.R
 import com.lukeneedham.videodiary.data.repository.VideoResolutionRepository
 import org.koin.compose.koinInject
 
@@ -30,7 +27,7 @@ private const val PREVIEW_ASPECT_RATIO = 9f / 16f
 
 /**
  * Shared page layout: the [content] fills the space at the top - full width, with its height
- * driven by the video aspect ratio - and a black toolbar holding [bottomBar] fills the space
+ * driven by the video aspect ratio - and a black toolbar holding the [bottomBar] content fills the space
  * below, so the toolbar sits in the same place on every page, whether or not the page shows a
  * video. [content] is given the aspect ratio, for pages that show a video in it.
  *
@@ -66,40 +63,11 @@ fun ToolbarPageLayout(
     }
 }
 
-/** A [ToolbarPageLayout] whose black toolbar holds just a back button (if [canGoBack]). */
-@Composable
-fun ToolbarPageLayout(
-    canGoBack: Boolean,
-    onBack: () -> Unit,
-    modifier: Modifier = Modifier,
-    content: @Composable BoxScope.(aspectRatio: Float) -> Unit,
-) {
-    ToolbarPageLayout(
-        modifier = modifier,
-        bottomBar = {
-            if (canGoBack) {
-                FlatIconButton(
-                    iconRes = R.drawable.back,
-                    contentDescription = "Back",
-                    onClick = onBack,
-                    selected = true,
-                    size = 44.dp,
-                    modifier = Modifier
-                        .align(Alignment.CenterStart)
-                        .padding(horizontal = 8.dp, vertical = 8.dp),
-                )
-            }
-        },
-        content = content,
-    )
-}
-
 @Preview
 @Composable
 private fun PreviewToolbarPageLayout() {
     ToolbarPageLayout(
-        canGoBack = true,
-        onBack = {},
+        bottomBar = { SubpageToolbar(canGoBack = true, onBack = {}) },
     ) {
         Text(text = "Content", modifier = Modifier.align(Alignment.Center))
     }

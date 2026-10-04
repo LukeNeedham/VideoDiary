@@ -10,6 +10,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
+import com.lukeneedham.videodiary.ui.feature.common.toolbar.SubpageToolbar
 import com.lukeneedham.videodiary.ui.feature.common.toolbar.ToolbarPageLayout
 import com.lukeneedham.videodiary.ui.feature.recap.model.RecapDayThumbnail
 import java.time.LocalDate
@@ -32,8 +33,7 @@ fun RecapCreateCustomPageContent(
     onSaveClick: () -> Unit,
 ) {
     ToolbarPageLayout(
-        canGoBack = canGoBack,
-        onBack = onBack,
+        bottomBar = { SubpageToolbar(canGoBack = canGoBack, onBack = onBack) },
     ) {
         Box(
             modifier = Modifier

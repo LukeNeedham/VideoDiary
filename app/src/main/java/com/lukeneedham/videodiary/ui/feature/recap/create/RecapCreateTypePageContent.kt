@@ -26,6 +26,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.lukeneedham.videodiary.R
+import com.lukeneedham.videodiary.ui.feature.common.toolbar.SubpageToolbar
 import com.lukeneedham.videodiary.ui.feature.common.toolbar.ToolbarPageLayout
 import com.lukeneedham.videodiary.ui.theme.AppBackground
 import com.lukeneedham.videodiary.ui.theme.AppSurfaceVariant
@@ -41,8 +42,7 @@ fun RecapCreateTypePageContent(
     onCreateCustomClick: () -> Unit,
 ) {
     ToolbarPageLayout(
-        canGoBack = canGoBack,
-        onBack = onBack,
+        bottomBar = { SubpageToolbar(canGoBack = canGoBack, onBack = onBack) },
     ) {
         Column(
             modifier = Modifier

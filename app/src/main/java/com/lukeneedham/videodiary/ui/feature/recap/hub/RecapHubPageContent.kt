@@ -32,6 +32,7 @@ import androidx.compose.ui.unit.dp
 import com.lukeneedham.videodiary.R
 import com.lukeneedham.videodiary.domain.model.SavedRecap
 import com.lukeneedham.videodiary.ui.feature.common.DeleteConfirmDialog
+import com.lukeneedham.videodiary.ui.feature.common.toolbar.SubpageToolbar
 import com.lukeneedham.videodiary.ui.feature.common.toolbar.ToolbarPageLayout
 import com.lukeneedham.videodiary.ui.theme.AppBackground
 import com.lukeneedham.videodiary.ui.theme.AppSurfaceVariant
@@ -52,8 +53,7 @@ fun RecapHubPageContent(
     var pendingIdToDelete: String? by remember { mutableStateOf(null) }
 
     ToolbarPageLayout(
-        canGoBack = canGoBack,
-        onBack = onBack,
+        bottomBar = { SubpageToolbar(canGoBack = canGoBack, onBack = onBack) },
     ) {
         LazyColumn(
             modifier = Modifier

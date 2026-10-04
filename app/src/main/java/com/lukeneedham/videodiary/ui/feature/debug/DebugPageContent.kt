@@ -20,6 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.lukeneedham.videodiary.ui.feature.common.toolbar.SubpageToolbar
 import com.lukeneedham.videodiary.ui.feature.common.toolbar.ToolbarPageLayout
 import com.lukeneedham.videodiary.ui.theme.Typography
 
@@ -34,8 +35,7 @@ fun DebugPageContent(
     onBack: () -> Unit,
 ) {
     ToolbarPageLayout(
-        canGoBack = canGoBack,
-        onBack = onBack,
+        bottomBar = { SubpageToolbar(canGoBack = canGoBack, onBack = onBack) },
     ) {
         Column(
             modifier = Modifier
