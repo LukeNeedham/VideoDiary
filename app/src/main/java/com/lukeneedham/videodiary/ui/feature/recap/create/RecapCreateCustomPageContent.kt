@@ -42,20 +42,16 @@ fun RecapCreateCustomPageContent(
             SubpageToolbar(
                 canGoBack = canGoBack,
                 onBack = onBack,
-                centerContent = if (totalVideoCount != null && totalVideoCount > 0) {
-                    {
-                        Button(
-                            text = "Create",
-                            onClick = onSaveClick,
-                            enabled = canSave,
-                            backgroundColor = AccentHighlight,
-                            foregroundColor = Color.Black,
-                            shape = CircleShape,
-                            contentPadding = PaddingValues(horizontal = 20.dp, vertical = 10.dp),
-                        )
-                    }
-                } else {
-                    null
+                centerContent = {
+                    Button(
+                        text = "Create",
+                        onClick = onSaveClick,
+                        enabled = canSave && totalVideoCount != null && totalVideoCount > 0,
+                        backgroundColor = AccentHighlight,
+                        foregroundColor = Color.Black,
+                        shape = CircleShape,
+                        contentPadding = PaddingValues(horizontal = 20.dp, vertical = 10.dp),
+                    )
                 },
             )
         },
