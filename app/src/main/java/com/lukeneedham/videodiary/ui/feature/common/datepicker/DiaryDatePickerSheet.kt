@@ -37,6 +37,8 @@ import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
 import java.time.LocalDate
 
+private val CalendarSideMargin = 40.dp
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DiaryDatePickerSheet(
@@ -101,6 +103,7 @@ fun DiaryDatePickerSheet(
                 Icon(
                     painter = painterResource(R.drawable.calendar_today),
                     contentDescription = "Jump to today",
+                    tint = Color.White,
                     modifier = Modifier
                         .align(Alignment.CenterEnd)
                         .clickable { hideThen(onJumpToToday) }
@@ -119,9 +122,10 @@ fun DiaryDatePickerSheet(
                     topBarMonthName = monthName
                     topBarYear = year
                 },
+                // Side margins narrow the cells, which also makes the (aspect ratio sized) sheet shorter
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(bottom = 8.dp)
+                    .padding(start = CalendarSideMargin, end = CalendarSideMargin, bottom = 8.dp)
             )
         } else {
             Spacer(modifier = Modifier.height(200.dp))
