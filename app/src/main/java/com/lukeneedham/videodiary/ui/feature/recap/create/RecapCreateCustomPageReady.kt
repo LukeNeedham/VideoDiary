@@ -26,7 +26,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.lukeneedham.videodiary.ui.feature.common.Button
@@ -135,7 +134,7 @@ fun RecapCreateCustomPageReady(
                         )
                     }
 
-                    if (!selectedDayThumbnails.isNullOrEmpty()) {
+                    if (selectedVideoCount == 0 || !selectedDayThumbnails.isNullOrEmpty()) {
                         RecapSection(
                             title = if (selectedVideoCount != null) {
                                 "Videos to include ($selectedVideoCount of $totalVideoCount)"
@@ -143,33 +142,29 @@ fun RecapCreateCustomPageReady(
                                 "Videos to include"
                             }
                         ) {
-                            RecapThumbnailRow(thumbnails = selectedDayThumbnails)
+                            if (selectedDayThumbnails.isNullOrEmpty()) {
+                                Text(
+                                    text = "None",
+                                    color = Color.White.copy(alpha = 0.6f),
+                                    fontSize = Typography.Size.extraSmall,
+                                )
+                            } else {
+                                RecapThumbnailRow(thumbnails = selectedDayThumbnails)
+                            }
                         }
                     }
                 }
 
                 Spacer(modifier = Modifier.height(12.dp))
 
-                if (selectedVideoCount == 0) {
-                    Text(
-                        text = "Cannot create recap - please select at least one video",
-                        textAlign = TextAlign.Center,
-                        color = Color.White.copy(alpha = 0.7f),
-                        fontSize = Typography.Size.extraSmall,
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                } else {
-                    Spacer(modifier = Modifier.height(12.dp))
-
-                    Button(
-                        text = "Save recap",
-                        onClick = onSaveClick,
-                        enabled = canSave,
-                        backgroundColor = AccentHighlight,
-                        foregroundColor = Color.Black,
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                }
+                Button(
+                    text = "Save recap",
+                    onClick = onSaveClick,
+                    enabled = canSave,
+                    backgroundColor = AccentHighlight,
+                    foregroundColor = Color.Black,
+                    modifier = Modifier.fillMaxWidth()
+                )
             }
         }
         if (showStartDatePicker) {
