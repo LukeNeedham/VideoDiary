@@ -22,6 +22,7 @@ class RootViewModel(
 ) : ViewModel() {
     private var isMissingPermissions: Boolean? by mutableStateOf(null)
     private var hasSetupCompleted: Boolean? by mutableStateOf(null)
+    private var isStorageInitialised: Boolean by mutableStateOf(false)
 
     var orientationState: RootOrientationState by mutableStateOf(RootOrientationState.Loading)
         private set
@@ -29,6 +30,7 @@ class RootViewModel(
     val state: RootState by derivedStateOf {
         val isMissingPermissions = isMissingPermissions ?: return@derivedStateOf RootState.Loading
         val hasSetupCompleted = hasSetupCompleted ?: return@derivedStateOf RootState.Loading
+        if (!isStorageInitialised) return@derivedStateOf RootState.Loading
 
         // First-time (or interrupted) setup always goes through the setup wizard, which shows the
         // onboarding intro before requesting permissions part-way through.
@@ -65,8 +67,10 @@ class RootViewModel(
         }
         viewModelScope.launch {
             withContext(ioDispatcher) {
+                videosDao.initialiseStorageLocation()
                 videosDao.generateMissingThumbnails()
             }
+            isStorageInitialised = true
         }
     }
 
