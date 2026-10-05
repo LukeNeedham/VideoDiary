@@ -1,5 +1,6 @@
 package com.lukeneedham.videodiary.ui.feature.storage
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -11,15 +12,20 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.RadioButton
+import androidx.compose.material.RadioButtonDefaults
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.lukeneedham.videodiary.domain.model.VideoStorageLocation
-import com.lukeneedham.videodiary.ui.feature.common.toolbar.GenericToolbar
+import com.lukeneedham.videodiary.ui.feature.common.toolbar.SubpageToolbar
+import com.lukeneedham.videodiary.ui.feature.common.toolbar.ToolbarPageLayout
+import com.lukeneedham.videodiary.ui.theme.AccentHighlight
+import com.lukeneedham.videodiary.ui.theme.AppBackground
 import com.lukeneedham.videodiary.ui.theme.Typography
 
 @Composable
@@ -32,18 +38,25 @@ fun VideoStoragePageContent(
     canGoBack: Boolean,
     onBack: () -> Unit,
 ) {
-    Column(modifier = Modifier.fillMaxSize()) {
-        GenericToolbar(canGoBack = canGoBack, onBack = onBack)
+    ToolbarPageLayout(
+        bottomBar = { SubpageToolbar(canGoBack = canGoBack, onBack = onBack) },
+    ) {
         Column(
             modifier = Modifier
-                .fillMaxWidth()
+                .fillMaxSize()
+                .background(AppBackground)
                 .padding(20.dp)
         ) {
-            Text(text = "Video storage", color = Color.Black, fontSize = Typography.Size.big)
+            Text(
+                text = "Video storage",
+                color = Color.White,
+                fontSize = Typography.Size.big,
+                fontWeight = FontWeight.Bold,
+            )
             Spacer(modifier = Modifier.height(12.dp))
             Text(
                 text = "Changing the location moves existing diary videos. Videos stored on removable storage are deleted if the app is uninstalled.",
-                color = Color.Black,
+                color = Color.White.copy(alpha = 0.6f),
                 fontSize = Typography.Size.extraSmall,
             )
             Spacer(modifier = Modifier.height(16.dp))
@@ -68,9 +81,12 @@ fun VideoStoragePageContent(
             if (isChangingLocation) {
                 Spacer(modifier = Modifier.height(16.dp))
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    CircularProgressIndicator(modifier = Modifier.height(20.dp))
+                    CircularProgressIndicator(
+                        modifier = Modifier.height(20.dp),
+                        color = AccentHighlight,
+                    )
                     Spacer(modifier = Modifier.width(12.dp))
-                    Text(text = "Moving videos…", color = Color.Black)
+                    Text(text = "Moving videos…", color = Color.White)
                 }
             }
             if (error != null) {
@@ -96,12 +112,29 @@ private fun StorageOption(
             .clickable(enabled = enabled, onClick = onClick)
             .padding(vertical = 10.dp),
     ) {
-        RadioButton(selected = selected, onClick = onClick, enabled = enabled)
+        RadioButton(
+            selected = selected,
+            onClick = onClick,
+            enabled = enabled,
+            colors = RadioButtonDefaults.colors(
+                selectedColor = AccentHighlight,
+                unselectedColor = Color.White.copy(alpha = 0.6f),
+                disabledColor = Color.White.copy(alpha = 0.2f),
+            ),
+        )
         Spacer(modifier = Modifier.width(10.dp))
         Column {
-            Text(text = title, color = if (enabled) Color.Black else Color.Gray, fontSize = Typography.Size.small)
+            Text(
+                text = title,
+                color = if (enabled) Color.White else Color.White.copy(alpha = 0.38f),
+                fontSize = Typography.Size.small,
+            )
             Spacer(modifier = Modifier.height(4.dp))
-            Text(text = description, color = if (enabled) Color.Black else Color.Gray, fontSize = Typography.Size.extraSmall)
+            Text(
+                text = description,
+                color = if (enabled) Color.White.copy(alpha = 0.6f) else Color.White.copy(alpha = 0.38f),
+                fontSize = Typography.Size.extraSmall,
+            )
         }
     }
 }
