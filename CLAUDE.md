@@ -56,7 +56,7 @@ app/                         Android app module
 buildSrc/                     Centralized dependency version catalog (deps.kt)
 docs/                         Technical docs (Release process, Screenshots)
 metadata/                     F-Droid metadata (changelogs, screenshots, store listing)
-.github/workflows/            CI: build APK on PRs, attach as a GitHub Release asset
+.github/workflows/            CI: build APK on PRs (shared workflows), attach as a GitHub Release asset
 ```
 
 ## Architecture & conventions
@@ -165,10 +165,16 @@ All DI wiring lives in `di/KoinModule.kt`, grouped into module functions:
 
 ## CI/CD
 
-- `.github/workflows/trigger_on_pull_request.yml` runs on PRs targeting `main`:
-  1. Builds `assembleDebug`.
-  2. Creates a draft GitHub Release tagged with the branch/run info and uploads `app-debug.apk` as an asset.
-  3. Posts/updates a sticky PR comment with a direct download link to the APK.
+- `.github/workflows/trigger_on_pull_request.yml` runs on PRs targeting `main` (opened, reopened,
+  pushed to, closed) and calls the shared `android_pr.yml` from `LukeNeedham/ci-workflows` (`@main`):
+  1. While the PR is open it builds `assembleDebug`, creates a pre-release tagged with the branch/run
+     info with `app-debug.apk` as an asset, and posts/updates a sticky PR comment with a direct
+     download link to the APK. A newer push cancels the running build.
+  2. When the PR is closed, merged or not, it deletes the PR's build pre-releases (and tags).
+- `.github/workflows/delete_prereleases.yml` (manual) calls the shared `delete_prereleases.yml`,
+  which deletes every pre-release and tag.
+- The APK build/cleanup logic and the input defaults live in the shared repo
+  (`LukeNeedham/ci-workflows`), not here, so make changes there.
 
 ## Release process
 
