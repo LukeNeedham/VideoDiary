@@ -21,6 +21,7 @@ import com.lukeneedham.videodiary.ui.theme.AppBackground
 @Composable
 fun SettingsHubPageContent(
     onMenuClick: () -> Unit,
+    onVideoStorageClick: () -> Unit,
     onDebugClick: () -> Unit,
 ) {
     ToolbarPageLayout(
@@ -34,6 +35,11 @@ fun SettingsHubPageContent(
                 .verticalScroll(rememberScrollState())
                 .padding(16.dp)
         ) {
+            SettingsCard(
+                title = "Video storage",
+                iconRes = R.drawable.movie,
+                onClick = onVideoStorageClick,
+            )
             if (BuildConfig.DEBUG) {
                 SettingsCard(
                     title = "Debug settings",
@@ -50,6 +56,7 @@ fun SettingsHubPageContent(
 internal fun PreviewSettingsHubPageContent() {
     SettingsHubPageContent(
         onMenuClick = {},
+        onVideoStorageClick = {},
         onDebugClick = {},
     )
 }

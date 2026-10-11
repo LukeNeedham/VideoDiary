@@ -2,23 +2,27 @@ package com.lukeneedham.videodiary.data.persistence
 
 import android.content.Context
 import android.net.Uri
+import android.os.Environment
 import android.provider.MediaStore
 import com.lukeneedham.videodiary.R
 import com.lukeneedham.videodiary.data.mapper.ThumbnailFileNameMapper
 import com.lukeneedham.videodiary.data.mapper.VideoFileNameMapper
 import com.lukeneedham.videodiary.domain.util.logger.Logger
+import com.lukeneedham.videodiary.domain.model.VideoStorageLocation
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import java.io.File
 import java.time.LocalDate
 
 class VideosDao(
     private val context: Context,
+    private val settingsDao: SettingsDao,
     private val videoFileNameMapper: VideoFileNameMapper,
     private val thumbnailFileNameMapper: ThumbnailFileNameMapper,
     private val videoThumbnailExtractor: VideoThumbnailExtractor,
 ) {
-    private val videosDir = File(context.filesDir, "videos").apply {
+    private var videosDir = File(context.filesDir, "videos").apply {
         mkdirs()
     }
 
@@ -27,9 +31,71 @@ class VideosDao(
     }
 
     private val allVideosMutable = MutableStateFlow(loadAllVideos())
+    private val removableStorageAvailableMutable = MutableStateFlow(isRemovableStorageAvailable())
 
     /** A Flow of all video files in the diary, unordered */
     val allVideos = allVideosMutable.asStateFlow()
+    val removableStorageAvailable = removableStorageAvailableMutable.asStateFlow()
+
+    suspend fun initialiseStorageLocation() {
+        val location = settingsDao.getVideoStorageLocationFlow().first()
+        videosDir = getVideosDir(location) ?: getVideosDir(VideoStorageLocation.Internal)!!
+        videosDir.mkdirs()
+        refreshVideosState()
+    }
+
+    fun isRemovableStorageAvailable(): Boolean = getVideosDir(VideoStorageLocation.RemovableStorage) != null
+
+    /** Moves all diary videos before changing the active storage location. */
+    suspend fun moveVideosTo(location: VideoStorageLocation): Result<Unit> = runCatching {
+        val destinationDir = getVideosDir(location)
+            ?: error("Removable storage is not available")
+        if (videosDir.canonicalPath == destinationDir.canonicalPath) return Result.success(Unit)
+
+        destinationDir.mkdirs()
+        check(destinationDir.isDirectory) { "Could not create destination directory" }
+        val sourceFiles = videosDir.listFiles()?.toList().orEmpty()
+        val temporaryFiles = mutableListOf<File>()
+        val deletedSources = mutableListOf<File>()
+        try {
+            sourceFiles.forEach { source ->
+                val destination = File(destinationDir, source.name)
+                check(!destination.exists()) {
+                    "A video named ${source.name} already exists in the destination"
+                }
+                val temporary = File(destinationDir, ".${source.name}.moving")
+                check(!temporary.exists()) {
+                    "A previous move for ${source.name} has not completed"
+                }
+                source.copyTo(temporary)
+                check(temporary.length() == source.length()) {
+                    "Copied video ${source.name} has an unexpected size"
+                }
+                temporaryFiles += temporary
+            }
+
+            sourceFiles.forEach { source ->
+                check(source.delete()) { "Could not remove ${source.name} from the old location" }
+                deletedSources += source
+            }
+            temporaryFiles.forEach { temporary ->
+                val destination = File(destinationDir, temporary.name.removePrefix(".").removeSuffix(".moving"))
+                check(temporary.renameTo(destination)) { "Could not finish moving ${destination.name}" }
+            }
+            videosDir = destinationDir
+            removableStorageAvailableMutable.value = isRemovableStorageAvailable()
+            refreshVideosState()
+        } catch (error: Exception) {
+            deletedSources.forEach { source ->
+                val temporary = temporaryFiles.firstOrNull {
+                    it.name == ".${source.name}.moving"
+                }
+                temporary?.copyTo(source, overwrite = true)
+            }
+            temporaryFiles.forEach { it.delete() }
+            throw error
+        }
+    }
 
     fun deleteVideo(date: LocalDate) {
         val file = getVideoFile(date)
@@ -150,6 +216,17 @@ class VideosDao(
     }
 
     private fun getVideoFile(name: String) = File(videosDir, name)
+
+    private fun getVideosDir(location: VideoStorageLocation): File? = when (location) {
+        VideoStorageLocation.Internal -> File(context.filesDir, "videos")
+        VideoStorageLocation.RemovableStorage -> context.getExternalFilesDirs(null)
+            .firstOrNull { directory ->
+                directory != null &&
+                    Environment.isExternalStorageRemovable(directory) &&
+                    Environment.getExternalStorageState(directory) == Environment.MEDIA_MOUNTED
+            }
+            ?.let { File(it, "videos") }
+    }
 
     private fun getVideoFileName(date: LocalDate) = videoFileNameMapper.dateToName(date)
 
