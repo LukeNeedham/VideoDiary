@@ -77,7 +77,7 @@ fun DiaryDatePickerSheet(
         dragHandle = null,
         // SheetLayout handles the nav bar inset itself, rather than the sheet window, so that the
         // sheet can animate fully out without getting stuck under the nav bar.
-        windowInsets = WindowInsets(0, 0, 0, 0),
+        contentWindowInsets = { WindowInsets(0, 0, 0, 0) },
     ) {
         SheetLayout(onClose = { hideThen {} }) {
         Box(
