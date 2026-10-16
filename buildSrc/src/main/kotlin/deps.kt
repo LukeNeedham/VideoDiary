@@ -73,6 +73,11 @@ object deps {
             val coreLibrary = "com.android.tools:desugar_jdk_libs:2.1.4"
         }
 
+        object common {
+            /** Shared logger, crash handler and debug pages: https://github.com/LukeNeedham/ci-workflows */
+            val library = "com.lukeneedham:common:0.1.0"
+        }
+
         object coil {
             val compose = "io.coil-kt:coil-compose:2.7.0"
         }

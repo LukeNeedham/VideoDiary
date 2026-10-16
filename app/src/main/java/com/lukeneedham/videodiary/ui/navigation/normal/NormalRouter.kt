@@ -8,14 +8,16 @@ import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.withFrameNanos
+import com.lukeneedham.common.logger.Logger
+import com.lukeneedham.common.ui.CrashesPage
+import com.lukeneedham.common.ui.DebugPage
+import com.lukeneedham.common.ui.LogsPage
 import com.lukeneedham.videodiary.domain.model.ShareRequest
-import com.lukeneedham.videodiary.domain.util.logger.Logger
 import com.lukeneedham.videodiary.ui.feature.calendar.CalendarPage
 import com.lukeneedham.videodiary.ui.feature.common.hub.Hub
 import com.lukeneedham.videodiary.ui.feature.common.hub.HubSwitcherSheet
 import com.lukeneedham.videodiary.ui.feature.common.sheet.SheetDefaults
-import com.lukeneedham.videodiary.ui.feature.crashlog.CrashLogPage
-import com.lukeneedham.videodiary.ui.feature.debug.DebugPage
+import com.lukeneedham.videodiary.ui.feature.debug.DebugExtras
 import com.lukeneedham.videodiary.ui.feature.settings.SettingsHubPage
 import com.lukeneedham.videodiary.ui.feature.recap.create.RecapCreateCustomPage
 import com.lukeneedham.videodiary.ui.feature.recap.create.RecapCreatePeriodListPage
@@ -45,7 +47,7 @@ fun NormalRouter(
     val canGoBack = navController.backstack.entries.size > 1
 
     fun navigate(to: NormalPage) {
-        Logger.debug("Navigating to: $to")
+        Logger.d("Navigating to: $to")
         navController.navigate(to)
     }
 
@@ -74,7 +76,7 @@ fun NormalRouter(
         // time the click lands
         val liveHub = (navController.backstack.entries.lastOrNull()?.destination as? NormalPage)?.hub
         if (hub != liveHub) {
-            Logger.debug("Switching to hub: $hub")
+            Logger.d("Switching to hub: $hub")
             // The calendar hub is always the bottom entry of the backstack and is never removed,
             // so it keeps its state. Switching hub drops everything above it, then opens the new
             // hub on top. Back from another hub's root page returns to the calendar.
@@ -243,20 +245,19 @@ fun NormalRouter(
                     },
                 )
 
+                // The debug, logs and crashes pages come from the shared library
                 is NormalPage.Debug -> DebugPage(
-                    viewModel = koinViewModel(),
-                    canGoBack = canGoBack,
                     onBack = onBack,
-                    onCrashLogClick = {
-                        navigate(NormalPage.CrashLog)
+                    onOpenLogs = { navigate(NormalPage.Logs) },
+                    onOpenCrashes = { navigate(NormalPage.Crashes) },
+                    extraContent = {
+                        DebugExtras(viewModel = koinViewModel())
                     },
                 )
 
-                is NormalPage.CrashLog -> CrashLogPage(
-                    viewModel = koinViewModel(),
-                    canGoBack = canGoBack,
-                    onBack = onBack,
-                )
+                is NormalPage.Logs -> LogsPage(onBack = onBack)
+
+                is NormalPage.Crashes -> CrashesPage(onBack = onBack)
             }
         }
     }

@@ -2,7 +2,7 @@ package com.lukeneedham.videodiary.data.persistence
 
 import android.graphics.Bitmap
 import android.media.MediaMetadataRetriever
-import com.lukeneedham.videodiary.domain.util.logger.Logger
+import com.lukeneedham.common.logger.Logger
 import java.io.File
 import java.io.FileOutputStream
 
@@ -19,7 +19,7 @@ class VideoThumbnailExtractor {
                 frame.compress(Bitmap.CompressFormat.JPEG, jpegQuality, output)
             }
         } catch (e: Exception) {
-            Logger.error("Error extracting video thumbnail", e)
+            Logger.e("Error extracting video thumbnail", e)
         } finally {
             retriever.release()
         }

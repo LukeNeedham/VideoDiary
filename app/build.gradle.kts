@@ -110,6 +110,9 @@ dependencies {
     implementation(deps.libs.koin.compose)
     implementation(deps.libs.koin.viewModel)
 
+    // Shared logger, crash handler and debug pages
+    implementation(deps.libs.common.library)
+
     // Datastore
     implementation(deps.libs.androidx.datastore)
 

@@ -19,6 +19,11 @@ dependencyResolutionManagement {
         maven {
             setUrl("https://www.jitpack.io")
         }
+        // Shared library (logger, crash handler, debug pages): https://github.com/LukeNeedham/ci-workflows
+        maven {
+            setUrl("https://lukeneedham.github.io/ci-workflows/maven")
+            content { includeGroup("com.lukeneedham") }
+        }
     }
 }
 

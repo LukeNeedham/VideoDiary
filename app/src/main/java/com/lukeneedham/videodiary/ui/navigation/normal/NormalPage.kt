@@ -37,5 +37,6 @@ sealed class NormalPage : Parcelable {
 
     data object SettingsHub : NormalPage()
     data object Debug : NormalPage()
-    data object CrashLog : NormalPage()
+    data object Logs : NormalPage()
+    data object Crashes : NormalPage()
 }

@@ -24,10 +24,11 @@ F-Droid.
 - **DI**: Koin (`koin-android`, `koin-compose`, `koin-compose-viewmodel`)
 - **Navigation**: [Reimagined Navigation](https://github.com/olshevski/compose-navigation-reimagined) (`dev.olshevski.navigation.reimagined`)
 - **Media**: CameraX (recording) + Media3 (ExoPlayer for playback, Transformer/Effect for export)
-- **Persistence**: AndroidX DataStore (preferences) for settings; plain files (via `Context.filesDir`) for videos
+- **Persistence**: AndroidX DataStore (preferences) for settings; plain files (via `Context.filesDir`) for videos; Room for saved recaps
+- **Shared library**: [`com.lukeneedham:common`](https://github.com/LukeNeedham/ci-workflows/tree/main/common) (logger, crash handler, Debug/Logs/Crashes pages), from the Maven repository at `https://lukeneedham.github.io/ci-workflows/maven` (added in `settings.gradle.kts`, version in `buildSrc/.../deps.kt`)
 - **Build**: Gradle Kotlin DSL, version catalog-style deps centralized in `buildSrc` (see below)
-- **Min/Target/Compile SDK**: minSdk 21, targetSdk/compileSdk 35
-- **Java/Kotlin target**: Java 11, Kotlin 2.0.0, AGP 8.7.1
+- **Min/Target/Compile SDK**: minSdk 23, targetSdk 35, compileSdk 36 (minSdk 23 and compileSdk 36 are required by the shared library)
+- **Java/Kotlin target**: Java 11, Kotlin 2.2.21, AGP 8.13.2, Gradle 8.14.3, KSP 2.2.21-2.0.4 (Kotlin 2.2 or newer is required by the shared library)
 
 ## Repository layout
 
@@ -35,7 +36,7 @@ F-Droid.
 app/                         Android app module
   src/main/java/com/lukeneedham/videodiary/
     data/                     Data layer: DAOs, repositories, Android-specific data sources, mappers
-    domain/                   Domain models and platform-agnostic utilities (logger, date utils, timer)
+    domain/                   Domain models and platform-agnostic utilities (date utils, timer)
     di/                       Koin module definitions (KoinModule.kt, KoinQualifier.kt)
     ui/
       feature/                One subpackage per feature/screen (see "Feature structure" below)
@@ -48,7 +49,7 @@ app/                         Android app module
       fileprovider/           FileProvider-related helpers
       util/                   UI-layer utilities/extensions
     util/ext/                 General Kotlin extensions
-    App.kt                    Application class - starts Koin, sets up Logger
+    App.kt                    Application class - initialises the shared library's `DebugKit` (logger + crash handler), starts Koin
     MainActivity.kt           Single Activity - hosts Root composable, handles orientation/share/permissions
   src/debug/res/              Debug-only resources (e.g. preview_video drawable for screenshots)
   src/test/                   JVM unit tests
@@ -107,11 +108,11 @@ All DI wiring lives in `di/KoinModule.kt`, grouped into module functions:
 
 - Two navigation graphs, each with a sealed `Page` class and a `Router` composable:
   - `ui/navigation/setup/` (`SetupPage`, `SetupRouter`) — first-run setup flow (intro → orientation → resolution → video duration)
-  - `ui/navigation/normal/` (`NormalPage`, `NormalRouter`) — main app flow (calendar, record video, check video, export diary, debug)
+  - `ui/navigation/normal/` (`NormalPage`, `NormalRouter`) — main app flow (calendar, record video, check video, export diary, debug, logs, crashes)
 - `ui/root/Root.kt` + `RootViewModel`/`RootState` decide which graph (or permissions screen / loading
   spinner) to show, based on permission state and whether setup has completed.
 - Built on Reimagined Navigation (`rememberNavController`, `NavHost`, `NavBackHandler`, `navigate`/`pop`/`popUpTo`).
-- Log navigation events via `Logger.debug("Navigating to: $to")` (existing convention in both routers).
+- Log navigation events via `Logger.d("Navigating to: $to")` (existing convention in both routers).
 
 ### Bottom sheets
 
@@ -121,18 +122,34 @@ All DI wiring lives in `di/KoinModule.kt`, grouped into module functions:
 
 ### Logging
 
-- **Always use `Logger` (`domain/util/logger/Logger.kt`)** — never call Android's `Log` directly
-  (it would break unit tests, since `Logger.setLoggerEngine` is set up only in `App.onCreate`).
-- `Logger.debug(...)` — for logs useful in testing/diagnostics.
-- `Logger.warning(...)` — expected-but-notable error states.
-- `Logger.error(...)` — unexpected errors / likely bugs.
+The logger, crash handler and the Debug / Logs / Crashes pages come from the shared library
+`com.lukeneedham:common` (source: `common/` in [LukeNeedham/ci-workflows](https://github.com/LukeNeedham/ci-workflows),
+docs: `docs/using-the-library.md` there). The app has no logger of its own.
+
+- **Always use `com.lukeneedham.common.logger.Logger`** — never call Android's `Log` directly. It logs to
+  Logcat and to a file, so the lines show on the Debug > Logs page. It works in unit tests without setup.
+- `Logger.d(...)` — for logs useful in testing/diagnostics. Dropped in release builds (`minLogLevel` is set in `App.onCreate`).
+- `Logger.i(...)` — informational.
+- `Logger.w(msg, throwable)` — expected-but-notable error states.
+- `Logger.e(msg, throwable)` — unexpected errors / likely bugs.
+- `DebugKit.init(...)` is the first call in `App.onCreate`, so it runs before anything can log or crash.
+  Uncaught exceptions are saved by the library (do not install another handler: crashes would be saved twice).
+- The library adds no permissions; the app still has no internet permission. Keep checking the merged
+  manifest when upgrading the library.
+- Crashes saved by the app's old crash handler (plain `.txt` files in `filesDir/crashlogs`) are not shown
+  any more and are not migrated. They are left on disk; delete that folder in a later release.
+  (There was never a Room table for crash logs in this app; Room only holds saved recaps.)
 
 ### Debug-only features
 
-- `BuildConfig.DEBUG` gates debug-only UI (e.g. extra buttons on the Calendar toolbar that open the
-  Debug page, `AndroidLoggerEngine` verbose logging).
-- The Debug page (`ui/feature/debug/`) lets developers fill the diary with mock data via
+- `BuildConfig.DEBUG` gates debug-only UI (e.g. the Settings entry that opens the Debug page) and the
+  library's `DebugKitConfig(enabled = ...)`, and keeps debug logs (`Logger.d`) out of release builds.
+- The Debug page is the library's `DebugPage` (animation speed, links to the Logs and Crashes pages), routed in
+  `NormalRouter`. The app's own tools (`ui/feature/debug/`: `DebugExtras` / `DebugExtrasContent`) are passed to it
+  as `extraContent`. They let developers fill the diary with mock data via
   `MockDataRepository` / `VideosDao.fillWithMockVideos(...)` — only reachable from debug builds.
+  The library's pages draw with Material 3 and the app theme is Material 2, so they look slightly different from the rest of the app.
+  The library's animation speed setting is not used by the app (it has no animation-scaling wrapper).
   Mock entries are populated by copying the `sample_video` raw resource in as each video file.
 - `app/src/debug/res/drawable/preview_video` is a large placeholder image used by Composable
   Previews for video players; it's excluded from release builds. A small fallback `preview_video`

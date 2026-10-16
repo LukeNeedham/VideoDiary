@@ -6,7 +6,7 @@ import android.provider.MediaStore
 import com.lukeneedham.videodiary.R
 import com.lukeneedham.videodiary.data.mapper.ThumbnailFileNameMapper
 import com.lukeneedham.videodiary.data.mapper.VideoFileNameMapper
-import com.lukeneedham.videodiary.domain.util.logger.Logger
+import com.lukeneedham.common.logger.Logger
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import java.io.File
@@ -46,7 +46,7 @@ class VideosDao(
         try {
             context.contentResolver.delete(videoContentUri, null, null)
         } catch (e: Exception) {
-            Logger.error("Error discarding video", e)
+            Logger.e("Error discarding video", e)
         }
     }
 
@@ -71,12 +71,12 @@ class VideosDao(
                 videoThumbnailExtractor.extractFirstFrame(destinationFile, getThumbnailFile(date))
                 refreshVideosState()
             } else {
-                Logger.error("Failed to get video path from content URI")
+                Logger.e("Failed to get video path from content URI")
             }
 
             cursor?.close()
         } catch (e: Exception) {
-            Logger.error("Error copying video", e)
+            Logger.e("Error copying video", e)
         }
     }
 
@@ -133,7 +133,7 @@ class VideosDao(
             val date = try {
                 videoFileNameMapper.nameToDate(videoFile.name)
             } catch (e: Exception) {
-                Logger.warning("Skipping video with unrecognised file name: ${videoFile.name}", e)
+                Logger.w("Skipping video with unrecognised file name: ${videoFile.name}", e)
                 return@forEach
             }
 
