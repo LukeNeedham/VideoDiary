@@ -7,6 +7,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.core.app.ActivityCompat
 import androidx.core.view.WindowCompat
+import com.lukeneedham.common.ui.ProvideDebugSettings
 import com.lukeneedham.videodiary.domain.model.Orientation
 import com.lukeneedham.videodiary.domain.model.ShareRequest
 import com.lukeneedham.videodiary.ui.media.VideoPlayerHolder
@@ -27,12 +28,15 @@ class MainActivity : ComponentActivity() {
         WindowCompat.getInsetsController(window, window.decorView)
             .isAppearanceLightStatusBars = false
         setContent {
-            Root(
-                share = ::share,
-                setOrientation = ::setOrientation,
-                requestPermission = ::requestPermission,
-                permissionResultListenerHolder = permissionResultListenerHolder,
-            )
+            // Every app wraps its content in ProvideDebugSettings, even without a debug setting to read.
+            ProvideDebugSettings {
+                Root(
+                    share = ::share,
+                    setOrientation = ::setOrientation,
+                    requestPermission = ::requestPermission,
+                    permissionResultListenerHolder = permissionResultListenerHolder,
+                )
+            }
         }
     }
 

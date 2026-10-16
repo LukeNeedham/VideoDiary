@@ -133,6 +133,7 @@ docs: `docs/using-the-library.md` there). The app has no logger of its own.
 - `Logger.w(msg, throwable)` — expected-but-notable error states.
 - `Logger.e(msg, throwable)` — unexpected errors / likely bugs.
 - `DebugKit.init(...)` is the first call in `App.onCreate`, so it runs before anything can log or crash.
+- `MainActivity` wraps `Root` in `ProvideDebugSettings` (the library's single provider of debug composition locals). Keep it wrapped, even though no debug setting is read yet, so a setting added to the library later reaches every screen with only a version bump.
   Uncaught exceptions are saved by the library (do not install another handler: crashes would be saved twice).
 - The library adds no permissions; the app still has no internet permission. Keep checking the merged
   manifest when upgrading the library.

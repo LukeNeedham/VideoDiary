@@ -75,7 +75,7 @@ object deps {
 
         object common {
             /** Shared logger, crash handler and debug pages: https://github.com/LukeNeedham/ci-workflows */
-            val library = "com.lukeneedham:common:0.1.0"
+            val library = "com.lukeneedham:common:0.2.0"
         }
 
         object coil {
