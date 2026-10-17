@@ -151,7 +151,11 @@ docs: `docs/using-the-library.md` there). The app has no logger of its own.
   opens the shared library's `DebugPage` (`NormalPage.SdkDebug`: animation speed, links to the Logs and Crashes pages). The
   library's page has no slot for app-specific tools, so add new ones to the app's page, never to the library's.
   The library's pages draw with Material 3 and the app theme is Material 2, so they look slightly different from the rest of the app.
-  The library's animation speed setting is not used by the app (it has no animation-scaling wrapper).
+  The library's animation speed (Debug > SDK debug) applies to the app's animations that have an explicit duration, through
+  `LocalAnimationSpeed.current.scale(ms)` (`com.lukeneedham.common.ui.LocalAnimationSpeed`, `com.lukeneedham.common.debug.scale`;
+  `ProvideDebugSettings` is in `MainActivity`): the recap share sheet settle (`RecapViewPageContent`) and the camera focus indicator
+  hold and fade (`CameraInput`). Give any new animation an explicit duration and pass it through `scale`. Animations that use the default
+  spring (`SingleOptionSelector`, the orientation text colour) are not affected by the setting.
   Mock entries are populated by copying the `sample_video` raw resource in as each video file.
 - `app/src/debug/res/drawable/preview_video` is a large placeholder image used by Composable
   Previews for video players; it's excluded from release builds. A small fallback `preview_video`

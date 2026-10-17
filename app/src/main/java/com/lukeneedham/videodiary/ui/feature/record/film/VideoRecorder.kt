@@ -5,12 +5,12 @@ import android.content.ContentValues
 import android.content.Context
 import android.os.Build
 import android.provider.MediaStore
-import android.util.Log
 import androidx.camera.video.MediaStoreOutputOptions
 import androidx.camera.video.Recorder
 import androidx.camera.video.Recording
 import androidx.camera.video.VideoCapture
 import androidx.camera.video.VideoRecordEvent
+import com.lukeneedham.common.logger.Logger
 import com.lukeneedham.videodiary.domain.util.timer.Timer
 import com.lukeneedham.videodiary.domain.util.timer.TimerTick
 import kotlinx.coroutines.CoroutineScope
@@ -78,7 +78,7 @@ class VideoRecorder(
                         try {
                             context.contentResolver.delete(output, null, null)
                         } catch (e: Exception) {
-                            Log.w("VideoRecorder", "Failed to delete cancelled recording", e)
+                            Logger.w("Failed to delete cancelled recording", e, tag = "VideoRecorder")
                         }
                         isCancelling = false
                         return@start
@@ -90,7 +90,7 @@ class VideoRecorder(
                         onStateUpdate(RecordingState.Success(output))
                     } else {
                         val ex = recordEvent.cause
-                        Log.e("VideoRecorder", "Failed", ex)
+                        Logger.e("Failed", ex, tag = "VideoRecorder")
                         onStateUpdate(RecordingState.Failed(error, ex))
                     }
                 }
