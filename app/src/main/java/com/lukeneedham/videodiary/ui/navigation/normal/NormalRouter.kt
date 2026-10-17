@@ -10,14 +10,14 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.withFrameNanos
 import com.lukeneedham.common.logger.Logger
 import com.lukeneedham.common.ui.CrashesPage
-import com.lukeneedham.common.ui.DebugPage
+import com.lukeneedham.common.ui.DebugPage as SdkDebugPage
 import com.lukeneedham.common.ui.LogsPage
 import com.lukeneedham.videodiary.domain.model.ShareRequest
 import com.lukeneedham.videodiary.ui.feature.calendar.CalendarPage
 import com.lukeneedham.videodiary.ui.feature.common.hub.Hub
 import com.lukeneedham.videodiary.ui.feature.common.hub.HubSwitcherSheet
 import com.lukeneedham.videodiary.ui.feature.common.sheet.SheetDefaults
-import com.lukeneedham.videodiary.ui.feature.debug.DebugExtras
+import com.lukeneedham.videodiary.ui.feature.debug.DebugPage
 import com.lukeneedham.videodiary.ui.feature.settings.SettingsHubPage
 import com.lukeneedham.videodiary.ui.feature.recap.create.RecapCreateCustomPage
 import com.lukeneedham.videodiary.ui.feature.recap.create.RecapCreatePeriodListPage
@@ -245,14 +245,19 @@ fun NormalRouter(
                     },
                 )
 
-                // The debug, logs and crashes pages come from the shared library
+                // The app's own debug page, which opens the shared library's debug page. The library's
+                // debug, logs and crashes pages show only the library's own things.
                 is NormalPage.Debug -> DebugPage(
+                    viewModel = koinViewModel(),
+                    canGoBack = canGoBack,
+                    onBack = onBack,
+                    onOpenSdkDebug = { navigate(NormalPage.SdkDebug) },
+                )
+
+                is NormalPage.SdkDebug -> SdkDebugPage(
                     onBack = onBack,
                     onOpenLogs = { navigate(NormalPage.Logs) },
                     onOpenCrashes = { navigate(NormalPage.Crashes) },
-                    extraContent = {
-                        DebugExtras(viewModel = koinViewModel())
-                    },
                 )
 
                 is NormalPage.Logs -> LogsPage(onBack = onBack)

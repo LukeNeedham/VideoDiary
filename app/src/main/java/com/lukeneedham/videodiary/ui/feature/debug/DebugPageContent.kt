@@ -9,12 +9,15 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Switch
 import androidx.compose.material.SwitchDefaults
 import androidx.compose.material.Text
@@ -30,54 +33,90 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.lukeneedham.videodiary.R
+import com.lukeneedham.videodiary.ui.feature.common.toolbar.SubpageToolbar
+import com.lukeneedham.videodiary.ui.feature.common.toolbar.ToolbarPageLayout
 import com.lukeneedham.videodiary.ui.theme.AccentAccept
 import com.lukeneedham.videodiary.ui.theme.AccentHighlight
+import com.lukeneedham.videodiary.ui.theme.AppBackground
 import com.lukeneedham.videodiary.ui.theme.AppSurface
 import com.lukeneedham.videodiary.ui.theme.AppSurfaceVariant
 import com.lukeneedham.videodiary.ui.theme.Typography
 
-/**
- * VideoDiary's own debug tools. Shown inside the shared library's debug page (as its
- * `extraContent`), below the library's animation speed, logs and crashes entries.
- */
 @Composable
-fun DebugExtrasContent(
+fun DebugPageContent(
     onFillWithMockDataClick: () -> Unit,
     allowRetakeForPastDays: Boolean,
     onAllowRetakeForPastDaysChange: (Boolean) -> Unit,
     onResyncThumbnailsClick: () -> Unit,
+    onOpenSdkDebug: () -> Unit,
+    canGoBack: Boolean,
+    onBack: () -> Unit,
 ) {
-    Column(modifier = Modifier.fillMaxWidth()) {
-        Section(title = "Data") {
-            DebugActionRow(
-                iconRes = R.drawable.movie,
-                accent = AccentAccept,
-                title = "Fill with mock data",
-                description = "Overwrites all diary data with a random mix of mock videos, " +
-                    "spanning the last 5 weeks",
-                onClick = onFillWithMockDataClick,
+    ToolbarPageLayout(
+        bottomBar = { SubpageToolbar(canGoBack = canGoBack, onBack = onBack) },
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(AppBackground)
+                .verticalScroll(rememberScrollState())
+                .padding(horizontal = 16.dp, vertical = 24.dp),
+        ) {
+            Text(
+                text = "Debug",
+                color = Color.White,
+                fontSize = Typography.Size.big,
+                fontWeight = FontWeight.Bold,
             )
-            Divider()
-            DebugActionRow(
-                iconRes = R.drawable.camera,
-                accent = AccentAccept,
-                title = "Resync thumbnails",
-                description = "Deletes all generated thumbnails and recalculates them " +
-                    "from the saved videos",
-                onClick = onResyncThumbnailsClick,
+            Text(
+                text = "Developer tools, only available in debug builds",
+                color = Color.White.copy(alpha = 0.6f),
+                fontSize = Typography.Size.extraSmall,
+                modifier = Modifier.padding(top = 4.dp),
             )
-        }
 
-        Section(title = "Behaviour") {
-            DebugSwitchRow(
-                iconRes = R.drawable.retake,
-                accent = AccentHighlight,
-                title = "Allow retake for past days",
-                description = "Shows the Retake button for past days, allowing the video " +
-                    "for that day to be re-recorded. Normally only today's video can be retaken",
-                checked = allowRetakeForPastDays,
-                onCheckedChange = onAllowRetakeForPastDaysChange,
-            )
+            Section(title = "Data") {
+                DebugActionRow(
+                    iconRes = R.drawable.movie,
+                    accent = AccentAccept,
+                    title = "Fill with mock data",
+                    description = "Overwrites all diary data with a random mix of mock videos, " +
+                        "spanning the last 5 weeks",
+                    onClick = onFillWithMockDataClick,
+                )
+                Divider()
+                DebugActionRow(
+                    iconRes = R.drawable.camera,
+                    accent = AccentAccept,
+                    title = "Resync thumbnails",
+                    description = "Deletes all generated thumbnails and recalculates them " +
+                        "from the saved videos",
+                    onClick = onResyncThumbnailsClick,
+                )
+            }
+
+            Section(title = "Behaviour") {
+                DebugSwitchRow(
+                    iconRes = R.drawable.retake,
+                    accent = AccentHighlight,
+                    title = "Allow retake for past days",
+                    description = "Shows the Retake button for past days, allowing the video " +
+                        "for that day to be re-recorded. Normally only today's video can be retaken",
+                    checked = allowRetakeForPastDays,
+                    onCheckedChange = onAllowRetakeForPastDaysChange,
+                )
+            }
+
+            Section(title = "Diagnostics") {
+                DebugActionRow(
+                    iconRes = R.drawable.bug,
+                    accent = AccentHighlight,
+                    title = "SDK debug",
+                    description = "Animation speed, logs and crashes, from the shared library",
+                    onClick = onOpenSdkDebug,
+                    showChevron = true,
+                )
+            }
         }
     }
 }
@@ -124,6 +163,7 @@ private fun DebugActionRow(
     title: String,
     description: String,
     onClick: () -> Unit,
+    showChevron: Boolean = false,
 ) {
     DebugRow(
         iconRes = iconRes,
@@ -131,7 +171,16 @@ private fun DebugActionRow(
         title = title,
         description = description,
         onClick = onClick,
-    ) {}
+    ) {
+        if (showChevron) {
+            Image(
+                painter = painterResource(R.drawable.chevron_right),
+                contentDescription = null,
+                colorFilter = ColorFilter.tint(Color.White.copy(alpha = 0.4f)),
+                modifier = Modifier.size(24.dp),
+            )
+        }
+    }
 }
 
 @Composable
@@ -217,11 +266,14 @@ private fun DebugRow(
 
 @Preview
 @Composable
-internal fun PreviewDebugExtrasContent() {
-    DebugExtrasContent(
+internal fun PreviewDebugPageContent() {
+    DebugPageContent(
         onFillWithMockDataClick = {},
         allowRetakeForPastDays = true,
         onAllowRetakeForPastDaysChange = {},
         onResyncThumbnailsClick = {},
+        onOpenSdkDebug = {},
+        canGoBack = true,
+        onBack = {},
     )
 }

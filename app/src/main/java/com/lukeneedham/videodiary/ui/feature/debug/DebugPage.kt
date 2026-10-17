@@ -5,19 +5,25 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 
 /**
- * VideoDiary's own debug tools, passed to the shared library's `DebugPage` as its `extraContent`.
- * The page itself (animation speed, logs, crashes) comes from the library.
+ * VideoDiary's own debug page. The shared library's debug page (animation speed, logs, crashes) has no
+ * slot for app-specific tools, so they live here, with a row that opens the library's page.
  */
 @Composable
-fun DebugExtras(
+fun DebugPage(
     viewModel: DebugViewModel,
+    canGoBack: Boolean,
+    onBack: () -> Unit,
+    onOpenSdkDebug: () -> Unit,
 ) {
     val allowRetakeForPastDays by viewModel.allowRetakeForPastDays.collectAsState()
 
-    DebugExtrasContent(
+    DebugPageContent(
         onFillWithMockDataClick = viewModel::fillWithMockData,
         allowRetakeForPastDays = allowRetakeForPastDays,
         onAllowRetakeForPastDaysChange = viewModel::setAllowRetakeForPastDays,
         onResyncThumbnailsClick = viewModel::resyncThumbnails,
+        onOpenSdkDebug = onOpenSdkDebug,
+        canGoBack = canGoBack,
+        onBack = onBack,
     )
 }

@@ -36,7 +36,13 @@ sealed class NormalPage : Parcelable {
     ) : NormalPage()
 
     data object SettingsHub : NormalPage()
+
+    /** The app's own debug page. */
     data object Debug : NormalPage()
+
+    /** The shared library's debug page, opened from [Debug]. */
+    data object SdkDebug : NormalPage()
+
     data object Logs : NormalPage()
     data object Crashes : NormalPage()
 }
