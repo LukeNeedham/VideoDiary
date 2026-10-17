@@ -63,7 +63,7 @@ fun RecapCreateTypeSheet(
         scrimColor = SheetDefaults.scrimColor,
         dragHandle = null,
         // Handled by SheetLayout, so that the sheet can animate fully out
-        windowInsets = WindowInsets(0, 0, 0, 0),
+        contentWindowInsets = { WindowInsets(0, 0, 0, 0) },
     ) {
         SheetLayout(
             onClose = {

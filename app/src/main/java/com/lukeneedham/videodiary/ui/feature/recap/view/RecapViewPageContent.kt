@@ -15,6 +15,8 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import com.lukeneedham.common.debug.scale
+import com.lukeneedham.common.ui.LocalAnimationSpeed
 import com.lukeneedham.videodiary.ui.feature.common.videoplayer.VideoPlayerController
 import com.lukeneedham.videodiary.ui.feature.common.videoplayer.VideoQueuePlayer
 import com.lukeneedham.videodiary.ui.feature.common.videoplayer.VideoToolbarLayout
@@ -29,6 +31,12 @@ import java.io.File
 import java.time.LocalDate
 
 @OptIn(ExperimentalMaterialApi::class)
+/**
+ * How long the share sheet takes to settle, before the debug animation speed is applied. A tween rather than
+ * a spring, so it settles right when the sheet stops moving (see the comment where it is used).
+ */
+private const val SHEET_SETTLE_MILLIS = 250
+
 @Composable
 fun RecapViewPageContent(
     name: String,
@@ -61,9 +69,10 @@ fun RecapViewPageContent(
     // behind by about a second, during which the sheet's content was still fully mounted and
     // sitting in the - unclipped, since Root pads the whole app away from the system bars -
     // navigation bar's area.
+    val animationSpeed = LocalAnimationSpeed.current
     val sheetState = rememberModalBottomSheetState(
         initialValue = ModalBottomSheetValue.Hidden,
-        animationSpec = tween(durationMillis = 250),
+        animationSpec = tween(durationMillis = animationSpeed.scale(SHEET_SETTLE_MILLIS)),
     )
     val coroutineScope = rememberCoroutineScope()
     var showInfoSheet by remember { mutableStateOf(false) }

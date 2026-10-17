@@ -168,7 +168,7 @@ fun CalendarScroller(
         ) {
             HorizontalPager(
                 state = pagerState,
-                beyondBoundsPageCount = 0,
+                beyondViewportPageCount = 0,
                 modifier = Modifier.fillMaxSize()
             ) { pageIndex ->
                 val day = days.getOrNull(pageIndex) ?: return@HorizontalPager

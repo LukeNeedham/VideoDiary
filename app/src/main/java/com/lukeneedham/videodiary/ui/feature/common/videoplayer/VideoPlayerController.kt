@@ -5,7 +5,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import com.lukeneedham.videodiary.domain.model.Video
-import com.lukeneedham.videodiary.domain.util.logger.Logger
 import java.io.File
 
 class VideoPlayerController {

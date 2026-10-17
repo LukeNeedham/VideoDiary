@@ -1,6 +1,5 @@
 package com.lukeneedham.videodiary.ui.feature.common.camera
 
-import android.util.Log
 import android.util.Size
 import androidx.camera.core.Camera
 import androidx.camera.core.CameraSelector
@@ -39,8 +38,17 @@ import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
+import com.lukeneedham.common.debug.scale
+import com.lukeneedham.common.logger.Logger
+import com.lukeneedham.common.ui.LocalAnimationSpeed
 import com.lukeneedham.videodiary.domain.model.CameraResolutionRotation
 import kotlinx.coroutines.delay
+
+/** How long the focus indicator stays fully visible after a tap, before the debug animation speed is applied. */
+private const val FOCUS_HOLD_MILLIS = 500
+
+/** How long the focus indicator takes to fade out, before the debug animation speed is applied. */
+private const val FOCUS_FADE_MILLIS = 400
 
 @Composable
 fun CameraInput(
@@ -103,7 +111,7 @@ fun CameraInput(
                         videoCapture,
                     )
                 } catch (ex: Exception) {
-                    Log.e("CameraX", "Use case binding failed", ex)
+                    Logger.e("Use case binding failed", ex, tag = "CameraX")
                 }
             },
             ContextCompat.getMainExecutor(context)
@@ -120,11 +128,12 @@ fun CameraInput(
     }
 
     // Animate focus indicator: snap in, hold, then fade out
+    val animationSpeed = LocalAnimationSpeed.current
     LaunchedEffect(focusTapCount) {
         if (focusTapCount == 0) return@LaunchedEffect
         focusAlpha.snapTo(0.7f)
-        delay(500)
-        focusAlpha.animateTo(0f, animationSpec = tween(400))
+        delay(animationSpeed.scale(FOCUS_HOLD_MILLIS).toLong())
+        focusAlpha.animateTo(0f, animationSpec = tween(animationSpeed.scale(FOCUS_FADE_MILLIS)))
         focusTapOffset = null
     }
 

@@ -19,3 +19,8 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+# Shared library (com.lukeneedham:common): its logs and crashes are saved as JSON with
+# kotlinx.serialization. Keep the entry classes so the Logs and Crashes pages work in minified builds.
+-keep class com.lukeneedham.common.logger.LogEntry { *; }
+-keep class com.lukeneedham.common.crash.CrashEntry { *; }

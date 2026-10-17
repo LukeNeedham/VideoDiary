@@ -28,7 +28,7 @@ ModalBottomSheet(
     shape = SheetDefaults.shape,
     scrimColor = SheetDefaults.scrimColor,
     dragHandle = null,
-    windowInsets = WindowInsets(0, 0, 0, 0), // SheetLayout handles the nav bar inset
+    contentWindowInsets = { WindowInsets(0, 0, 0, 0) }, // SheetLayout handles the nav bar inset
 ) {
     SheetLayout(
         onClose = { scope.launch { sheetState.hide() }.invokeOnCompletion { onDismiss() } },

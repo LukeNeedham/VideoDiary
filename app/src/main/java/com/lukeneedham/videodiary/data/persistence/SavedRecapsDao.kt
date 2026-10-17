@@ -3,7 +3,7 @@ package com.lukeneedham.videodiary.data.persistence
 import com.lukeneedham.videodiary.data.persistence.room.SavedRecapEntity
 import com.lukeneedham.videodiary.data.persistence.room.SavedRecapRoomDao
 import com.lukeneedham.videodiary.domain.model.SavedRecap
-import com.lukeneedham.videodiary.domain.util.logger.Logger
+import com.lukeneedham.common.logger.Logger
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import java.time.LocalDate
@@ -49,7 +49,7 @@ class SavedRecapsDao(
                 endDate = LocalDate.parse(entity.endDate),
             )
         } catch (e: Exception) {
-            Logger.warning("Failed to parse saved recap: ${entity.id}", e)
+            Logger.w("Failed to parse saved recap: ${entity.id}", e)
             null
         }
     }

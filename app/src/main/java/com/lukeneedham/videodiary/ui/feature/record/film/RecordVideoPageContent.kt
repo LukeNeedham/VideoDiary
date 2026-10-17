@@ -37,7 +37,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import com.lukeneedham.videodiary.R
-import com.lukeneedham.videodiary.domain.util.logger.Logger
+import com.lukeneedham.common.logger.Logger
 import com.lukeneedham.videodiary.ui.feature.common.camera.CameraInput
 import com.lukeneedham.videodiary.ui.feature.common.glass.GlassRecordButton
 import com.lukeneedham.videodiary.ui.feature.common.toolbar.FlatIconButton
@@ -270,7 +270,7 @@ fun RecordVideoPageContent(
             videoCapture = videoCapture,
             onResolutionLoaded = { resolution, isMissing, loadedRotation ->
                 if (isMissing) {
-                    Logger.error("No camera feed available for resolution: $resolution")
+                    Logger.e("No camera feed available for resolution: $resolution")
                 }
             },
             canZoom = true,
