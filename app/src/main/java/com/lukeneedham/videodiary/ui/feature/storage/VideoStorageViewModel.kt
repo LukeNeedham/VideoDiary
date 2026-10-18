@@ -16,7 +16,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class VideoStorageViewModel(
-    private val settingsDao: SettingsDao,
+    settingsDao: SettingsDao,
     private val videosDao: VideosDao,
     private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
@@ -26,11 +26,22 @@ class VideoStorageViewModel(
     val isRemovableStorageAvailable: StateFlow<Boolean> = videosDao.removableStorageAvailable
         .stateIn(viewModelScope, SharingStarted.Eagerly, videosDao.isRemovableStorageAvailable())
 
+    val isUsingFallbackStorage: StateFlow<Boolean> = videosDao.usingFallbackStorage
+
     var isChangingLocation by mutableStateOf(false)
         private set
 
     var error: String? by mutableStateOf(null)
         private set
+
+    init {
+        // The SD card may have been inserted or removed since the app started
+        viewModelScope.launch {
+            withContext(ioDispatcher) {
+                videosDao.initialiseStorageLocation()
+            }
+        }
+    }
 
     fun selectLocation(location: VideoStorageLocation) {
         if (isChangingLocation || location == this.location.value) return
@@ -41,9 +52,7 @@ class VideoStorageViewModel(
             val result = withContext(ioDispatcher) {
                 videosDao.moveVideosTo(location)
             }
-            if (result.isSuccess) {
-                settingsDao.setVideoStorageLocation(location)
-            } else {
+            if (result.isFailure) {
                 error = "Could not move videos. Your current storage location has not changed."
             }
             isChangingLocation = false

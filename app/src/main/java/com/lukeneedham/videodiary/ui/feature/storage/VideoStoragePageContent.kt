@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.RadioButton
@@ -32,6 +33,7 @@ import com.lukeneedham.videodiary.ui.theme.Typography
 fun VideoStoragePageContent(
     location: VideoStorageLocation,
     isRemovableStorageAvailable: Boolean,
+    isUsingFallbackStorage: Boolean,
     isChangingLocation: Boolean,
     error: String?,
     onLocationSelected: (VideoStorageLocation) -> Unit,
@@ -78,11 +80,19 @@ fun VideoStoragePageContent(
                 enabled = isRemovableStorageAvailable && !isChangingLocation,
                 onClick = { onLocationSelected(VideoStorageLocation.RemovableStorage) },
             )
+            if (isUsingFallbackStorage) {
+                Spacer(modifier = Modifier.height(16.dp))
+                Text(
+                    text = "The SD card is not available, so videos are temporarily being kept in internal storage. They will be moved back to the SD card when it is inserted.",
+                    color = Color.Yellow,
+                    fontSize = Typography.Size.extraSmall,
+                )
+            }
             if (isChangingLocation) {
                 Spacer(modifier = Modifier.height(16.dp))
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     CircularProgressIndicator(
-                        modifier = Modifier.height(20.dp),
+                        modifier = Modifier.size(20.dp),
                         color = AccentHighlight,
                     )
                     Spacer(modifier = Modifier.width(12.dp))
@@ -145,6 +155,7 @@ private fun PreviewVideoStoragePageContent() {
     VideoStoragePageContent(
         location = VideoStorageLocation.Internal,
         isRemovableStorageAvailable = true,
+        isUsingFallbackStorage = false,
         isChangingLocation = false,
         error = null,
         onLocationSelected = {},

@@ -22,6 +22,7 @@ import com.lukeneedham.videodiary.ui.feature.crashlog.CrashLogViewModel
 import com.lukeneedham.videodiary.ui.feature.debug.DebugViewModel
 import com.lukeneedham.videodiary.ui.feature.permissions.RequestPermissionsViewModel
 import com.lukeneedham.videodiary.ui.feature.recap.create.RecapCreateCustomViewModel
+import com.lukeneedham.videodiary.ui.feature.storage.VideoStorageViewModel
 import com.lukeneedham.videodiary.ui.feature.recap.create.RecapCreatePeriodListViewModel
 import com.lukeneedham.videodiary.ui.feature.recap.hub.RecapHubViewModel
 import com.lukeneedham.videodiary.ui.feature.recap.model.RecapPeriodType
@@ -183,7 +184,7 @@ object KoinModule {
             )
         }
         viewModel {
-            com.lukeneedham.videodiary.ui.feature.storage.VideoStorageViewModel(
+            VideoStorageViewModel(
                 settingsDao = get(),
                 videosDao = get(),
                 ioDispatcher = get(KoinQualifier.Dispatcher.io),

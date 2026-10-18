@@ -9,9 +9,11 @@ import com.lukeneedham.videodiary.data.mapper.ThumbnailFileNameMapper
 import com.lukeneedham.videodiary.data.mapper.VideoFileNameMapper
 import com.lukeneedham.videodiary.domain.util.logger.Logger
 import com.lukeneedham.videodiary.domain.model.VideoStorageLocation
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.withContext
 import java.io.File
 import java.time.LocalDate
 
@@ -22,9 +24,16 @@ class VideosDao(
     private val thumbnailFileNameMapper: ThumbnailFileNameMapper,
     private val videoThumbnailExtractor: VideoThumbnailExtractor,
 ) {
-    private var videosDir = File(context.filesDir, "videos").apply {
+    private val internalVideosDir = File(context.filesDir, "videos").apply {
         mkdirs()
     }
+
+    /** The folder videos are currently read from and written to */
+    @Volatile
+    private var videosDir = internalVideosDir
+
+    /** Held briefly by anything that changes the video files, and while a move is committed */
+    private val filesLock = Any()
 
     private val thumbnailsDir = File(context.filesDir, "thumbnails").apply {
         mkdirs()
@@ -32,75 +41,129 @@ class VideosDao(
 
     private val allVideosMutable = MutableStateFlow(loadAllVideos())
     private val removableStorageAvailableMutable = MutableStateFlow(isRemovableStorageAvailable())
+    private val usingFallbackStorageMutable = MutableStateFlow(false)
 
     /** A Flow of all video files in the diary, unordered */
     val allVideos = allVideosMutable.asStateFlow()
+
     val removableStorageAvailable = removableStorageAvailableMutable.asStateFlow()
 
+    /**
+     * True when the chosen location is the SD card but it is not available right now,
+     * so internal storage is being used until it comes back.
+     */
+    val usingFallbackStorage = usingFallbackStorageMutable.asStateFlow()
+
+    /**
+     * Points the diary at the saved storage location. Also re-checks whether the SD card is
+     * available, so call it again when the SD card may have been inserted or removed.
+     *
+     * If the saved location is the SD card but it is missing, internal storage is used for now.
+     * Once the card is back, any videos recorded in the meantime are merged onto it.
+     */
     suspend fun initialiseStorageLocation() {
         val location = settingsDao.getVideoStorageLocationFlow().first()
-        videosDir = getVideosDir(location) ?: getVideosDir(VideoStorageLocation.Internal)!!
-        videosDir.mkdirs()
+        removableStorageAvailableMutable.value = isRemovableStorageAvailable()
+
+        val wantedDir = getVideosDir(location)
+        if (wantedDir == null) {
+            usingFallbackStorageMutable.value = true
+            switchVideosDir(internalVideosDir)
+            return
+        }
+        usingFallbackStorageMutable.value = false
+
+        // Videos may be in the other folder after an interrupted move, or after a fallback
+        val otherDir = if (wantedDir == internalVideosDir) {
+            getVideosDir(VideoStorageLocation.RemovableStorage)
+        } else {
+            internalVideosDir
+        }
+        if (otherDir != null && otherDir != wantedDir) {
+            try {
+                mergeInto(wantedDir, from = otherDir)
+            } catch (e: Exception) {
+                Logger.warning("Could not merge videos into $wantedDir", e)
+            }
+        }
+        switchVideosDir(wantedDir)
+    }
+
+    fun isRemovableStorageAvailable(): Boolean =
+        getVideosDir(VideoStorageLocation.RemovableStorage) != null
+
+    /**
+     * Moves all diary videos to [location] and saves it as the new storage location.
+     * On failure nothing changes: the videos stay where they were.
+     *
+     * This keeps going if the caller is cancelled, so a move is never left half-finished.
+     */
+    suspend fun moveVideosTo(location: VideoStorageLocation): Result<Unit> =
+        withContext(NonCancellable) {
+            runCatching {
+                val destinationDir = getVideosDir(location)
+                    ?: error("Removable storage is not available")
+                val previousLocation = settingsDao.getVideoStorageLocationFlow().first()
+                val sourceDir = videosDir
+                if (sourceDir.canonicalPath == destinationDir.canonicalPath) {
+                    settingsDao.setVideoStorageLocation(location)
+                    usingFallbackStorageMutable.value = false
+                    return@runCatching
+                }
+
+                val transfer = VideoFolderTransfer.copy(
+                    from = sourceDir,
+                    to = destinationDir,
+                    failOnConflict = true,
+                )
+                try {
+                    settingsDao.setVideoStorageLocation(location)
+                    try {
+                        synchronized(filesLock) {
+                            // A video was recorded or deleted during the copy
+                            check(transfer.isSourceUnchanged()) {
+                                "The diary changed while videos were being moved"
+                            }
+                            videosDir = destinationDir
+                        }
+                    } catch (e: Throwable) {
+                        settingsDao.setVideoStorageLocation(previousLocation)
+                        throw e
+                    }
+                } catch (e: Throwable) {
+                    transfer.rollback()
+                    throw e
+                }
+
+                usingFallbackStorageMutable.value = false
+                refreshVideosState()
+                // The move already worked, so leftovers are just wasted space until the next merge
+                transfer.commit().forEach { Logger.warning("Could not delete old video $it") }
+            }.onFailure { Logger.warning("Failed to move videos to $location", it) }
+        }
+
+    /** Moves videos that are in [from] but not in [into], then deletes them from [from] */
+    private fun mergeInto(into: File, from: File) {
+        VideoFolderTransfer.deleteTemporaryFiles(from)
+        if (from.listFiles().isNullOrEmpty()) return
+        val transfer = VideoFolderTransfer.copy(from = from, to = into, failOnConflict = false)
+        transfer.commit().forEach { Logger.warning("Could not delete merged video $it") }
+    }
+
+    private fun switchVideosDir(dir: File) {
+        synchronized(filesLock) {
+            dir.mkdirs()
+            videosDir = dir
+        }
         refreshVideosState()
     }
 
-    fun isRemovableStorageAvailable(): Boolean = getVideosDir(VideoStorageLocation.RemovableStorage) != null
-
-    /** Moves all diary videos before changing the active storage location. */
-    suspend fun moveVideosTo(location: VideoStorageLocation): Result<Unit> = runCatching {
-        val destinationDir = getVideosDir(location)
-            ?: error("Removable storage is not available")
-        if (videosDir.canonicalPath == destinationDir.canonicalPath) return Result.success(Unit)
-
-        destinationDir.mkdirs()
-        check(destinationDir.isDirectory) { "Could not create destination directory" }
-        val sourceFiles = videosDir.listFiles()?.toList().orEmpty()
-        val temporaryFiles = mutableListOf<File>()
-        val deletedSources = mutableListOf<File>()
-        try {
-            sourceFiles.forEach { source ->
-                val destination = File(destinationDir, source.name)
-                check(!destination.exists()) {
-                    "A video named ${source.name} already exists in the destination"
-                }
-                val temporary = File(destinationDir, ".${source.name}.moving")
-                check(!temporary.exists()) {
-                    "A previous move for ${source.name} has not completed"
-                }
-                source.copyTo(temporary)
-                check(temporary.length() == source.length()) {
-                    "Copied video ${source.name} has an unexpected size"
-                }
-                temporaryFiles += temporary
-            }
-
-            sourceFiles.forEach { source ->
-                check(source.delete()) { "Could not remove ${source.name} from the old location" }
-                deletedSources += source
-            }
-            temporaryFiles.forEach { temporary ->
-                val destination = File(destinationDir, temporary.name.removePrefix(".").removeSuffix(".moving"))
-                check(temporary.renameTo(destination)) { "Could not finish moving ${destination.name}" }
-            }
-            videosDir = destinationDir
-            removableStorageAvailableMutable.value = isRemovableStorageAvailable()
-            refreshVideosState()
-        } catch (error: Exception) {
-            deletedSources.forEach { source ->
-                val temporary = temporaryFiles.firstOrNull {
-                    it.name == ".${source.name}.moving"
-                }
-                temporary?.copyTo(source, overwrite = true)
-            }
-            temporaryFiles.forEach { it.delete() }
-            throw error
-        }
-    }
-
     fun deleteVideo(date: LocalDate) {
-        val file = getVideoFile(date)
-        file.delete()
-        getThumbnailFile(date).delete()
+        synchronized(filesLock) {
+            val file = getVideoFile(date)
+            file.delete()
+            getThumbnailFile(date).delete()
+        }
         refreshVideosState()
     }
 
@@ -127,13 +190,15 @@ class VideosDao(
                 val sourcePath = cursor.getString(columnIndex)
                 val sourceFile = File(sourcePath)
 
-                val destinationFile = getVideoFile(date)
-                destinationFile.parentFile?.mkdirs()
-                if (destinationFile.exists()) {
-                    destinationFile.delete()
+                val destinationFile = synchronized(filesLock) {
+                    getVideoFile(date).also { destinationFile ->
+                        destinationFile.parentFile?.mkdirs()
+                        if (destinationFile.exists()) {
+                            destinationFile.delete()
+                        }
+                        sourceFile.copyTo(destinationFile)
+                    }
                 }
-
-                sourceFile.copyTo(destinationFile)
                 videoThumbnailExtractor.extractFirstFrame(destinationFile, getThumbnailFile(date))
                 refreshVideosState()
             } else {
@@ -151,14 +216,16 @@ class VideosDao(
      * the `sample_video` raw resource. Used to fill the diary with mock data for debugging.
      */
     fun fillWithMockVideos(dates: List<LocalDate>) {
-        videosDir.listFiles()?.forEach { it.delete() }
-        thumbnailsDir.listFiles()?.forEach { it.delete() }
-        dates.forEach { date ->
-            val videoFile = getVideoFile(date)
-            context.resources.openRawResource(R.raw.sample_video).use { input ->
-                videoFile.outputStream().use { output -> input.copyTo(output) }
+        synchronized(filesLock) {
+            videosDir.listFiles()?.forEach { it.delete() }
+            thumbnailsDir.listFiles()?.forEach { it.delete() }
+            dates.forEach { date ->
+                val videoFile = getVideoFile(date)
+                context.resources.openRawResource(R.raw.sample_video).use { input ->
+                    videoFile.outputStream().use { output -> input.copyTo(output) }
+                }
+                videoThumbnailExtractor.extractFirstFrame(videoFile, getThumbnailFile(date))
             }
-            videoThumbnailExtractor.extractFirstFrame(videoFile, getThumbnailFile(date))
         }
         refreshVideosState()
     }
@@ -193,7 +260,9 @@ class VideosDao(
     }
 
     private fun generateThumbnails(onlyMissing: Boolean) {
-        val videoFiles = videosDir.listFiles() ?: return
+        val videoFiles = videosDir.listFiles()
+            ?.filterNot { it.name.endsWith(VideoFolderTransfer.TEMPORARY_SUFFIX) }
+            ?: return
         var generatedAny = false
         videoFiles.forEach { videoFile ->
             val date = try {
@@ -218,7 +287,7 @@ class VideosDao(
     private fun getVideoFile(name: String) = File(videosDir, name)
 
     private fun getVideosDir(location: VideoStorageLocation): File? = when (location) {
-        VideoStorageLocation.Internal -> File(context.filesDir, "videos")
+        VideoStorageLocation.Internal -> internalVideosDir
         VideoStorageLocation.RemovableStorage -> context.getExternalFilesDirs(null)
             .firstOrNull { directory ->
                 directory != null &&
@@ -240,6 +309,6 @@ class VideosDao(
 
     private fun loadAllVideos(): List<File> {
         val files = videosDir.listFiles() ?: return emptyList()
-        return files.toList()
+        return files.filterNot { it.name.endsWith(VideoFolderTransfer.TEMPORARY_SUFFIX) }
     }
 }
