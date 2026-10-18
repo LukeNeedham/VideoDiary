@@ -9,7 +9,7 @@ description: Luke Needham's conventions for Android apps - project setup, debug 
 # Luke's app conventions
 
 The full, current guides are in the public repo `LukeNeedham/ci-workflows` under `docs/`:
-`new-app.md` (read first when starting an app), `setup.md` (CI workflows), `library.md` and
+`new-app.md` (read first when starting an app), `setup.md` (CI workflows), `app-icon.md`, `library.md` and
 `using-the-library.md` (shared library), `consuming-apps.md` (which apps use it). If you can reach
 GitHub, read the relevant page there; otherwise the rules below are enough.
 
@@ -32,6 +32,10 @@ in the PR for the work you were asked to do, saying so in the description. Never
 - `apk-path` is `app/build/outputs/apk/debug/app-debug.apk`; `comment-header` is `<app>-app-link`.
 - Debug mode always comes from `BuildConfig.DEBUG` (the build config field).
 - Open a PR for completed work. When the APK build comment appears on the PR, paste the download link into the chat.
+
+## App icon
+- Commit the icon as `app-icon.png` at the repo root: square PNG, at least 512x512. The app hub reads it
+  from `main`, and the PR build (`check-icon` job) fails without it. Update it whenever the launcher icon changes.
 
 ## Architecture
 - Single activity (`ComponentActivity`), Jetpack Compose + Material 3, no XML, no fragments.
