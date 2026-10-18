@@ -16,6 +16,7 @@ import com.lukeneedham.videodiary.ui.feature.permissions.RequestPermissionsPage
 import com.lukeneedham.videodiary.ui.navigation.normal.NormalRouter
 import com.lukeneedham.videodiary.ui.navigation.setup.SetupRouter
 import com.lukeneedham.videodiary.ui.permissions.PermissionResultListenerHolder
+import com.lukeneedham.videodiary.ui.theme.ProvideAppDebugSettings
 import com.lukeneedham.videodiary.ui.theme.VideoDiaryTheme
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -54,39 +55,42 @@ fun Root(
             .background(Color.White)
     ) {
         VideoDiaryTheme {
-            when (viewModel.state) {
-                RootState.Loading -> {
-                    Box(
-                        contentAlignment = Alignment.Center,
-                        modifier = Modifier.fillMaxSize()
-                    ) {
-                        CircularProgressIndicator()
+            // Every app wraps its content in ProvideDebugSettings, even without a debug setting to read.
+            ProvideAppDebugSettings {
+                when (viewModel.state) {
+                    RootState.Loading -> {
+                        Box(
+                            contentAlignment = Alignment.Center,
+                            modifier = Modifier.fillMaxSize()
+                        ) {
+                            CircularProgressIndicator()
+                        }
                     }
-                }
 
-                RootState.NeedsPermissions -> {
-                    RequestPermissionsPage(
-                        viewModel = koinViewModel(),
-                        requestPermission = requestPermission,
-                        onContinue = viewModel::onPermissionsAcquired,
-                        permissionResultListenerHolder = permissionResultListenerHolder,
-                    )
-                }
+                    RootState.NeedsPermissions -> {
+                        RequestPermissionsPage(
+                            viewModel = koinViewModel(),
+                            requestPermission = requestPermission,
+                            onContinue = viewModel::onPermissionsAcquired,
+                            permissionResultListenerHolder = permissionResultListenerHolder,
+                        )
+                    }
 
-                RootState.NeedsSetup -> {
-                    SetupRouter(
-                        onSetupComplete = viewModel::onSetupComplete,
-                        setOrientation = setOrientation,
-                        requestPermission = requestPermission,
-                        permissionResultListenerHolder = permissionResultListenerHolder,
-                        onPermissionsAcquired = viewModel::onPermissionsAcquired,
-                    )
-                }
+                    RootState.NeedsSetup -> {
+                        SetupRouter(
+                            onSetupComplete = viewModel::onSetupComplete,
+                            setOrientation = setOrientation,
+                            requestPermission = requestPermission,
+                            permissionResultListenerHolder = permissionResultListenerHolder,
+                            onPermissionsAcquired = viewModel::onPermissionsAcquired,
+                        )
+                    }
 
-                RootState.Ready -> {
-                    NormalRouter(
-                        share = share,
-                    )
+                    RootState.Ready -> {
+                        NormalRouter(
+                            share = share,
+                        )
+                    }
                 }
             }
         }
