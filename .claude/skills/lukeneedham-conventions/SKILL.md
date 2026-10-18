@@ -9,7 +9,7 @@ description: Luke Needham's conventions for Android apps - project setup, debug 
 # Luke's app conventions
 
 The full, current guides are in the public repo `LukeNeedham/ci-workflows` under `docs/`:
-`new-app.md` (read first when starting an app), `setup.md` (CI workflows), `library.md` and
+`new-app.md` (read first when starting an app), `setup.md` (CI workflows), `app-icon.md`, `library.md` and
 `using-the-library.md` (shared library), `consuming-apps.md` (which apps use it). If you can reach
 GitHub, read the relevant page there; otherwise the rules below are enough.
 
@@ -33,6 +33,10 @@ in the PR for the work you were asked to do, saying so in the description. Never
 - Debug mode always comes from `BuildConfig.DEBUG` (the build config field).
 - Open a PR for completed work. When the APK build comment appears on the PR, paste the download link into the chat.
 
+## App icon
+- Commit the icon as `app-icon.png` at the repo root: square PNG, at least 512x512. The app hub reads it
+  from `main`, and the PR build (`check-icon` job) fails without it. Update it whenever the launcher icon changes.
+
 ## Architecture
 - Single activity (`ComponentActivity`), Jetpack Compose + Material 3, no XML, no fragments.
 - Navigation 3 (`NavKey` destinations that are `@Serializable`, back stack owned by the app).
@@ -46,7 +50,8 @@ in the PR for the work you were asked to do, saying so in the description. Never
 ## Shared library (`com.lukeneedham:common`)
 - Repository `https://lukeneedham.github.io/ci-workflows/maven` (group `com.lukeneedham` only); version in `libs.versions.toml`.
 - Call `DebugKit.init(DebugKitConfig(enabled = BuildConfig.DEBUG))` first thing in `Application.onCreate`.
-- Wrap the UI in `ProvideDebugSettings`, place a `DebugButton`, add `DebugPage`, `LogsPage`, `CrashesPage` to navigation.
+- Wrap the UI in `ProvideDebugSettings`, add `DebugPage`, `LogsPage`, `CrashesPage` to navigation.
+- Every app has a settings page (add one to an existing app that lacks it; fine if nothing else is on it). It holds the `DebugButton`, and never a floating button on the main page. The library's `DebugPage` shows the app's package and current version.
 - Use `Logger.d/i/w/e`, never `Log` or `println`. Scale animation durations with `LocalAnimationSpeed.current.scale(ms)`.
 - Apps with their own debug tools keep their own debug page, with a button that opens the library's `DebugPage`.
 
