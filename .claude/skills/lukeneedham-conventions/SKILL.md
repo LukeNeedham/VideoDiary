@@ -34,16 +34,15 @@ in the PR for the work you were asked to do, saying so in the description. Never
 - Open a PR for completed work. When the APK build comment appears on the PR, paste the download link into the chat.
 
 ## App icon
-- Commit the icon as `app-icon.png` at the repo root: a 512x512 PNG drawn as a **circle on a transparent
-  background**, filled with the adaptive launcher icon's background and with its foreground centred at the
-  same size and position (the centre 72dp of the 108dp canvas, as a circular launcher mask shows it). The
-  app hub reads it from `main`, and the PR build (`check-icon` job) fails if it is missing or not that shape.
-- **Never draw it by hand; render it:** `pip install cairosvg pillow`, then from the repo root
-  `python3 .claude/skills/lukeneedham-conventions/scripts/render_app_icon.py`. Look at the result.
-- **Keep it in step with the launcher icon, always.** CI cannot check that the two match. Whenever a change
-  touches the Android launcher icon (`ic_launcher*` mipmaps or drawables, the adaptive icon XML, its
-  foreground, background or monochrome layers, or their colors), re-run the script in the same PR, and say
-  so in the PR description. Before finishing any work that mentions the app's icon, check this.
+- `app-icon.png` at the repo root is the app's icon for the app hub: a 512x512 circle on a transparent
+  background (the adaptive launcher icon's background with its foreground centred, as a circular launcher
+  mask shows it). **CI generates it**: the `app-icon` job of the shared PR workflow renders it from the
+  adaptive icon on every PR and commits it to the PR branch when it differs. Never draw or edit it by hand.
+- So: the app needs an adaptive launcher icon (`android:icon` -> `mipmap-anydpi*` adaptive icon), and a
+  caller that grants `contents: write` (the example callers do). Changing the launcher icon needs no extra
+  step. After a push, `git pull --rebase` to pick up the bot's `app-icon.png` commit before pushing again.
+- To look at it before pushing (optional): `pip install cairosvg pillow`, fetch
+  `scripts/render_app_icon.py` from `main` of `LukeNeedham/ci-workflows` and run it from the repo root.
 
 ## Architecture
 - Single activity (`ComponentActivity`), Jetpack Compose + Material 3, no XML, no fragments.
