@@ -1,11 +1,11 @@
 package com.lukeneedham.videodiary
 
 import android.app.Application
-import com.lukeneedham.videodiary.data.persistence.CrashLogDao
+import com.lukeneedham.common.DebugKit
+import com.lukeneedham.common.DebugKitConfig
+import com.lukeneedham.common.logger.LogLevel
 import com.lukeneedham.videodiary.data.repository.VideoResolutionRepository
 import com.lukeneedham.videodiary.di.KoinModule
-import com.lukeneedham.videodiary.domain.util.logger.Logger
-import com.lukeneedham.videodiary.domain.util.logger.android.AndroidLoggerEngine
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -17,15 +17,21 @@ class App : Application() {
     override fun onCreate() {
         super.onCreate()
 
-        // Set logger as soon as possible
-        Logger.setLoggerEngine(AndroidLoggerEngine())
+        // Set up the logger and crash handler as soon as possible, before anything can log or crash.
+        // Fatal crashes are saved to disk and shown on the Debug > Crashes page.
+        DebugKit.init(
+            DebugKitConfig(
+                enabled = BuildConfig.DEBUG,
+                // Debug logs are only kept in debug builds
+                minLogLevel = if (BuildConfig.DEBUG) LogLevel.Debug else LogLevel.Info,
+            ),
+        )
 
         startKoin {
             modules(KoinModule.modules)
             androidContext(this@App)
         }
 
-        installCrashLogHandler()
         preloadVideoAspectRatio()
     }
 
@@ -34,20 +40,6 @@ class App : Application() {
         val videoResolutionRepository = GlobalContext.get().get<VideoResolutionRepository>()
         CoroutineScope(Dispatchers.IO).launch {
             videoResolutionRepository.getAspectRatio()
-        }
-    }
-
-    /** Persists fatal crashes to disk so they can be viewed later from the Debug page. */
-    private fun installCrashLogHandler() {
-        val crashLogDao = GlobalContext.get().get<CrashLogDao>()
-        val defaultHandler = Thread.getDefaultUncaughtExceptionHandler()
-        Thread.setDefaultUncaughtExceptionHandler { thread, throwable ->
-            try {
-                crashLogDao.saveCrashLog(throwable)
-            } catch (e: Exception) {
-                Logger.error("Failed to save crash log", e)
-            }
-            defaultHandler?.uncaughtException(thread, throwable)
         }
     }
 }

@@ -7,7 +7,7 @@ import android.provider.MediaStore
 import com.lukeneedham.videodiary.R
 import com.lukeneedham.videodiary.data.mapper.ThumbnailFileNameMapper
 import com.lukeneedham.videodiary.data.mapper.VideoFileNameMapper
-import com.lukeneedham.videodiary.domain.util.logger.Logger
+import com.lukeneedham.common.logger.Logger
 import com.lukeneedham.videodiary.domain.model.VideoStorageLocation
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -83,7 +83,7 @@ class VideosDao(
             try {
                 mergeInto(wantedDir, from = otherDir)
             } catch (e: Exception) {
-                Logger.warning("Could not merge videos into $wantedDir", e)
+                Logger.w("Could not merge videos into $wantedDir", e)
             }
         }
         switchVideosDir(wantedDir)
@@ -138,8 +138,8 @@ class VideosDao(
                 usingFallbackStorageMutable.value = false
                 refreshVideosState()
                 // The move already worked, so leftovers are just wasted space until the next merge
-                transfer.commit().forEach { Logger.warning("Could not delete old video $it") }
-            }.onFailure { Logger.warning("Failed to move videos to $location", it) }
+                transfer.commit().forEach { Logger.w("Could not delete old video $it") }
+            }.onFailure { Logger.w("Failed to move videos to $location", it) }
         }
 
     /** Moves videos that are in [from] but not in [into], then deletes them from [from] */
@@ -147,7 +147,7 @@ class VideosDao(
         VideoFolderTransfer.deleteTemporaryFiles(from)
         if (from.listFiles().isNullOrEmpty()) return
         val transfer = VideoFolderTransfer.copy(from = from, to = into, failOnConflict = false)
-        transfer.commit().forEach { Logger.warning("Could not delete merged video $it") }
+        transfer.commit().forEach { Logger.w("Could not delete merged video $it") }
     }
 
     private fun switchVideosDir(dir: File) {
@@ -175,7 +175,7 @@ class VideosDao(
         try {
             context.contentResolver.delete(videoContentUri, null, null)
         } catch (e: Exception) {
-            Logger.error("Error discarding video", e)
+            Logger.e("Error discarding video", e)
         }
     }
 
@@ -202,12 +202,12 @@ class VideosDao(
                 videoThumbnailExtractor.extractFirstFrame(destinationFile, getThumbnailFile(date))
                 refreshVideosState()
             } else {
-                Logger.error("Failed to get video path from content URI")
+                Logger.e("Failed to get video path from content URI")
             }
 
             cursor?.close()
         } catch (e: Exception) {
-            Logger.error("Error copying video", e)
+            Logger.e("Error copying video", e)
         }
     }
 
@@ -268,7 +268,7 @@ class VideosDao(
             val date = try {
                 videoFileNameMapper.nameToDate(videoFile.name)
             } catch (e: Exception) {
-                Logger.warning("Skipping video with unrecognised file name: ${videoFile.name}", e)
+                Logger.w("Skipping video with unrecognised file name: ${videoFile.name}", e)
                 return@forEach
             }
 

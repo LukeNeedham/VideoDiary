@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
 plugins {
     id(deps.plugins.application)
     id(deps.plugins.kotlinAndroid)
@@ -8,11 +10,11 @@ plugins {
 
 android {
     namespace = "com.lukeneedham.videodiary"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.lukeneedham.videodiary"
-        minSdk = 21
+        minSdk = 23
         targetSdk = 35
         versionCode = 9
         versionName = "1.0.8"
@@ -47,9 +49,6 @@ android {
         targetCompatibility = JavaVersion.VERSION_11
         isCoreLibraryDesugaringEnabled = true
     }
-    kotlinOptions {
-        jvmTarget = "11"
-    }
     buildFeatures {
         buildConfig = true
         compose = true
@@ -62,6 +61,13 @@ android {
         includeInBundle = false
     }
 
+}
+
+// `android { kotlinOptions }` is an error since Kotlin 2.2
+kotlin {
+    compilerOptions {
+        jvmTarget.set(JvmTarget.JVM_11)
+    }
 }
 
 dependencies {
@@ -103,6 +109,9 @@ dependencies {
     implementation(deps.libs.koin.android)
     implementation(deps.libs.koin.compose)
     implementation(deps.libs.koin.viewModel)
+
+    // Shared logger, crash handler and debug pages
+    implementation(deps.libs.common.library)
 
     // Datastore
     implementation(deps.libs.androidx.datastore)

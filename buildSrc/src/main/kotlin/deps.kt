@@ -1,9 +1,9 @@
 object deps {
     object plugins {
         object versions {
-            val agp = "8.7.1"
-            val kotlin = "2.0.0"
-            val ksp = "2.0.0-1.0.21"
+            val agp = "8.13.2"
+            val kotlin = "2.2.21"
+            val ksp = "2.2.21-2.0.4"
         }
 
         val application = "com.android.application"
@@ -49,7 +49,7 @@ object deps {
 
         object compose {
             val activity = "androidx.activity:activity-compose:1.9.3"
-            val bom = "androidx.compose:compose-bom:2024.04.01"
+            val bom = "androidx.compose:compose-bom:2026.02.00"
             val ui = "androidx.compose.ui:ui"
             val uiGraphics = "androidx.compose.ui:ui-graphics"
             val material = "androidx.compose.material:material"
@@ -63,7 +63,7 @@ object deps {
         }
 
         object room {
-            private val version = "2.6.1"
+            private val version = "2.8.4"
             val runtime = "androidx.room:room-runtime:$version"
             val ktx = "androidx.room:room-ktx:$version"
             val compiler = "androidx.room:room-compiler:$version"
@@ -71,6 +71,11 @@ object deps {
 
         object desugaring {
             val coreLibrary = "com.android.tools:desugar_jdk_libs:2.1.4"
+        }
+
+        object common {
+            /** Shared logger, crash handler and debug pages: https://github.com/LukeNeedham/ci-workflows */
+            val library = "com.lukeneedham:common:0.6.0"
         }
 
         object coil {

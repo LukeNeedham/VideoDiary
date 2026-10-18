@@ -48,7 +48,7 @@ fun DebugPageContent(
     allowRetakeForPastDays: Boolean,
     onAllowRetakeForPastDaysChange: (Boolean) -> Unit,
     onResyncThumbnailsClick: () -> Unit,
-    onCrashLogClick: () -> Unit,
+    onOpenSdkDebug: () -> Unit,
     canGoBack: Boolean,
     onBack: () -> Unit,
 ) {
@@ -111,9 +111,9 @@ fun DebugPageContent(
                 DebugActionRow(
                     iconRes = R.drawable.bug,
                     accent = AccentHighlight,
-                    title = "Crash logs",
-                    description = "View all fatal crash logs recorded by the app",
-                    onClick = onCrashLogClick,
+                    title = "SDK debug",
+                    description = "Animation speed, logs and crashes, from the shared library",
+                    onClick = onOpenSdkDebug,
                     showChevron = true,
                 )
             }
@@ -272,7 +272,7 @@ internal fun PreviewDebugPageContent() {
         allowRetakeForPastDays = true,
         onAllowRetakeForPastDaysChange = {},
         onResyncThumbnailsClick = {},
-        onCrashLogClick = {},
+        onOpenSdkDebug = {},
         canGoBack = true,
         onBack = {},
     )

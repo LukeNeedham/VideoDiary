@@ -8,13 +8,15 @@ import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.withFrameNanos
+import com.lukeneedham.common.logger.Logger
+import com.lukeneedham.common.ui.CrashesPage
+import com.lukeneedham.common.ui.DebugPage as SdkDebugPage
+import com.lukeneedham.common.ui.LogsPage
 import com.lukeneedham.videodiary.domain.model.ShareRequest
-import com.lukeneedham.videodiary.domain.util.logger.Logger
 import com.lukeneedham.videodiary.ui.feature.calendar.CalendarPage
 import com.lukeneedham.videodiary.ui.feature.common.hub.Hub
 import com.lukeneedham.videodiary.ui.feature.common.hub.HubSwitcherSheet
 import com.lukeneedham.videodiary.ui.feature.common.sheet.SheetDefaults
-import com.lukeneedham.videodiary.ui.feature.crashlog.CrashLogPage
 import com.lukeneedham.videodiary.ui.feature.debug.DebugPage
 import com.lukeneedham.videodiary.ui.feature.settings.SettingsHubPage
 import com.lukeneedham.videodiary.ui.feature.storage.VideoStoragePage
@@ -46,7 +48,7 @@ fun NormalRouter(
     val canGoBack = navController.backstack.entries.size > 1
 
     fun navigate(to: NormalPage) {
-        Logger.debug("Navigating to: $to")
+        Logger.d("Navigating to: $to")
         navController.navigate(to)
     }
 
@@ -75,7 +77,7 @@ fun NormalRouter(
         // time the click lands
         val liveHub = (navController.backstack.entries.lastOrNull()?.destination as? NormalPage)?.hub
         if (hub != liveHub) {
-            Logger.debug("Switching to hub: $hub")
+            Logger.d("Switching to hub: $hub")
             // The calendar hub is always the bottom entry of the backstack and is never removed,
             // so it keeps its state. Switching hub drops everything above it, then opens the new
             // hub on top. Back from another hub's root page returns to the calendar.
@@ -253,20 +255,24 @@ fun NormalRouter(
                     onBack = onBack,
                 )
 
+                // The app's own debug page, which opens the shared library's debug page. The library's
+                // debug, logs and crashes pages show only the library's own things.
                 is NormalPage.Debug -> DebugPage(
                     viewModel = koinViewModel(),
                     canGoBack = canGoBack,
                     onBack = onBack,
-                    onCrashLogClick = {
-                        navigate(NormalPage.CrashLog)
-                    },
+                    onOpenSdkDebug = { navigate(NormalPage.SdkDebug) },
                 )
 
-                is NormalPage.CrashLog -> CrashLogPage(
-                    viewModel = koinViewModel(),
-                    canGoBack = canGoBack,
+                is NormalPage.SdkDebug -> SdkDebugPage(
                     onBack = onBack,
+                    onOpenLogs = { navigate(NormalPage.Logs) },
+                    onOpenCrashes = { navigate(NormalPage.Crashes) },
                 )
+
+                is NormalPage.Logs -> LogsPage(onBack = onBack)
+
+                is NormalPage.Crashes -> CrashesPage(onBack = onBack)
             }
         }
     }
