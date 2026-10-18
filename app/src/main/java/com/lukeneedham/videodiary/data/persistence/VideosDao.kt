@@ -4,12 +4,14 @@ import android.content.Context
 import android.net.Uri
 import android.os.Environment
 import android.provider.MediaStore
+import com.lukeneedham.videodiary.BuildConfig
 import com.lukeneedham.videodiary.R
 import com.lukeneedham.videodiary.data.mapper.ThumbnailFileNameMapper
 import com.lukeneedham.videodiary.data.mapper.VideoFileNameMapper
 import com.lukeneedham.common.logger.Logger
 import com.lukeneedham.videodiary.domain.model.VideoStorageLocation
 import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
@@ -34,6 +36,14 @@ class VideosDao(
 
     /** Held briefly by anything that changes the video files, and while a move is committed */
     private val filesLock = Any()
+
+    // Debug-only (ignored in release builds), loaded from the settings by initialiseStorageLocation
+    @Volatile
+    private var debugFakeSdCardEnabled = false
+    @Volatile
+    private var debugFakeSdCardInserted = true
+    @Volatile
+    private var debugSlowVideoMoves = false
 
     private val thumbnailsDir = File(context.filesDir, "thumbnails").apply {
         mkdirs()
@@ -62,6 +72,7 @@ class VideosDao(
      * Once the card is back, any videos recorded in the meantime are merged onto it.
      */
     suspend fun initialiseStorageLocation() {
+        loadDebugSettings()
         val location = settingsDao.getVideoStorageLocationFlow().first()
         removableStorageAvailableMutable.value = isRemovableStorageAvailable()
 
@@ -87,6 +98,13 @@ class VideosDao(
             }
         }
         switchVideosDir(wantedDir)
+    }
+
+    private suspend fun loadDebugSettings() {
+        if (!BuildConfig.DEBUG) return
+        debugFakeSdCardEnabled = settingsDao.getDebugFakeSdCardEnabledFlow().first()
+        debugFakeSdCardInserted = settingsDao.getDebugFakeSdCardInsertedFlow().first()
+        debugSlowVideoMoves = settingsDao.getDebugSlowVideoMovesFlow().first()
     }
 
     fun isRemovableStorageAvailable(): Boolean =
@@ -117,6 +135,7 @@ class VideosDao(
                     failOnConflict = true,
                 )
                 try {
+                    if (BuildConfig.DEBUG && debugSlowVideoMoves) delay(DEBUG_SLOW_MOVE_MILLIS)
                     settingsDao.setVideoStorageLocation(location)
                     try {
                         synchronized(filesLock) {
@@ -288,7 +307,14 @@ class VideosDao(
 
     private fun getVideosDir(location: VideoStorageLocation): File? = when (location) {
         VideoStorageLocation.Internal -> internalVideosDir
-        VideoStorageLocation.RemovableStorage -> context.getExternalFilesDirs(null)
+        VideoStorageLocation.RemovableStorage -> getRemovableVideosDir()
+    }
+
+    private fun getRemovableVideosDir(): File? {
+        if (BuildConfig.DEBUG && debugFakeSdCardEnabled) {
+            return if (debugFakeSdCardInserted) File(context.filesDir, "fake_sd_card/videos") else null
+        }
+        return context.getExternalFilesDirs(null)
             .firstOrNull { directory ->
                 directory != null &&
                     Environment.isExternalStorageRemovable(directory) &&
@@ -310,5 +336,9 @@ class VideosDao(
     private fun loadAllVideos(): List<File> {
         val files = videosDir.listFiles() ?: return emptyList()
         return files.filterNot { it.name.endsWith(VideoFolderTransfer.TEMPORARY_SUFFIX) }
+    }
+
+    private companion object {
+        const val DEBUG_SLOW_MOVE_MILLIS = 8_000L
     }
 }
