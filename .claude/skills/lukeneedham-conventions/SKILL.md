@@ -34,8 +34,15 @@ in the PR for the work you were asked to do, saying so in the description. Never
 - Open a PR for completed work. When the APK build comment appears on the PR, paste the download link into the chat.
 
 ## App icon
-- Commit the icon as `app-icon.png` at the repo root: square PNG, at least 512x512. The app hub reads it
-  from `main`, and the PR build (`check-icon` job) fails without it. Update it whenever the launcher icon changes.
+- `app-icon.png` at the repo root is the app's icon for the app hub: a 512x512 circle on a transparent
+  background (the adaptive launcher icon's background with its foreground centred, as a circular launcher
+  mask shows it). **CI generates it**: the `app-icon` job of the shared PR workflow renders it from the
+  adaptive icon on every PR and commits it to the PR branch when it differs. Never draw or edit it by hand.
+- So: the app needs an adaptive launcher icon (`android:icon` -> `mipmap-anydpi*` adaptive icon), and a
+  caller that grants `contents: write` (the example callers do). Changing the launcher icon needs no extra
+  step. After a push, `git pull --rebase` to pick up the bot's `app-icon.png` commit before pushing again.
+- To look at it before pushing (optional): `pip install cairosvg pillow`, fetch
+  `scripts/render_app_icon.py` from `main` of `LukeNeedham/ci-workflows` and run it from the repo root.
 
 ## Architecture
 - Single activity (`ComponentActivity`), Jetpack Compose + Material 3, no XML, no fragments.
