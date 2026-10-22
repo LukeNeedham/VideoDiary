@@ -1,13 +1,14 @@
+# Copy to .github/workflows/delete_prereleases.yml in your project. Nothing to configure.
+# Run it from the Actions tab. It deletes EVERY pre-release and tag in the repo.
+# Setup guide: https://github.com/LukeNeedham/ci-workflows/blob/main/docs/setup.md
 name: Delete Pre-releases
 
 on:
   workflow_dispatch:
 
 permissions:
-  contents: write       # write to allow deleting Releases and tags
+  contents: write       # delete releases and tags
 
 jobs:
   delete-prereleases:
-    # Deletes all pre-releases and their tags.
-    # Shared across projects: https://github.com/LukeNeedham/ci-workflows
     uses: LukeNeedham/ci-workflows/.github/workflows/delete_prereleases.yml@main

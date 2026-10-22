@@ -3,7 +3,7 @@ name: lukeneedham-conventions
 description: Luke Needham's conventions for Android apps - project setup, debug keystore, CI workflows, architecture (single activity, Compose, Navigation 3, MVVM, Koin DI, Coil 3 images, own AppTheme) and the shared `common` debug library. Use when starting an app, adding a feature, screen, dependency or CI change, or touching logging, crashes or debug pages.
 ---
 
-<!-- Copied from LukeNeedham/ci-workflows (skills/lukeneedham-conventions). Do not edit here: change it
+<!-- Synced from LukeNeedham/ci-workflows (skills/lukeneedham-conventions) by CI. Do not edit here: change it
      in that repo. -->
 
 # Luke's app conventions
@@ -14,9 +14,10 @@ The full, current guides are in the public repo `LukeNeedham/ci-workflows` under
 GitHub, read the relevant page there; otherwise the rules below are enough.
 
 ## Keep this skill current
-Before starting any work in an app, compare this folder with `skills/lukeneedham-conventions` on `main` of
-`LukeNeedham/ci-workflows` (public). If it differs, copy the shared folder over this one and include that
-in the PR for the work you were asked to do, saying so in the description. Never open a PR just for this.
+CI keeps this folder, and the callers in `.github/workflows/`, in line with `LukeNeedham/ci-workflows`: it
+opens a PR called "Sync from ci-workflows" in the app when they differ. Do not copy them by hand and do not
+edit them in an app; change them in `ci-workflows`. Settings of a caller, such as `apk-path`, are the
+app's own.
 
 ## Project
 - Kotlin only, Gradle Kotlin DSL, version catalog (`gradle/libs.versions.toml`), Gradle wrapper.
@@ -27,11 +28,11 @@ in the PR for the work you were asked to do, saying so in the description. Never
 - No Android SDK in the sandbox: you usually cannot compile locally. CI is the first build.
 
 ## CI
-- Callers `trigger_on_pull_request.yml` and `delete_prereleases.yml` come from
+- Callers `trigger_on_pull_request.yml`, `build_main.yml` (AppHub builds main through it, so keep the name) and `delete_prereleases.yml` come from
   `LukeNeedham/ci-workflows/examples/`; the logic is in the shared reusable workflows there.
 - `apk-path` is `app/build/outputs/apk/debug/app-debug.apk`; `comment-header` is `<app>-app-link`.
 - Debug mode always comes from `BuildConfig.DEBUG` (the build config field).
-- Open a PR for completed work. When the build comment appears on the PR, paste its **AppHub link** (the `AppHub:` line) into the chat, not the APK download link. Paste the APK link only if the comment has no AppHub line.
+- Open a PR for completed work. Paste the PR's **AppHub link** (`https://www.lukeneedham.com/apphub/pr/<repo name>/<number>`, also in CI's AppHub comment) into the chat as soon as the PR is open, without waiting for the build, and not the APK download link.
 
 ## App icon
 - `app-icon.png` at the repo root is the app's icon for the app hub: a 512x512 circle on a transparent
@@ -78,6 +79,6 @@ in the PR for the work you were asked to do, saying so in the description. Never
 - Apps with their own debug tools keep their own debug page, with a button that opens the library's `DebugPage`.
 
 ## Updating
-"Update all consuming apps" means every app with a library tick in `docs/consuming-apps.md` of
+"Update all consuming apps" means every app with `"library": true` in `apps.json` of
 `ci-workflows`: bump `common` in each, one PR per app. Whenever a project starts using workflows, the
-library or this skill, add it to that list.
+library or this skill, add it to that file.
