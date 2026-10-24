@@ -215,8 +215,6 @@ See [docs/Release.md](docs/Release.md) for the full F-Droid release checklist (c
 - Keep landscape/portrait-specific UI in `component/landscape/` and `component/portrait/`
   subpackages, mirroring the calendar feature's structure.
 
-Before starting work, check that `.claude/skills/lukeneedham-conventions` matches `skills/lukeneedham-conventions` on `main` of `LukeNeedham/ci-workflows`; if not, copy it over and include that in this work's PR. See that repo's `docs/skill.md`.
-
 <!-- ci-workflows:begin (managed by LukeNeedham/ci-workflows, do not edit) -->
 - `.claude/skills/lukeneedham-conventions` and the callers `trigger_on_pull_request.yml`, `build_main.yml`, `delete_prereleases.yml`, `release.yml` in `.github/workflows/` are kept in sync from
   `LukeNeedham/ci-workflows` by CI, which keeps one PR titled "Sync from ci-workflows" open when they
