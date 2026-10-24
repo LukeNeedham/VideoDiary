@@ -1,23 +1,17 @@
 ---
 name: lukeneedham-conventions
-description: Luke Needham's conventions for Android apps - project setup, debug keystore, CI workflows, architecture (single activity, Compose, Navigation 3, MVVM, Koin DI, Coil 3 images, own AppTheme) and the shared `common` debug library. Use when starting an app, adding a feature, screen, dependency or CI change, or touching logging, crashes or debug pages.
+description: Luke Needham's conventions for Android apps - project setup, debug keystore, CI workflows, architecture (single activity, Compose, Navigation 3, MVVM, Koin DI, Coil 3 images, own AppTheme) and the shared `common` library (logger, crash handler, debug pages). Use when starting an app, adding a feature, screen, dependency or CI change, or touching logging, crashes or debug pages.
 ---
-
-<!-- Synced from LukeNeedham/ci-workflows (skills/lukeneedham-conventions) by CI. Do not edit here: change it
-     in that repo. -->
 
 # Luke's app conventions
 
-The full, current guides are in the public repo `LukeNeedham/ci-workflows` under `docs/`:
-`new-app.md` (read first when starting an app), `setup.md` (CI workflows), `app-icon.md`, `app-conventions.md` (libraries and code patterns), `library.md` and
-`using-the-library.md` (shared library), `consuming-apps.md` (which apps use it). If you can reach
-GitHub, read the relevant page there; otherwise the rules below are enough.
+This folder is copied from `LukeNeedham/ci-workflows` (`skills/lukeneedham-conventions`) by CI, which opens a
+"Sync from ci-workflows" PR when it differs. Never edit it here; change it there. The same goes for the four
+callers in `.github/workflows/`.
 
-## Keep this skill current
-CI keeps this folder, and the four callers in `.github/workflows/`, in line with `LukeNeedham/ci-workflows`: it
-opens a PR called "Sync from ci-workflows" in the app when they differ. Do not copy them by hand and do not
-edit them in an app; change them in `ci-workflows`. The callers hold no settings: every app
-is built the same way (`docs/app-config.md` in `ci-workflows`), so there is nothing to configure per app.
+The long guides are in that repo's `docs/`: `new-app.md` (read first when starting an app), `setup.md`,
+`app-config.md`, `app-icon.md`, `app-conventions.md`, `library.md`, `using-the-library.md` and `consuming-apps.md`.
+If you can reach GitHub, read the relevant page; otherwise the rules below are enough.
 
 ## Project
 - Kotlin only, Gradle Kotlin DSL, version catalog (`gradle/libs.versions.toml`), Gradle wrapper.
@@ -28,23 +22,26 @@ is built the same way (`docs/app-config.md` in `ci-workflows`), so there is noth
 - No Android SDK in the sandbox: you usually cannot compile locally. CI is the first build.
 
 ## CI
-- Callers `trigger_on_pull_request.yml`, `build_main.yml` (AppHub builds main through it, so keep the name), `delete_prereleases.yml` and `release.yml` come from
-  `LukeNeedham/ci-workflows/callers/`; the logic is in the shared reusable workflows there.
-- Every app follows the same standard, with no per-app options: module `:app`, debug APK `app/build/outputs/apk/debug/app-debug.apk`, PRs into `main` only (never `master` or `develop`), JDK 17, the shared library, and all four callers (`release.yml` fails with a clear message until the app has the release secrets and `gradle/android-release.gradle`). A new app needs only its entry (`name`, `repo`) in `ci-workflows`' `apps.json`.
-- A PR that changes only `.claude/skills/` does not build (no APK, no AppHub link comment from CI).
-- Debug mode always comes from `BuildConfig.DEBUG` (the build config field).
-- Open a PR for completed work. Paste the PR's **AppHub link** (`https://www.lukeneedham.com/apphub/pr/<repo name>/<number>`, also in CI's AppHub comment) into the chat as soon as the PR is open, without waiting for the build, and not the APK download link.
+- Every app is built the same way and nothing is configured per app: module `:app`, debug APK at
+  `app/build/outputs/apk/debug/app-debug.apk`, PRs into `main` only (never `master` or `develop`), JDK 17.
+  A new app needs only its entry (`name`, `repo`) in `ci-workflows`' `apps.json`.
+- Every app has all four callers: `trigger_on_pull_request.yml`, `build_main.yml` (AppHub builds main through
+  it, so keep the name), `delete_prereleases.yml` and `release.yml`. `release.yml` fails at once, with a message
+  that lists what is missing, until the app has the four release secrets and `gradle/android-release.gradle`.
+- A PR that changes only `.claude/skills/` is not built, so it has no APK and no AppHub comment from CI.
+- Debug mode always comes from `BuildConfig.DEBUG`.
+- Open a PR for completed work. Paste the PR's **AppHub link** (`https://www.lukeneedham.com/apphub/pr/<repo name>/<number>`,
+  also in CI's AppHub comment) into the chat as soon as the PR is open, without waiting for the build, and not the
+  APK download link.
 
 ## App icon
-- `app-icon.png` at the repo root is the app's icon for the app hub: a 512x512 circle on a transparent
-  background (the adaptive launcher icon's background with its foreground centred, as a circular launcher
-  mask shows it). **CI generates it**: the `app-icon` job of the shared PR workflow renders it from the
-  adaptive icon on every PR and commits it to the PR branch when it differs. Never draw or edit it by hand.
-- So: the app needs an adaptive launcher icon (`android:icon` -> `mipmap-anydpi*` adaptive icon), and a
-  caller that grants `contents: write` (the example callers do). Changing the launcher icon needs no extra
-  step. After a push, `git pull --rebase` to pick up the bot's `app-icon.png` commit before pushing again.
-- To look at it before pushing (optional): `pip install cairosvg pillow`, fetch
-  `scripts/render_app_icon.py` from `main` of `LukeNeedham/ci-workflows` and run it from the repo root.
+- `app-icon.png` at the repo root is the icon for the app hub: a 512x512 circle on a transparent background.
+  **CI generates it** from the adaptive launcher icon on every PR and commits it to the PR branch when it
+  differs. Never draw or edit it by hand.
+- So the app needs an adaptive launcher icon (`android:icon` -> `mipmap-anydpi*`). After a push,
+  `git pull --rebase` to pick up the bot's `app-icon.png` commit before pushing again.
+- To look at it first (optional): `pip install cairosvg pillow`, fetch `scripts/render_app_icon.py` from `main`
+  of `LukeNeedham/ci-workflows` and run it from the repo root.
 
 ## Architecture
 - Single activity (`ComponentActivity`), Jetpack Compose, no XML, no fragments.
@@ -72,13 +69,15 @@ is built the same way (`docs/app-config.md` in `ci-workflows`), so there is noth
 - **Release builds are minified** (`isMinifyEnabled = true`, `isShrinkResources = true`) with keep rules.
 
 ## Shared library (`com.lukeneedham:common`)
-- Repository `https://lukeneedham.github.io/ci-workflows/maven` (group `com.lukeneedham` only); version in `libs.versions.toml`.
-- **Every app uses the library** (Compose or not): add it, and call `DebugKit.init(DebugKitConfig(enabled = BuildConfig.DEBUG))` first thing in `Application.onCreate`.
-- The debug pages are optional. An app that shows them: wrap the UI in `ProvideDebugSettings(theme = AppTheme.current.toDebugTheme())`, inside `AppTheme`: the library uses no Material and the app passes it a `DebugTheme` (colours + font family, mapped from `AppTheme` in one function). Add `DebugPage`, `LogsPage`, `CrashesPage` to navigation, and a `DebugButton` on a settings page (never a floating button on the main page; the library's `DebugPage` shows the app's package and current version).
-- Use `Logger.d/i/w/e`, never `Log` or `println`, and log caught failures instead of swallowing them. Scale animation durations with `LocalAnimationSpeed.current.scale(ms)`.
-- Apps with their own debug tools keep their own debug page, with a button that opens the library's `DebugPage`.
-
-## Updating
-"Update all consuming apps" means every app in `apps.json` of
-`ci-workflows`: bump `common` in each, one PR per app. Whenever a project starts using workflows, the
-library or this skill, add it to that file.
+- Every app uses it, Compose or not. Repository `https://lukeneedham.github.io/ci-workflows/maven` (group
+  `com.lukeneedham` only); version in `libs.versions.toml`. Call
+  `DebugKit.init(DebugKitConfig(enabled = BuildConfig.DEBUG))` first thing in `Application.onCreate`.
+- Use `Logger.d/i/w/e`, never `Log` or `println`, and log caught failures instead of swallowing them.
+- The debug pages are optional. An app that shows them wraps the UI in
+  `ProvideDebugSettings(theme = AppTheme.current.toDebugTheme())`, inside `AppTheme` (the library uses no Material:
+  the app maps `AppTheme` to a `DebugTheme` in one function), adds `DebugPage`, `LogsPage` and `CrashesPage` to
+  navigation, and puts a `DebugButton` on a settings page (never a floating button). The library's `DebugPage` shows
+  the app's package and version; an app with its own debug tools keeps its own debug page with a button to it.
+  Scale animation durations with `LocalAnimationSpeed.current.scale(ms)`.
+- "Update all consuming apps" means every app in `apps.json` of `ci-workflows`: bump `common` in each, one PR per
+  app.
