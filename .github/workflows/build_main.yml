@@ -1,8 +1,4 @@
-# Copy to .github/workflows/build_main.yml in your project. The file name matters: AppHub starts it by name.
-# Lines marked CONFIGURE are the ones to adjust per project; leave the rest as is.
-# Run it from the Actions tab (Run workflow, on main), or from AppHub. It builds the branch it is run on
-# and keeps the APK as an artifact for one day.
-# Setup guide: https://github.com/LukeNeedham/ci-workflows/blob/main/docs/setup.md
+# Copied from LukeNeedham/ci-workflows (callers/build_main.yml). Do not edit it here: change it there.
 name: Build Main
 
 on:
@@ -14,11 +10,3 @@ permissions:
 jobs:
   android:
     uses: LukeNeedham/ci-workflows/.github/workflows/android_main_build.yml@main
-    with:
-      # CONFIGURE (required): same as in trigger_on_pull_request.yml
-      apk-path: app/build/outputs/apk/debug/app-debug.apk
-
-      # CONFIGURE (optional): only if your project differs. Defaults shown.
-      # gradle-task: assembleDebug
-      # java-version: '17'
-      # java-distribution: zulu

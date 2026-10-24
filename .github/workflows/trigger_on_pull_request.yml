@@ -1,31 +1,16 @@
-# Copy to .github/workflows/trigger_on_pull_request.yml in your project.
-# Lines marked CONFIGURE are the ones to adjust per project; leave the rest as is.
-# Setup guide: https://github.com/LukeNeedham/ci-workflows/blob/main/docs/setup.md
+# Copied from LukeNeedham/ci-workflows (callers/trigger_on_pull_request.yml). Do not edit it here: change it there.
 name: On Pull Request
 
 on:
   workflow_dispatch: {}
   pull_request:
-    # `closed` runs the release cleanup, the other types run the build. Keep all four.
+
     types: [opened, reopened, synchronize, closed]
-    branches:
-      - main   # CONFIGURE: the branch(es) your PRs target
 
 permissions:
-  contents: write       # create the release that holds the APK, and delete it again
-  pull-requests: write  # post the sticky comment
+  contents: write
+  pull-requests: write
 
 jobs:
   android:
     uses: LukeNeedham/ci-workflows/.github/workflows/android_pr.yml@main
-    with:
-      # CONFIGURE (required): path to the APK your build produces, relative to the repo root.
-      # Find it by running the build locally.
-      apk-path: app/build/outputs/apk/debug/app-debug.apk
-
-      # CONFIGURE (optional): the rest are only needed if your project differs. Defaults shown.
-      # gradle-task: assembleDebug
-      # java-version: '17'
-      # java-distribution: zulu
-      # timezone: Europe/Amsterdam       # used for the timestamps in the comment and release
-      comment-header: videodiary-app-link # change only if a PR needs several APK comments
