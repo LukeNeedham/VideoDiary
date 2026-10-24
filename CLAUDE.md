@@ -156,6 +156,9 @@ docs: `docs/using-the-library.md` there). The app has no logger of its own.
   `ProvideDebugSettings` is in `MainActivity`): the recap share sheet settle (`RecapViewPageContent`) and the camera focus indicator
   hold and fade (`CameraInput`). Give any new animation an explicit duration and pass it through `scale`. Animations that use the default
   spring (`SingleOptionSelector`, the orientation text colour) are not affected by the setting.
+  The Debug page's Storage section fakes an SD card for testing Video storage on a phone without one: "Fake SD card" swaps the removable
+  storage folder for `filesDir/fake_sd_card/videos`, "Fake SD card inserted" simulates removing and re-inserting it, and "Slow video moves" adds
+  an 8 second pause to a move so it can be interrupted (all `BuildConfig.DEBUG` only, applied in `VideosDao`).
   Mock entries are populated by copying the `sample_video` raw resource in as each video file.
 - `app/src/debug/res/drawable/preview_video` is a large placeholder image used by Composable
   Previews for video players; it's excluded from release builds. A small fallback `preview_video`

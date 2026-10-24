@@ -19,6 +19,7 @@ import com.lukeneedham.videodiary.ui.feature.common.hub.HubSwitcherSheet
 import com.lukeneedham.videodiary.ui.feature.common.sheet.SheetDefaults
 import com.lukeneedham.videodiary.ui.feature.debug.DebugPage
 import com.lukeneedham.videodiary.ui.feature.settings.SettingsHubPage
+import com.lukeneedham.videodiary.ui.feature.storage.VideoStoragePage
 import com.lukeneedham.videodiary.ui.feature.recap.create.RecapCreateCustomPage
 import com.lukeneedham.videodiary.ui.feature.recap.create.RecapCreatePeriodListPage
 import com.lukeneedham.videodiary.ui.feature.recap.hub.RecapHubPage
@@ -240,9 +241,18 @@ fun NormalRouter(
 
                 is NormalPage.SettingsHub -> SettingsHubPage(
                     onMenuClick = openHubSwitcher,
+                    onVideoStorageClick = {
+                        navigate(NormalPage.VideoStorage)
+                    },
                     onDebugClick = {
                         navigate(NormalPage.Debug)
                     },
+                )
+
+                is NormalPage.VideoStorage -> VideoStoragePage(
+                    viewModel = koinViewModel(),
+                    canGoBack = canGoBack,
+                    onBack = onBack,
                 )
 
                 // The app's own debug page, which opens the shared library's debug page. The library's

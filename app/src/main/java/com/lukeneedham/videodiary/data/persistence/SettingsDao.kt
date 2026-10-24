@@ -13,6 +13,7 @@ import androidx.datastore.preferences.preferencesDataStore
 import com.lukeneedham.videodiary.data.persistence.model.OrientationPersistence
 import com.lukeneedham.videodiary.domain.model.CameraResolutionRotation
 import com.lukeneedham.videodiary.domain.model.Orientation
+import com.lukeneedham.videodiary.domain.model.VideoStorageLocation
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
@@ -39,6 +40,17 @@ class SettingsDao(
 
     /** Debug setting: whether the user is allowed to retake the video for a past day */
     private val allowEditPastDays = booleanPreferencesKey("debugAllowRetakeForPastDays")
+
+    private val videoStorageLocationKey = stringPreferencesKey("videoStorageLocation")
+
+    /** Debug setting: pretend there is an SD card, stored in a folder inside the app's files */
+    private val debugFakeSdCardEnabled = booleanPreferencesKey("debugFakeSdCardEnabled")
+
+    /** Debug setting: whether the fake SD card is currently inserted */
+    private val debugFakeSdCardInserted = booleanPreferencesKey("debugFakeSdCardInserted")
+
+    /** Debug setting: pause during video moves, so there is time to interrupt them */
+    private val debugSlowVideoMoves = booleanPreferencesKey("debugSlowVideoMoves")
 
     suspend fun setResolution(resolution: Size) {
         val components = listOf(resolution.width, resolution.height)
@@ -110,6 +122,52 @@ class SettingsDao(
         return context.dataStore.data.map { prefs ->
             prefs[allowEditPastDays] ?: false
         }
+    }
+
+    suspend fun setVideoStorageLocation(location: VideoStorageLocation) {
+        updatePrefs {
+            when (location) {
+                VideoStorageLocation.Internal -> {
+                    set(videoStorageLocationKey, "Internal")
+                }
+                VideoStorageLocation.RemovableStorage -> {
+                    set(videoStorageLocationKey, "RemovableStorage")
+                }
+            }
+        }
+    }
+
+    fun getVideoStorageLocationFlow(): Flow<VideoStorageLocation> {
+        return context.dataStore.data.map { prefs ->
+            when (prefs[videoStorageLocationKey]) {
+                "RemovableStorage" -> VideoStorageLocation.RemovableStorage
+                else -> VideoStorageLocation.Internal
+            }
+        }
+    }
+
+    suspend fun setDebugFakeSdCardEnabled(enabled: Boolean) {
+        updatePrefs { set(debugFakeSdCardEnabled, enabled) }
+    }
+
+    fun getDebugFakeSdCardEnabledFlow(): Flow<Boolean> {
+        return context.dataStore.data.map { it[debugFakeSdCardEnabled] ?: false }
+    }
+
+    suspend fun setDebugFakeSdCardInserted(inserted: Boolean) {
+        updatePrefs { set(debugFakeSdCardInserted, inserted) }
+    }
+
+    fun getDebugFakeSdCardInsertedFlow(): Flow<Boolean> {
+        return context.dataStore.data.map { it[debugFakeSdCardInserted] ?: true }
+    }
+
+    suspend fun setDebugSlowVideoMoves(slow: Boolean) {
+        updatePrefs { set(debugSlowVideoMoves, slow) }
+    }
+
+    fun getDebugSlowVideoMovesFlow(): Flow<Boolean> {
+        return context.dataStore.data.map { it[debugSlowVideoMoves] ?: false }
     }
 
     private suspend fun getPrefs() = context.dataStore.data.first()

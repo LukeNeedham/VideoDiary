@@ -20,6 +20,7 @@ import com.lukeneedham.videodiary.ui.feature.common.datepicker.DiaryDatePickerVi
 import com.lukeneedham.videodiary.ui.feature.debug.DebugViewModel
 import com.lukeneedham.videodiary.ui.feature.permissions.RequestPermissionsViewModel
 import com.lukeneedham.videodiary.ui.feature.recap.create.RecapCreateCustomViewModel
+import com.lukeneedham.videodiary.ui.feature.storage.VideoStorageViewModel
 import com.lukeneedham.videodiary.ui.feature.recap.create.RecapCreatePeriodListViewModel
 import com.lukeneedham.videodiary.ui.feature.recap.hub.RecapHubViewModel
 import com.lukeneedham.videodiary.ui.feature.recap.model.RecapPeriodType
@@ -74,6 +75,7 @@ object KoinModule {
         single {
             VideosDao(
                 context = androidContext(),
+                settingsDao = get(),
                 videoFileNameMapper = get(),
                 thumbnailFileNameMapper = get(),
                 videoThumbnailExtractor = get(),
@@ -172,6 +174,13 @@ object KoinModule {
                 calendarRepository = get(),
                 videosDao = get(),
                 settingsDao = get(),
+            )
+        }
+        viewModel {
+            VideoStorageViewModel(
+                settingsDao = get(),
+                videosDao = get(),
+                ioDispatcher = get(KoinQualifier.Dispatcher.io),
             )
         }
         viewModel {
