@@ -14,10 +14,10 @@ The full, current guides are in the public repo `LukeNeedham/ci-workflows` under
 GitHub, read the relevant page there; otherwise the rules below are enough.
 
 ## Keep this skill current
-CI keeps this folder, and the callers in `.github/workflows/`, in line with `LukeNeedham/ci-workflows`: it
+CI keeps this folder, and the four callers in `.github/workflows/`, in line with `LukeNeedham/ci-workflows`: it
 opens a PR called "Sync from ci-workflows" in the app when they differ. Do not copy them by hand and do not
-edit them in an app; change them in `ci-workflows`. Settings of a caller, such as `apk-path`, are the
-app's own.
+edit them in an app; change them in `ci-workflows`. The callers hold no settings: every app
+is built the same way (`docs/app-config.md` in `ci-workflows`), so there is nothing to configure per app.
 
 ## Project
 - Kotlin only, Gradle Kotlin DSL, version catalog (`gradle/libs.versions.toml`), Gradle wrapper.
@@ -28,9 +28,10 @@ app's own.
 - No Android SDK in the sandbox: you usually cannot compile locally. CI is the first build.
 
 ## CI
-- Callers `trigger_on_pull_request.yml`, `build_main.yml` (AppHub builds main through it, so keep the name) and `delete_prereleases.yml` come from
-  `LukeNeedham/ci-workflows/examples/`; the logic is in the shared reusable workflows there.
-- `apk-path` is `app/build/outputs/apk/debug/app-debug.apk`; `comment-header` is `<app>-app-link`.
+- Callers `trigger_on_pull_request.yml`, `build_main.yml` (AppHub builds main through it, so keep the name), `delete_prereleases.yml` and `release.yml` come from
+  `LukeNeedham/ci-workflows/callers/`; the logic is in the shared reusable workflows there.
+- Every app follows the same standard, with no per-app options: module `:app`, debug APK `app/build/outputs/apk/debug/app-debug.apk`, PRs into `main` only (never `master` or `develop`), JDK 17, the shared library, and all four callers (`release.yml` fails with a clear message until the app has the release secrets and `gradle/android-release.gradle`). A new app needs only its entry (`name`, `repo`) in `ci-workflows`' `apps.json`.
+- A PR that changes only `.claude/skills/` does not build (no APK, no AppHub link comment from CI).
 - Debug mode always comes from `BuildConfig.DEBUG` (the build config field).
 - Open a PR for completed work. Paste the PR's **AppHub link** (`https://www.lukeneedham.com/apphub/pr/<repo name>/<number>`, also in CI's AppHub comment) into the chat as soon as the PR is open, without waiting for the build, and not the APK download link.
 
@@ -72,13 +73,12 @@ app's own.
 
 ## Shared library (`com.lukeneedham:common`)
 - Repository `https://lukeneedham.github.io/ci-workflows/maven` (group `com.lukeneedham` only); version in `libs.versions.toml`.
-- Call `DebugKit.init(DebugKitConfig(enabled = BuildConfig.DEBUG))` first thing in `Application.onCreate`.
-- Wrap the UI in `ProvideDebugSettings(theme = AppTheme.current.toDebugTheme())`, inside `AppTheme`: the library uses no Material and the app passes it a `DebugTheme` (colours + font family, mapped from `AppTheme` in one function). Add `DebugPage`, `LogsPage`, `CrashesPage` to navigation.
-- Every app has a settings page (add one to an existing app that lacks it; fine if nothing else is on it). It holds the `DebugButton`, and never a floating button on the main page. The library's `DebugPage` shows the app's package and current version.
-- Use `Logger.d/i/w/e`, never `Log` or `println`. Scale animation durations with `LocalAnimationSpeed.current.scale(ms)`.
+- **Every app uses the library** (Compose or not): add it, and call `DebugKit.init(DebugKitConfig(enabled = BuildConfig.DEBUG))` first thing in `Application.onCreate`.
+- The debug pages are optional. An app that shows them: wrap the UI in `ProvideDebugSettings(theme = AppTheme.current.toDebugTheme())`, inside `AppTheme`: the library uses no Material and the app passes it a `DebugTheme` (colours + font family, mapped from `AppTheme` in one function). Add `DebugPage`, `LogsPage`, `CrashesPage` to navigation, and a `DebugButton` on a settings page (never a floating button on the main page; the library's `DebugPage` shows the app's package and current version).
+- Use `Logger.d/i/w/e`, never `Log` or `println`, and log caught failures instead of swallowing them. Scale animation durations with `LocalAnimationSpeed.current.scale(ms)`.
 - Apps with their own debug tools keep their own debug page, with a button that opens the library's `DebugPage`.
 
 ## Updating
-"Update all consuming apps" means every app with `"library": true` in `apps.json` of
+"Update all consuming apps" means every app in `apps.json` of
 `ci-workflows`: bump `common` in each, one PR per app. Whenever a project starts using workflows, the
 library or this skill, add it to that file.
