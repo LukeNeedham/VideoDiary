@@ -11,7 +11,7 @@ You're done! The F-Droid CI should now handle publishing a new release automatic
 ## Tester builds
 
 To send a build to someone to try out, run the "Tester Release" workflow (Actions > Tester Release > Run workflow) from the branch to test.
-It builds the `tester` build type: signed with the debug keystore, with the application ID suffix `.tester`, and with `BuildConfig.DEBUG` false,
+It builds the `beta` build type: signed with the debug keystore, with the application ID suffix `.beta`, and with `BuildConfig.DEBUG` false,
 so it has none of the debug-only features (debug settings, fake SD card, verbose logging). It publishes the APK as a GitHub pre-release,
-which the "Delete pre-releases" workflow removes with the others. Locally: `./gradlew assembleTester`.
+which the "Delete pre-releases" workflow removes with the others. Locally: `./gradlew assembleBeta`.
 

@@ -1,6 +1,6 @@
 name: Tester Release
 
-# Builds the "tester" variant (debug-signed, but without the debug flag or any debug-only features)
+# Builds the "beta" variant (debug-signed, but without the debug flag or any debug-only features)
 # and publishes it as a GitHub pre-release, so it can be sent to someone to try out.
 # Run it from the branch to test: Actions > Tester Release > Run workflow.
 # Note: the "Delete pre-releases" workflow removes these along with every other pre-release.
@@ -30,8 +30,8 @@ jobs:
 
       - uses: gradle/actions/setup-gradle@v4
 
-      - name: Build the tester APK
-        run: ./gradlew assembleTester
+      - name: Build the beta APK
+        run: ./gradlew assembleBeta
 
       - name: Publish the pre-release
         env:
@@ -39,7 +39,7 @@ jobs:
           NOTES: ${{ inputs.notes }}
         run: |
           tag="tester-${{ github.run_number }}"
-          gh release create "$tag" app/build/outputs/apk/tester/app-tester.apk \
+          gh release create "$tag" app/build/outputs/apk/beta/app-beta.apk \
             --prerelease \
             --target "$GITHUB_SHA" \
             --title "Tester build ${{ github.run_number }} (${GITHUB_REF_NAME})" \
