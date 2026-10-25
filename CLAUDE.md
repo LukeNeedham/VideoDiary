@@ -163,6 +163,9 @@ docs: `docs/using-the-library.md` there). The app has no logger of its own.
   `RemovableStorageMonitor`), `RootState.SdCardMissing` replaces the whole app with `SdCardMissingPage`; back closes the app. In debug builds that
   page has a "Reinsert SD card (debug)" button that turns the fake SD card on and inserts it.
   Mock entries are populated by copying the `sample_video` raw resource in as each video file.
+- `BuildConfig.DEBUG_KIT_ENABLED` (true in `debug` and `beta`, false in `release`) controls whether the library's logger and crash handler save to disk
+  (`DebugKitConfig(enabled = ...)` in `App.onCreate`) and whether Settings shows "Logs" and "Crashes" cards when `DEBUG` is false. The `beta` build type
+  (debug keystore, `DEBUG` false, built by the "Tester Release" workflow) therefore has no debug settings or fake SD card, but testers can open the logs and crashes.
 - `app/src/debug/res/drawable/preview_video` is a large placeholder image used by Composable
   Previews for video players; it's excluded from release builds. A small fallback `preview_video`
   exists in the main `drawable` folder so release builds still compile. See [docs/Screenshots.md](docs/Screenshots.md).

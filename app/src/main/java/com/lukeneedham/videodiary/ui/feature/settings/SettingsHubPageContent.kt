@@ -23,6 +23,8 @@ fun SettingsHubPageContent(
     onMenuClick: () -> Unit,
     onVideoStorageClick: () -> Unit,
     onDebugClick: () -> Unit,
+    onLogsClick: () -> Unit,
+    onCrashesClick: () -> Unit,
 ) {
     ToolbarPageLayout(
         bottomBar = { HubToolbar(onMenuClick = onMenuClick) },
@@ -47,6 +49,20 @@ fun SettingsHubPageContent(
                     onClick = onDebugClick,
                 )
             }
+            // Debug builds reach these through the Debug settings. Beta builds have no debug
+            // settings, but testers still need to be able to send these back.
+            if (BuildConfig.DEBUG_KIT_ENABLED && !BuildConfig.DEBUG) {
+                SettingsCard(
+                    title = "Logs",
+                    iconRes = R.drawable.info,
+                    onClick = onLogsClick,
+                )
+                SettingsCard(
+                    title = "Crashes",
+                    iconRes = R.drawable.bug,
+                    onClick = onCrashesClick,
+                )
+            }
         }
     }
 }
@@ -58,5 +74,7 @@ internal fun PreviewSettingsHubPageContent() {
         onMenuClick = {},
         onVideoStorageClick = {},
         onDebugClick = {},
+        onLogsClick = {},
+        onCrashesClick = {},
     )
 }

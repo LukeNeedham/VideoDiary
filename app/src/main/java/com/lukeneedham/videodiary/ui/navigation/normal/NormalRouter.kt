@@ -247,6 +247,12 @@ fun NormalRouter(
                     onDebugClick = {
                         navigate(NormalPage.Debug)
                     },
+                    onLogsClick = {
+                        navigate(NormalPage.Logs)
+                    },
+                    onCrashesClick = {
+                        navigate(NormalPage.Crashes)
+                    },
                 )
 
                 is NormalPage.VideoStorage -> VideoStoragePage(
