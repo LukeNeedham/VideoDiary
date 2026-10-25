@@ -1,4 +1,3 @@
-# the order of the README: the calendar, then the recaps and making one
 CalendarPage
 RecapHubPage
 RecapCreatePeriodListPage
