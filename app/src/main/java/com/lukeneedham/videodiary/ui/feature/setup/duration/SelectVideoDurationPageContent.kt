@@ -19,7 +19,7 @@ import com.lukeneedham.videodiary.ui.feature.common.IntPicker
 import com.lukeneedham.videodiary.ui.feature.setup.SetupStepHeader
 
 @Composable
-fun SelectVideoDurationPageContent(
+internal fun SelectVideoDurationPageContent(
     seconds: Int,
     setSeconds: (Int) -> Unit,
 ) {
@@ -54,7 +54,7 @@ fun SelectVideoDurationPageContent(
 
 @Preview
 @Composable
-internal fun PreviewSelectVideoDurationPageContent() {
+private fun Preview() {
     SelectVideoDurationPageContent(
         seconds = 1,
         setSeconds = {},

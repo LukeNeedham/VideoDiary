@@ -25,7 +25,7 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun RequestPermissionsPageContent(
+internal fun RequestPermissionsPageContent(
     requestPermission: (permission: String) -> Unit,
     onContinue: () -> Unit,
     acquiredPermissions: List<String>,
@@ -100,7 +100,7 @@ fun RequestPermissionsPageContent(
 
 @Preview
 @Composable
-internal fun PreviewRequestPermissionsPageContent() {
+private fun Preview() {
     RequestPermissionsPageContent(
         requestPermission = {},
         onContinue = {},

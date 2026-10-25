@@ -21,7 +21,7 @@ import com.lukeneedham.videodiary.ui.feature.common.SingleOptionSelector
 import com.lukeneedham.videodiary.ui.feature.setup.SetupStepHeader
 
 @Composable
-fun SetupSelectOrientationPageContent(
+internal fun SetupSelectOrientationPageContent(
     options: List<Orientation>,
     selectedOption: Orientation,
     setSelectedOption: (Orientation) -> Unit,
@@ -71,7 +71,7 @@ fun SetupSelectOrientationPageContent(
 
 @Preview
 @Composable
-internal fun PreviewSetupSelectOrientationPageContent() {
+private fun Preview() {
     SetupSelectOrientationPageContent(
         options = Orientation.entries,
         selectedOption = Orientation.Portrait,

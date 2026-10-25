@@ -108,7 +108,7 @@ All DI wiring lives in `di/KoinModule.kt`, grouped into module functions:
 
 - Two navigation graphs, each with a sealed `Page` class and a `Router` composable:
   - `ui/navigation/setup/` (`SetupPage`, `SetupRouter`) — first-run setup flow (intro → orientation → resolution → video duration)
-  - `ui/navigation/normal/` (`NormalPage`, `NormalRouter`) — main app flow (calendar, record video, check video, export diary, debug, logs, crashes)
+  - `ui/navigation/normal/` (`NavKeys.kt`, `NormalRouter`) — main app flow (calendar, record video, check video, export diary, debug, logs, crashes)
 - `ui/root/Root.kt` + `RootViewModel`/`RootState` decide which graph (or permissions screen / loading
   spinner) to show, based on permission state and whether setup has completed.
 - Built on Reimagined Navigation (`rememberNavController`, `NavHost`, `NavBackHandler`, `navigate`/`pop`/`popUpTo`).
@@ -145,10 +145,10 @@ docs: `docs/using-the-library.md` there). The app has no logger of its own.
 
 - `BuildConfig.DEBUG` gates debug-only UI (e.g. the Settings entry that opens the Debug page) and the
   library's `DebugKitConfig(enabled = ...)`, and keeps debug logs (`Logger.d`) out of release builds.
-- The Debug page is the app's own (`ui/feature/debug/`: `DebugPage` / `DebugPageContent` / `DebugViewModel`, routed as
-  `NormalPage.Debug` in `NormalRouter`). It holds the app's own tools, which let developers fill the diary with mock data via
+- The Debug page is the app's own (`ui/feature/debug/`: `AppDebugPage` / `AppDebugPageContent` / `AppDebugViewModel`, routed as
+  `AppDebugNavKey` in `NormalRouter`). It holds the app's own tools, which let developers fill the diary with mock data via
   `MockDataRepository` / `VideosDao.fillWithMockVideos(...)` — only reachable from debug builds — and has an "SDK debug" row that
-  opens the shared library's `DebugPage` (`NormalPage.SdkDebug`: animation speed, links to the Logs and Crashes pages). The
+  opens the shared library's `DebugPage` (`DebugNavKey`: animation speed, links to the Logs and Crashes pages). The
   library's page has no slot for app-specific tools, so add new ones to the app's page, never to the library's.
   The library's pages draw with Material 3 and the app theme is Material 2, so they look slightly different from the rest of the app.
   The library's animation speed (Debug > SDK debug) applies to the app's animations that have an explicit duration, through

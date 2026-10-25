@@ -38,7 +38,7 @@ import java.io.File
 import java.time.LocalDate
 
 @Composable
-fun RecapHubPageContent(
+internal fun RecapHubPageContent(
     savedRecaps: List<SavedRecapWithThumbnails>,
     videoAspectRatio: Float?,
     onMenuClick: () -> Unit,
@@ -143,7 +143,7 @@ private fun PreviewEmpty() {
 
 @Preview
 @Composable
-private fun PreviewWithItems() {
+private fun Preview() {
     RecapHubPageContent(
         savedRecaps = listOf(
             SavedRecapWithThumbnails(

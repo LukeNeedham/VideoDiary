@@ -33,7 +33,7 @@ import com.lukeneedham.videodiary.ui.feature.common.pageindicator.PageIndicator
 import com.lukeneedham.videodiary.ui.feature.setup.SetupStepHeader
 
 @Composable
-fun SetupPageContent(
+internal fun SetupSelectResolutionPageContent(
     resolutions: List<Size>,
     currentResolutionIndex: Int,
     setCurrentResolutionIndex: (Int) -> Unit,
@@ -138,8 +138,8 @@ fun SetupPageContent(
 
 @Preview
 @Composable
-internal fun PreviewSetupPageContent() {
-    SetupPageContent(
+private fun Preview() {
+    SetupSelectResolutionPageContent(
         resolutions = emptyList(),
         currentResolutionIndex = 0,
         setCurrentResolutionIndex = {},

@@ -17,7 +17,7 @@ import com.lukeneedham.videodiary.data.repository.MockDataRepository
 import com.lukeneedham.videodiary.data.repository.VideoResolutionRepository
 import com.lukeneedham.videodiary.ui.feature.calendar.CalendarViewModel
 import com.lukeneedham.videodiary.ui.feature.common.datepicker.DiaryDatePickerViewModel
-import com.lukeneedham.videodiary.ui.feature.debug.DebugViewModel
+import com.lukeneedham.videodiary.ui.feature.debug.AppDebugViewModel
 import com.lukeneedham.videodiary.ui.feature.permissions.RequestPermissionsViewModel
 import com.lukeneedham.videodiary.ui.feature.recap.create.RecapCreateCustomViewModel
 import com.lukeneedham.videodiary.ui.feature.recap.create.RecapCreatePeriodListViewModel
@@ -212,7 +212,7 @@ object KoinModule {
             )
         }
         viewModel {
-            DebugViewModel(
+            AppDebugViewModel(
                 mockDataRepository = get(),
                 settingsDao = get(),
                 videosDao = get(),
