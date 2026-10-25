@@ -15,4 +15,4 @@ It builds the `beta` build type: signed with the debug keystore, with the applic
 so it has none of the debug-only features (debug settings, fake SD card). It does save logs and crashes, with "Logs" and "Crashes" entries in Settings
 so testers can send them back (`BuildConfig.DEBUG_KIT_ENABLED`, true in debug and beta builds, false in release builds). It publishes the APK as a GitHub pre-release,
 which the "Delete pre-releases" workflow removes with the others. Locally: `./gradlew assembleBeta`.
-
+Its launcher name is "Video Diary - Beta" (`app/src/beta/res`), like "Video Diary - Debug" for debug builds, so it is easy to tell apart from the real app.
