@@ -1,8 +1,6 @@
 package com.lukeneedham.videodiary.screenshot
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.tooling.preview.Preview
 import com.lukeneedham.videodiary.ui.feature.recap.create.RecapCreatePeriodListPageContent
 import com.lukeneedham.videodiary.ui.feature.recap.model.RecapPeriodOption
@@ -13,40 +11,37 @@ import java.time.LocalDate
 @Preview
 @Composable
 private fun RecapCreatePeriodListPageScreenshot() {
-    // Like Android Studio: the page reads Koin and plays video unless it is in inspection mode
-    CompositionLocalProvider(LocalInspectionMode provides true) {
-        RecapCreatePeriodListPageContent(
-            periodType = RecapPeriodType.MONTH,
-            options = listOf(
-                RecapPeriodOption(
-                    label = "January 2024",
-                    startDate = LocalDate.of(2024, 1, 1),
-                    endDate = LocalDate.of(2024, 1, 31),
-                    dateRangeText = "1 - 31 January",
-                    suggestedName = "January 2024 recap",
-                    videoCount = 12,
-                ),
-                RecapPeriodOption(
-                    label = "February 2024",
-                    startDate = LocalDate.of(2024, 2, 1),
-                    endDate = LocalDate.of(2024, 2, 29),
-                    dateRangeText = "1 - 29 February",
-                    suggestedName = "February 2024 recap",
-                    videoCount = 0,
-                ),
-                RecapPeriodOption(
-                    label = "March 2024",
-                    startDate = LocalDate.of(2024, 3, 1),
-                    endDate = LocalDate.of(2024, 3, 31),
-                    dateRangeText = "1 - 31 March",
-                    suggestedName = "March 2024 recap",
-                    videoCount = 1,
-                ),
+    RecapCreatePeriodListPageContent(
+        periodType = RecapPeriodType.MONTH,
+        options = listOf(
+            RecapPeriodOption(
+                label = "January 2024",
+                startDate = LocalDate.of(2024, 1, 1),
+                endDate = LocalDate.of(2024, 1, 31),
+                dateRangeText = "1 - 31 January",
+                suggestedName = "January 2024 recap",
+                videoCount = 12,
             ),
-            isLoaded = true,
-            canGoBack = true,
-            onBack = {},
-            onOptionClick = {},
-        )
-    }
+            RecapPeriodOption(
+                label = "February 2024",
+                startDate = LocalDate.of(2024, 2, 1),
+                endDate = LocalDate.of(2024, 2, 29),
+                dateRangeText = "1 - 29 February",
+                suggestedName = "February 2024 recap",
+                videoCount = 0,
+            ),
+            RecapPeriodOption(
+                label = "March 2024",
+                startDate = LocalDate.of(2024, 3, 1),
+                endDate = LocalDate.of(2024, 3, 31),
+                dateRangeText = "1 - 31 March",
+                suggestedName = "March 2024 recap",
+                videoCount = 1,
+            ),
+        ),
+        isLoaded = true,
+        canGoBack = true,
+        onBack = {},
+        onOptionClick = {},
+    )
 }
