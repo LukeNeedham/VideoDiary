@@ -1,0 +1,12 @@
+# Copied from LukeNeedham/ci-workflows (callers/build_main.yml). Do not edit it here: change it there.
+name: Build Main
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  android:
+    uses: LukeNeedham/ci-workflows/.github/workflows/android_main_build.yml@main

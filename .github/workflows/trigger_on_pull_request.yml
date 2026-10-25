@@ -1,23 +1,16 @@
+# Copied from LukeNeedham/ci-workflows (callers/trigger_on_pull_request.yml). Do not edit it here: change it there.
 name: On Pull Request
 
 on:
-    workflow_dispatch: {}
-    pull_request:
-        # `closed` triggers the release cleanup; the other types run the build
-        types: [opened, reopened, synchronize, closed]
-        branches:
-            # The following branches are worth running the checks on
-            - main
+  workflow_dispatch: {}
+  pull_request:
+
+    types: [opened, reopened, synchronize, closed]
 
 permissions:
-  contents: write       # write to allow creating and deleting Releases
-  pull-requests: write  # So we can write comments from the workflow
+  contents: write
+  pull-requests: write
 
 jobs:
-    # Builds the APK, publishes it as a pre-release and comments the link on the PR, then deletes
-    # the PR's pre-releases when it is closed (merged or not).
-    # Shared across projects: https://github.com/LukeNeedham/ci-workflows
-    android:
-        uses: LukeNeedham/ci-workflows/.github/workflows/android_pr.yml@main
-        with:
-            apk-path: app/build/outputs/apk/debug/app-debug.apk
+  android:
+    uses: LukeNeedham/ci-workflows/.github/workflows/android_pr.yml@main

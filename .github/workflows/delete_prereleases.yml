@@ -1,13 +1,12 @@
+# Copied from LukeNeedham/ci-workflows (callers/delete_prereleases.yml). Do not edit it here: change it there.
 name: Delete Pre-releases
 
 on:
   workflow_dispatch:
 
 permissions:
-  contents: write       # write to allow deleting Releases and tags
+  contents: write
 
 jobs:
   delete-prereleases:
-    # Deletes all pre-releases and their tags.
-    # Shared across projects: https://github.com/LukeNeedham/ci-workflows
     uses: LukeNeedham/ci-workflows/.github/workflows/delete_prereleases.yml@main
