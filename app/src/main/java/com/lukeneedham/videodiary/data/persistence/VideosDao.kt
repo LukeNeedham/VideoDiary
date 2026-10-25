@@ -73,6 +73,7 @@ class VideosDao(
      *
      * If the saved location is the SD card but it is missing, [sdCardMissing] becomes true and
      * nothing else changes: the videos on the card are not reachable until it is back.
+     * Videos are only ever moved between the two folders by [moveVideosTo], when the user asks.
      */
     suspend fun initialiseStorageLocation() = initialiseMutex.withLock {
         loadDebugSettings()
@@ -83,19 +84,6 @@ class VideosDao(
         sdCardMissingMutable.value = wantedDir == null
         if (wantedDir == null) return@withLock
 
-        // Videos may be in the other folder after an interrupted move
-        val otherDir = if (wantedDir == internalVideosDir) {
-            getVideosDir(VideoStorageLocation.RemovableStorage)
-        } else {
-            internalVideosDir
-        }
-        if (otherDir != null && otherDir != wantedDir) {
-            try {
-                mergeInto(wantedDir, from = otherDir)
-            } catch (e: Exception) {
-                Logger.w("Could not merge videos into $wantedDir", e)
-            }
-        }
         switchVideosDir(wantedDir)
     }
 
@@ -131,7 +119,6 @@ class VideosDao(
                 val transfer = VideoFolderTransfer.copy(
                     from = sourceDir,
                     to = destinationDir,
-                    failOnConflict = true,
                 )
                 try {
                     if (BuildConfig.DEBUG && debugSlowVideoMoves) delay(DEBUG_SLOW_MOVE_MILLIS)
@@ -155,18 +142,10 @@ class VideosDao(
 
                 sdCardMissingMutable.value = false
                 refreshVideosState()
-                // The move already worked, so leftovers are just wasted space until the next merge
+                // The move already worked, so leftovers are just wasted space
                 transfer.commit().forEach { Logger.w("Could not delete old video $it") }
             }.onFailure { Logger.w("Failed to move videos to $location", it) }
         }
-
-    /** Moves videos that are in [from] but not in [into], then deletes them from [from] */
-    private fun mergeInto(into: File, from: File) {
-        VideoFolderTransfer.deleteTemporaryFiles(from)
-        if (from.listFiles().isNullOrEmpty()) return
-        val transfer = VideoFolderTransfer.copy(from = from, to = into, failOnConflict = false)
-        transfer.commit().forEach { Logger.w("Could not delete merged video $it") }
-    }
 
     private fun switchVideosDir(dir: File) {
         synchronized(filesLock) {

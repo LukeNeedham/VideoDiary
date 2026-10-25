@@ -75,6 +75,14 @@ fun SdCardMissingPageContent(
             fontSize = Typography.Size.medium,
             textAlign = TextAlign.Center,
         )
+        Spacer(modifier = Modifier.height(24.dp))
+        Text(
+            text = "Lost your card? You can start over by clearing this app's data in " +
+                "Android settings.",
+            color = Color.White.copy(alpha = 0.4f),
+            fontSize = Typography.Size.extraSmall,
+            textAlign = TextAlign.Center,
+        )
         if (canMockReinsert) {
             Spacer(modifier = Modifier.height(32.dp))
             Button(

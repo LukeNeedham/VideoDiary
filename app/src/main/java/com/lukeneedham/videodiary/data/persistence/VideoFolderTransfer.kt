@@ -46,13 +46,12 @@ class VideoFolderTransfer private constructor(
          * Copies every video in [from] to [to].
          *
          * If [to] already holds a file with the same name and size, it is treated as an
-         * already-copied video. If it holds one with a different size, that is a conflict:
-         * with [failOnConflict] this throws, otherwise the existing file in [to] is kept
-         * and the one in [from] is left untouched.
+         * already-copied video. If it holds one with a different size, that is a conflict
+         * and this throws, rather than overwrite a video.
          *
          * On any failure the copies made so far are removed and the sources are untouched.
          */
-        fun copy(from: File, to: File, failOnConflict: Boolean): VideoFolderTransfer {
+        fun copy(from: File, to: File): VideoFolderTransfer {
             to.mkdirs()
             check(to.isDirectory) { "Could not create destination directory" }
             deleteTemporaryFiles(to)
@@ -64,13 +63,10 @@ class VideoFolderTransfer private constructor(
                 videoFiles(from).forEach { source ->
                     val destination = File(to, source.name)
                     if (destination.exists()) {
-                        if (destination.length() == source.length()) {
-                            toMove += source
-                        } else {
-                            check(!failOnConflict) {
-                                "A different video named ${source.name} already exists in the destination"
-                            }
+                        check(destination.length() == source.length()) {
+                            "A different video named ${source.name} already exists in the destination"
                         }
+                        toMove += source
                         return@forEach
                     }
 

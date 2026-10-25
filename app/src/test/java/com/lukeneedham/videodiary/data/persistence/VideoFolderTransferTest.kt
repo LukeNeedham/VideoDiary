@@ -30,7 +30,7 @@ class VideoFolderTransferTest {
         from.write("a", "aaa")
         from.write("b", "bb")
 
-        val transfer = VideoFolderTransfer.copy(from, to, failOnConflict = true)
+        val transfer = VideoFolderTransfer.copy(from, to)
         assertEquals("aaa", File(to, "a").readText())
         assertTrue("Sources are untouched until commit", File(from, "a").exists())
 
@@ -43,7 +43,7 @@ class VideoFolderTransferTest {
     fun rollbackRemovesCopiesAndKeepsSources() {
         from.write("a", "aaa")
 
-        VideoFolderTransfer.copy(from, to, failOnConflict = true).rollback()
+        VideoFolderTransfer.copy(from, to).rollback()
 
         assertEquals("aaa", File(from, "a").readText())
         assertEquals(emptyList<String>(), to.list()!!.toList())
@@ -57,7 +57,7 @@ class VideoFolderTransferTest {
         to.write("b", "different length")
 
         try {
-            VideoFolderTransfer.copy(from, to, failOnConflict = true)
+            VideoFolderTransfer.copy(from, to)
             fail("Expected a conflict")
         } catch (e: IllegalStateException) {
             // expected
@@ -70,27 +70,12 @@ class VideoFolderTransferTest {
     }
 
     @Test
-    fun conflictIsKeptAsIsWhenNotFailing() {
-        from.write("a", "aaa")
-        from.write("b", "bbb")
-        to.mkdirs()
-        to.write("b", "different length")
-
-        val transfer = VideoFolderTransfer.copy(from, to, failOnConflict = false)
-        transfer.commit()
-
-        assertEquals("different length", File(to, "b").readText())
-        assertEquals("aaa", File(to, "a").readText())
-        assertEquals("The conflicting source must not be deleted", listOf("b"), from.list()!!.toList())
-    }
-
-    @Test
     fun alreadyCopiedVideoIsNotAConflictAndIsNotRolledBack() {
         from.write("a", "aaa")
         to.mkdirs()
         to.write("a", "xyz")
 
-        val transfer = VideoFolderTransfer.copy(from, to, failOnConflict = true)
+        val transfer = VideoFolderTransfer.copy(from, to)
         transfer.rollback()
 
         assertTrue("Rollback must not delete a file it did not create", File(to, "a").exists())
@@ -102,7 +87,7 @@ class VideoFolderTransferTest {
         to.mkdirs()
         to.write(".a${VideoFolderTransfer.TEMPORARY_SUFFIX}", "half")
 
-        VideoFolderTransfer.copy(from, to, failOnConflict = true)
+        VideoFolderTransfer.copy(from, to)
 
         assertEquals(listOf("a"), to.list()!!.toList())
     }
@@ -111,7 +96,7 @@ class VideoFolderTransferTest {
     fun temporaryFilesInSourceAreNotMoved() {
         from.write(".a${VideoFolderTransfer.TEMPORARY_SUFFIX}", "half")
 
-        VideoFolderTransfer.copy(from, to, failOnConflict = true).commit()
+        VideoFolderTransfer.copy(from, to).commit()
 
         assertEquals(emptyList<String>(), to.list()!!.toList())
     }
@@ -119,7 +104,7 @@ class VideoFolderTransferTest {
     @Test
     fun detectsSourceChangedAfterCopy() {
         from.write("a", "aaa")
-        val transfer = VideoFolderTransfer.copy(from, to, failOnConflict = true)
+        val transfer = VideoFolderTransfer.copy(from, to)
         assertTrue(transfer.isSourceUnchanged())
 
         from.write("new", "recorded during the copy")
