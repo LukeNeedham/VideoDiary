@@ -43,6 +43,15 @@ android {
             applicationIdSuffix = ".dbg"
             signingConfig = signingConfigs.getByName("debugConfig")
         }
+        // For sending a build to testers: signed with the debug keystore, so it installs without the
+        // official key, but with BuildConfig.DEBUG false, so none of the debug-only features
+        // (debug settings, fake SD card, extra logging) are in it. Installs next to the other builds.
+        create("tester") {
+            initWith(getByName("debug"))
+            isDebuggable = false
+            applicationIdSuffix = ".tester"
+            matchingFallbacks += listOf("release", "debug")
+        }
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11

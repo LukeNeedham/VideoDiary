@@ -1,0 +1,46 @@
+name: Tester Release
+
+# Builds the "tester" variant (debug-signed, but without the debug flag or any debug-only features)
+# and publishes it as a GitHub pre-release, so it can be sent to someone to try out.
+# Run it from the branch to test: Actions > Tester Release > Run workflow.
+# Note: the "Delete pre-releases" workflow removes these along with every other pre-release.
+
+on:
+  workflow_dispatch:
+    inputs:
+      notes:
+        description: 'What to say about this build'
+        required: false
+        type: string
+        default: ''
+
+permissions:
+  contents: write
+
+jobs:
+  tester:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - uses: gradle/actions/setup-gradle@v4
+
+      - name: Build the tester APK
+        run: ./gradlew assembleTester
+
+      - name: Publish the pre-release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          NOTES: ${{ inputs.notes }}
+        run: |
+          tag="tester-${{ github.run_number }}"
+          gh release create "$tag" app/build/outputs/apk/tester/app-tester.apk \
+            --prerelease \
+            --target "$GITHUB_SHA" \
+            --title "Tester build ${{ github.run_number }} (${GITHUB_REF_NAME})" \
+            --notes "${NOTES:-Tester build of ${GITHUB_REF_NAME} at ${GITHUB_SHA::7}.}"
