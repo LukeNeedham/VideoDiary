@@ -7,6 +7,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.core.app.ActivityCompat
 import androidx.core.view.WindowCompat
+import com.lukeneedham.videodiary.data.android.RemovableStorageMonitor
 import com.lukeneedham.videodiary.domain.model.Orientation
 import com.lukeneedham.videodiary.domain.model.ShareRequest
 import com.lukeneedham.videodiary.ui.media.VideoPlayerHolder
@@ -18,6 +19,7 @@ import org.koin.android.ext.android.inject
 class MainActivity : ComponentActivity() {
     private val sharer: Sharer by inject()
     private val videoPlayerHolder: VideoPlayerHolder by inject()
+    private val removableStorageMonitor: RemovableStorageMonitor by inject()
 
     private val permissionResultListenerHolder = PermissionResultListenerHolder()
 
@@ -32,8 +34,19 @@ class MainActivity : ComponentActivity() {
                 setOrientation = ::setOrientation,
                 requestPermission = ::requestPermission,
                 permissionResultListenerHolder = permissionResultListenerHolder,
+                closeApp = ::finish,
             )
         }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        removableStorageMonitor.start()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        removableStorageMonitor.stop()
     }
 
     override fun onPause() {
@@ -44,6 +57,8 @@ class MainActivity : ComponentActivity() {
     override fun onResume() {
         super.onResume()
         videoPlayerHolder.onAppResume()
+        // The card may have been removed while the app was paused, and the event missed
+        removableStorageMonitor.recheck()
     }
 
     @Suppress("OVERRIDE_DEPRECATION")

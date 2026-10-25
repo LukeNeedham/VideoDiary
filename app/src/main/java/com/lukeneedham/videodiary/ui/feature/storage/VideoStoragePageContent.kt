@@ -46,7 +46,6 @@ import com.lukeneedham.videodiary.ui.theme.Typography
 fun VideoStoragePageContent(
     location: VideoStorageLocation,
     isRemovableStorageAvailable: Boolean,
-    isUsingFallbackStorage: Boolean,
     isChangingLocation: Boolean,
     error: String?,
     onLocationSelected: (VideoStorageLocation) -> Unit,
@@ -120,14 +119,6 @@ fun VideoStoragePageContent(
                         fontSize = Typography.Size.medium,
                     )
                 }
-            }
-            if (isUsingFallbackStorage) {
-                Notice(
-                    accent = AccentHighlight,
-                    text = "The SD card is not available, so videos are temporarily being kept " +
-                        "in internal storage. They will be moved back to the SD card when it " +
-                        "is inserted",
-                )
             }
             if (error != null) {
                 Notice(accent = AccentRecord, text = error)
@@ -269,7 +260,6 @@ private fun PreviewVideoStoragePageContent() {
     VideoStoragePageContent(
         location = VideoStorageLocation.Internal,
         isRemovableStorageAvailable = true,
-        isUsingFallbackStorage = false,
         isChangingLocation = false,
         error = null,
         onLocationSelected = {},
@@ -280,11 +270,10 @@ private fun PreviewVideoStoragePageContent() {
 
 @Preview
 @Composable
-private fun PreviewVideoStoragePageContentFallbackAndError() {
+private fun PreviewVideoStoragePageContentUnavailableAndError() {
     VideoStoragePageContent(
         location = VideoStorageLocation.RemovableStorage,
         isRemovableStorageAvailable = false,
-        isUsingFallbackStorage = true,
         isChangingLocation = false,
         error = "Could not move videos. Your current storage location has not changed.",
         onLocationSelected = {},

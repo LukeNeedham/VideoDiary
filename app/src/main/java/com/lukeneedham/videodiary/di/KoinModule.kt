@@ -2,6 +2,7 @@ package com.lukeneedham.videodiary.di
 
 import android.net.Uri
 import com.lukeneedham.videodiary.data.android.PermissionChecker
+import com.lukeneedham.videodiary.data.android.RemovableStorageMonitor
 import com.lukeneedham.videodiary.data.mapper.ThumbnailFileNameMapper
 import com.lukeneedham.videodiary.data.mapper.VideoFileNameMapper
 import com.lukeneedham.videodiary.data.persistence.SavedRecapsDao
@@ -70,6 +71,13 @@ object KoinModule {
         factory {
             PermissionChecker(
                 context = androidContext(),
+            )
+        }
+        single {
+            RemovableStorageMonitor(
+                context = androidContext(),
+                videosDao = get(),
+                ioDispatcher = get(KoinQualifier.Dispatcher.io),
             )
         }
         single {

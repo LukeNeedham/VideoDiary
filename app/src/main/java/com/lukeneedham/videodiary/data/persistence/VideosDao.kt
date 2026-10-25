@@ -15,6 +15,8 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.time.LocalDate
@@ -51,7 +53,8 @@ class VideosDao(
 
     private val allVideosMutable = MutableStateFlow(loadAllVideos())
     private val removableStorageAvailableMutable = MutableStateFlow(isRemovableStorageAvailable())
-    private val usingFallbackStorageMutable = MutableStateFlow(false)
+    private val sdCardMissingMutable = MutableStateFlow(false)
+    private val initialiseMutex = Mutex()
 
     /** A Flow of all video files in the diary, unordered */
     val allVideos = allVideosMutable.asStateFlow()
@@ -59,32 +62,28 @@ class VideosDao(
     val removableStorageAvailable = removableStorageAvailableMutable.asStateFlow()
 
     /**
-     * True when the chosen location is the SD card but it is not available right now,
-     * so internal storage is being used until it comes back.
+     * True when the chosen location is the SD card but it is not available right now.
+     * The app does not work in this state: it asks the user to put the SD card back.
      */
-    val usingFallbackStorage = usingFallbackStorageMutable.asStateFlow()
+    val sdCardMissing = sdCardMissingMutable.asStateFlow()
 
     /**
      * Points the diary at the saved storage location. Also re-checks whether the SD card is
      * available, so call it again when the SD card may have been inserted or removed.
      *
-     * If the saved location is the SD card but it is missing, internal storage is used for now.
-     * Once the card is back, any videos recorded in the meantime are merged onto it.
+     * If the saved location is the SD card but it is missing, [sdCardMissing] becomes true and
+     * nothing else changes: the videos on the card are not reachable until it is back.
      */
-    suspend fun initialiseStorageLocation() {
+    suspend fun initialiseStorageLocation() = initialiseMutex.withLock {
         loadDebugSettings()
         val location = settingsDao.getVideoStorageLocationFlow().first()
         removableStorageAvailableMutable.value = isRemovableStorageAvailable()
 
         val wantedDir = getVideosDir(location)
-        if (wantedDir == null) {
-            usingFallbackStorageMutable.value = true
-            switchVideosDir(internalVideosDir)
-            return
-        }
-        usingFallbackStorageMutable.value = false
+        sdCardMissingMutable.value = wantedDir == null
+        if (wantedDir == null) return@withLock
 
-        // Videos may be in the other folder after an interrupted move, or after a fallback
+        // Videos may be in the other folder after an interrupted move
         val otherDir = if (wantedDir == internalVideosDir) {
             getVideosDir(VideoStorageLocation.RemovableStorage)
         } else {
@@ -125,7 +124,7 @@ class VideosDao(
                 val sourceDir = videosDir
                 if (sourceDir.canonicalPath == destinationDir.canonicalPath) {
                     settingsDao.setVideoStorageLocation(location)
-                    usingFallbackStorageMutable.value = false
+                    sdCardMissingMutable.value = false
                     return@runCatching
                 }
 
@@ -154,7 +153,7 @@ class VideosDao(
                     throw e
                 }
 
-                usingFallbackStorageMutable.value = false
+                sdCardMissingMutable.value = false
                 refreshVideosState()
                 // The move already worked, so leftovers are just wasted space until the next merge
                 transfer.commit().forEach { Logger.w("Could not delete old video $it") }

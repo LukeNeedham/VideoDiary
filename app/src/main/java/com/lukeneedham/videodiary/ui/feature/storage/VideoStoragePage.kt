@@ -12,11 +12,9 @@ fun VideoStoragePage(
 ) {
     val location by viewModel.location.collectAsState()
     val isRemovableStorageAvailable by viewModel.isRemovableStorageAvailable.collectAsState()
-    val isUsingFallbackStorage by viewModel.isUsingFallbackStorage.collectAsState()
     VideoStoragePageContent(
         location = location,
         isRemovableStorageAvailable = isRemovableStorageAvailable,
-        isUsingFallbackStorage = isUsingFallbackStorage,
         isChangingLocation = viewModel.isChangingLocation,
         error = viewModel.error,
         onLocationSelected = viewModel::selectLocation,

@@ -159,6 +159,9 @@ docs: `docs/using-the-library.md` there). The app has no logger of its own.
   The Debug page's Storage section fakes an SD card for testing Video storage on a phone without one: "Fake SD card" swaps the removable
   storage folder for `filesDir/fake_sd_card/videos`, "Fake SD card inserted" simulates removing and re-inserting it, and "Slow video moves" adds
   an 8 second pause to a move so it can be interrupted (all `BuildConfig.DEBUG` only, applied in `VideosDao`).
+  When the videos are stored on the SD card and it is missing (checked on launch, on every resume, and on storage broadcasts via
+  `RemovableStorageMonitor`), `RootState.SdCardMissing` replaces the whole app with `SdCardMissingPage`; back closes the app. In debug builds that
+  page has a "Reinsert SD card (debug)" button that turns the fake SD card on and inserts it.
   Mock entries are populated by copying the `sample_video` raw resource in as each video file.
 - `app/src/debug/res/drawable/preview_video` is a large placeholder image used by Composable
   Previews for video players; it's excluded from release builds. A small fallback `preview_video`

@@ -26,8 +26,6 @@ class VideoStorageViewModel(
     val isRemovableStorageAvailable: StateFlow<Boolean> = videosDao.removableStorageAvailable
         .stateIn(viewModelScope, SharingStarted.Eagerly, videosDao.isRemovableStorageAvailable())
 
-    val isUsingFallbackStorage: StateFlow<Boolean> = videosDao.usingFallbackStorage
-
     var isChangingLocation by mutableStateOf(false)
         private set
 
