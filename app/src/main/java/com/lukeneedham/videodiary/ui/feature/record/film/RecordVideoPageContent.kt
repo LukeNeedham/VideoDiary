@@ -48,7 +48,7 @@ import com.lukeneedham.videodiary.ui.feature.record.film.component.RecordingCoun
 private enum class CameraControlType { BRIGHTNESS, ZOOM }
 
 @Composable
-fun RecordVideoPageContent(
+internal fun RecordVideoPageContent(
     videoDurationMillis: Long,
     resolution: Size,
     quality: Quality,
@@ -282,7 +282,7 @@ fun RecordVideoPageContent(
 
 @Preview
 @Composable
-internal fun PreviewRecordVideoPage() {
+private fun Preview() {
     RecordVideoPageContent(
         quality = Quality.HD,
         resolution = Size(100, 300),

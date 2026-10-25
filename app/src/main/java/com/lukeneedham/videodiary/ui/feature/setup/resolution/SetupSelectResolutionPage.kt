@@ -21,7 +21,7 @@ fun SetupSelectResolutionPage(
         }
     }
 
-    SetupPageContent(
+    SetupSelectResolutionPageContent(
         resolutions = resolutions,
         currentResolutionIndex = currentResolutionIndex,
         setCurrentResolutionIndex = setCurrentResolutionIndex,

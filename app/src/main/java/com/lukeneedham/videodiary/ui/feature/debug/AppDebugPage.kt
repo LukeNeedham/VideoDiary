@@ -9,15 +9,15 @@ import androidx.compose.runtime.getValue
  * slot for app-specific tools, so they live here, with a row that opens the library's page.
  */
 @Composable
-fun DebugPage(
-    viewModel: DebugViewModel,
+fun AppDebugPage(
+    viewModel: AppDebugViewModel,
     canGoBack: Boolean,
     onBack: () -> Unit,
     onOpenSdkDebug: () -> Unit,
 ) {
     val allowRetakeForPastDays by viewModel.allowRetakeForPastDays.collectAsState()
 
-    DebugPageContent(
+    AppDebugPageContent(
         onFillWithMockDataClick = viewModel::fillWithMockData,
         allowRetakeForPastDays = allowRetakeForPastDays,
         onAllowRetakeForPastDaysChange = viewModel::setAllowRetakeForPastDays,

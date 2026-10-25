@@ -33,7 +33,7 @@ import com.lukeneedham.videodiary.ui.theme.GlassFillStrong
 import com.lukeneedham.videodiary.ui.theme.Typography
 
 @Composable
-fun CheckVideoPageContent(
+internal fun CheckVideoPageContent(
     existingVideo: Video,
     newVideo: Video,
     onBack: () -> Unit,
@@ -200,7 +200,7 @@ fun CheckVideoPageContent(
 
 @Preview
 @Composable
-internal fun PreviewCheckVideoPageContent() {
+private fun Preview() {
     CheckVideoPageContent(
         existingVideo = MockDataCheckVideo.existingVideo,
         newVideo = MockDataCheckVideo.newVideo,

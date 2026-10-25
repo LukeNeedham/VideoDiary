@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class DebugViewModel(
+class AppDebugViewModel(
     private val mockDataRepository: MockDataRepository,
     private val settingsDao: SettingsDao,
     private val videosDao: VideosDao,

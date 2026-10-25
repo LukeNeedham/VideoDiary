@@ -10,14 +10,14 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.withFrameNanos
 import com.lukeneedham.common.logger.Logger
 import com.lukeneedham.common.ui.CrashesPage
-import com.lukeneedham.common.ui.DebugPage as SdkDebugPage
+import com.lukeneedham.common.ui.DebugPage
 import com.lukeneedham.common.ui.LogsPage
 import com.lukeneedham.videodiary.domain.model.ShareRequest
 import com.lukeneedham.videodiary.ui.feature.calendar.CalendarPage
 import com.lukeneedham.videodiary.ui.feature.common.hub.Hub
 import com.lukeneedham.videodiary.ui.feature.common.hub.HubSwitcherSheet
 import com.lukeneedham.videodiary.ui.feature.common.sheet.SheetDefaults
-import com.lukeneedham.videodiary.ui.feature.debug.DebugPage
+import com.lukeneedham.videodiary.ui.feature.debug.AppDebugPage
 import com.lukeneedham.videodiary.ui.feature.settings.SettingsHubPage
 import com.lukeneedham.videodiary.ui.feature.recap.create.RecapCreateCustomPage
 import com.lukeneedham.videodiary.ui.feature.recap.create.RecapCreatePeriodListPage
@@ -42,11 +42,11 @@ import org.koin.core.parameter.parametersOf
 fun NormalRouter(
     share: (ShareRequest) -> Unit,
 ) {
-    val navController = rememberNavController<NormalPage>(startDestination = NormalPage.Calendar)
+    val navController = rememberNavController<Route>(startDestination = Route.Calendar)
 
     val canGoBack = navController.backstack.entries.size > 1
 
-    fun navigate(to: NormalPage) {
+    fun navigate(to: Route) {
         Logger.d("Navigating to: $to")
         navController.navigate(to)
     }
@@ -66,7 +66,7 @@ fun NormalRouter(
 
     // The hub switcher is only reachable from hub pages, so the top of the backstack is a hub
     // root page whenever it is open.
-    val currentHub = (navController.backstack.entries.lastOrNull()?.destination as? NormalPage)
+    val currentHub = (navController.backstack.entries.lastOrNull()?.destination as? Route)
         ?.hub
 
     // The sheet is hosted here, outside the pages. When a hub is chosen the page behind it is
@@ -74,17 +74,17 @@ fun NormalRouter(
     fun switchToHub(hub: Hub) {
         // Read the live backstack rather than the composed currentHub, which can be stale by the
         // time the click lands
-        val liveHub = (navController.backstack.entries.lastOrNull()?.destination as? NormalPage)?.hub
+        val liveHub = (navController.backstack.entries.lastOrNull()?.destination as? Route)?.hub
         if (hub != liveHub) {
             Logger.d("Switching to hub: $hub")
             // The calendar hub is always the bottom entry of the backstack and is never removed,
             // so it keeps its state. Switching hub drops everything above it, then opens the new
             // hub on top. Back from another hub's root page returns to the calendar.
-            navController.popUpTo { it is NormalPage.Calendar }
+            navController.popUpTo { it is Route.Calendar }
             when (hub) {
                 Hub.Calendar -> Unit
-                Hub.Recap -> navController.navigate(NormalPage.RecapHub)
-                Hub.Settings -> navController.navigate(NormalPage.SettingsHub)
+                Hub.Recap -> navController.navigate(Route.RecapHub)
+                Hub.Settings -> navController.navigate(Route.SettingsHub)
             }
         }
         coroutineScope.launch {
@@ -119,16 +119,16 @@ fun NormalRouter(
             controller = navController,
         ) { page ->
             when (page) {
-                is NormalPage.Calendar -> CalendarPage(
+                is Route.Calendar -> CalendarPage(
                     viewModel = koinViewModel(),
                     onRecordVideoClick = { date ->
-                        navigate(NormalPage.RecordVideo(date))
+                        navigate(Route.RecordVideo(date))
                     },
                     onMenuClick = openHubSwitcher,
                     share = share,
                 )
 
-                is NormalPage.RecordVideo -> {
+                is Route.RecordVideo -> {
                     val viewModel = koinViewModel<RecordVideoViewModel> {
                         parametersOf(page.date)
                     }
@@ -137,23 +137,23 @@ fun NormalRouter(
                         onRecordingFinished = { videoContentUri ->
                             if (viewModel.hasExistingVideo) {
                                 navigate(
-                                    NormalPage.CheckVideo(
+                                    Route.CheckVideo(
                                         date = page.date,
                                         videoContentUri = videoContentUri,
                                     )
                                 )
                             } else {
                                 viewModel.persistVideoDirectly(videoContentUri)
-                                navController.popUpTo { it is NormalPage.Calendar }
+                                navController.popUpTo { it is Route.Calendar }
                             }
                         },
                         onBack = onBack,
                     )
                 }
 
-                is NormalPage.CheckVideo -> {
+                is Route.CheckVideo -> {
                     val returnToCalendar: () -> Unit = {
-                        navController.popUpTo { it is NormalPage.Calendar }
+                        navController.popUpTo { it is Route.Calendar }
                     }
                     CheckVideoPage(
                         viewModel = koinViewModel {
@@ -167,24 +167,24 @@ fun NormalRouter(
                     )
                 }
 
-                is NormalPage.RecapHub -> RecapHubPage(
+                is Route.RecapHub -> RecapHubPage(
                     viewModel = koinViewModel(),
                     onMenuClick = openHubSwitcher,
                     onCreateWeekClick = {
-                        navigate(NormalPage.RecapCreatePeriodList(RecapPeriodType.WEEK))
+                        navigate(Route.RecapCreatePeriodList(RecapPeriodType.WEEK))
                     },
                     onCreateMonthClick = {
-                        navigate(NormalPage.RecapCreatePeriodList(RecapPeriodType.MONTH))
+                        navigate(Route.RecapCreatePeriodList(RecapPeriodType.MONTH))
                     },
                     onCreateYearClick = {
-                        navigate(NormalPage.RecapCreatePeriodList(RecapPeriodType.YEAR))
+                        navigate(Route.RecapCreatePeriodList(RecapPeriodType.YEAR))
                     },
                     onCreateCustomClick = {
-                        navigate(NormalPage.RecapCreateCustom)
+                        navigate(Route.RecapCreateCustom)
                     },
                     onRecapClick = { savedRecap ->
                         navigate(
-                            NormalPage.RecapView(
+                            Route.RecapView(
                                 startDate = savedRecap.startDate,
                                 endDate = savedRecap.endDate,
                                 name = savedRecap.name,
@@ -194,7 +194,7 @@ fun NormalRouter(
                     },
                 )
 
-                is NormalPage.RecapCreatePeriodList -> RecapCreatePeriodListPage(
+                is Route.RecapCreatePeriodList -> RecapCreatePeriodListPage(
                     viewModel = koinViewModel {
                         parametersOf(page.periodType)
                     },
@@ -202,7 +202,7 @@ fun NormalRouter(
                     onBack = onBack,
                     onOptionClick = { option ->
                         navigate(
-                            NormalPage.RecapView(
+                            Route.RecapView(
                                 startDate = option.startDate,
                                 endDate = option.endDate,
                                 name = option.suggestedName,
@@ -212,14 +212,14 @@ fun NormalRouter(
                     },
                 )
 
-                is NormalPage.RecapCreateCustom -> RecapCreateCustomPage(
+                is Route.RecapCreateCustom -> RecapCreateCustomPage(
                     viewModel = koinViewModel(),
                     canGoBack = canGoBack,
                     onBack = onBack,
                     onRecapCreated = { startDate, endDate, name, savedRecapId ->
-                        navController.popUpTo { it is NormalPage.RecapHub }
+                        navController.popUpTo { it is Route.RecapHub }
                         navigate(
-                            NormalPage.RecapView(
+                            Route.RecapView(
                                 startDate = startDate,
                                 endDate = endDate,
                                 name = name,
@@ -229,7 +229,7 @@ fun NormalRouter(
                     },
                 )
 
-                is NormalPage.RecapView -> RecapViewPage(
+                is Route.RecapView -> RecapViewPage(
                     viewModel = koinViewModel {
                         parametersOf(page.startDate, page.endDate, page.name, page.savedRecapId)
                     },
@@ -238,31 +238,31 @@ fun NormalRouter(
                     share = share,
                 )
 
-                is NormalPage.SettingsHub -> SettingsHubPage(
+                is Route.SettingsHub -> SettingsHubPage(
                     onMenuClick = openHubSwitcher,
                     onDebugClick = {
-                        navigate(NormalPage.Debug)
+                        navigate(Route.AppDebug)
                     },
                 )
 
                 // The app's own debug page, which opens the shared library's debug page. The library's
                 // debug, logs and crashes pages show only the library's own things.
-                is NormalPage.Debug -> DebugPage(
+                is Route.AppDebug -> AppDebugPage(
                     viewModel = koinViewModel(),
                     canGoBack = canGoBack,
                     onBack = onBack,
-                    onOpenSdkDebug = { navigate(NormalPage.SdkDebug) },
+                    onOpenSdkDebug = { navigate(Route.Debug) },
                 )
 
-                is NormalPage.SdkDebug -> SdkDebugPage(
+                is Route.Debug -> DebugPage(
                     onBack = onBack,
-                    onOpenLogs = { navigate(NormalPage.Logs) },
-                    onOpenCrashes = { navigate(NormalPage.Crashes) },
+                    onOpenLogs = { navigate(Route.Logs) },
+                    onOpenCrashes = { navigate(Route.Crashes) },
                 )
 
-                is NormalPage.Logs -> LogsPage(onBack = onBack)
+                is Route.Logs -> LogsPage(onBack = onBack)
 
-                is NormalPage.Crashes -> CrashesPage(onBack = onBack)
+                is Route.Crashes -> CrashesPage(onBack = onBack)
             }
         }
     }
