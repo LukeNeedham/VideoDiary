@@ -43,7 +43,10 @@ class SettingsDao(
 
     private val videoStorageLocationKey = stringPreferencesKey("videoStorageLocation")
 
-    /** Debug setting: pretend there is an SD card, stored in a folder inside the app's files */
+    /**
+     * Debug setting: pretend there is an SD card, stored in a folder inside the app's files.
+     * On by default, so onboarding offers the SD card choice in debug builds without a real card.
+     */
     private val debugFakeSdCardEnabled = booleanPreferencesKey("debugFakeSdCardEnabled")
 
     /** Debug setting: whether the fake SD card is currently inserted */
@@ -151,7 +154,7 @@ class SettingsDao(
     }
 
     fun getDebugFakeSdCardEnabledFlow(): Flow<Boolean> {
-        return context.dataStore.data.map { it[debugFakeSdCardEnabled] ?: false }
+        return context.dataStore.data.map { it[debugFakeSdCardEnabled] ?: true }
     }
 
     suspend fun setDebugFakeSdCardInserted(inserted: Boolean) {

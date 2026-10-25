@@ -107,7 +107,7 @@ All DI wiring lives in `di/KoinModule.kt`, grouped into module functions:
 ### Navigation
 
 - Two navigation graphs, each with a sealed `Page` class and a `Router` composable:
-  - `ui/navigation/setup/` (`SetupPage`, `SetupRouter`) — first-run setup flow (intro → orientation → resolution → video duration)
+  - `ui/navigation/setup/` (`SetupPage`, `SetupRouter`) — first-run setup flow (intro → permissions → orientation → video storage → resolution → video duration). The video storage page is only part of the flow when an SD card is detected as onboarding starts (`SetupProgress(hasStoragePage)`)
   - `ui/navigation/normal/` (`NormalPage`, `NormalRouter`) — main app flow (calendar, record video, check video, export diary, debug, logs, crashes)
 - `ui/root/Root.kt` + `RootViewModel`/`RootState` decide which graph (or permissions screen / loading
   spinner) to show, based on permission state and whether setup has completed.
@@ -156,7 +156,7 @@ docs: `docs/using-the-library.md` there). The app has no logger of its own.
   `ProvideDebugSettings` is in `MainActivity`): the recap share sheet settle (`RecapViewPageContent`) and the camera focus indicator
   hold and fade (`CameraInput`). Give any new animation an explicit duration and pass it through `scale`. Animations that use the default
   spring (`SingleOptionSelector`, the orientation text colour) are not affected by the setting.
-  The Debug page's Storage section fakes an SD card for testing Video storage on a phone without one: "Fake SD card" swaps the removable
+  The Debug page's Storage section fakes an SD card for testing Video storage on a phone without one: "Fake SD card" (on by default in debug builds, so onboarding offers the SD card without a real card) swaps the removable
   storage folder for `filesDir/fake_sd_card/videos`, "Fake SD card inserted" simulates removing and re-inserting it, and "Slow video moves" adds
   an 8 second pause to a move so it can be interrupted (all `BuildConfig.DEBUG` only, applied in `VideosDao`).
   When the videos are stored on the SD card and it is missing (checked on launch, on every resume, and on storage broadcasts via

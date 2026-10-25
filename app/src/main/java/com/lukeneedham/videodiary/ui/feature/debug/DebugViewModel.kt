@@ -22,7 +22,7 @@ class DebugViewModel(
         .stateIn(viewModelScope, SharingStarted.Eagerly, false)
 
     val fakeSdCardEnabled: StateFlow<Boolean> = settingsDao.getDebugFakeSdCardEnabledFlow()
-        .stateIn(viewModelScope, SharingStarted.Eagerly, false)
+        .stateIn(viewModelScope, SharingStarted.Eagerly, true)
 
     val fakeSdCardInserted: StateFlow<Boolean> = settingsDao.getDebugFakeSdCardInsertedFlow()
         .stateIn(viewModelScope, SharingStarted.Eagerly, true)

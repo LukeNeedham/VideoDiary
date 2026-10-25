@@ -32,6 +32,7 @@ import com.lukeneedham.videodiary.ui.feature.record.film.RecordVideoViewModel
 import com.lukeneedham.videodiary.ui.feature.setup.duration.SelectVideoDurationViewModel
 import com.lukeneedham.videodiary.ui.feature.setup.orientation.SetupSelectOrientationViewModel
 import com.lukeneedham.videodiary.ui.feature.setup.resolution.SetupSelectResolutionViewModel
+import com.lukeneedham.videodiary.ui.feature.setup.storage.SetupSelectStorageViewModel
 import com.lukeneedham.videodiary.ui.media.VideoPlayerHolder
 import com.lukeneedham.videodiary.ui.root.RootViewModel
 import com.lukeneedham.videodiary.ui.share.Sharer
@@ -154,6 +155,12 @@ object KoinModule {
         viewModel {
             SetupSelectOrientationViewModel(
                 settingsDao = get(),
+                ioDispatcher = get(KoinQualifier.Dispatcher.io),
+            )
+        }
+        viewModel {
+            SetupSelectStorageViewModel(
+                videosDao = get(),
                 ioDispatcher = get(KoinQualifier.Dispatcher.io),
             )
         }

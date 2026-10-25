@@ -41,7 +41,7 @@ class VideosDao(
 
     // Debug-only (ignored in release builds), loaded from the settings by initialiseStorageLocation
     @Volatile
-    private var debugFakeSdCardEnabled = false
+    private var debugFakeSdCardEnabled = true
     @Volatile
     private var debugFakeSdCardInserted = true
     @Volatile
