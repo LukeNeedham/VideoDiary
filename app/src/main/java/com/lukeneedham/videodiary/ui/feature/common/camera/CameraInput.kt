@@ -50,6 +50,7 @@ private const val FOCUS_HOLD_MILLIS = 500
 /** How long the focus indicator takes to fade out, before the debug animation speed is applied. */
 private const val FOCUS_FADE_MILLIS = 400
 
+// lint:ignore PRV-7: needs a camera, so it cannot be previewed
 @Composable
 fun CameraInput(
     currentResolution: Size,

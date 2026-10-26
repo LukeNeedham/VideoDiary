@@ -24,6 +24,7 @@ import com.lukeneedham.videodiary.ui.feature.recap.share.MockDataRecapShare
 import com.lukeneedham.videodiary.ui.feature.recap.share.RecapShareSheet
 import com.lukeneedham.videodiary.ui.feature.recap.share.model.RecapShareState
 import com.lukeneedham.videodiary.ui.feature.recap.view.component.RecapViewBottomBar
+import com.lukeneedham.videodiary.ui.theme.AppTheme
 import kotlinx.coroutines.launch
 import com.lukeneedham.videodiary.ui.feature.recap.model.RecapDayThumbnail
 import com.lukeneedham.videodiary.ui.feature.recap.view.component.RecapInfoSheet
@@ -125,57 +126,61 @@ internal fun RecapViewPageContent(
 @Preview
 @Composable
 private fun Preview() {
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-    ) {
-        RecapViewPageContent(
-            name = MockDataRecapView.name,
-            onNameChange = {},
-            startDate = LocalDate.of(2026, 3, 1),
-            endDate = LocalDate.of(2026, 5, 31),
-            thumbnails = emptyList(),
-            videoFiles = MockDataRecapView.videoFiles,
-            isSaved = false,
-            onToggleSavedClick = {},
-            canGoBack = true,
-            onBack = {},
-            shareState = RecapShareState.SelectingOptions,
-            includeDateStamp = false,
-            onIncludeDateStampChange = {},
-            onCreateExportClick = {},
-            onCancelExportClick = {},
-            onBackToOptionsClick = {},
-            onManualShareClick = {},
-        )
+    AppTheme {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+        ) {
+            RecapViewPageContent(
+                name = MockDataRecapView.name,
+                onNameChange = {},
+                startDate = LocalDate.of(2026, 3, 1),
+                endDate = LocalDate.of(2026, 5, 31),
+                thumbnails = emptyList(),
+                videoFiles = MockDataRecapView.videoFiles,
+                isSaved = false,
+                onToggleSavedClick = {},
+                canGoBack = true,
+                onBack = {},
+                shareState = RecapShareState.SelectingOptions,
+                includeDateStamp = false,
+                onIncludeDateStampChange = {},
+                onCreateExportClick = {},
+                onCancelExportClick = {},
+                onBackToOptionsClick = {},
+                onManualShareClick = {},
+            )
+        }
     }
 }
 
 @Preview
 @Composable
 private fun PreviewSaved() {
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-    ) {
-        RecapViewPageContent(
-            name = MockDataRecapView.name,
-            onNameChange = {},
-            startDate = LocalDate.of(2026, 3, 1),
-            endDate = LocalDate.of(2026, 5, 31),
-            thumbnails = emptyList(),
-            videoFiles = MockDataRecapView.videoFiles,
-            isSaved = true,
-            onToggleSavedClick = {},
-            canGoBack = true,
-            onBack = {},
-            shareState = MockDataRecapShare.ready,
-            includeDateStamp = false,
-            onIncludeDateStampChange = {},
-            onCreateExportClick = {},
-            onCancelExportClick = {},
-            onBackToOptionsClick = {},
-            onManualShareClick = {},
-        )
+    AppTheme {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+        ) {
+            RecapViewPageContent(
+                name = MockDataRecapView.name,
+                onNameChange = {},
+                startDate = LocalDate.of(2026, 3, 1),
+                endDate = LocalDate.of(2026, 5, 31),
+                thumbnails = emptyList(),
+                videoFiles = MockDataRecapView.videoFiles,
+                isSaved = true,
+                onToggleSavedClick = {},
+                canGoBack = true,
+                onBack = {},
+                shareState = MockDataRecapShare.ready,
+                includeDateStamp = false,
+                onIncludeDateStampChange = {},
+                onCreateExportClick = {},
+                onCancelExportClick = {},
+                onBackToOptionsClick = {},
+                onManualShareClick = {},
+            )
+        }
     }
 }

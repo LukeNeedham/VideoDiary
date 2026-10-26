@@ -18,7 +18,7 @@ private val VideoDiaryColors = darkColors(
 )
 
 @Composable
-fun VideoDiaryTheme(
+fun AppTheme(
     content: @Composable () -> Unit
 ) {
     MaterialTheme(

@@ -10,6 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.lukeneedham.videodiary.R
+import com.lukeneedham.videodiary.ui.theme.AppTheme
 
 /**
  * Toolbar content for subpages: a back button (if [canGoBack]) and optional [centerContent] in the
@@ -48,8 +49,10 @@ fun SubpageToolbar(
 @Preview
 @Composable
 private fun PreviewSubpageToolbar() {
-    SubpageToolbar(
-        canGoBack = true,
-        onBack = {},
-    )
+    AppTheme {
+        SubpageToolbar(
+            canGoBack = true,
+            onBack = {},
+        )
+    }
 }

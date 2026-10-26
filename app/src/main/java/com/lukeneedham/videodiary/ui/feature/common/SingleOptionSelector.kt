@@ -33,6 +33,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import com.lukeneedham.videodiary.ui.theme.AccentHighlight
+import com.lukeneedham.videodiary.ui.theme.AppTheme
 import com.lukeneedham.videodiary.ui.util.DpUtil
 
 private val TrackColor = Color(0xFFEFEFF2)
@@ -118,14 +119,16 @@ fun <T> SingleOptionSelector(
 @Preview
 @Composable
 private fun PreviewSingleItemRowSelector() {
-    SingleOptionSelector(
-        options = listOf("a", "eniohoa ndosroei", "cnaear amroie mar"),
-        selectedOption = "a",
-        setSelectedOption = {},
-        optionContent = { option, isSelected ->
-            val color = if (isSelected) Color.White else Color.DarkGray
-            Text(text = option, color = color)
-        },
-        modifier = Modifier.fillMaxWidth()
-    )
+    AppTheme {
+        SingleOptionSelector(
+            options = listOf("a", "eniohoa ndosroei", "cnaear amroie mar"),
+            selectedOption = "a",
+            setSelectedOption = {},
+            optionContent = { option, isSelected ->
+                val color = if (isSelected) Color.White else Color.DarkGray
+                Text(text = option, color = color)
+            },
+            modifier = Modifier.fillMaxWidth()
+        )
+    }
 }

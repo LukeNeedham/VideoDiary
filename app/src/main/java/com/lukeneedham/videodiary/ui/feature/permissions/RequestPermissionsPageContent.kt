@@ -21,6 +21,7 @@ import com.lukeneedham.videodiary.ui.feature.common.Button
 import com.lukeneedham.videodiary.ui.feature.common.pageindicator.PageIndicator
 import com.lukeneedham.videodiary.ui.permissions.RequiredPermission
 import com.lukeneedham.videodiary.ui.permissions.RequiredPermissions
+import com.lukeneedham.videodiary.ui.theme.AppTheme
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -101,10 +102,12 @@ internal fun RequestPermissionsPageContent(
 @Preview
 @Composable
 private fun Preview() {
-    RequestPermissionsPageContent(
-        requestPermission = {},
-        onContinue = {},
-        acquiredPermissions = emptyList(),
-        requiredPermissions = RequiredPermissions.permissions,
-    )
+    AppTheme {
+        RequestPermissionsPageContent(
+            requestPermission = {},
+            onContinue = {},
+            acquiredPermissions = emptyList(),
+            requiredPermissions = RequiredPermissions.permissions,
+        )
+    }
 }

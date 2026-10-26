@@ -17,6 +17,7 @@ import com.lukeneedham.videodiary.domain.util.date.StandardDateTimeFormatter
 import com.lukeneedham.videodiary.ui.feature.recap.create.MockDataRecapCreateCustom
 import com.lukeneedham.videodiary.ui.theme.AccentHighlight
 import com.lukeneedham.videodiary.ui.theme.AppSurfaceVariant
+import com.lukeneedham.videodiary.ui.theme.AppTheme
 import com.lukeneedham.videodiary.ui.theme.GlassBorder
 import com.lukeneedham.videodiary.ui.theme.Typography
 import java.time.LocalDate
@@ -52,10 +53,12 @@ fun RecapDatePicker(
 
 @Preview
 @Composable
-internal fun PreviewRecapDatePicker() {
-    RecapDatePicker(
-        label = "From",
-        date = MockDataRecapCreateCustom.startDate,
-        onClick = {},
-    )
+private fun Preview() {
+    AppTheme {
+        RecapDatePicker(
+            label = "From",
+            date = MockDataRecapCreateCustom.startDate,
+            onClick = {},
+        )
+    }
 }

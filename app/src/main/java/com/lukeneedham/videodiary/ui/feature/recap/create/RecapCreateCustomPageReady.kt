@@ -37,6 +37,7 @@ import com.lukeneedham.videodiary.ui.feature.recap.model.RecapDayThumbnail
 import com.lukeneedham.videodiary.ui.theme.AccentHighlight
 import com.lukeneedham.videodiary.ui.theme.AppSurface
 import com.lukeneedham.videodiary.ui.theme.AppSurfaceVariant
+import com.lukeneedham.videodiary.ui.theme.AppTheme
 import com.lukeneedham.videodiary.ui.theme.Typography
 import java.time.LocalDate
 
@@ -199,16 +200,18 @@ private fun RecapSection(
 
 @Preview
 @Composable
-internal fun PreviewRecapCreateCustomPageReady() {
-    RecapCreateCustomPageReady(
-        totalVideoCount = 10,
-        selectedVideoCount = 5,
-        selectedDayThumbnails = emptyList(),
-        recapStartDate = MockDataRecapCreateCustom.startDate,
-        recapEndDate = MockDataRecapCreateCustom.endDate,
-        onStartDateSelected = {},
-        onEndDateSelected = {},
-        recapName = "",
-        onRecapNameChange = {},
-    )
+private fun Preview() {
+    AppTheme {
+        RecapCreateCustomPageReady(
+            totalVideoCount = 10,
+            selectedVideoCount = 5,
+            selectedDayThumbnails = emptyList(),
+            recapStartDate = MockDataRecapCreateCustom.startDate,
+            recapEndDate = MockDataRecapCreateCustom.endDate,
+            onStartDateSelected = {},
+            onEndDateSelected = {},
+            recapName = "",
+            onRecapNameChange = {},
+        )
+    }
 }

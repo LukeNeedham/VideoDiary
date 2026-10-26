@@ -26,6 +26,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.lukeneedham.videodiary.R
 import com.lukeneedham.videodiary.ui.feature.common.glass.GlassSurface
+import com.lukeneedham.videodiary.ui.theme.AppTheme
 
 /**
  * A floating "glass" panel containing a labelled slider, intended to pop up just above the
@@ -115,17 +116,19 @@ fun CameraControlSlider(
 @Preview
 @Composable
 private fun Preview() {
-    Column(
-        modifier = Modifier
-            .background(Color.Black)
-            .padding(20.dp),
-    ) {
-        CameraControlSlider(
-            value = 0.5f,
-            onValueChange = {},
-            iconRes = R.drawable.brightness,
-            contentDescription = "Brightness",
-            modifier = Modifier.width(150.dp),
-        )
+    AppTheme {
+        Column(
+            modifier = Modifier
+                .background(Color.Black)
+                .padding(20.dp),
+        ) {
+            CameraControlSlider(
+                value = 0.5f,
+                onValueChange = {},
+                iconRes = R.drawable.brightness,
+                contentDescription = "Brightness",
+                modifier = Modifier.width(150.dp),
+            )
+        }
     }
 }

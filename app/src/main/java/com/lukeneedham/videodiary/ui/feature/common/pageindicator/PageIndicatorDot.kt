@@ -7,6 +7,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
+import com.lukeneedham.videodiary.ui.theme.AppTheme
 
 @Composable
 fun PageIndicatorDot(
@@ -19,7 +20,9 @@ fun PageIndicatorDot(
 @Preview
 @Composable
 private fun PreviewPageIndicatorDot() {
-    PageIndicatorDot(
-        color = Color.Black,
-    )
+    AppTheme {
+        PageIndicatorDot(
+            color = Color.Black,
+        )
+    }
 }

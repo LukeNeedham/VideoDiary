@@ -15,6 +15,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import coil.compose.AsyncImage
 import com.lukeneedham.videodiary.R
 import com.lukeneedham.videodiary.domain.model.Video
+import com.lukeneedham.videodiary.ui.theme.AppTheme
 import java.io.File
 
 /**
@@ -84,11 +85,13 @@ private fun VideoThumbnail(thumbnailFile: File?) {
 
 @Preview
 @Composable
-internal fun PreviewVideoPlayer() {
-    VideoPlayer(
-        video = Video.PersistedFile(File("")),
-        thumbnailFile = null,
-        aspectRatio = 1f,
-        controller = rememberVideoPlayerController(),
-    )
+private fun Preview() {
+    AppTheme {
+        VideoPlayer(
+            video = Video.PersistedFile(File("")),
+            thumbnailFile = null,
+            aspectRatio = 1f,
+            controller = rememberVideoPlayerController(),
+        )
+    }
 }

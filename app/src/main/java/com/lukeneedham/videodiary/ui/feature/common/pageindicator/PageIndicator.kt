@@ -8,6 +8,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.lukeneedham.videodiary.ui.theme.AppTheme
 
 @Composable
 fun PageIndicator(
@@ -31,9 +32,11 @@ fun PageIndicator(
 @Preview
 @Composable
 private fun PreviewPageIndicator() {
-    PageIndicator(
-        pageCount = 6,
-        currentPageIndex = 2,
-        color = Color.Black,
-    )
+    AppTheme {
+        PageIndicator(
+            pageCount = 6,
+            currentPageIndex = 2,
+            color = Color.Black,
+        )
+    }
 }
