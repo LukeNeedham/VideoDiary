@@ -12,3 +12,4 @@ permissions:
 jobs:
   android:
     uses: LukeNeedham/ci-workflows/.github/workflows/android_previews_main.yml@trial-previews
+# trial: refresh the comments of open PRs
