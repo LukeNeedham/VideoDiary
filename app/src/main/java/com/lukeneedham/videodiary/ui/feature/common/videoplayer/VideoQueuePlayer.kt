@@ -2,7 +2,6 @@ package com.lukeneedham.videodiary.ui.feature.common.videoplayer
 
 import android.view.TextureView
 import android.view.ViewGroup
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.aspectRatio
@@ -13,14 +12,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalInspectionMode
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.net.toUri
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
-import com.lukeneedham.videodiary.R
 import com.lukeneedham.videodiary.ui.media.VideoPlayerHolder
 import com.lukeneedham.videodiary.ui.theme.AppTheme
 import org.koin.compose.getKoin
@@ -47,11 +44,7 @@ fun VideoQueuePlayer(
     ) {
         // Don't render the player in Previews - ExoPlayer will break Previews
         if (LocalInspectionMode.current) {
-            Image(
-                painter = painterResource(R.drawable.preview_video),
-                contentDescription = null,
-                modifier = Modifier.align(Alignment.Center)
-            )
+            VideoPlayerPlaceholder(modifier = Modifier.align(Alignment.Center))
         } else {
             VideoQueuePlayerExo(
                 videoFiles = videoFiles,

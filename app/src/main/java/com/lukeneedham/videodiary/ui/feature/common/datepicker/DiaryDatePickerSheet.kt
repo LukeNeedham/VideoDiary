@@ -36,6 +36,7 @@ import java.time.LocalDate
 
 private val CalendarSideMargin = 20.dp
 
+// lint:ignore PRV-7: gets its state from Koin, so it cannot be previewed; DiaryDatePicker, which draws the dates, has the preview
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DiaryDatePickerSheet(

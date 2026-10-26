@@ -20,7 +20,7 @@ import com.lukeneedham.videodiary.domain.model.Video
  * video (the shared app-wide player), so it's stopped before this composable claims its texture
  * view; it's unnecessary (but harmless) for a freshly created, dedicated player.
  */
-// lint:ignore PRV-7: needs a real ExoPlayer, so it cannot be previewed
+// lint:ignore PRV-7: needs a real ExoPlayer; VideoPlayerExo and VideoPlayerExoStandalone, which call it, have previews with a placeholder
 @Composable
 internal fun VideoPlayerExoContent(
     video: Video,

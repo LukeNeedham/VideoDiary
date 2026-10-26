@@ -1,6 +1,5 @@
 package com.lukeneedham.videodiary.ui.feature.common.videoplayer
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.aspectRatio
@@ -10,10 +9,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalInspectionMode
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import coil.compose.AsyncImage
-import com.lukeneedham.videodiary.R
 import com.lukeneedham.videodiary.domain.model.Video
 import com.lukeneedham.videodiary.ui.theme.AppTheme
 import java.io.File
@@ -42,11 +39,7 @@ fun VideoPlayer(
         // Don't render the video player in Previews - ExoPlayer will break Previews
         val isPreview = LocalInspectionMode.current
         if (isPreview) {
-            Image(
-                painter = painterResource(R.drawable.preview_video),
-                contentDescription = null,
-                modifier = Modifier.align(Alignment.Center)
-            )
+            VideoPlayerPlaceholder(modifier = Modifier.align(Alignment.Center))
         } else {
             val isCurrent = controller.playingVideo == video
 
