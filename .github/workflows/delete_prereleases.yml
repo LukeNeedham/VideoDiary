@@ -9,4 +9,4 @@ permissions:
 
 jobs:
   delete-prereleases:
-    uses: LukeNeedham/ci-workflows/.github/workflows/delete_prereleases.yml@main
+    uses: LukeNeedham/ci-workflows/.github/workflows/delete_prereleases.yml@trial-previews

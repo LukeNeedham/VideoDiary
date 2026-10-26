@@ -19,7 +19,7 @@ permissions:
 
 jobs:
   release:
-    uses: LukeNeedham/ci-workflows/.github/workflows/android_release.yml@main
+    uses: LukeNeedham/ci-workflows/.github/workflows/android_release.yml@trial-previews
     with:
       version: ${{ inputs.version }}
       notes: ${{ inputs.notes }}
