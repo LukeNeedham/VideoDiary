@@ -3,14 +3,16 @@ package com.lukeneedham.videodiary.ui.feature.recap.create
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import java.time.LocalDate
+import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun RecapCreateCustomPage(
-    viewModel: RecapCreateCustomViewModel,
     canGoBack: Boolean,
     onBack: () -> Unit,
     onRecapCreated: (startDate: LocalDate, endDate: LocalDate, name: String, savedRecapId: String) -> Unit,
 ) {
+    val viewModel = koinViewModel<RecapCreateCustomViewModel>()
+
     LaunchedEffect(viewModel) {
         viewModel.onSavedFlow.collect { args ->
             onRecapCreated(args.startDate, args.endDate, args.name, args.savedRecapId)

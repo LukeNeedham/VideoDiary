@@ -10,18 +10,10 @@ import com.lukeneedham.videodiary.data.persistence.SavedRecapsDao
 import com.lukeneedham.videodiary.data.repository.CalendarRepository
 import com.lukeneedham.videodiary.domain.model.Day
 import com.lukeneedham.videodiary.ui.feature.recap.model.RecapDayThumbnail
-import kotlinx.coroutines.channels.BufferOverflow
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import java.time.LocalDate
-
-data class RecapCreatedArgs(
-    val startDate: LocalDate,
-    val endDate: LocalDate,
-    val name: String,
-    val savedRecapId: String,
-)
 
 class RecapCreateCustomViewModel(
     private val calendarRepository: CalendarRepository,
@@ -80,11 +72,8 @@ class RecapCreateCustomViewModel(
         (selectedVideoCount ?: 0) > 0
     }
 
-    private val onSavedMutable = MutableSharedFlow<RecapCreatedArgs>(
-        onBufferOverflow = BufferOverflow.DROP_OLDEST,
-        extraBufferCapacity = 1,
-    )
-    val onSavedFlow = onSavedMutable.asSharedFlow()
+    private val onSavedChannel = Channel<RecapCreatedArgs>(Channel.BUFFERED)
+    val onSavedFlow = onSavedChannel.receiveAsFlow()
 
     init {
         viewModelScope.launch {
@@ -111,7 +100,7 @@ class RecapCreateCustomViewModel(
 
         viewModelScope.launch {
             val id = savedRecapsDao.saveRecap(name, startDate, endDate)
-            onSavedMutable.emit(RecapCreatedArgs(startDate, endDate, name, id))
+            onSavedChannel.send(RecapCreatedArgs(startDate, endDate, name, id))
         }
     }
 }

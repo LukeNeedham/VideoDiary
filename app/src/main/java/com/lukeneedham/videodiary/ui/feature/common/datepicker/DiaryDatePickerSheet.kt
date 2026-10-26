@@ -45,11 +45,11 @@ fun DiaryDatePickerSheet(
     onJumpToToday: (() -> Unit)? = null,
     /** If set, days before this date are shown but can't be selected */
     minDate: LocalDate? = null,
-    viewModel: DiaryDatePickerViewModel = koinInject(),
+    state: DiaryDatePickerState = koinInject(),
 ) {
-    DisposableEffect(viewModel) {
+    DisposableEffect(state) {
         onDispose {
-            viewModel.dispose()
+            state.dispose()
         }
     }
 
@@ -101,11 +101,11 @@ fun DiaryDatePickerSheet(
                 )
             }
         }
-        val videoAspectRatio = viewModel.videoAspectRatio
+        val videoAspectRatio = state.videoAspectRatio
         if (videoAspectRatio != null) {
             DiaryDatePicker(
                 initialFocusedDate = initialFocusedDate,
-                allMonths = viewModel.months,
+                allMonths = state.months,
                 videoAspectRatio = videoAspectRatio,
                 onDateSelected = { hideThen { onDateSelected(it) } },
                 minDate = minDate,

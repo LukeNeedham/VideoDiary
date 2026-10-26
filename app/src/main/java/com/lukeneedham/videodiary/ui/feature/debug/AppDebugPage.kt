@@ -3,6 +3,7 @@ package com.lukeneedham.videodiary.ui.feature.debug
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import org.koin.compose.viewmodel.koinViewModel
 
 /**
  * VideoDiary's own debug page. The shared library's debug page (animation speed, logs, crashes) has no
@@ -10,11 +11,11 @@ import androidx.compose.runtime.getValue
  */
 @Composable
 fun AppDebugPage(
-    viewModel: AppDebugViewModel,
     canGoBack: Boolean,
     onBack: () -> Unit,
     onOpenSdkDebug: () -> Unit,
 ) {
+    val viewModel = koinViewModel<AppDebugViewModel>()
     val allowRetakeForPastDays by viewModel.allowRetakeForPastDays.collectAsState()
 
     AppDebugPageContent(

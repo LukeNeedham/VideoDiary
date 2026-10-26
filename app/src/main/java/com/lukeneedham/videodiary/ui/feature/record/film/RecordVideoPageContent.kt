@@ -8,6 +8,7 @@ import androidx.camera.video.Quality
 import androidx.camera.video.QualitySelector
 import androidx.camera.video.Recorder
 import androidx.camera.video.VideoCapture
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -17,6 +18,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.Observer
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -48,8 +50,34 @@ import com.lukeneedham.videodiary.ui.theme.AppTheme
 
 private enum class CameraControlType { BRIGHTNESS, ZOOM }
 
+/** The camera and its controls, on black. Empty until the resolution, the duration and the quality are known. */
 @Composable
 internal fun RecordVideoPageContent(
+    videoDurationMillis: Long?,
+    resolution: Size?,
+    quality: Quality?,
+    onRecordingFinished: (videoContentUri: Uri) -> Unit,
+    onBack: () -> Unit,
+) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(color = Color.Black)
+    ) {
+        if (quality != null && resolution != null && videoDurationMillis != null) {
+            RecordVideoCamera(
+                videoDurationMillis = videoDurationMillis,
+                resolution = resolution,
+                quality = quality,
+                onRecordingFinished = onRecordingFinished,
+                onBack = onBack,
+            )
+        }
+    }
+}
+
+@Composable
+private fun RecordVideoCamera(
     videoDurationMillis: Long,
     resolution: Size,
     quality: Quality,

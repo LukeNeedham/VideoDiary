@@ -26,16 +26,13 @@ import com.lukeneedham.videodiary.ui.feature.recap.model.RecapPeriodType
 import com.lukeneedham.videodiary.ui.feature.recap.view.RecapViewPage
 import com.lukeneedham.videodiary.ui.feature.record.check.CheckVideoPage
 import com.lukeneedham.videodiary.ui.feature.record.film.RecordVideoPage
-import com.lukeneedham.videodiary.ui.feature.record.film.RecordVideoViewModel
 import dev.olshevski.navigation.reimagined.NavBackHandler
 import dev.olshevski.navigation.reimagined.NavHost
 import dev.olshevski.navigation.reimagined.navigate
 import dev.olshevski.navigation.reimagined.pop
 import dev.olshevski.navigation.reimagined.popUpTo
 import dev.olshevski.navigation.reimagined.rememberNavController
-import org.koin.compose.viewmodel.koinViewModel
 import kotlinx.coroutines.launch
-import org.koin.core.parameter.parametersOf
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -120,7 +117,6 @@ fun NormalRouter(
         ) { page ->
             when (page) {
                 is Route.Calendar -> CalendarPage(
-                    viewModel = koinViewModel(),
                     onRecordVideoClick = { date ->
                         navigate(Route.RecordVideo(date))
                     },
@@ -128,37 +124,29 @@ fun NormalRouter(
                     share = share,
                 )
 
-                is Route.RecordVideo -> {
-                    val viewModel = koinViewModel<RecordVideoViewModel> {
-                        parametersOf(page.date)
-                    }
-                    RecordVideoPage(
-                        viewModel = viewModel,
-                        onRecordingFinished = { videoContentUri ->
-                            if (viewModel.hasExistingVideo) {
-                                navigate(
-                                    Route.CheckVideo(
-                                        date = page.date,
-                                        videoContentUri = videoContentUri,
-                                    )
-                                )
-                            } else {
-                                viewModel.persistVideoDirectly(videoContentUri)
-                                navController.popUpTo { it is Route.Calendar }
-                            }
-                        },
-                        onBack = onBack,
-                    )
-                }
+                is Route.RecordVideo -> RecordVideoPage(
+                    date = page.date,
+                    onCheckVideo = { videoContentUri ->
+                        navigate(
+                            Route.CheckVideo(
+                                date = page.date,
+                                videoContentUri = videoContentUri,
+                            )
+                        )
+                    },
+                    onVideoSaved = {
+                        navController.popUpTo { it is Route.Calendar }
+                    },
+                    onBack = onBack,
+                )
 
                 is Route.CheckVideo -> {
                     val returnToCalendar: () -> Unit = {
                         navController.popUpTo { it is Route.Calendar }
                     }
                     CheckVideoPage(
-                        viewModel = koinViewModel {
-                            parametersOf(page.date, page.videoContentUri)
-                        },
+                        date = page.date,
+                        videoContentUri = page.videoContentUri,
                         onRetake = {
                             pop()
                         },
@@ -168,7 +156,6 @@ fun NormalRouter(
                 }
 
                 is Route.RecapHub -> RecapHubPage(
-                    viewModel = koinViewModel(),
                     onMenuClick = openHubSwitcher,
                     onCreateWeekClick = {
                         navigate(Route.RecapCreatePeriodList(RecapPeriodType.WEEK))
@@ -195,9 +182,7 @@ fun NormalRouter(
                 )
 
                 is Route.RecapCreatePeriodList -> RecapCreatePeriodListPage(
-                    viewModel = koinViewModel {
-                        parametersOf(page.periodType)
-                    },
+                    periodType = page.periodType,
                     canGoBack = canGoBack,
                     onBack = onBack,
                     onOptionClick = { option ->
@@ -213,7 +198,6 @@ fun NormalRouter(
                 )
 
                 is Route.RecapCreateCustom -> RecapCreateCustomPage(
-                    viewModel = koinViewModel(),
                     canGoBack = canGoBack,
                     onBack = onBack,
                     onRecapCreated = { startDate, endDate, name, savedRecapId ->
@@ -230,9 +214,10 @@ fun NormalRouter(
                 )
 
                 is Route.RecapView -> RecapViewPage(
-                    viewModel = koinViewModel {
-                        parametersOf(page.startDate, page.endDate, page.name, page.savedRecapId)
-                    },
+                    startDate = page.startDate,
+                    endDate = page.endDate,
+                    name = page.name,
+                    savedRecapId = page.savedRecapId,
                     canGoBack = canGoBack,
                     onBack = onBack,
                     share = share,
@@ -248,7 +233,6 @@ fun NormalRouter(
                 // The app's own debug page, which opens the shared library's debug page. The library's
                 // debug, logs and crashes pages show only the library's own things.
                 is Route.AppDebug -> AppDebugPage(
-                    viewModel = koinViewModel(),
                     canGoBack = canGoBack,
                     onBack = onBack,
                     onOpenSdkDebug = { navigate(Route.Debug) },

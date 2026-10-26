@@ -16,14 +16,13 @@ import com.lukeneedham.videodiary.data.repository.CurrentDateRepository
 import com.lukeneedham.videodiary.data.repository.MockDataRepository
 import com.lukeneedham.videodiary.data.repository.VideoResolutionRepository
 import com.lukeneedham.videodiary.ui.feature.calendar.CalendarViewModel
-import com.lukeneedham.videodiary.ui.feature.common.datepicker.DiaryDatePickerViewModel
+import com.lukeneedham.videodiary.ui.feature.common.datepicker.DiaryDatePickerState
 import com.lukeneedham.videodiary.ui.feature.debug.AppDebugViewModel
 import com.lukeneedham.videodiary.ui.feature.permissions.RequestPermissionsViewModel
 import com.lukeneedham.videodiary.ui.feature.recap.create.RecapCreateCustomViewModel
 import com.lukeneedham.videodiary.ui.feature.recap.create.RecapCreatePeriodListViewModel
 import com.lukeneedham.videodiary.ui.feature.recap.hub.RecapHubViewModel
 import com.lukeneedham.videodiary.ui.feature.recap.model.RecapPeriodType
-import com.lukeneedham.videodiary.ui.feature.recap.share.RecapShareViewModel
 import com.lukeneedham.videodiary.ui.feature.recap.view.RecapViewViewModel
 import com.lukeneedham.videodiary.ui.feature.record.check.CheckVideoViewModel
 import com.lukeneedham.videodiary.ui.feature.record.film.RecordVideoViewModel
@@ -45,7 +44,7 @@ object KoinModule {
         getUtil(),
         getData(),
         getRepositories(),
-        getNonAndroidViewModel(),
+        getComponentState(),
         getViewModel(),
         getPersistence(),
         getUi(),
@@ -194,13 +193,6 @@ object KoinModule {
                 initialSavedRecapId = savedRecapId,
                 calendarRepository = get(),
                 savedRecapsDao = get(),
-            )
-        }
-        viewModel { (startDate: LocalDate, endDate: LocalDate, name: String) ->
-            RecapShareViewModel(
-                startDate = startDate,
-                endDate = endDate,
-                initialName = name,
                 videoExportDao = get(),
             )
         }
@@ -221,9 +213,9 @@ object KoinModule {
         }
     }
 
-    private fun getNonAndroidViewModel() = module {
+    private fun getComponentState() = module {
         factory {
-            DiaryDatePickerViewModel(
+            DiaryDatePickerState(
                 calendarRepository = get(),
                 videoResolutionRepository = get(),
                 mainDispatcher = get(KoinQualifier.Dispatcher.main)

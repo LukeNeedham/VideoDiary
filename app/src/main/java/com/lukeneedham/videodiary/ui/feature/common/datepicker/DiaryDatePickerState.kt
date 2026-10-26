@@ -12,7 +12,7 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import java.time.YearMonth
 
-class DiaryDatePickerViewModel(
+class DiaryDatePickerState(
     private val calendarRepository: CalendarRepository,
     private val videoResolutionRepository: VideoResolutionRepository,
     private val mainDispatcher: CoroutineDispatcher,
