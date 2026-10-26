@@ -16,7 +16,6 @@ import com.lukeneedham.videodiary.data.repository.CurrentDateRepository
 import com.lukeneedham.videodiary.data.repository.MockDataRepository
 import com.lukeneedham.videodiary.data.repository.VideoResolutionRepository
 import com.lukeneedham.videodiary.ui.feature.calendar.CalendarViewModel
-import com.lukeneedham.videodiary.ui.feature.common.datepicker.DiaryDatePickerState
 import com.lukeneedham.videodiary.ui.feature.debug.AppDebugViewModel
 import com.lukeneedham.videodiary.ui.feature.permissions.RequestPermissionsViewModel
 import com.lukeneedham.videodiary.ui.feature.recap.create.RecapCreateCustomViewModel
@@ -45,7 +44,6 @@ object KoinModule {
         getUtil(),
         getData(),
         getRepositories(),
-        getComponentState(),
         getViewModel(),
         getPersistence(),
         getUi(),
@@ -169,12 +167,14 @@ object KoinModule {
                 calendarRepository = get(),
                 videosDao = get(),
                 settingsDao = get(),
+                videoResolutionRepository = get(),
             )
         }
         viewModel {
             RecapCreateCustomViewModel(
                 calendarRepository = get(),
                 savedRecapsDao = get(),
+                videoResolutionRepository = get(),
             )
         }
         viewModel { (periodType: RecapPeriodType) ->
@@ -207,16 +207,6 @@ object KoinModule {
                 settingsDao = get(),
                 videosDao = get(),
                 ioDispatcher = get(KoinQualifier.Dispatcher.io),
-            )
-        }
-    }
-
-    private fun getComponentState() = module {
-        factory {
-            DiaryDatePickerState(
-                calendarRepository = get(),
-                videoResolutionRepository = get(),
-                mainDispatcher = get(KoinQualifier.Dispatcher.main)
             )
         }
     }

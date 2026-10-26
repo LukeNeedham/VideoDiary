@@ -14,7 +14,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -31,29 +30,27 @@ import com.lukeneedham.videodiary.R
 import com.lukeneedham.videodiary.ui.feature.common.sheet.SheetDefaults
 import com.lukeneedham.videodiary.ui.feature.common.sheet.SheetLayout
 import kotlinx.coroutines.launch
-import org.koin.compose.koinInject
+import androidx.compose.ui.tooling.preview.Preview
+import com.lukeneedham.videodiary.domain.model.Day
+import com.lukeneedham.videodiary.ui.theme.AppTheme
 import java.time.LocalDate
 
 private val CalendarSideMargin = 20.dp
 
-// lint:ignore PRV-7: gets its state from Koin, so it cannot be previewed; DiaryDatePicker, which draws the dates, has the preview
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DiaryDatePickerSheet(
+    /** All days of the diary, grouped by calendar month in chronological order */
+    months: List<List<Day>>,
+    /** Null until it is known: the sheet shows a placeholder meanwhile */
+    videoAspectRatio: Float?,
     initialFocusedDate: LocalDate,
     onDateSelected: (LocalDate) -> Unit,
     onDismiss: () -> Unit,
     onJumpToToday: (() -> Unit)? = null,
     /** If set, days before this date are shown but can't be selected */
     minDate: LocalDate? = null,
-    state: DiaryDatePickerState = koinInject(),
 ) {
-    DisposableEffect(state) {
-        onDispose {
-            state.dispose()
-        }
-    }
-
     // Only read inside MonthTitle, so that swiping between months doesn't recompose the whole sheet
     val monthTitle = remember { mutableStateOf("") }
 
@@ -102,11 +99,10 @@ fun DiaryDatePickerSheet(
                 )
             }
         }
-        val videoAspectRatio = state.videoAspectRatio
         if (videoAspectRatio != null) {
             DiaryDatePicker(
                 initialFocusedDate = initialFocusedDate,
-                allMonths = state.months,
+                allMonths = months,
                 videoAspectRatio = videoAspectRatio,
                 onDateSelected = { hideThen { onDateSelected(it) } },
                 minDate = minDate,
@@ -136,3 +132,17 @@ private fun MonthTitle(title: () -> String, modifier: Modifier = Modifier) {
     )
 }
 
+@Preview
+@Composable
+private fun Preview() {
+    AppTheme {
+        DiaryDatePickerSheet(
+            months = MockDataDiaryDatePicker.months,
+            videoAspectRatio = MockDataDiaryDatePicker.videoAspectRatio,
+            initialFocusedDate = MockDataDiaryDatePicker.endDate,
+            onDateSelected = {},
+            onDismiss = {},
+            onJumpToToday = {},
+        )
+    }
+}

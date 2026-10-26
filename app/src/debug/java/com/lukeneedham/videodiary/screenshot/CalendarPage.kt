@@ -7,6 +7,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.lukeneedham.videodiary.domain.model.Day
 import com.lukeneedham.videodiary.ui.feature.calendar.CalendarPageContent
+import com.lukeneedham.videodiary.ui.feature.common.datepicker.groupedByMonth
 import com.lukeneedham.videodiary.ui.feature.common.videoplayer.rememberVideoPlayerController
 import com.lukeneedham.videodiary.ui.theme.AppBackground
 import com.lukeneedham.videodiary.ui.theme.AppTheme
@@ -19,11 +20,14 @@ import java.time.LocalDate
 private fun CalendarPageScreenshot() {
     AppTheme {
         Box(modifier = Modifier.background(AppBackground)) {
+            val days = listOf(
+                Day(date = LocalDate.of(2024, 12, 26), videoFile = File("")),
+                Day(date = LocalDate.of(2024, 12, 27), videoFile = File("")),
+            )
             CalendarPageContent(
-                days = listOf(
-                    Day(date = LocalDate.of(2024, 12, 26), videoFile = File("")),
-                    Day(date = LocalDate.of(2024, 12, 27), videoFile = File("")),
-                ),
+                days = days,
+                months = days.groupedByMonth(),
+                videoAspectRatio = 9f / 16f,
                 currentDayIndex = 1,
                 allowEditPastDays = false,
                 onRecordVideoClick = {},
