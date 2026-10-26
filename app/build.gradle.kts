@@ -5,6 +5,7 @@ plugins {
     id(deps.plugins.kotlinAndroid)
     id(deps.plugins.kotlinCompose)
     id(deps.plugins.parcelize)
+    id(deps.plugins.kotlinSerialization)
     id(deps.plugins.ksp)
 }
 
@@ -93,7 +94,10 @@ dependencies {
     implementation(deps.libs.compose.material3)
 
     // Navigation
-    implementation(deps.libs.navigation.compose)
+    implementation(deps.libs.navigation.runtime)
+    implementation(deps.libs.navigation.ui)
+    implementation(deps.libs.navigation.viewModel)
+    implementation(deps.libs.navigation.serialization)
 
     // Media3
     implementation(deps.libs.media3.player)
