@@ -22,7 +22,7 @@ import com.lukeneedham.videodiary.ui.navigation.normal.AppNavigation
 import com.lukeneedham.videodiary.ui.permissions.PermissionResultListenerHolder
 import com.lukeneedham.videodiary.ui.theme.AppTheme
 import com.lukeneedham.videodiary.ui.theme.ProvideAppDebugSettings
-import org.koin.compose.viewmodel.koinViewModel
+import org.koin.compose.koinInject
 
 @Composable
 fun Root(
@@ -31,19 +31,19 @@ fun Root(
     requestPermission: (permissions: String) -> Unit,
     permissionResultListenerHolder: PermissionResultListenerHolder,
 ) {
-    val viewModel: RootViewModel = koinViewModel()
+    val coordinator: RootCoordinator = koinInject()
 
     // Whenever the app comes back to the foreground, check the permissions again: a revoked one blocks the normal UI
     val lifecycleOwner = LocalLifecycleOwner.current
-    DisposableEffect(lifecycleOwner, viewModel) {
+    DisposableEffect(lifecycleOwner, coordinator) {
         val observer = LifecycleEventObserver { _, event ->
-            if (event == Lifecycle.Event.ON_RESUME) viewModel.onResume()
+            if (event == Lifecycle.Event.ON_RESUME) coordinator.onResume()
         }
         lifecycleOwner.lifecycle.addObserver(observer)
         onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
     }
 
-    val orientationState = viewModel.orientationState
+    val orientationState = coordinator.orientationState
 
     LaunchedEffect(orientationState) {
         when (orientationState) {
@@ -71,7 +71,7 @@ fun Root(
         AppTheme {
             // Every app wraps its content in ProvideDebugSettings, even without a debug setting to read.
             ProvideAppDebugSettings {
-                when (viewModel.state) {
+                when (coordinator.state) {
                     RootState.Loading -> {
                         Box(
                             contentAlignment = Alignment.Center,
@@ -84,18 +84,18 @@ fun Root(
                     RootState.NeedsPermissions -> {
                         RequestPermissionsPage(
                             requestPermission = requestPermission,
-                            onContinue = viewModel::onPermissionsAcquired,
+                            onContinue = coordinator::onPermissionsAcquired,
                             permissionResultListenerHolder = permissionResultListenerHolder,
                         )
                     }
 
                     RootState.NeedsSetup -> {
                         SetupPage(
-                            onSetupComplete = viewModel::onSetupComplete,
+                            onSetupComplete = coordinator::onSetupComplete,
                             setOrientation = setOrientation,
                             requestPermission = requestPermission,
                             permissionResultListenerHolder = permissionResultListenerHolder,
-                            onPermissionsAcquired = viewModel::onPermissionsAcquired,
+                            onPermissionsAcquired = coordinator::onPermissionsAcquired,
                         )
                     }
 

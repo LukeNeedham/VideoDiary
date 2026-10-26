@@ -4,22 +4,30 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.lukeneedham.videodiary.data.android.PermissionChecker
 import com.lukeneedham.videodiary.data.persistence.SettingsDao
 import com.lukeneedham.videodiary.data.persistence.VideosDao
 import com.lukeneedham.videodiary.ui.permissions.RequiredPermissions
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class RootViewModel(
+/**
+ * Decides what the app shows: the normal UI only when it can be used, otherwise the screen that deals with
+ * what is missing (permissions, setup). It is not a ViewModel, because it belongs to no screen: [Root] always
+ * renders, so there is one for the whole life of the app (a Koin `single`), with a scope of its own.
+ */
+class RootCoordinator(
     private val settingsDao: SettingsDao,
     private val permissionChecker: PermissionChecker,
     private val videosDao: VideosDao,
     private val ioDispatcher: CoroutineDispatcher,
-) : ViewModel() {
+    mainDispatcher: CoroutineDispatcher,
+) {
+    private val scope = CoroutineScope(SupervisorJob() + mainDispatcher)
+
     private var isMissingPermissions: Boolean? by mutableStateOf(null)
     private var hasSetupCompleted: Boolean? by mutableStateOf(null)
 
@@ -46,7 +54,7 @@ class RootViewModel(
     init {
         isMissingPermissions = !hasAllRequiredPermissions()
 
-        viewModelScope.launch {
+        scope.launch {
             val requiredSetupData = listOf(
                 settingsDao.getResolution(),
                 settingsDao.getResolutionRotation(),
@@ -54,7 +62,7 @@ class RootViewModel(
             )
             hasSetupCompleted = requiredSetupData.all { it != null }
         }
-        viewModelScope.launch {
+        scope.launch {
             settingsDao.getOrientationFlow().collect { orientation ->
                 orientationState = if (orientation == null) {
                     RootOrientationState.NeedsSetup
@@ -63,7 +71,7 @@ class RootViewModel(
                 }
             }
         }
-        viewModelScope.launch {
+        scope.launch {
             withContext(ioDispatcher) {
                 videosDao.generateMissingThumbnails()
             }

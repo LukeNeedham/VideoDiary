@@ -41,7 +41,7 @@ app/                         Android app module
     ui/
       feature/                One subpackage per feature/screen (see "Feature structure" below)
       navigation/             Navigation 3: `AppNavigation` (back stack + `NavDisplay`), `Router` (exhaustive `when` over `Route`) and the `Route` sealed interface of the main flow
-      root/                   App root composable + RootViewModel (top-level state machine); the root is not a page
+      root/                   `Root` (the root composable) + `RootCoordinator` (not a ViewModel: decides what the app shows) + `RootState`
       theme/                  Compose theme (Color, Typography, AppTheme)
       media/                  Shared media helpers (e.g. VideoPlayerPool)
       permissions/            Permission models/holders shared across the app
@@ -113,8 +113,11 @@ All DI wiring lives in `di/KoinModule.kt`, grouped into module functions:
     `…SlideContent` composables; the orientation, resolution and duration steps are pages with their own ViewModels, which
     hand up what the shared "Next" button saves (`registerSave`), so no page ever touches another page's ViewModel
   - `ui/navigation/normal/` (`Route.kt`, `AppNavigation.kt`, `Router.kt`) — main app flow (calendar, record video, check video, export diary, debug, logs, crashes)
-- `ui/root/Root.kt` + `RootViewModel`/`RootState` decide which flow (or permissions screen / loading
-  spinner) to show, based on permission state and whether setup has completed.
+- `ui/root/Root.kt` + `RootCoordinator`/`RootState` decide which flow (or permissions screen / loading
+  spinner) to show, based on permission state and whether setup has completed, and block the normal UI whenever a required
+  permission is missing (also when it was revoked while the app was in the background: `RootCoordinator.onResume()`). The
+  coordinator is not a ViewModel: only `XPage` composables request ViewModels. It is a Koin `single` with a scope of its own,
+  obtained in `Root` with `koinInject()`.
 - Built on Navigation 3 (`rememberNavBackStack`, `NavDisplay`, `NavEntry`); `Router` defines `navigateTo`, `onBack` and `popUpTo` once, and each page's ViewModel is scoped to its back stack entry.
 - Log navigation events via `Logger.d("Navigating to: $to")` (existing convention in both routers).
 

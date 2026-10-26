@@ -31,7 +31,7 @@ import com.lukeneedham.videodiary.ui.feature.setup.duration.SelectVideoDurationV
 import com.lukeneedham.videodiary.ui.feature.setup.orientation.SetupSelectOrientationViewModel
 import com.lukeneedham.videodiary.ui.feature.setup.resolution.SetupSelectResolutionViewModel
 import com.lukeneedham.videodiary.ui.media.VideoPlayerHolder
-import com.lukeneedham.videodiary.ui.root.RootViewModel
+import com.lukeneedham.videodiary.ui.root.RootCoordinator
 import com.lukeneedham.videodiary.ui.share.Sharer
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
@@ -121,14 +121,6 @@ object KoinModule {
     }
 
     private fun getViewModel() = module {
-        viewModel {
-            RootViewModel(
-                settingsDao = get(),
-                permissionChecker = get(),
-                videosDao = get(),
-                ioDispatcher = get(KoinQualifier.Dispatcher.io),
-            )
-        }
         viewModel {
             RequestPermissionsViewModel(
                 permissionChecker = get(),
@@ -249,6 +241,16 @@ object KoinModule {
         single {
             VideoPlayerHolder(
                 context = androidContext(),
+            )
+        }
+        // Not a ViewModel: Root always renders, so there is one for the whole life of the app
+        single {
+            RootCoordinator(
+                settingsDao = get(),
+                permissionChecker = get(),
+                videosDao = get(),
+                ioDispatcher = get(KoinQualifier.Dispatcher.io),
+                mainDispatcher = get(KoinQualifier.Dispatcher.main),
             )
         }
     }
