@@ -17,7 +17,7 @@ import com.lukeneedham.videodiary.ui.navigation.normal.AppNavigation
 import com.lukeneedham.videodiary.ui.navigation.setup.SetupRouter
 import com.lukeneedham.videodiary.ui.permissions.PermissionResultListenerHolder
 import com.lukeneedham.videodiary.ui.theme.ProvideAppDebugSettings
-import com.lukeneedham.videodiary.ui.theme.VideoDiaryTheme
+import com.lukeneedham.videodiary.ui.theme.AppTheme
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
@@ -54,7 +54,7 @@ fun Root(
             .statusBarsPadding()
             .background(Color.White)
     ) {
-        VideoDiaryTheme {
+        AppTheme {
             // Every app wraps its content in ProvideDebugSettings, even without a debug setting to read.
             ProvideAppDebugSettings {
                 when (viewModel.state) {
