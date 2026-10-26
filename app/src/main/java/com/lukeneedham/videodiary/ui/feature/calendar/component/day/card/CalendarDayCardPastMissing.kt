@@ -9,6 +9,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
+import com.lukeneedham.videodiary.ui.theme.AppTheme
 
 @Composable
 fun CalendarDayCardPastMissing(
@@ -34,12 +35,16 @@ fun CalendarDayCardPastMissing(
 
 @Preview
 @Composable
-internal fun PreviewCalendarDayMissing() {
-    CalendarDayCardPastMissing()
+private fun Preview() {
+    AppTheme {
+        CalendarDayCardPastMissing()
+    }
 }
 
 @Preview
 @Composable
-internal fun PreviewCalendarDayMissingRecordable() {
-    CalendarDayCardPastMissing(onRecordVideoClick = {})
+private fun PreviewRecordable() {
+    AppTheme {
+        CalendarDayCardPastMissing(onRecordVideoClick = {})
+    }
 }

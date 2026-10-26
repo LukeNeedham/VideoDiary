@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.net.toUri
 import androidx.media3.common.MediaItem
@@ -21,6 +22,7 @@ import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
 import com.lukeneedham.videodiary.R
 import com.lukeneedham.videodiary.ui.media.VideoPlayerHolder
+import com.lukeneedham.videodiary.ui.theme.AppTheme
 import org.koin.compose.getKoin
 import java.io.File
 
@@ -128,4 +130,16 @@ private fun VideoQueuePlayerExo(
             view.alpha = if (controller.hasRenderedFirstFrame) 1f else 0f
         },
     )
+}
+
+@Preview
+@Composable
+private fun Preview() {
+    AppTheme {
+        VideoQueuePlayer(
+            videoFiles = emptyList(),
+            aspectRatio = 9f / 16f,
+            controller = rememberVideoPlayerController(),
+        )
+    }
 }

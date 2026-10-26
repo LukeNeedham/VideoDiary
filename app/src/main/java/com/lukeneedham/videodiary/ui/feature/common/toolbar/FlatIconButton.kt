@@ -16,6 +16,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.lukeneedham.videodiary.R
+import com.lukeneedham.videodiary.ui.theme.AppTheme
 
 /** The smallest size a button's clickable area may be (the Material minimum touch target) */
 private val MinInteractiveSize = 48.dp
@@ -54,19 +55,21 @@ fun FlatIconButton(
 @Preview
 @Composable
 private fun Preview() {
-    Row(
-        modifier = Modifier.background(Color.Black),
-    ) {
-        FlatIconButton(
-            iconRes = R.drawable.close,
-            contentDescription = "Close",
-            onClick = {},
-        )
-        FlatIconButton(
-            iconRes = R.drawable.brightness,
-            contentDescription = "Brightness",
-            selected = true,
-            onClick = {},
-        )
+    AppTheme {
+        Row(
+            modifier = Modifier.background(Color.Black),
+        ) {
+            FlatIconButton(
+                iconRes = R.drawable.close,
+                contentDescription = "Close",
+                onClick = {},
+            )
+            FlatIconButton(
+                iconRes = R.drawable.brightness,
+                contentDescription = "Brightness",
+                selected = true,
+                onClick = {},
+            )
+        }
     }
 }

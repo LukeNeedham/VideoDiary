@@ -49,6 +49,7 @@ import com.lukeneedham.videodiary.ui.feature.recap.model.RecapDayThumbnail
 import com.lukeneedham.videodiary.ui.theme.AccentHighlight
 import com.lukeneedham.videodiary.ui.feature.common.sheet.SheetDefaults
 import com.lukeneedham.videodiary.ui.feature.common.sheet.SheetLayout
+import com.lukeneedham.videodiary.ui.theme.AppTheme
 import com.lukeneedham.videodiary.ui.theme.Typography
 import kotlinx.coroutines.launch
 import java.time.LocalDate
@@ -190,12 +191,14 @@ private fun EditableName(
 @Preview
 @Composable
 private fun Preview() {
-    RecapInfoSheet(
-        name = "Spring Trip",
-        onNameChange = {},
-        startDate = LocalDate.of(2026, 3, 1),
-        endDate = LocalDate.of(2026, 5, 31),
-        thumbnails = emptyList(),
-        onDismiss = {},
-    )
+    AppTheme {
+        RecapInfoSheet(
+            name = "Spring Trip",
+            onNameChange = {},
+            startDate = LocalDate.of(2026, 3, 1),
+            endDate = LocalDate.of(2026, 5, 31),
+            thumbnails = emptyList(),
+            onDismiss = {},
+        )
+    }
 }

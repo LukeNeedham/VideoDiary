@@ -19,6 +19,7 @@ import com.lukeneedham.videodiary.R
 import com.lukeneedham.videodiary.domain.model.Orientation
 import com.lukeneedham.videodiary.ui.feature.common.SingleOptionSelector
 import com.lukeneedham.videodiary.ui.feature.setup.SetupStepHeader
+import com.lukeneedham.videodiary.ui.theme.AppTheme
 
 @Composable
 internal fun SetupSelectOrientationPageContent(
@@ -72,9 +73,11 @@ internal fun SetupSelectOrientationPageContent(
 @Preview
 @Composable
 private fun Preview() {
-    SetupSelectOrientationPageContent(
-        options = Orientation.entries,
-        selectedOption = Orientation.Portrait,
-        setSelectedOption = {},
-    )
+    AppTheme {
+        SetupSelectOrientationPageContent(
+            options = Orientation.entries,
+            selectedOption = Orientation.Portrait,
+            setSelectedOption = {},
+        )
+    }
 }

@@ -21,6 +21,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.lukeneedham.videodiary.ui.theme.AppTheme
 import com.lukeneedham.videodiary.ui.theme.Typography
 
 /** One slide of the onboarding intro, as a single page within the wider onboarding pager. */
@@ -75,7 +76,9 @@ fun SetupIntroSlidePage(
 @Preview
 @Composable
 internal fun PreviewSetupIntroSlidePage() {
-    SetupIntroSlidePage(
-        slide = setupIntroSlides.first(),
-    )
+    AppTheme {
+        SetupIntroSlidePage(
+            slide = setupIntroSlides.first(),
+        )
+    }
 }

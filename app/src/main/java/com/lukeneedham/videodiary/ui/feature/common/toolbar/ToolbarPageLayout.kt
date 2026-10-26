@@ -21,6 +21,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.tooling.preview.Preview
 import com.lukeneedham.videodiary.data.repository.VideoResolutionRepository
+import com.lukeneedham.videodiary.ui.theme.AppTheme
 import org.koin.compose.koinInject
 
 private const val PREVIEW_ASPECT_RATIO = 9f / 16f
@@ -66,10 +67,12 @@ fun ToolbarPageLayout(
 @Preview
 @Composable
 private fun PreviewToolbarPageLayout() {
-    ToolbarPageLayout(
-        bottomBar = { SubpageToolbar(canGoBack = true, onBack = {}) },
-    ) {
-        Text(text = "Content", modifier = Modifier.align(Alignment.Center))
+    AppTheme {
+        ToolbarPageLayout(
+            bottomBar = { SubpageToolbar(canGoBack = true, onBack = {}) },
+        ) {
+            Text(text = "Content", modifier = Modifier.align(Alignment.Center))
+        }
     }
 }
 

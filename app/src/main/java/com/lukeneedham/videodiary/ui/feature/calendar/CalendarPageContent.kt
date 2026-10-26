@@ -24,6 +24,7 @@ import com.lukeneedham.videodiary.ui.feature.common.datepicker.DiaryDatePickerSh
 import com.lukeneedham.videodiary.ui.feature.common.videoplayer.VideoPlayerController
 import com.lukeneedham.videodiary.ui.feature.common.videoplayer.rememberVideoPlayerController
 import com.lukeneedham.videodiary.ui.theme.AppBackground
+import com.lukeneedham.videodiary.ui.theme.AppTheme
 import java.time.LocalDate
 
 @Composable
@@ -144,11 +145,15 @@ private fun PreviewOf(
 @Preview
 @Composable
 private fun Preview() {
-    PreviewOf(currentDayIndex = 0)
+    AppTheme {
+        PreviewOf(currentDayIndex = 0)
+    }
 }
 
 @Preview
 @Composable
 private fun PreviewDay2() {
-    PreviewOf(currentDayIndex = 1)
+    AppTheme {
+        PreviewOf(currentDayIndex = 1)
+    }
 }

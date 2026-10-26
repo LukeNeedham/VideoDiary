@@ -29,6 +29,7 @@ import com.lukeneedham.videodiary.ui.feature.common.videoplayer.VideoPlayerContr
 import com.lukeneedham.videodiary.ui.feature.common.videoplayer.VideoPlayerExo
 import com.lukeneedham.videodiary.ui.feature.common.videoplayer.VideoToolbarLayout
 import com.lukeneedham.videodiary.ui.feature.common.videoplayer.rememberVideoPlayerController
+import com.lukeneedham.videodiary.ui.theme.AppTheme
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import java.time.LocalDate
@@ -206,17 +207,19 @@ fun CalendarScroller(
 @OptIn(ExperimentalFoundationApi::class)
 @Preview
 @Composable
-internal fun PreviewCalendarScroller() {
-    CalendarScroller(
-        days = MockDataCalendar.days,
-        allowEditPastDays = false,
-        onRecordVideoClick = {},
-        onDeleteVideoClick = {},
-        openDayPicker = {},
-        onMenuClick = {},
-        setCurrentDayIndex = {},
-        currentDayIndex = 0,
-        share = {},
-        videoPlayerController = rememberVideoPlayerController(),
-    )
+private fun Preview() {
+    AppTheme {
+        CalendarScroller(
+            days = MockDataCalendar.days,
+            allowEditPastDays = false,
+            onRecordVideoClick = {},
+            onDeleteVideoClick = {},
+            openDayPicker = {},
+            onMenuClick = {},
+            setCurrentDayIndex = {},
+            currentDayIndex = 0,
+            share = {},
+            videoPlayerController = rememberVideoPlayerController(),
+        )
+    }
 }
