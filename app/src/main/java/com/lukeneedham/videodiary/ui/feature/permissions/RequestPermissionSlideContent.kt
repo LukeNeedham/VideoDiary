@@ -110,7 +110,7 @@ internal fun RequestPermissionSlideContent(
 
 @Preview
 @Composable
-private fun PreviewRequestPermissionSlideContent() {
+private fun Preview() {
     AppTheme {
         RequestPermissionSlideContent(
             permission = RequiredPermissions.permissions.first(),

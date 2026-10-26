@@ -40,9 +40,9 @@ app/                         Android app module
     di/                       Koin module definitions (KoinModule.kt, KoinQualifier.kt)
     ui/
       feature/                One subpackage per feature/screen (see "Feature structure" below)
-      navigation/             Reimagined Navigation routers + page (route) sealed classes
-      root/                   App root composable + RootViewModel (top-level state machine)
-      theme/                  Compose theme (Color, Typography, Theme)
+      navigation/             Reimagined Navigation router + `Route` sealed interface of the main flow
+      root/                   RootPage + RootPageContent + RootViewModel (top-level state machine)
+      theme/                  Compose theme (Color, Typography, AppTheme)
       media/                  Shared media helpers (e.g. VideoPlayerPool)
       permissions/            Permission models/holders shared across the app
       share/                  Sharer (creates share intents)
@@ -50,7 +50,7 @@ app/                         Android app module
       util/                   UI-layer utilities/extensions
     util/ext/                 General Kotlin extensions
     App.kt                    Application class - initialises the shared library's `DebugKit` (logger + crash handler), starts Koin
-    MainActivity.kt           Single Activity - hosts Root composable, handles orientation/share/permissions
+    MainActivity.kt           Single Activity - hosts RootPage, handles orientation/share/permissions
   src/debug/res/              Debug-only resources (e.g. preview_video drawable for screenshots)
   src/test/                   JVM unit tests
   src/androidTest/            Instrumented tests
@@ -76,7 +76,8 @@ metadata/                     F-Droid metadata (changelogs, screenshots, store l
 ### Feature structure (`ui/feature/<name>/`)
 
 Each screen/feature typically has:
-- `<Name>Page.kt` — thin composable that wires a ViewModel's state/callbacks into `<Name>PageContent`
+- `<Name>Page.kt` — thin composable that gets its own `<Name>ViewModel` (`koinViewModel`) and wires its state/callbacks into `<Name>PageContent`.
+  One ViewModel per page: it is never shared, and only the page requests it (CI checks this: `docs/lint.md` in ci-workflows)
 - `<Name>PageContent.kt` — "dumb" composable taking explicit parameters (state + lambdas), easy to preview
 - `<Name>ViewModel.kt` — `androidx.lifecycle.ViewModel` exposing Compose state via `mutableStateOf`/`derivedStateOf`
 - `component/` — subcomponents specific to that feature (sometimes split further into `portrait/`/`landscape/`)
@@ -90,8 +91,8 @@ Look at `ui/feature/calendar/` as the canonical example (`CalendarPage`, `Calend
   `private set`, not as `StateFlow`/`LiveData`.
 - Async work happens in `viewModelScope.launch { ... }`, often collecting Flows from DAOs/repositories.
 - ViewModels that need runtime parameters (e.g. `CheckVideoViewModel`) are registered with Koin's
-  parameterized `viewModel { (param1, param2) -> ... }` and instantiated via
-  `koinViewModel { parametersOf(...) }`.
+  parameterized `viewModel { (param1, param2) -> ... }` and instantiated by the page, via
+  `koinViewModel { parametersOf(...) }`, with the parameters coming from the page's own arguments (the route's).
 
 ### Dependency Injection (Koin)
 
@@ -106,10 +107,13 @@ All DI wiring lives in `di/KoinModule.kt`, grouped into module functions:
 
 ### Navigation
 
-- Two navigation graphs, each with a sealed `Page` class and a `Router` composable:
-  - `ui/navigation/setup/` (`SetupPage`, `SetupRouter`) — first-run setup flow (intro → orientation → resolution → video duration)
+- Two flows:
+  - `ui/feature/setup/` (`SetupPage`, `SetupPageContent`, `SetupViewModel`) — first-run setup flow, one swipeable pager
+    (intro → permissions → orientation → resolution → video duration). The intro, permission and final steps are plain
+    `…SlideContent` composables; the orientation, resolution and duration steps are pages with their own ViewModels, which
+    hand up what the shared "Next" button saves (`registerSave`), so no page ever touches another page's ViewModel
   - `ui/navigation/normal/` (`Route.kt`, `NormalRouter`) — main app flow (calendar, record video, check video, export diary, debug, logs, crashes)
-- `ui/root/Root.kt` + `RootViewModel`/`RootState` decide which graph (or permissions screen / loading
+- `ui/root/RootPage` + `RootPageContent` + `RootViewModel`/`RootState` decide which flow (or permissions screen / loading
   spinner) to show, based on permission state and whether setup has completed.
 - Built on Reimagined Navigation (`rememberNavController`, `NavHost`, `NavBackHandler`, `navigate`/`pop`/`popUpTo`).
 - Log navigation events via `Logger.d("Navigating to: $to")` (existing convention in both routers).
@@ -133,7 +137,7 @@ docs: `docs/using-the-library.md` there). The app has no logger of its own.
 - `Logger.w(msg, throwable)` — expected-but-notable error states.
 - `Logger.e(msg, throwable)` — unexpected errors / likely bugs.
 - `DebugKit.init(...)` is the first call in `App.onCreate`, so it runs before anything can log or crash.
-- `MainActivity` wraps `Root` in `ProvideDebugSettings` (the library's single provider of debug composition locals). Keep it wrapped, even though no debug setting is read yet, so a setting added to the library later reaches every screen with only a version bump.
+- `RootPage` wraps the app in `ProvideAppDebugSettings` (which wraps the library's `ProvideDebugSettings`) (the library's single provider of debug composition locals). Keep it wrapped, even though no debug setting is read yet, so a setting added to the library later reaches every screen with only a version bump.
   Uncaught exceptions are saved by the library (do not install another handler: crashes would be saved twice).
 - The library adds no permissions; the app still has no internet permission. Keep checking the merged
   manifest when upgrading the library.
@@ -153,7 +157,7 @@ docs: `docs/using-the-library.md` there). The app has no logger of its own.
   The library's pages draw with Material 3 and the app theme is Material 2, so they look slightly different from the rest of the app.
   The library's animation speed (Debug > SDK debug) applies to the app's animations that have an explicit duration, through
   `LocalAnimationSpeed.current.scale(ms)` (`com.lukeneedham.common.ui.LocalAnimationSpeed`, `com.lukeneedham.common.debug.scale`;
-  `ProvideDebugSettings` is in `MainActivity`): the recap share sheet settle (`RecapViewPageContent`) and the camera focus indicator
+  `ProvideDebugSettings` is in `ProvideAppDebugSettings`, used by `RootPage`): the recap share sheet settle (`RecapViewPageContent`) and the camera focus indicator
   hold and fade (`CameraInput`). Give any new animation an explicit duration and pass it through `scale`. Animations that use the default
   spring (`SingleOptionSelector`, the orientation text colour) are not affected by the setting.
   Mock entries are populated by copying the `sample_video` raw resource in as each video file.

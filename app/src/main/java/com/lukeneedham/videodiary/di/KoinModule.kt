@@ -26,6 +26,7 @@ import com.lukeneedham.videodiary.ui.feature.recap.model.RecapPeriodType
 import com.lukeneedham.videodiary.ui.feature.recap.view.RecapViewViewModel
 import com.lukeneedham.videodiary.ui.feature.record.check.CheckVideoViewModel
 import com.lukeneedham.videodiary.ui.feature.record.film.RecordVideoViewModel
+import com.lukeneedham.videodiary.ui.feature.setup.SetupViewModel
 import com.lukeneedham.videodiary.ui.feature.setup.duration.SelectVideoDurationViewModel
 import com.lukeneedham.videodiary.ui.feature.setup.orientation.SetupSelectOrientationViewModel
 import com.lukeneedham.videodiary.ui.feature.setup.resolution.SetupSelectResolutionViewModel
@@ -130,6 +131,11 @@ object KoinModule {
         }
         viewModel {
             RequestPermissionsViewModel(
+                permissionChecker = get(),
+            )
+        }
+        viewModel {
+            SetupViewModel(
                 permissionChecker = get(),
             )
         }
