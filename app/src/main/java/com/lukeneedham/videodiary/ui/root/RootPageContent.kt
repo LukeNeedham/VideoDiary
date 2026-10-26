@@ -14,7 +14,7 @@ import com.lukeneedham.videodiary.domain.model.Orientation
 import com.lukeneedham.videodiary.domain.model.ShareRequest
 import com.lukeneedham.videodiary.ui.feature.permissions.RequestPermissionsPage
 import com.lukeneedham.videodiary.ui.feature.setup.SetupPage
-import com.lukeneedham.videodiary.ui.navigation.normal.NormalRouter
+import com.lukeneedham.videodiary.ui.navigation.normal.AppNavigation
 import com.lukeneedham.videodiary.ui.permissions.PermissionResultListenerHolder
 import com.lukeneedham.videodiary.ui.theme.AppTheme
 
@@ -68,7 +68,7 @@ internal fun RootPageContent(
             }
 
             RootState.Ready -> {
-                NormalRouter(
+                AppNavigation(
                     share = share,
                 )
             }
