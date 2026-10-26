@@ -11,7 +11,7 @@ fun CalendarDeleteConfirmDialog(
     dismiss: () -> Unit,
 ) {
     DeleteConfirmDialog(
-        title = "Delete video?",
+        title = "Delete this video for good?",
         onConfirm = onConfirm,
         dismiss = dismiss,
     )
