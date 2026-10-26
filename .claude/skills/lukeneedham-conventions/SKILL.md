@@ -6,12 +6,12 @@ description: Luke Needham's conventions for Android apps - project setup, debug 
 # Luke's app conventions
 
 This folder is copied from `LukeNeedham/ci-workflows` (`skills/lukeneedham-conventions`) by CI, which opens a
-"Sync from ci-workflows" PR when it differs. Never edit it here; change it there. The same goes for the four
-callers in `.github/workflows/`.
+"Sync from ci-workflows" PR when it differs, which merges itself once its checks pass. Never edit it here; change it
+there. The same goes for the four callers in `.github/workflows/`.
 
 The long guides are in that repo's `docs/`: `new-app.md` (read first when starting an app), `setup.md`,
 `app-config.md`, `app-icon.md`, `readme.md` (the README layout and `readme.yml`), `pages.md` (`XPage` and
-`XPageContent`), `screenshots.md` (the README screenshots), `app-conventions.md`, `library.md`,
+`XPageContent`), `app-shell.md` (`MainActivity`, `Root`, navigation), `screenshots.md` (the README screenshots), `app-conventions.md`, `library.md`,
 `using-the-library.md` and `consuming-apps.md`. If you can reach GitHub, read the relevant page; otherwise the rules
 below are enough.
 
@@ -73,7 +73,7 @@ below are enough.
   navigator) and **always has at least one `private` `@Preview` in the same file** (named `Preview`; see Previews below). **Each of `XPage`, `XPageContent`, `XViewModel` and `XUiState` is in its own file**
   (`XPage.kt`, `XPageContent.kt` with the previews, `XViewModel.kt`, `XUiState.kt`). Never `XScreen`, `XContent` or `XView`. **The route is always
   `Route.X`**, a member of the one `sealed interface Route : NavKey` in `Route.kt` (`Route.Home` is `HomePage`:
-  `entry<Route.Home> { HomePage(...) }`; never `HomeNavKey`, `HomeKey` or `HomeRoute`).
+  `Route.Home -> HomePage(...)` in `Router`; never `HomeNavKey`, `HomeKey` or `HomeRoute`).
 - **README screenshots live in one package, `<app package>.screenshot`, in `src/debug`**: a file per page that has
   some, named after the page (`HomePage.kt`; more previews = more screenshots, no file = none). Each screenshot is a
   **private `@Preview` composable that owns its mock data** inside its body and renders `HomePageContent` with it
@@ -88,8 +88,20 @@ below are enough.
   wrapper) opts out with `screenshots: manual` in `readme.yml`, has no `screenshot` folder and commits one by hand.
 
 ## Architecture
-- Single activity (`ComponentActivity`), Jetpack Compose, no XML, no fragments.
-- Navigation 3 (the `@Serializable` members of one `sealed interface Route : NavKey`, back stack owned by the app).
+- **The app shell is defined in one doc, `docs/app-shell.md`, for new apps and for migrating existing ones.** Single
+  activity, always **`MainActivity`** (never another name, a second activity or fragments), which only calls
+  `setContent { Root(...) }` and may hand `Root` what only the activity can provide (a deep link, a permission callback); `Root` (`Root.kt`) sets up `AppTheme`, `ProvideDebugSettings` and the other app-wide providers,
+  then calls `AppNavigation` (owns the `backStack` and the `NavDisplay`; only `Root` calls it); `Router` is the
+  exhaustive `when (route)` with one `XPage(...)` per `Route` member, **no `else`**, and the common actions as local
+  functions (`navigateTo(route)`, `onBack()`; branches pass `::onBack`, never `backStack.add(...)`); `routeEntryProvider`
+  does `val route = key as Route` and returns `NavEntry(route) { Router(backStack, route) }`; never the
+  `entryProvider { entry<...> { } }` DSL (a missing route fails at runtime). Fixed names, one file each: `App` (the
+  `Application`), `MainActivity`, `Root`, `AppNavigation`, `Router`, `Route`, `AppTheme` (the composable `AppTheme { }`, read
+  through the `object AppTheme`); never a variant (`AppRoot`, `MainScreen`, `AppRouter`, `NavHost`, `RoutePage`,
+  `<AppName>Theme`, `ProvideAppTheme`). Exceptions (`docs/app-shell.md`): an overlay activity (a window over other
+  apps, named after its job) may be a second activity but a screen never is; Kotlin Multiplatform apps use the JetBrains
+  Navigation 3 artifacts (`rememberNavBackStack(config, ...)` with every `Route` member registered in the config, since iOS and the web have no reflection). A route needing its own `NavEntry` options (`metadata`) builds its own.
+- Jetpack Compose, no XML. Navigation 3 (the `@Serializable` members of one `sealed interface Route : NavKey`, back stack owned by the app).
 - MVVM with unidirectional data flow: a `ViewModel` exposes one immutable `UiState` `StateFlow`; composables
   use `collectAsStateWithLifecycle()` and send events up as function calls; no logic in composables.
 - Coroutines + Flow; `viewModelScope` for screen work. UI -> domain/data layers; no Android types in the lower layer.
