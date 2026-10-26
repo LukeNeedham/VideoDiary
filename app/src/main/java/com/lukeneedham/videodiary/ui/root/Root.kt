@@ -13,7 +13,7 @@ import androidx.compose.ui.graphics.Color
 import com.lukeneedham.videodiary.domain.model.Orientation
 import com.lukeneedham.videodiary.domain.model.ShareRequest
 import com.lukeneedham.videodiary.ui.feature.permissions.RequestPermissionsPage
-import com.lukeneedham.videodiary.ui.navigation.normal.NormalRouter
+import com.lukeneedham.videodiary.ui.navigation.normal.AppNavigation
 import com.lukeneedham.videodiary.ui.navigation.setup.SetupRouter
 import com.lukeneedham.videodiary.ui.permissions.PermissionResultListenerHolder
 import com.lukeneedham.videodiary.ui.theme.ProvideAppDebugSettings
@@ -87,7 +87,7 @@ fun Root(
                     }
 
                     RootState.Ready -> {
-                        NormalRouter(
+                        AppNavigation(
                             share = share,
                         )
                     }

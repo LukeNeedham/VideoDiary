@@ -22,7 +22,7 @@ F-Droid.
 - **Language**: Kotlin
 - **UI**: Jetpack Compose (Material)
 - **DI**: Koin (`koin-android`, `koin-compose`, `koin-compose-viewmodel`)
-- **Navigation**: [Reimagined Navigation](https://github.com/olshevski/compose-navigation-reimagined) (`dev.olshevski.navigation.reimagined`)
+- **Navigation**: Navigation 3 (`androidx.navigation3`)
 - **Media**: CameraX (recording) + Media3 (ExoPlayer for playback, Transformer/Effect for export)
 - **Persistence**: AndroidX DataStore (preferences) for settings; plain files (via `Context.filesDir`) for videos; Room for saved recaps
 - **Shared library**: [`com.lukeneedham:common`](https://github.com/LukeNeedham/ci-workflows/tree/main/common) (logger, crash handler, Debug/Logs/Crashes pages), from the Maven repository at `https://lukeneedham.github.io/ci-workflows/maven` (added in `settings.gradle.kts`, version in `buildSrc/.../deps.kt`)
@@ -40,7 +40,7 @@ app/                         Android app module
     di/                       Koin module definitions (KoinModule.kt, KoinQualifier.kt)
     ui/
       feature/                One subpackage per feature/screen (see "Feature structure" below)
-      navigation/             Reimagined Navigation routers + page (route) sealed classes
+      navigation/             Navigation 3: `AppNavigation` (back stack + `NavDisplay`), `Router` (exhaustive `when` over `Route`), the `Route` sealed interface, and the first-run setup router
       root/                   App root composable + RootViewModel (top-level state machine)
       theme/                  Compose theme (Color, Typography, Theme)
       media/                  Shared media helpers (e.g. VideoPlayerPool)
@@ -106,12 +106,12 @@ All DI wiring lives in `di/KoinModule.kt`, grouped into module functions:
 
 ### Navigation
 
-- Two navigation graphs, each with a sealed `Page` class and a `Router` composable:
+- Two navigation graphs: the main app flow on Navigation 3 (a sealed `Route : NavKey`, `AppNavigation` and an exhaustive `Router`), and the first-run setup flow (a pager-based `SetupRouter`):
   - `ui/navigation/setup/` (`SetupPage`, `SetupRouter`) — first-run setup flow (intro → orientation → resolution → video duration)
-  - `ui/navigation/normal/` (`Route.kt`, `NormalRouter`) — main app flow (calendar, record video, check video, export diary, debug, logs, crashes)
+  - `ui/navigation/normal/` (`Route.kt`, `AppNavigation.kt`, `Router.kt`) — main app flow (calendar, record video, check video, export diary, debug, logs, crashes)
 - `ui/root/Root.kt` + `RootViewModel`/`RootState` decide which graph (or permissions screen / loading
   spinner) to show, based on permission state and whether setup has completed.
-- Built on Reimagined Navigation (`rememberNavController`, `NavHost`, `NavBackHandler`, `navigate`/`pop`/`popUpTo`).
+- Built on Navigation 3 (`rememberNavBackStack`, `NavDisplay`, `NavEntry`); `Router` defines `navigateTo`, `onBack` and `popUpTo` once, and each page's ViewModel is scoped to its back stack entry.
 - Log navigation events via `Logger.d("Navigating to: $to")` (existing convention in both routers).
 
 ### Bottom sheets
@@ -146,7 +146,7 @@ docs: `docs/using-the-library.md` there). The app has no logger of its own.
 - `BuildConfig.DEBUG` gates debug-only UI (e.g. the Settings entry that opens the Debug page) and the
   library's `DebugKitConfig(enabled = ...)`, and keeps debug logs (`Logger.d`) out of release builds.
 - The Debug page is the app's own (`ui/feature/debug/`: `AppDebugPage` / `AppDebugPageContent` / `AppDebugViewModel`, routed as
-  `Route.AppDebug` in `NormalRouter`). It holds the app's own tools, which let developers fill the diary with mock data via
+  `Route.AppDebug` in `Router`). It holds the app's own tools, which let developers fill the diary with mock data via
   `MockDataRepository` / `VideosDao.fillWithMockVideos(...)` — only reachable from debug builds — and has an "SDK debug" row that
   opens the shared library's `DebugPage` (`Route.Debug`: animation speed, links to the Logs and Crashes pages). The
   library's page has no slot for app-specific tools, so add new ones to the app's page, never to the library's.
