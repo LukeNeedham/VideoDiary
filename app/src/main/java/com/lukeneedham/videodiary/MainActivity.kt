@@ -11,7 +11,7 @@ import com.lukeneedham.videodiary.domain.model.Orientation
 import com.lukeneedham.videodiary.domain.model.ShareRequest
 import com.lukeneedham.videodiary.ui.media.VideoPlayerHolder
 import com.lukeneedham.videodiary.ui.permissions.PermissionResultListenerHolder
-import com.lukeneedham.videodiary.ui.root.RootPage
+import com.lukeneedham.videodiary.ui.root.Root
 import com.lukeneedham.videodiary.ui.share.Sharer
 import org.koin.android.ext.android.inject
 
@@ -27,7 +27,7 @@ class MainActivity : ComponentActivity() {
         WindowCompat.getInsetsController(window, window.decorView)
             .isAppearanceLightStatusBars = false
         setContent {
-            RootPage(
+            Root(
                 share = ::share,
                 setOrientation = ::setOrientation,
                 requestPermission = ::requestPermission,

@@ -41,7 +41,7 @@ app/                         Android app module
     ui/
       feature/                One subpackage per feature/screen (see "Feature structure" below)
       navigation/             Navigation 3: `AppNavigation` (back stack + `NavDisplay`), `Router` (exhaustive `when` over `Route`) and the `Route` sealed interface of the main flow
-      root/                   RootPage + RootPageContent + RootViewModel (top-level state machine)
+      root/                   App root composable + RootViewModel (top-level state machine); the root is not a page
       theme/                  Compose theme (Color, Typography, AppTheme)
       media/                  Shared media helpers (e.g. VideoPlayerPool)
       permissions/            Permission models/holders shared across the app
@@ -50,7 +50,7 @@ app/                         Android app module
       util/                   UI-layer utilities/extensions
     util/ext/                 General Kotlin extensions
     App.kt                    Application class - initialises the shared library's `DebugKit` (logger + crash handler), starts Koin
-    MainActivity.kt           Single Activity - hosts RootPage, handles orientation/share/permissions
+    MainActivity.kt           Single Activity - hosts the Root composable, handles orientation/share/permissions
   src/debug/res/              Debug-only resources (e.g. preview_video drawable for screenshots)
   src/test/                   JVM unit tests
   src/androidTest/            Instrumented tests
@@ -113,7 +113,7 @@ All DI wiring lives in `di/KoinModule.kt`, grouped into module functions:
     `…SlideContent` composables; the orientation, resolution and duration steps are pages with their own ViewModels, which
     hand up what the shared "Next" button saves (`registerSave`), so no page ever touches another page's ViewModel
   - `ui/navigation/normal/` (`Route.kt`, `AppNavigation.kt`, `Router.kt`) — main app flow (calendar, record video, check video, export diary, debug, logs, crashes)
-- `ui/root/RootPage` + `RootPageContent` + `RootViewModel`/`RootState` decide which flow (or permissions screen / loading
+- `ui/root/Root.kt` + `RootViewModel`/`RootState` decide which flow (or permissions screen / loading
   spinner) to show, based on permission state and whether setup has completed.
 - Built on Navigation 3 (`rememberNavBackStack`, `NavDisplay`, `NavEntry`); `Router` defines `navigateTo`, `onBack` and `popUpTo` once, and each page's ViewModel is scoped to its back stack entry.
 - Log navigation events via `Logger.d("Navigating to: $to")` (existing convention in both routers).
@@ -137,7 +137,7 @@ docs: `docs/using-the-library.md` there). The app has no logger of its own.
 - `Logger.w(msg, throwable)` — expected-but-notable error states.
 - `Logger.e(msg, throwable)` — unexpected errors / likely bugs.
 - `DebugKit.init(...)` is the first call in `App.onCreate`, so it runs before anything can log or crash.
-- `RootPage` wraps the app in `ProvideAppDebugSettings` (which wraps the library's `ProvideDebugSettings`) (the library's single provider of debug composition locals). Keep it wrapped, even though no debug setting is read yet, so a setting added to the library later reaches every screen with only a version bump.
+- `Root` wraps the app in `ProvideAppDebugSettings` (which wraps the library's `ProvideDebugSettings`) (the library's single provider of debug composition locals). Keep it wrapped, even though no debug setting is read yet, so a setting added to the library later reaches every screen with only a version bump.
   Uncaught exceptions are saved by the library (do not install another handler: crashes would be saved twice).
 - The library adds no permissions; the app still has no internet permission. Keep checking the merged
   manifest when upgrading the library.
@@ -157,7 +157,7 @@ docs: `docs/using-the-library.md` there). The app has no logger of its own.
   The library's pages draw with Material 3 and the app theme is Material 2, so they look slightly different from the rest of the app.
   The library's animation speed (Debug > SDK debug) applies to the app's animations that have an explicit duration, through
   `LocalAnimationSpeed.current.scale(ms)` (`com.lukeneedham.common.ui.LocalAnimationSpeed`, `com.lukeneedham.common.debug.scale`;
-  `ProvideDebugSettings` is in `ProvideAppDebugSettings`, used by `RootPage`): the recap share sheet settle (`RecapViewPageContent`) and the camera focus indicator
+  `ProvideDebugSettings` is in `ProvideAppDebugSettings`, used by `Root`): the recap share sheet settle (`RecapViewPageContent`) and the camera focus indicator
   hold and fade (`CameraInput`). Give any new animation an explicit duration and pass it through `scale`. Animations that use the default
   spring (`SingleOptionSelector`, the orientation text colour) are not affected by the setting.
   Mock entries are populated by copying the `sample_video` raw resource in as each video file.
