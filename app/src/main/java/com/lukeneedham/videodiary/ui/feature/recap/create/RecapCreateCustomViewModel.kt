@@ -8,7 +8,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.lukeneedham.videodiary.data.persistence.SavedRecapsDao
 import com.lukeneedham.videodiary.data.repository.CalendarRepository
+import com.lukeneedham.videodiary.data.repository.VideoResolutionRepository
 import com.lukeneedham.videodiary.domain.model.Day
+import com.lukeneedham.videodiary.ui.feature.common.datepicker.groupedByMonth
 import com.lukeneedham.videodiary.ui.feature.recap.model.RecapDayThumbnail
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
@@ -18,6 +20,7 @@ import java.time.LocalDate
 class RecapCreateCustomViewModel(
     private val calendarRepository: CalendarRepository,
     private val savedRecapsDao: SavedRecapsDao,
+    private val videoResolutionRepository: VideoResolutionRepository,
 ) : ViewModel() {
     private var allDays: List<Day> by mutableStateOf(emptyList())
 
@@ -64,6 +67,12 @@ class RecapCreateCustomViewModel(
         }
     }
 
+    /** The days grouped by calendar month, for the date picker */
+    val months by derivedStateOf { allDays.groupedByMonth() }
+
+    var videoAspectRatio by mutableStateOf<Float?>(null)
+        private set
+
     val diaryStartDate by derivedStateOf {
         allDays.firstOrNull()?.date
     }
@@ -76,6 +85,9 @@ class RecapCreateCustomViewModel(
     val onSavedFlow = onSavedChannel.receiveAsFlow()
 
     init {
+        viewModelScope.launch {
+            videoAspectRatio = videoResolutionRepository.getAspectRatio()
+        }
         viewModelScope.launch {
             calendarRepository.allDays.collect { days ->
                 allDays = days

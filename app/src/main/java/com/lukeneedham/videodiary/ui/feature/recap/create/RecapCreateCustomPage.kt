@@ -28,6 +28,8 @@ fun RecapCreateCustomPage(
         selectedVideoCount = viewModel.selectedVideoCount,
         selectedDayThumbnails = viewModel.selectedDayThumbnails,
         diaryStartDate = viewModel.diaryStartDate,
+        months = viewModel.months,
+        videoAspectRatio = viewModel.videoAspectRatio,
         onStartDateSelected = { start ->
             viewModel.recapStartDate = start
             // Keep the range valid if the new start date is after the current end date

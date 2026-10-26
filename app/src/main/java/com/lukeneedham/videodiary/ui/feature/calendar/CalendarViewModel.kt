@@ -10,7 +10,9 @@ import androidx.lifecycle.viewModelScope
 import com.lukeneedham.videodiary.data.persistence.SettingsDao
 import com.lukeneedham.videodiary.data.persistence.VideosDao
 import com.lukeneedham.videodiary.data.repository.CalendarRepository
+import com.lukeneedham.videodiary.data.repository.VideoResolutionRepository
 import com.lukeneedham.videodiary.domain.model.Day
+import com.lukeneedham.videodiary.ui.feature.common.datepicker.groupedByMonth
 import com.lukeneedham.videodiary.ui.feature.common.videoplayer.VideoPlayerController
 import kotlinx.coroutines.launch
 import java.time.LocalDate
@@ -19,6 +21,7 @@ class CalendarViewModel(
     private val calendarRepository: CalendarRepository,
     private val videosDao: VideosDao,
     private val settingsDao: SettingsDao,
+    private val videoResolutionRepository: VideoResolutionRepository,
 ) : ViewModel() {
 
     /**
@@ -28,6 +31,12 @@ class CalendarViewModel(
     val videoPlayerController = VideoPlayerController()
 
     var days by mutableStateOf<List<Day>>(emptyList())
+        private set
+
+    /** The days grouped by calendar month, for the date picker */
+    val months by derivedStateOf { days.groupedByMonth() }
+
+    var videoAspectRatio by mutableStateOf<Float?>(null)
         private set
 
     val startDate by derivedStateOf {
@@ -41,6 +50,9 @@ class CalendarViewModel(
         private set
 
     init {
+        viewModelScope.launch {
+            videoAspectRatio = videoResolutionRepository.getAspectRatio()
+        }
         viewModelScope.launch {
             settingsDao.getAllowEditPastDaysFlow().collect { allow ->
                 allowEditPastDays = allow

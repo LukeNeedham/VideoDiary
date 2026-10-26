@@ -97,7 +97,7 @@ Look at `ui/feature/calendar/` as the canonical example (`CalendarPage`, `Calend
 ### Dependency Injection (Koin)
 
 All DI wiring lives in `di/KoinModule.kt`, grouped into module functions:
-`getUtil()`, `getData()`, `getRepositories()`, `getViewModel()`, `getComponentState()`, `getPersistence()`.
+`getUtil()`, `getData()`, `getRepositories()`, `getViewModel()`, `getPersistence()`.
 
 - Use `factory { }` for most things; use `single { }` for stateful singletons — notably DataStore-backed
   DAOs (`SettingsDao`) **must** be singletons, since only one DataStore instance can exist per file.

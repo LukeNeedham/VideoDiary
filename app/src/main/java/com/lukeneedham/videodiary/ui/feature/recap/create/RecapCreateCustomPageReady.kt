@@ -29,7 +29,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 import com.lukeneedham.videodiary.ui.feature.common.Button
+import com.lukeneedham.videodiary.domain.model.Day
 import com.lukeneedham.videodiary.ui.feature.common.datepicker.DiaryDatePickerSheet
+import com.lukeneedham.videodiary.ui.feature.common.datepicker.MockDataDiaryDatePicker
 import com.lukeneedham.videodiary.ui.feature.recap.create.component.RecapCreateEmpty
 import com.lukeneedham.videodiary.ui.feature.recap.create.component.RecapDatePicker
 import com.lukeneedham.videodiary.ui.feature.recap.create.component.RecapThumbnailRow
@@ -44,6 +46,8 @@ import java.time.LocalDate
 @Composable
 fun RecapCreateCustomPageReady(
     totalVideoCount: Int,
+    months: List<List<Day>>,
+    videoAspectRatio: Float?,
     selectedVideoCount: Int?,
     selectedDayThumbnails: List<RecapDayThumbnail>?,
     recapStartDate: LocalDate,
@@ -158,6 +162,8 @@ fun RecapCreateCustomPageReady(
         }
         if (showStartDatePicker) {
             DiaryDatePickerSheet(
+                months = months,
+                videoAspectRatio = videoAspectRatio,
                 onDateSelected = onStartDateSelected,
                 initialFocusedDate = recapStartDate,
                 onDismiss = { showStartDatePicker = false },
@@ -165,6 +171,8 @@ fun RecapCreateCustomPageReady(
         }
         if (showEndDatePicker) {
             DiaryDatePickerSheet(
+                months = months,
+                videoAspectRatio = videoAspectRatio,
                 initialFocusedDate = recapEndDate,
                 // The recap can't end before it starts
                 minDate = recapStartDate,
@@ -204,6 +212,8 @@ private fun Preview() {
     AppTheme {
         RecapCreateCustomPageReady(
             totalVideoCount = 10,
+            months = MockDataDiaryDatePicker.months,
+            videoAspectRatio = MockDataDiaryDatePicker.videoAspectRatio,
             selectedVideoCount = 5,
             selectedDayThumbnails = emptyList(),
             recapStartDate = MockDataRecapCreateCustom.startDate,
