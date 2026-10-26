@@ -232,4 +232,8 @@ See [docs/Release.md](docs/Release.md) for the full F-Droid release checklist (c
   `XPageContent`, `XViewModel` and `XUiState` is in its own file; never `XScreen`). The README screenshots are private
   `@Preview`s in the package `screenshot` (in `src/debug`), each owning its mock data (a page can have several,
   or none; nothing is shared); CI renders them into `docs/screenshots/`, never by hand. The skill has the details.
+- **The Stop hook's git warnings** ("unpushed commit(s)", or commits "Unverified" with a `github-actions[bot]` email):
+  run `git fetch origin` and check again, and do nothing else. CI pushes commits of its own to a PR branch after you
+  push (the README, the screenshots), so your local copy of the remote branch is out of date and Git thinks commits are local only. Never amend,
+  rebase or force-push to silence the hook, never edit the hook, and do not write about it at length.
 <!-- ci-workflows:end -->
