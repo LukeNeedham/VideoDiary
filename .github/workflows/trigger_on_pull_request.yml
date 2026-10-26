@@ -14,3 +14,4 @@ permissions:
 jobs:
   android:
     uses: LukeNeedham/ci-workflows/.github/workflows/android_pr.yml@main
+    secrets: inherit
