@@ -2,6 +2,7 @@ package com.lukeneedham.videodiary.di
 
 import android.net.Uri
 import com.lukeneedham.videodiary.data.android.PermissionChecker
+import com.lukeneedham.videodiary.data.android.RemovableStorageMonitor
 import com.lukeneedham.videodiary.data.mapper.ThumbnailFileNameMapper
 import com.lukeneedham.videodiary.data.mapper.VideoFileNameMapper
 import com.lukeneedham.videodiary.data.persistence.SavedRecapsDao
@@ -19,6 +20,7 @@ import com.lukeneedham.videodiary.ui.feature.calendar.CalendarViewModel
 import com.lukeneedham.videodiary.ui.feature.debug.AppDebugViewModel
 import com.lukeneedham.videodiary.ui.feature.permissions.RequestPermissionsViewModel
 import com.lukeneedham.videodiary.ui.feature.recap.create.RecapCreateCustomViewModel
+import com.lukeneedham.videodiary.ui.feature.storage.VideoStorageViewModel
 import com.lukeneedham.videodiary.ui.feature.recap.create.RecapCreatePeriodListViewModel
 import com.lukeneedham.videodiary.ui.feature.recap.hub.RecapHubViewModel
 import com.lukeneedham.videodiary.ui.feature.recap.model.RecapPeriodType
@@ -29,6 +31,7 @@ import com.lukeneedham.videodiary.ui.feature.setup.SetupViewModel
 import com.lukeneedham.videodiary.ui.feature.setup.duration.SelectVideoDurationViewModel
 import com.lukeneedham.videodiary.ui.feature.setup.orientation.SetupSelectOrientationViewModel
 import com.lukeneedham.videodiary.ui.feature.setup.resolution.SetupSelectResolutionViewModel
+import com.lukeneedham.videodiary.ui.feature.setup.storage.SetupSelectStorageViewModel
 import com.lukeneedham.videodiary.ui.media.VideoPlayerHolder
 import com.lukeneedham.videodiary.ui.root.RootCoordinator
 import com.lukeneedham.videodiary.ui.share.Sharer
@@ -70,8 +73,16 @@ object KoinModule {
             )
         }
         single {
+            RemovableStorageMonitor(
+                context = androidContext(),
+                videosDao = get(),
+                ioDispatcher = get(KoinQualifier.Dispatcher.io),
+            )
+        }
+        single {
             VideosDao(
                 context = androidContext(),
+                settingsDao = get(),
                 videoFileNameMapper = get(),
                 thumbnailFileNameMapper = get(),
                 videoThumbnailExtractor = get(),
@@ -127,6 +138,7 @@ object KoinModule {
         viewModel {
             SetupViewModel(
                 permissionChecker = get(),
+                videosDao = get(),
             )
         }
         viewModel {
@@ -139,6 +151,12 @@ object KoinModule {
         viewModel {
             SetupSelectOrientationViewModel(
                 settingsDao = get(),
+                ioDispatcher = get(KoinQualifier.Dispatcher.io),
+            )
+        }
+        viewModel {
+            SetupSelectStorageViewModel(
+                videosDao = get(),
                 ioDispatcher = get(KoinQualifier.Dispatcher.io),
             )
         }
@@ -168,6 +186,13 @@ object KoinModule {
                 videosDao = get(),
                 settingsDao = get(),
                 videoResolutionRepository = get(),
+            )
+        }
+        viewModel {
+            VideoStorageViewModel(
+                settingsDao = get(),
+                videosDao = get(),
+                ioDispatcher = get(KoinQualifier.Dispatcher.io),
             )
         }
         viewModel {

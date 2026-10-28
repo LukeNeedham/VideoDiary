@@ -18,11 +18,21 @@ fun AppDebugPage(
     val viewModel = koinViewModel<AppDebugViewModel>()
     val allowRetakeForPastDays by viewModel.allowRetakeForPastDays.collectAsState()
 
+    val fakeSdCardEnabled by viewModel.fakeSdCardEnabled.collectAsState()
+    val fakeSdCardInserted by viewModel.fakeSdCardInserted.collectAsState()
+    val slowVideoMoves by viewModel.slowVideoMoves.collectAsState()
+
     AppDebugPageContent(
         onFillWithMockDataClick = viewModel::fillWithMockData,
         allowRetakeForPastDays = allowRetakeForPastDays,
         onAllowRetakeForPastDaysChange = viewModel::setAllowRetakeForPastDays,
         onResyncThumbnailsClick = viewModel::resyncThumbnails,
+        fakeSdCardEnabled = fakeSdCardEnabled,
+        onFakeSdCardEnabledChange = viewModel::setFakeSdCardEnabled,
+        fakeSdCardInserted = fakeSdCardInserted,
+        onFakeSdCardInsertedChange = viewModel::setFakeSdCardInserted,
+        slowVideoMoves = slowVideoMoves,
+        onSlowVideoMovesChange = viewModel::setSlowVideoMoves,
         onOpenSdkDebug = onOpenSdkDebug,
         canGoBack = canGoBack,
         onBack = onBack,

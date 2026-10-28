@@ -18,6 +18,7 @@ import com.lukeneedham.videodiary.domain.model.Orientation
 import com.lukeneedham.videodiary.domain.model.ShareRequest
 import com.lukeneedham.videodiary.ui.feature.permissions.RequestPermissionsPage
 import com.lukeneedham.videodiary.ui.feature.setup.SetupPage
+import com.lukeneedham.videodiary.ui.feature.storage.SdCardMissingPage
 import com.lukeneedham.videodiary.ui.navigation.normal.AppNavigation
 import com.lukeneedham.videodiary.ui.permissions.PermissionResultListenerHolder
 import com.lukeneedham.videodiary.ui.theme.AppTheme
@@ -30,6 +31,7 @@ fun Root(
     setOrientation: (Orientation) -> Unit,
     requestPermission: (permissions: String) -> Unit,
     permissionResultListenerHolder: PermissionResultListenerHolder,
+    closeApp: () -> Unit,
 ) {
     val coordinator: RootCoordinator = koinInject()
 
@@ -86,6 +88,14 @@ fun Root(
                             requestPermission = requestPermission,
                             onContinue = coordinator::onPermissionsAcquired,
                             permissionResultListenerHolder = permissionResultListenerHolder,
+                        )
+                    }
+
+                    RootState.SdCardMissing -> {
+                        SdCardMissingPage(
+                            canMockReinsert = coordinator.canMockSdCardReinsert,
+                            onMockReinsertClick = coordinator::mockSdCardReinsert,
+                            onClose = closeApp,
                         )
                     }
 

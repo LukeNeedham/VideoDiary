@@ -18,6 +18,7 @@ import com.lukeneedham.videodiary.ui.feature.recap.view.RecapViewPage
 import com.lukeneedham.videodiary.ui.feature.record.check.CheckVideoPage
 import com.lukeneedham.videodiary.ui.feature.record.film.RecordVideoPage
 import com.lukeneedham.videodiary.ui.feature.settings.SettingsHubPage
+import com.lukeneedham.videodiary.ui.feature.storage.VideoStoragePage
 
 /** Calls the page of [route], with the navigation as lambdas. The only place that calls a page. */
 @Composable
@@ -143,9 +144,23 @@ fun Router(
 
         Route.SettingsHub -> SettingsHubPage(
             onMenuClick = openHubSwitcher,
+            onVideoStorageClick = {
+                navigateTo(Route.VideoStorage)
+            },
             onDebugClick = {
                 navigateTo(Route.AppDebug)
             },
+            onLogsClick = {
+                navigateTo(Route.Logs)
+            },
+            onCrashesClick = {
+                navigateTo(Route.Crashes)
+            },
+        )
+
+        Route.VideoStorage -> VideoStoragePage(
+            canGoBack = canGoBack,
+            onBack = ::onBack,
         )
 
         // The app's own debug page, which opens the shared library's debug page. The library's

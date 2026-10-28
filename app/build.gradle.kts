@@ -34,6 +34,9 @@ android {
 
     buildTypes {
         release {
+            // Whether the shared library's logger and crash handler save logs and crashes to disk,
+            // and the Logs and Crashes pages can be opened. Off in release builds.
+            buildConfigField("boolean", "DEBUG_KIT_ENABLED", "false")
             isMinifyEnabled = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
@@ -41,8 +44,20 @@ android {
             )
         }
         debug {
+            buildConfigField("boolean", "DEBUG_KIT_ENABLED", "true")
             applicationIdSuffix = ".dbg"
             signingConfig = signingConfigs.getByName("debugConfig")
+        }
+        // For sending a build to testers (not named "tester": build type names cannot start with "test").
+        // Signed with the debug keystore, so it installs without the official key. BuildConfig.DEBUG is
+        // false, so none of the debug-only features are in it (debug settings, fake SD card), but the
+        // Logs and Crashes pages are, so testers can send them back. Installs next to the other builds.
+        create("beta") {
+            initWith(getByName("debug"))
+            isDebuggable = false
+            buildConfigField("boolean", "DEBUG_KIT_ENABLED", "true")
+            applicationIdSuffix = ".beta"
+            matchingFallbacks += listOf("release", "debug")
         }
     }
     compileOptions {

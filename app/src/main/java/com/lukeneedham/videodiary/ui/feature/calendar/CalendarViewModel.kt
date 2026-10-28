@@ -61,11 +61,9 @@ class CalendarViewModel(
         viewModelScope.launch {
             calendarRepository.allDays.collect { newDays ->
                 val oldDays = days
+                val oldIndex = currentDayIndex
                 days = newDays
-                if (oldDays.isEmpty()) {
-                    // This is the first load
-                    currentDayIndex = newDays.lastIndex
-                }
+                currentDayIndex = resolveCurrentDayIndex(oldDays, oldIndex, newDays)
             }
         }
     }

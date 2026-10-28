@@ -109,10 +109,10 @@ All DI wiring lives in `di/KoinModule.kt`, grouped into module functions:
 
 - Two flows: the main app flow on Navigation 3 (a sealed `Route : NavKey`, `AppNavigation` and an exhaustive `Router`), and the first-run setup flow (a pager):
   - `ui/feature/setup/` (`SetupPage`, `SetupPageContent`, `SetupViewModel`) — first-run setup flow, one swipeable pager
-    (intro → permissions → orientation → resolution → video duration). The intro, permission and final steps are plain
-    `…SlideContent` composables; the orientation, resolution and duration steps are pages with their own ViewModels, which
+    (intro → permissions → orientation → video storage → resolution → video duration; the video storage step is only there when an SD card is detected as onboarding starts: `SetupProgress(hasStoragePage)`). The intro, permission and final steps are plain
+    `…SlideContent` composables; the orientation, video storage, resolution and duration steps are pages with their own ViewModels, which
     hand up what the shared "Next" button saves (`registerSave`), so no page ever touches another page's ViewModel
-  - `ui/navigation/normal/` (`Route.kt`, `AppNavigation.kt`, `Router.kt`) — main app flow (calendar, record video, check video, export diary, debug, logs, crashes)
+  - `ui/navigation/normal/` (`Route.kt`, `AppNavigation.kt`, `Router.kt`) — main app flow (calendar, record video, check video, export diary, video storage, debug, logs, crashes)
 - `ui/root/Root.kt` + `RootCoordinator`/`RootState` decide which flow (or permissions screen / loading
   spinner) to show, based on permission state and whether setup has completed, and block the normal UI whenever a required
   permission is missing (also when it was revoked while the app was in the background: `RootCoordinator.onResume()`). The
@@ -166,7 +166,16 @@ docs: `docs/using-the-library.md` there). The app has no logger of its own.
   `ProvideDebugSettings` is in `ProvideAppDebugSettings`, used by `Root`): the recap share sheet settle (`RecapViewPageContent`) and the camera focus indicator
   hold and fade (`CameraInput`). Give any new animation an explicit duration and pass it through `scale`. Animations that use the default
   spring (`SingleOptionSelector`, the orientation text colour) are not affected by the setting.
+  The Debug page's Storage section fakes an SD card for testing Video storage on a phone without one: "Fake SD card" (on by default in debug builds, so onboarding offers the SD card without a real card) swaps the removable
+  storage folder for `filesDir/fake_sd_card/videos`, "Fake SD card inserted" simulates removing and re-inserting it, and "Slow video moves" adds
+  an 8 second pause to a move so it can be interrupted (all `BuildConfig.DEBUG` only, applied in `VideosDao`).
+  When the videos are stored on the SD card and it is missing (checked on launch, on every resume, and on storage broadcasts via
+  `RemovableStorageMonitor`), `RootState.SdCardMissing` replaces the whole app with `SdCardMissingPage`; back closes the app. In debug builds that
+  page has a "Reinsert SD card (debug)" button that turns the fake SD card on and inserts it.
   Mock entries are populated by copying the `sample_video` raw resource in as each video file.
+- `BuildConfig.DEBUG_KIT_ENABLED` (true in `debug` and `beta`, false in `release`) controls whether the library's logger and crash handler save to disk
+  (`DebugKitConfig(enabled = ...)` in `App.onCreate`) and whether Settings shows "Logs" and "Crashes" cards when `DEBUG` is false. The `beta` build type
+  (debug keystore, `DEBUG` false, built by the "Tester Release" workflow) therefore has no debug settings or fake SD card, but testers can open the logs and crashes.
 - `app/src/debug/res/drawable/preview_video` is a large placeholder image used by Composable
   Previews for video players; it's excluded from release builds. A small fallback `preview_video`
   exists in the main `drawable` folder so release builds still compile. See [docs/Screenshots.md](docs/Screenshots.md).

@@ -34,15 +34,16 @@ import com.lukeneedham.videodiary.ui.feature.setup.intro.SetupIntroSlideContent
 import com.lukeneedham.videodiary.ui.feature.setup.intro.setupIntroSlides
 import com.lukeneedham.videodiary.ui.feature.setup.orientation.SetupSelectOrientationPage
 import com.lukeneedham.videodiary.ui.feature.setup.resolution.SetupSelectResolutionPage
+import com.lukeneedham.videodiary.ui.feature.setup.storage.SetupSelectStoragePage
 import com.lukeneedham.videodiary.ui.permissions.RequiredPermission
 import com.lukeneedham.videodiary.ui.permissions.RequiredPermissions
 import com.lukeneedham.videodiary.ui.theme.AppTheme
 import kotlinx.coroutines.launch
 
 /**
- * The onboarding flow as one continuous swipeable pager. Pages are only revealed as their
- * prerequisites are met: permission pages reveal one at a time as each is granted, and the setup
- * pages that follow (which rely on the camera) aren't revealed until every permission is granted.
+ * The onboarding flow (intro, permissions, orientation, video storage (only if there is an SD card), resolution, video duration)
+ * as one continuous swipeable pager. Pages are only revealed as their prerequisites are met: permission pages reveal one at a
+ * time as each is granted, and the setup pages that follow (which rely on the camera) aren't revealed until every permission is granted.
  *
  * The page indicator and the primary action button live outside the pager, so they stay static
  * while only the page content itself swipes. The button is computed directly here from state this
@@ -57,11 +58,15 @@ import kotlinx.coroutines.launch
 internal fun SetupPageContent(
     requiredPermissions: List<RequiredPermission>,
     acquiredPermissions: List<String>,
+    hasStoragePage: Boolean,
     resolutions: List<Size>,
     setOrientation: (Orientation) -> Unit,
     requestPermission: (permission: String) -> Unit,
     onSetupComplete: () -> Unit,
 ) {
+    // The storage page is only there if there is an SD card to choose when onboarding starts
+    val progress = remember { SetupProgress(hasStoragePage = hasStoragePage) }
+
     val firstMissingPermissionIndex = requiredPermissions.indexOfFirst { it.permission !in acquiredPermissions }
     val allPermissionsGranted = firstMissingPermissionIndex == -1
 
@@ -84,9 +89,9 @@ internal fun SetupPageContent(
     // Pages beyond the current prerequisite aren't revealed yet, so the user can't swipe past a
     // permission without granting it, or past resolution selection without a valid resolution.
     val revealedPageCount = when {
-        !allPermissionsGranted -> SetupProgress.PERMISSIONS_START_INDEX + firstMissingPermissionIndex + 1
-        !isResolutionReady -> SetupProgress.RESOLUTION_PAGE_INDEX + 1
-        else -> SetupProgress.TOTAL_PAGE_COUNT
+        !allPermissionsGranted -> progress.PERMISSIONS_START_INDEX + firstMissingPermissionIndex + 1
+        !isResolutionReady -> progress.RESOLUTION_PAGE_INDEX + 1
+        else -> progress.TOTAL_PAGE_COUNT
     }
 
     val pagerState = rememberPagerState { revealedPageCount }
@@ -109,8 +114,8 @@ internal fun SetupPageContent(
             onClick = ::goToNextPage,
         )
 
-        currentPage < SetupProgress.ORIENTATION_PAGE_INDEX -> {
-            val permission = requiredPermissions.getOrNull(currentPage - SetupProgress.PERMISSIONS_START_INDEX)
+        currentPage < progress.ORIENTATION_PAGE_INDEX -> {
+            val permission = requiredPermissions.getOrNull(currentPage - progress.PERMISSIONS_START_INDEX)
             when {
                 permission == null -> null
                 permission.permission in acquiredPermissions -> PagerAction(
@@ -124,23 +129,28 @@ internal fun SetupPageContent(
             }
         }
 
-        currentPage == SetupProgress.ORIENTATION_PAGE_INDEX -> PagerAction(
+        currentPage == progress.ORIENTATION_PAGE_INDEX -> PagerAction(
             label = "Next",
-            onClick = { saveActions[SetupProgress.ORIENTATION_PAGE_INDEX]?.invoke() },
+            onClick = { saveActions[progress.ORIENTATION_PAGE_INDEX]?.invoke() },
         )
 
-        currentPage == SetupProgress.RESOLUTION_PAGE_INDEX -> PagerAction(
+        currentPage == progress.STORAGE_PAGE_INDEX -> PagerAction(
+            label = "Next",
+            onClick = { saveActions[progress.STORAGE_PAGE_INDEX]?.invoke() },
+        )
+
+        currentPage == progress.RESOLUTION_PAGE_INDEX -> PagerAction(
             label = "Next",
             enabled = isResolutionReady,
-            onClick = { saveActions[SetupProgress.RESOLUTION_PAGE_INDEX]?.invoke() },
+            onClick = { saveActions[progress.RESOLUTION_PAGE_INDEX]?.invoke() },
         )
 
-        currentPage == SetupProgress.DURATION_PAGE_INDEX -> PagerAction(
+        currentPage == progress.DURATION_PAGE_INDEX -> PagerAction(
             label = "Next",
-            onClick = { saveActions[SetupProgress.DURATION_PAGE_INDEX]?.invoke() },
+            onClick = { saveActions[progress.DURATION_PAGE_INDEX]?.invoke() },
         )
 
-        currentPage == SetupProgress.FINAL_PAGE_INDEX -> PagerAction(
+        currentPage == progress.FINAL_PAGE_INDEX -> PagerAction(
             label = "Get started",
             onClick = onSetupComplete,
         )
@@ -160,8 +170,8 @@ internal fun SetupPageContent(
                     slide = setupIntroSlides[page],
                 )
 
-                page < SetupProgress.ORIENTATION_PAGE_INDEX -> {
-                    val permission = requiredPermissions[page - SetupProgress.PERMISSIONS_START_INDEX]
+                page < progress.ORIENTATION_PAGE_INDEX -> {
+                    val permission = requiredPermissions[page - progress.PERMISSIONS_START_INDEX]
                     RequestPermissionSlideContent(
                         permission = permission,
                         isGranted = permission.permission in acquiredPermissions,
@@ -169,15 +179,20 @@ internal fun SetupPageContent(
                     )
                 }
 
-                page == SetupProgress.ORIENTATION_PAGE_INDEX -> SetupSelectOrientationPage(
+                page == progress.ORIENTATION_PAGE_INDEX -> SetupSelectOrientationPage(
                     onContinue = ::goToNextPage,
                     setOrientation = setOrientation,
-                    registerSave = { saveActions[SetupProgress.ORIENTATION_PAGE_INDEX] = it },
+                    registerSave = { saveActions[progress.ORIENTATION_PAGE_INDEX] = it },
                 )
 
-                page == SetupProgress.RESOLUTION_PAGE_INDEX -> SetupSelectResolutionPage(
+                page == progress.STORAGE_PAGE_INDEX -> SetupSelectStoragePage(
                     onContinue = ::goToNextPage,
-                    registerSave = { saveActions[SetupProgress.RESOLUTION_PAGE_INDEX] = it },
+                    registerSave = { saveActions[progress.STORAGE_PAGE_INDEX] = it },
+                )
+
+                page == progress.RESOLUTION_PAGE_INDEX -> SetupSelectResolutionPage(
+                    onContinue = ::goToNextPage,
+                    registerSave = { saveActions[progress.RESOLUTION_PAGE_INDEX] = it },
                     resolutions = resolutions,
                     currentResolutionIndex = currentResolutionIndex,
                     setCurrentResolutionIndex = ::setCurrentResolutionIndex,
@@ -188,9 +203,9 @@ internal fun SetupPageContent(
                     },
                 )
 
-                page == SetupProgress.DURATION_PAGE_INDEX -> SelectVideoDurationPage(
+                page == progress.DURATION_PAGE_INDEX -> SelectVideoDurationPage(
                     onContinue = ::goToNextPage,
-                    registerSave = { saveActions[SetupProgress.DURATION_PAGE_INDEX] = it },
+                    registerSave = { saveActions[progress.DURATION_PAGE_INDEX] = it },
                 )
 
                 else -> SetupCompleteSlideContent()
@@ -204,7 +219,7 @@ internal fun SetupPageContent(
                 .padding(vertical = 10.dp),
         ) {
             PageIndicator(
-                pageCount = SetupProgress.TOTAL_PAGE_COUNT,
+                pageCount = progress.TOTAL_PAGE_COUNT,
                 currentPageIndex = currentPage,
                 color = Color.Black,
             )
@@ -237,6 +252,7 @@ private fun Preview() {
         SetupPageContent(
             requiredPermissions = RequiredPermissions.permissions,
             acquiredPermissions = emptyList(),
+            hasStoragePage = true,
             resolutions = emptyList(),
             setOrientation = {},
             requestPermission = {},

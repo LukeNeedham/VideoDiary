@@ -78,6 +78,7 @@ fun SetupPage(
     SetupPageContent(
         requiredPermissions = requiredPermissions,
         acquiredPermissions = acquiredPermissions,
+        hasStoragePage = viewModel.isRemovableStorageAvailable,
         resolutions = resolutions,
         setOrientation = setOrientation,
         requestPermission = requestPermission,
