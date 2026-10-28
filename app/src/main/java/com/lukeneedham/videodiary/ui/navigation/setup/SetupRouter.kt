@@ -46,12 +46,14 @@ import com.lukeneedham.videodiary.ui.feature.setup.orientation.SetupSelectOrient
 import com.lukeneedham.videodiary.ui.feature.setup.orientation.SetupSelectOrientationViewModel
 import com.lukeneedham.videodiary.ui.feature.setup.resolution.SetupSelectResolutionPage
 import com.lukeneedham.videodiary.ui.feature.setup.resolution.SetupSelectResolutionViewModel
+import com.lukeneedham.videodiary.ui.feature.setup.storage.SetupSelectStoragePage
+import com.lukeneedham.videodiary.ui.feature.setup.storage.SetupSelectStorageViewModel
 import com.lukeneedham.videodiary.ui.permissions.PermissionResultListenerHolder
 import kotlinx.coroutines.launch
 import org.koin.compose.viewmodel.koinViewModel
 
 /**
- * The whole onboarding flow (intro, permissions, orientation, resolution, video duration) is one
+ * The whole onboarding flow (intro, permissions, orientation, video storage (only if there is an SD card), resolution, video duration) is one
  * continuous swipeable pager. Pages are only revealed as their prerequisites are met: permission
  * pages reveal one at a time as each is granted, and the setup pages that follow (which rely on
  * the camera) aren't revealed until every permission is granted.
@@ -77,6 +79,10 @@ fun SetupRouter(
     val orientationViewModel: SetupSelectOrientationViewModel = koinViewModel()
     val resolutionViewModel: SetupSelectResolutionViewModel = koinViewModel()
     val durationViewModel: SelectVideoDurationViewModel = koinViewModel()
+    val storageViewModel: SetupSelectStorageViewModel = koinViewModel()
+
+    // The storage page is only there if there is an SD card to choose when onboarding starts
+    val progress = remember { SetupProgress(hasStoragePage = storageViewModel.isRemovableStorageAvailable) }
 
     LaunchedEffect(permissionResultListenerHolder, permissionsViewModel) {
         permissionResultListenerHolder.onPermissionResult = permissionsViewModel::onPermissionResult
@@ -138,9 +144,9 @@ fun SetupRouter(
     // Pages beyond the current prerequisite aren't revealed yet, so the user can't swipe past a
     // permission without granting it, or past resolution selection without a valid resolution.
     val revealedPageCount = when {
-        !allPermissionsGranted -> SetupProgress.PERMISSIONS_START_INDEX + firstMissingPermissionIndex + 1
-        !isResolutionReady -> SetupProgress.RESOLUTION_PAGE_INDEX + 1
-        else -> SetupProgress.TOTAL_PAGE_COUNT
+        !allPermissionsGranted -> progress.PERMISSIONS_START_INDEX + firstMissingPermissionIndex + 1
+        !isResolutionReady -> progress.RESOLUTION_PAGE_INDEX + 1
+        else -> progress.TOTAL_PAGE_COUNT
     }
 
     val pagerState = rememberPagerState { revealedPageCount }
@@ -159,8 +165,8 @@ fun SetupRouter(
             onClick = ::goToNextPage,
         )
 
-        currentPage < SetupProgress.ORIENTATION_PAGE_INDEX -> {
-            val permission = requiredPermissions.getOrNull(currentPage - SetupProgress.PERMISSIONS_START_INDEX)
+        currentPage < progress.ORIENTATION_PAGE_INDEX -> {
+            val permission = requiredPermissions.getOrNull(currentPage - progress.PERMISSIONS_START_INDEX)
             when {
                 permission == null -> null
                 permission.permission in acquiredPermissions -> PagerAction(
@@ -174,12 +180,17 @@ fun SetupRouter(
             }
         }
 
-        currentPage == SetupProgress.ORIENTATION_PAGE_INDEX -> PagerAction(
+        currentPage == progress.ORIENTATION_PAGE_INDEX -> PagerAction(
             label = "Next",
             onClick = { orientationViewModel.saveSettings() },
         )
 
-        currentPage == SetupProgress.RESOLUTION_PAGE_INDEX -> {
+        currentPage == progress.STORAGE_PAGE_INDEX -> PagerAction(
+            label = "Next",
+            onClick = { storageViewModel.saveSettings() },
+        )
+
+        currentPage == progress.RESOLUTION_PAGE_INDEX -> {
             val rotationLocal = resolutionRotation
             PagerAction(
                 label = "Next",
@@ -192,12 +203,12 @@ fun SetupRouter(
             )
         }
 
-        currentPage == SetupProgress.DURATION_PAGE_INDEX -> PagerAction(
+        currentPage == progress.DURATION_PAGE_INDEX -> PagerAction(
             label = "Next",
             onClick = { durationViewModel.saveSettings() },
         )
 
-        currentPage == SetupProgress.FINAL_PAGE_INDEX -> PagerAction(
+        currentPage == progress.FINAL_PAGE_INDEX -> PagerAction(
             label = "Get started",
             onClick = onSetupComplete,
         )
@@ -217,21 +228,26 @@ fun SetupRouter(
                     slide = setupIntroSlides[page],
                 )
 
-                page < SetupProgress.ORIENTATION_PAGE_INDEX -> {
-                    val permission = requiredPermissions[page - SetupProgress.PERMISSIONS_START_INDEX]
+                page < progress.ORIENTATION_PAGE_INDEX -> {
+                    val permission = requiredPermissions[page - progress.PERMISSIONS_START_INDEX]
                     RequestPermissionPage(
                         permission = permission,
                         isGranted = permission.permission in acquiredPermissions,
                     )
                 }
 
-                page == SetupProgress.ORIENTATION_PAGE_INDEX -> SetupSelectOrientationPage(
+                page == progress.ORIENTATION_PAGE_INDEX -> SetupSelectOrientationPage(
                     viewModel = orientationViewModel,
                     onContinue = ::goToNextPage,
                     setOrientation = setOrientation,
                 )
 
-                page == SetupProgress.RESOLUTION_PAGE_INDEX -> SetupSelectResolutionPage(
+                page == progress.STORAGE_PAGE_INDEX -> SetupSelectStoragePage(
+                    viewModel = storageViewModel,
+                    onContinue = ::goToNextPage,
+                )
+
+                page == progress.RESOLUTION_PAGE_INDEX -> SetupSelectResolutionPage(
                     viewModel = resolutionViewModel,
                     onContinue = ::goToNextPage,
                     resolutions = resolutions,
@@ -244,7 +260,7 @@ fun SetupRouter(
                     },
                 )
 
-                page == SetupProgress.DURATION_PAGE_INDEX -> SelectVideoDurationPage(
+                page == progress.DURATION_PAGE_INDEX -> SelectVideoDurationPage(
                     viewModel = durationViewModel,
                     onContinue = ::goToNextPage,
                 )
@@ -260,7 +276,7 @@ fun SetupRouter(
                 .padding(vertical = 10.dp),
         ) {
             PageIndicator(
-                pageCount = SetupProgress.TOTAL_PAGE_COUNT,
+                pageCount = progress.TOTAL_PAGE_COUNT,
                 currentPageIndex = currentPage,
                 color = Color.Black,
             )

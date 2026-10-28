@@ -54,6 +54,9 @@ sealed interface Route : NavKey {
     @Serializable
     data object SettingsHub : Route
 
+    @Serializable
+    data object VideoStorage : Route
+
     /** The app's own debug page. */
     @Serializable
     data object AppDebug : Route

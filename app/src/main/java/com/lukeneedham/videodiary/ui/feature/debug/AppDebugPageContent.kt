@@ -48,6 +48,12 @@ internal fun AppDebugPageContent(
     allowRetakeForPastDays: Boolean,
     onAllowRetakeForPastDaysChange: (Boolean) -> Unit,
     onResyncThumbnailsClick: () -> Unit,
+    fakeSdCardEnabled: Boolean,
+    onFakeSdCardEnabledChange: (Boolean) -> Unit,
+    fakeSdCardInserted: Boolean,
+    onFakeSdCardInsertedChange: (Boolean) -> Unit,
+    slowVideoMoves: Boolean,
+    onSlowVideoMovesChange: (Boolean) -> Unit,
     onOpenSdkDebug: () -> Unit,
     canGoBack: Boolean,
     onBack: () -> Unit,
@@ -104,6 +110,39 @@ internal fun AppDebugPageContent(
                         "for that day to be re-recorded. Normally only today's video can be retaken",
                     checked = allowRetakeForPastDays,
                     onCheckedChange = onAllowRetakeForPastDaysChange,
+                )
+            }
+
+            Section(title = "Storage") {
+                DebugSwitchRow(
+                    iconRes = R.drawable.movie,
+                    accent = AccentAccept,
+                    title = "Fake SD card",
+                    description = "Pretends there is an SD card, kept in a folder inside the app's " +
+                        "files, so Video storage can be tested on a phone without one",
+                    checked = fakeSdCardEnabled,
+                    onCheckedChange = onFakeSdCardEnabledChange,
+                )
+                if (fakeSdCardEnabled) {
+                    Divider()
+                    DebugSwitchRow(
+                        iconRes = R.drawable.movie,
+                        accent = AccentAccept,
+                        title = "Fake SD card inserted",
+                        description = "Turn off to simulate removing the card, on to put it back",
+                        checked = fakeSdCardInserted,
+                        onCheckedChange = onFakeSdCardInsertedChange,
+                    )
+                }
+                Divider()
+                DebugSwitchRow(
+                    iconRes = R.drawable.pause,
+                    accent = AccentHighlight,
+                    title = "Slow video moves",
+                    description = "Adds an 8 second pause to moving videos between storage " +
+                        "locations, so a move can be interrupted",
+                    checked = slowVideoMoves,
+                    onCheckedChange = onSlowVideoMovesChange,
                 )
             }
 
@@ -272,6 +311,12 @@ private fun Preview() {
         allowRetakeForPastDays = true,
         onAllowRetakeForPastDaysChange = {},
         onResyncThumbnailsClick = {},
+        fakeSdCardEnabled = true,
+        onFakeSdCardEnabledChange = {},
+        fakeSdCardInserted = true,
+        onFakeSdCardInsertedChange = {},
+        slowVideoMoves = false,
+        onSlowVideoMovesChange = {},
         onOpenSdkDebug = {},
         canGoBack = true,
         onBack = {},

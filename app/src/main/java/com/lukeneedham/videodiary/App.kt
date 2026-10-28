@@ -21,9 +21,9 @@ class App : Application() {
         // Fatal crashes are saved to disk and shown on the Debug > Crashes page.
         DebugKit.init(
             DebugKitConfig(
-                enabled = BuildConfig.DEBUG,
-                // Debug logs are only kept in debug builds
-                minLogLevel = if (BuildConfig.DEBUG) LogLevel.Debug else LogLevel.Info,
+                enabled = BuildConfig.DEBUG_KIT_ENABLED,
+                // Debug logs are only kept in builds that save logs
+                minLogLevel = if (BuildConfig.DEBUG_KIT_ENABLED) LogLevel.Debug else LogLevel.Info,
             ),
         )
 

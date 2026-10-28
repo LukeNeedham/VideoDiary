@@ -107,8 +107,8 @@ All DI wiring lives in `di/KoinModule.kt`, grouped into module functions:
 ### Navigation
 
 - Two navigation graphs: the main app flow on Navigation 3 (a sealed `Route : NavKey`, `AppNavigation` and an exhaustive `Router`), and the first-run setup flow (a pager-based `SetupRouter`):
-  - `ui/navigation/setup/` (`SetupPage`, `SetupRouter`) — first-run setup flow (intro → orientation → resolution → video duration)
-  - `ui/navigation/normal/` (`Route.kt`, `AppNavigation.kt`, `Router.kt`) — main app flow (calendar, record video, check video, export diary, debug, logs, crashes)
+  - `ui/navigation/setup/` (`SetupPage`, `SetupRouter`) — first-run setup flow (intro → permissions → orientation → video storage → resolution → video duration). The video storage page is only part of the flow when an SD card is detected as onboarding starts (`SetupProgress(hasStoragePage)`)
+  - `ui/navigation/normal/` (`Route.kt`, `AppNavigation.kt`, `Router.kt`) — main app flow (calendar, record video, check video, export diary, video storage, debug, logs, crashes)
 - `ui/root/Root.kt` + `RootViewModel`/`RootState` decide which graph (or permissions screen / loading
   spinner) to show, based on permission state and whether setup has completed.
 - Built on Navigation 3 (`rememberNavBackStack`, `NavDisplay`, `NavEntry`); `Router` defines `navigateTo`, `onBack` and `popUpTo` once, and each page's ViewModel is scoped to its back stack entry.
@@ -156,7 +156,16 @@ docs: `docs/using-the-library.md` there). The app has no logger of its own.
   `ProvideDebugSettings` is in `MainActivity`): the recap share sheet settle (`RecapViewPageContent`) and the camera focus indicator
   hold and fade (`CameraInput`). Give any new animation an explicit duration and pass it through `scale`. Animations that use the default
   spring (`SingleOptionSelector`, the orientation text colour) are not affected by the setting.
+  The Debug page's Storage section fakes an SD card for testing Video storage on a phone without one: "Fake SD card" (on by default in debug builds, so onboarding offers the SD card without a real card) swaps the removable
+  storage folder for `filesDir/fake_sd_card/videos`, "Fake SD card inserted" simulates removing and re-inserting it, and "Slow video moves" adds
+  an 8 second pause to a move so it can be interrupted (all `BuildConfig.DEBUG` only, applied in `VideosDao`).
+  When the videos are stored on the SD card and it is missing (checked on launch, on every resume, and on storage broadcasts via
+  `RemovableStorageMonitor`), `RootState.SdCardMissing` replaces the whole app with `SdCardMissingPage`; back closes the app. In debug builds that
+  page has a "Reinsert SD card (debug)" button that turns the fake SD card on and inserts it.
   Mock entries are populated by copying the `sample_video` raw resource in as each video file.
+- `BuildConfig.DEBUG_KIT_ENABLED` (true in `debug` and `beta`, false in `release`) controls whether the library's logger and crash handler save to disk
+  (`DebugKitConfig(enabled = ...)` in `App.onCreate`) and whether Settings shows "Logs" and "Crashes" cards when `DEBUG` is false. The `beta` build type
+  (debug keystore, `DEBUG` false, built by the "Tester Release" workflow) therefore has no debug settings or fake SD card, but testers can open the logs and crashes.
 - `app/src/debug/res/drawable/preview_video` is a large placeholder image used by Composable
   Previews for video players; it's excluded from release builds. A small fallback `preview_video`
   exists in the main `drawable` folder so release builds still compile. See [docs/Screenshots.md](docs/Screenshots.md).

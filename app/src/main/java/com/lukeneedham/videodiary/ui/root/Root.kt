@@ -13,6 +13,7 @@ import androidx.compose.ui.graphics.Color
 import com.lukeneedham.videodiary.domain.model.Orientation
 import com.lukeneedham.videodiary.domain.model.ShareRequest
 import com.lukeneedham.videodiary.ui.feature.permissions.RequestPermissionsPage
+import com.lukeneedham.videodiary.ui.feature.storage.SdCardMissingPage
 import com.lukeneedham.videodiary.ui.navigation.normal.AppNavigation
 import com.lukeneedham.videodiary.ui.navigation.setup.SetupRouter
 import com.lukeneedham.videodiary.ui.permissions.PermissionResultListenerHolder
@@ -26,6 +27,7 @@ fun Root(
     setOrientation: (Orientation) -> Unit,
     requestPermission: (permissions: String) -> Unit,
     permissionResultListenerHolder: PermissionResultListenerHolder,
+    closeApp: () -> Unit,
 ) {
     val viewModel: RootViewModel = koinViewModel()
 
@@ -73,6 +75,14 @@ fun Root(
                             requestPermission = requestPermission,
                             onContinue = viewModel::onPermissionsAcquired,
                             permissionResultListenerHolder = permissionResultListenerHolder,
+                        )
+                    }
+
+                    RootState.SdCardMissing -> {
+                        SdCardMissingPage(
+                            canMockReinsert = viewModel.canMockSdCardReinsert,
+                            onMockReinsertClick = viewModel::mockSdCardReinsert,
+                            onClose = closeApp,
                         )
                     }
 

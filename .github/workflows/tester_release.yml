@@ -1,0 +1,57 @@
+name: Tester Release
+
+# Builds the "beta" variant (debug-signed, but without the debug flag or any debug-only features)
+# and publishes it as a GitHub pre-release, so it can be sent to someone to try out.
+# Two ways to run it:
+# - Add the "tester-build" label to a pull request: builds that pull request's branch. Works before
+#   the workflow is on main. Remove and re-add the label to build again.
+# - Actions > Tester Release > Run workflow: builds the branch you pick (once this file is on main).
+# Note: the "Delete pre-releases" workflow removes these along with every other pre-release.
+
+on:
+  pull_request:
+    types: [labeled]
+  workflow_dispatch:
+    inputs:
+      notes:
+        description: 'What to say about this build'
+        required: false
+        type: string
+        default: ''
+
+permissions:
+  contents: write
+
+jobs:
+  tester:
+    if: github.event_name == 'workflow_dispatch' || github.event.label.name == 'tester-build'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # For a pull request, build the branch itself, not its merge with main
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - uses: gradle/actions/setup-gradle@v4
+
+      - name: Build the beta APK
+        run: ./gradlew assembleBeta
+
+      - name: Publish the pre-release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          NOTES: ${{ inputs.notes }}
+          BUILD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+          BUILD_REF_NAME: ${{ github.event.pull_request.head.ref || github.ref_name }}
+        run: |
+          tag="tester-${{ github.run_number }}"
+          gh release create "$tag" app/build/outputs/apk/beta/app-beta.apk \
+            --prerelease \
+            --target "$BUILD_SHA" \
+            --title "Tester build ${{ github.run_number }} (${BUILD_REF_NAME})" \
+            --notes "${NOTES:-Tester build of ${BUILD_REF_NAME} at ${BUILD_SHA::7}.}"

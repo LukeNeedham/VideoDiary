@@ -19,6 +19,7 @@ import com.lukeneedham.videodiary.ui.feature.record.check.CheckVideoPage
 import com.lukeneedham.videodiary.ui.feature.record.film.RecordVideoPage
 import com.lukeneedham.videodiary.ui.feature.record.film.RecordVideoViewModel
 import com.lukeneedham.videodiary.ui.feature.settings.SettingsHubPage
+import com.lukeneedham.videodiary.ui.feature.storage.VideoStoragePage
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 
@@ -160,9 +161,24 @@ fun Router(
 
         Route.SettingsHub -> SettingsHubPage(
             onMenuClick = openHubSwitcher,
+            onVideoStorageClick = {
+                navigateTo(Route.VideoStorage)
+            },
             onDebugClick = {
                 navigateTo(Route.AppDebug)
             },
+            onLogsClick = {
+                navigateTo(Route.Logs)
+            },
+            onCrashesClick = {
+                navigateTo(Route.Crashes)
+            },
+        )
+
+        Route.VideoStorage -> VideoStoragePage(
+            viewModel = koinViewModel(),
+            canGoBack = canGoBack,
+            onBack = ::onBack,
         )
 
         // The app's own debug page, which opens the shared library's debug page. The library's
