@@ -27,7 +27,7 @@ import com.lukeneedham.videodiary.ui.theme.AppBackground
 import java.time.LocalDate
 
 @Composable
-fun CalendarPageContent(
+internal fun CalendarPageContent(
     days: List<Day>,
     currentDayIndex: Int,
     allowEditPastDays: Boolean,
@@ -120,7 +120,7 @@ fun CalendarPageContent(
 }
 
 @Composable
-private fun Preview(
+private fun PreviewOf(
     currentDayIndex: Int,
 ) {
     Box(
@@ -143,12 +143,12 @@ private fun Preview(
 
 @Preview
 @Composable
-private fun PreviewDay1() {
-    Preview(currentDayIndex = 0)
+private fun Preview() {
+    PreviewOf(currentDayIndex = 0)
 }
 
 @Preview
 @Composable
 private fun PreviewDay2() {
-    Preview(currentDayIndex = 1)
+    PreviewOf(currentDayIndex = 1)
 }

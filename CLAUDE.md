@@ -22,7 +22,7 @@ F-Droid.
 - **Language**: Kotlin
 - **UI**: Jetpack Compose (Material)
 - **DI**: Koin (`koin-android`, `koin-compose`, `koin-compose-viewmodel`)
-- **Navigation**: [Reimagined Navigation](https://github.com/olshevski/compose-navigation-reimagined) (`dev.olshevski.navigation.reimagined`)
+- **Navigation**: Navigation 3 (`androidx.navigation3`)
 - **Media**: CameraX (recording) + Media3 (ExoPlayer for playback, Transformer/Effect for export)
 - **Persistence**: AndroidX DataStore (preferences) for settings; plain files (via `Context.filesDir`) for videos; Room for saved recaps
 - **Shared library**: [`com.lukeneedham:common`](https://github.com/LukeNeedham/ci-workflows/tree/main/common) (logger, crash handler, Debug/Logs/Crashes pages), from the Maven repository at `https://lukeneedham.github.io/ci-workflows/maven` (added in `settings.gradle.kts`, version in `buildSrc/.../deps.kt`)
@@ -40,7 +40,7 @@ app/                         Android app module
     di/                       Koin module definitions (KoinModule.kt, KoinQualifier.kt)
     ui/
       feature/                One subpackage per feature/screen (see "Feature structure" below)
-      navigation/             Reimagined Navigation routers + page (route) sealed classes
+      navigation/             Navigation 3: `AppNavigation` (back stack + `NavDisplay`), `Router` (exhaustive `when` over `Route`), the `Route` sealed interface, and the first-run setup router
       root/                   App root composable + RootViewModel (top-level state machine)
       theme/                  Compose theme (Color, Typography, Theme)
       media/                  Shared media helpers (e.g. VideoPlayerPool)
@@ -106,12 +106,12 @@ All DI wiring lives in `di/KoinModule.kt`, grouped into module functions:
 
 ### Navigation
 
-- Two navigation graphs, each with a sealed `Page` class and a `Router` composable:
+- Two navigation graphs: the main app flow on Navigation 3 (a sealed `Route : NavKey`, `AppNavigation` and an exhaustive `Router`), and the first-run setup flow (a pager-based `SetupRouter`):
   - `ui/navigation/setup/` (`SetupPage`, `SetupRouter`) — first-run setup flow (intro → permissions → orientation → video storage → resolution → video duration). The video storage page is only part of the flow when an SD card is detected as onboarding starts (`SetupProgress(hasStoragePage)`)
-  - `ui/navigation/normal/` (`NormalPage`, `NormalRouter`) — main app flow (calendar, record video, check video, export diary, debug, logs, crashes)
+  - `ui/navigation/normal/` (`Route.kt`, `AppNavigation.kt`, `Router.kt`) — main app flow (calendar, record video, check video, export diary, video storage, debug, logs, crashes)
 - `ui/root/Root.kt` + `RootViewModel`/`RootState` decide which graph (or permissions screen / loading
   spinner) to show, based on permission state and whether setup has completed.
-- Built on Reimagined Navigation (`rememberNavController`, `NavHost`, `NavBackHandler`, `navigate`/`pop`/`popUpTo`).
+- Built on Navigation 3 (`rememberNavBackStack`, `NavDisplay`, `NavEntry`); `Router` defines `navigateTo`, `onBack` and `popUpTo` once, and each page's ViewModel is scoped to its back stack entry.
 - Log navigation events via `Logger.d("Navigating to: $to")` (existing convention in both routers).
 
 ### Bottom sheets
@@ -145,10 +145,10 @@ docs: `docs/using-the-library.md` there). The app has no logger of its own.
 
 - `BuildConfig.DEBUG` gates debug-only UI (e.g. the Settings entry that opens the Debug page) and the
   library's `DebugKitConfig(enabled = ...)`, and keeps debug logs (`Logger.d`) out of release builds.
-- The Debug page is the app's own (`ui/feature/debug/`: `DebugPage` / `DebugPageContent` / `DebugViewModel`, routed as
-  `NormalPage.Debug` in `NormalRouter`). It holds the app's own tools, which let developers fill the diary with mock data via
+- The Debug page is the app's own (`ui/feature/debug/`: `AppDebugPage` / `AppDebugPageContent` / `AppDebugViewModel`, routed as
+  `Route.AppDebug` in `Router`). It holds the app's own tools, which let developers fill the diary with mock data via
   `MockDataRepository` / `VideosDao.fillWithMockVideos(...)` — only reachable from debug builds — and has an "SDK debug" row that
-  opens the shared library's `DebugPage` (`NormalPage.SdkDebug`: animation speed, links to the Logs and Crashes pages). The
+  opens the shared library's `DebugPage` (`Route.Debug`: animation speed, links to the Logs and Crashes pages). The
   library's page has no slot for app-specific tools, so add new ones to the app's page, never to the library's.
   The library's pages draw with Material 3 and the app theme is Material 2, so they look slightly different from the rest of the app.
   The library's animation speed (Debug > SDK debug) applies to the app's animations that have an explicit duration, through
@@ -230,6 +230,19 @@ See [docs/Release.md](docs/Release.md) for the full F-Droid release checklist (c
   differ. Do not edit them here and do not copy them by hand: change them in ci-workflows. The callers
   hold no settings: every app is built the same way (see `docs/app-config.md` there).
 - **Always give the user the AppHub link when work on this app completes.** As soon as a PR is open,
-  paste `https://www.lukeneedham.com/apphub/pr/<repo name>/<PR number>` into the chat (CI posts the
-  same link as a PR comment). Do not wait for the build and do not paste the APK link instead.
+  paste `📦 [Open in AppHub](https://www.lukeneedham.com/apphub/pr/<repo name>/<PR number>)` into the chat
+  on a line of its own, never inside a sentence (CI posts the same link as a PR comment), and put the same
+  line at the very top of the PR description. Do not wait for the build and do not paste the APK link instead.
+- **`README.md` is generated by CI from `readme.yml`**: never edit `README.md`, edit `readme.yml` (write it once
+  from `docs/readme-template.yml` in `LukeNeedham/ci-workflows` if it is missing) and keep it accurate. Every app
+  has a `LICENSE` file. The skill has the details.
+- **Every page is an `XPage` plus a stateless `internal` `XPageContent`, always** (`XPage` gets its
+  `XViewModel`; its route is always `Route.X`, a member of the one `sealed interface Route`; each of `XPage`,
+  `XPageContent`, `XViewModel` and `XUiState` is in its own file; never `XScreen`). The README screenshots are private
+  `@Preview`s in the package `screenshot` (in `src/debug`), each owning its mock data (a page can have several,
+  or none; nothing is shared); CI renders them into `docs/screenshots/`, never by hand. The skill has the details.
+- **The Stop hook's git warnings** ("unpushed commit(s)", or commits "Unverified" with a `github-actions[bot]` email):
+  run `git fetch origin` and check again, and do nothing else. CI pushes commits of its own to a PR branch after you
+  push (the README, the screenshots), so your local copy of the remote branch is out of date and Git thinks commits are local only. Never amend,
+  rebase or force-push to silence the hook, never edit the hook, and do not write about it at length.
 <!-- ci-workflows:end -->

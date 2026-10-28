@@ -1,0 +1,25 @@
+# The data of this app's README.md. CI renders README.md from it (docs/readme.md in LukeNeedham/ci-workflows):
+# edit this file, never README.md.
+
+name: Video Diary
+tagline: Record your life in one short video a day.
+
+description: |
+  Video Diary lets you record one short video a day, a snippet of your day, so don't miss your chance. Hop back in time
+  or scroll through the calendar to see what your past self was up to, and at any point export your diary to a single
+  video for a full recap of your life so far.
+
+  It is private: the app has no internet permission, so your videos stay on your own device. It works well in landscape,
+  and you choose the daily video duration, the video orientation and the camera resolution.
+
+links:
+  f-droid: https://f-droid.org/packages/com.lukeneedham.videodiary
+  other:
+    - title: The story behind the project
+      url: https://www.lukeneedham.com/blog/video-diary
+
+developer:
+  notes: |
+    The screenshot previews use the drawable `preview_video` as the placeholder image of a video player. It is a large
+    PNG, so it lives under `app/src/debug/res/drawable` and is left out of release builds; the default drawable folder
+    holds a simple fallback so that release builds still compile. See [docs/Screenshots.md](docs/Screenshots.md).

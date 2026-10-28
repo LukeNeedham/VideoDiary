@@ -21,7 +21,7 @@ import com.lukeneedham.videodiary.ui.theme.AppBackground
 import java.time.LocalDate
 
 @Composable
-fun RecapCreateCustomPageContent(
+internal fun RecapCreateCustomPageContent(
     canGoBack: Boolean,
     onBack: () -> Unit,
     totalVideoCount: Int?,
@@ -85,7 +85,7 @@ fun RecapCreateCustomPageContent(
 
 @Preview
 @Composable
-internal fun PreviewRecapCreateCustomPageContent() {
+private fun Preview() {
     Box(
         modifier = Modifier.background(AppBackground)
     ) {

@@ -26,7 +26,7 @@ import com.lukeneedham.videodiary.ui.theme.AccentRecord
 import com.lukeneedham.videodiary.ui.theme.Typography
 
 @Composable
-fun SetupSelectStoragePageContent(
+internal fun SetupSelectStoragePageContent(
     options: List<VideoStorageLocation>,
     selectedOption: VideoStorageLocation,
     setSelectedOption: (VideoStorageLocation) -> Unit,
@@ -107,7 +107,7 @@ fun SetupSelectStoragePageContent(
 
 @Preview
 @Composable
-internal fun PreviewSetupSelectStoragePageContent() {
+private fun Preview() {
     SetupSelectStoragePageContent(
         options = listOf(VideoStorageLocation.Internal, VideoStorageLocation.RemovableStorage),
         selectedOption = VideoStorageLocation.RemovableStorage,

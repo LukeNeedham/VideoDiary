@@ -38,7 +38,7 @@ import java.time.LocalDate
 private const val SHEET_SETTLE_MILLIS = 250
 
 @Composable
-fun RecapViewPageContent(
+internal fun RecapViewPageContent(
     name: String,
     onNameChange: (String) -> Unit,
     startDate: LocalDate,
@@ -124,7 +124,7 @@ fun RecapViewPageContent(
 
 @Preview
 @Composable
-private fun PreviewPortrait() {
+private fun Preview() {
     Box(
         modifier = Modifier
             .fillMaxSize()

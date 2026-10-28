@@ -11,12 +11,13 @@ object deps {
         val kotlinCompose = "org.jetbrains.kotlin.plugin.compose"
         val parcelize = "kotlin-parcelize"
         val ksp = "com.google.devtools.ksp"
+        val kotlinSerialization = "org.jetbrains.kotlin.plugin.serialization"
     }
 
     object libs {
         object androidx {
             val coreKtx = "androidx.core:core-ktx:1.15.0"
-            val lifecycle = "androidx.lifecycle:lifecycle-runtime-ktx:2.8.7"
+            val lifecycle = "androidx.lifecycle:lifecycle-runtime-ktx:2.10.0"
             val datastore = "androidx.datastore:datastore-preferences:1.1.1"
         }
 
@@ -38,7 +39,11 @@ object deps {
         }
 
         object navigation {
-            val compose = "dev.olshevski.navigation:reimagined:1.5.0"
+            private val version = "1.1.7"
+            val runtime = "androidx.navigation3:navigation3-runtime:$version"
+            val ui = "androidx.navigation3:navigation3-ui:$version"
+            val viewModel = "androidx.lifecycle:lifecycle-viewmodel-navigation3:2.10.0"
+            val serialization = "org.jetbrains.kotlinx:kotlinx-serialization-core:1.7.3"
         }
 
         object testing {
@@ -48,8 +53,8 @@ object deps {
         }
 
         object compose {
-            val activity = "androidx.activity:activity-compose:1.9.3"
-            val bom = "androidx.compose:compose-bom:2026.02.00"
+            val activity = "androidx.activity:activity-compose:1.13.0"
+            val bom = "androidx.compose:compose-bom:2026.06.01"
             val ui = "androidx.compose.ui:ui"
             val uiGraphics = "androidx.compose.ui:ui-graphics"
             val material = "androidx.compose.material:material"
@@ -75,7 +80,7 @@ object deps {
 
         object common {
             /** Shared logger, crash handler and debug pages: https://github.com/LukeNeedham/ci-workflows */
-            val library = "com.lukeneedham:common:0.7.0"
+            val library = "com.lukeneedham:common:0.8.0"
         }
 
         object coil {
@@ -83,7 +88,7 @@ object deps {
         }
 
         object koin {
-            val bom = "io.insert-koin:koin-bom:4.0.1"
+            val bom = "io.insert-koin:koin-bom:4.2.2"
             val core = "io.insert-koin:koin-core"
             val android = "io.insert-koin:koin-android"
             val compose = "io.insert-koin:koin-compose"

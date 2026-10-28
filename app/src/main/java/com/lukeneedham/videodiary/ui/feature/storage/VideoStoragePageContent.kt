@@ -43,7 +43,7 @@ import com.lukeneedham.videodiary.ui.theme.AppSurface
 import com.lukeneedham.videodiary.ui.theme.Typography
 
 @Composable
-fun VideoStoragePageContent(
+internal fun VideoStoragePageContent(
     location: VideoStorageLocation,
     isRemovableStorageAvailable: Boolean,
     isChangingLocation: Boolean,
@@ -256,7 +256,7 @@ private fun Notice(
 
 @Preview
 @Composable
-private fun PreviewVideoStoragePageContent() {
+private fun Preview() {
     VideoStoragePageContent(
         location = VideoStorageLocation.Internal,
         isRemovableStorageAvailable = true,

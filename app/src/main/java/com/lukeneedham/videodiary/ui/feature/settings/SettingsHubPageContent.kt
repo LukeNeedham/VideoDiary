@@ -19,7 +19,7 @@ import com.lukeneedham.videodiary.ui.feature.settings.component.SettingsCard
 import com.lukeneedham.videodiary.ui.theme.AppBackground
 
 @Composable
-fun SettingsHubPageContent(
+internal fun SettingsHubPageContent(
     onMenuClick: () -> Unit,
     onVideoStorageClick: () -> Unit,
     onDebugClick: () -> Unit,
@@ -69,7 +69,7 @@ fun SettingsHubPageContent(
 
 @Preview
 @Composable
-internal fun PreviewSettingsHubPageContent() {
+private fun Preview() {
     SettingsHubPageContent(
         onMenuClick = {},
         onVideoStorageClick = {},

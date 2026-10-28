@@ -37,7 +37,7 @@ import com.lukeneedham.videodiary.ui.theme.Typography
 import java.time.LocalDate
 
 @Composable
-fun RecapCreatePeriodListPageContent(
+internal fun RecapCreatePeriodListPageContent(
     periodType: RecapPeriodType,
     options: List<RecapPeriodOption>,
     isLoaded: Boolean,
@@ -164,7 +164,7 @@ private fun RecapPeriodOptionCard(
 
 @Preview
 @Composable
-private fun PreviewRecapCreatePeriodListPageContent() {
+private fun Preview() {
     RecapCreatePeriodListPageContent(
         periodType = RecapPeriodType.MONTH,
         options = listOf(
@@ -202,7 +202,7 @@ private fun PreviewRecapCreatePeriodListPageContent() {
 
 @Preview
 @Composable
-private fun PreviewRecapCreatePeriodListPageContentEmpty() {
+private fun PreviewEmpty() {
     RecapCreatePeriodListPageContent(
         periodType = RecapPeriodType.YEAR,
         options = emptyList(),

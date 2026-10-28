@@ -32,7 +32,7 @@ import com.lukeneedham.videodiary.ui.theme.AppSurfaceVariant
 import com.lukeneedham.videodiary.ui.theme.Typography
 
 @Composable
-fun SdCardMissingPageContent(
+internal fun SdCardMissingPageContent(
     canMockReinsert: Boolean,
     onMockReinsertClick: () -> Unit,
 ) {
@@ -100,7 +100,7 @@ fun SdCardMissingPageContent(
 
 @Preview
 @Composable
-private fun PreviewSdCardMissingPageContent() {
+private fun Preview() {
     SdCardMissingPageContent(
         canMockReinsert = false,
         onMockReinsertClick = {},

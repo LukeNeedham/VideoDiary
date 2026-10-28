@@ -43,7 +43,7 @@ import com.lukeneedham.videodiary.ui.theme.AppSurfaceVariant
 import com.lukeneedham.videodiary.ui.theme.Typography
 
 @Composable
-fun DebugPageContent(
+internal fun AppDebugPageContent(
     onFillWithMockDataClick: () -> Unit,
     allowRetakeForPastDays: Boolean,
     onAllowRetakeForPastDaysChange: (Boolean) -> Unit,
@@ -305,8 +305,8 @@ private fun DebugRow(
 
 @Preview
 @Composable
-internal fun PreviewDebugPageContent() {
-    DebugPageContent(
+private fun Preview() {
+    AppDebugPageContent(
         onFillWithMockDataClick = {},
         allowRetakeForPastDays = true,
         onAllowRetakeForPastDaysChange = {},
