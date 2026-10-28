@@ -126,6 +126,9 @@ All DI wiring lives in `di/KoinModule.kt`, grouped into module functions:
 - **All bottom sheets must use `SheetLayout` and `SheetDefaults`** (`ui/feature/common/sheet/SheetLayout.kt`).
   Never write a custom drag handle or style a sheet container by hand. When adding a new sheet, or
   touching an existing one, make sure it follows this. See [docs/BottomSheets.md](docs/BottomSheets.md).
+- **A bottom sheet is an `XSheet` composable that puts an `XSheetContent` in the sheet.** `XSheet` (`XSheet.kt`) is the only place
+  that uses `ModalBottomSheet` / `ModalBottomSheetLayout` with `SheetLayout` and `SheetDefaults`, and pages call it; `XSheetContent`
+  (`XSheetContent.kt`) is the content alone, stateless, with no sheet in it and its own `Preview` (CI checks this: `docs/lint.md` in ci-workflows).
 
 ### Logging
 
