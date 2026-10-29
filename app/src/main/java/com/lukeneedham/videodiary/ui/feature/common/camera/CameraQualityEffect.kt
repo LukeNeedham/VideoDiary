@@ -12,6 +12,7 @@ import androidx.camera.video.QualitySelector
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.core.content.ContextCompat
 
 @OptIn(ExperimentalCamera2Interop::class)
@@ -21,6 +22,8 @@ fun CameraQualityEffect(
     onQuality: (Quality?) -> Unit,
 ) {
     val context = LocalContext.current
+    // A preview has no camera: reading one fails, and the effect has nothing to show anyway
+    if (LocalInspectionMode.current) return
 
     LaunchedEffect(resolution) {
         val cameraProviderFuture = ProcessCameraProvider.getInstance(context)
