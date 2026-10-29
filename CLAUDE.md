@@ -239,7 +239,7 @@ See [docs/Release.md](docs/Release.md) for the full F-Droid release checklist (c
 - **Every page is an `XPage` plus a stateless `internal` `XPageContent`, always** (`XPage` gets its
   `XViewModel`; its route is always `Route.X`, a member of the one `sealed interface Route`; each of `XPage`,
   `XPageContent`, `XViewModel` and `XUiState` is in its own file; never `XScreen`). The README screenshots are private
-  `@Preview`s in the package `screenshot` (in `src/debug`), each owning its mock data (a page can have several,
+  `@Preview`s in the package `screenshot` (in `src/debug`, or `src/androidDebug` in a Kotlin Multiplatform app), each owning its mock data (a page can have several,
   or none; nothing is shared); CI renders them into `docs/screenshots/`, never by hand. The skill has the details.
 - **The Stop hook's git warnings** ("unpushed commit(s)", or commits "Unverified" with a `github-actions[bot]` email):
   run `git fetch origin` and check again, and do nothing else. CI pushes commits of its own to a PR branch after you

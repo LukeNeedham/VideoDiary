@@ -12,7 +12,7 @@ there. The same goes for the callers in `.github/workflows/`.
 The long guides are in that repo's `docs/`: `new-app.md` (read first when starting an app), `setup.md`,
 `app-config.md`, `app-icon.md`, `readme.md` (the README layout and `readme.yml`), `pages.md` (`XPage` and
 `XPageContent`), `app-shell.md` (`MainActivity`, `Root`, navigation), `screenshots.md` (the README screenshots), `app-conventions.md`, `library.md`,
-`using-the-library.md` and `consuming-apps.md`. If you can reach GitHub, read the relevant page; otherwise the rules
+`using-the-library.md`, `consuming-apps.md` and `create-app.md` (how a new app repo is created). If you can reach GitHub, read the relevant page; otherwise the rules
 below are enough.
 
 ## Project
@@ -31,6 +31,12 @@ below are enough.
 - Every app is built the same way and nothing is configured per app: module `:app`, debug APK at
   `app/build/outputs/apk/debug/app-debug.apk`, PRs into `main` only (never `master` or `develop`), JDK 17.
   A new app needs only its entry (`name`, `repo`) in `ci-workflows`' `apps.json`.
+  Claude cannot create the repo (403): the user makes it with AppHub's New app button, which creates the repo and then runs
+  the *New App* workflow of `ci-workflows` (`docs/create-app.md`), which adds the entry, the first sync and a Kotlin
+  Multiplatform project (Android target only: shared code in `commonMain`, `App`, `MainActivity` and the manifest in `androidMain`, the
+  screenshots in `androidDebug`, strings as Compose resources) that builds: the debug keystore, the dependencies, the app shell,
+  `AppTheme` and a `SettingsPage` with the `DebugButton`. Look at what is there before adding anything, and keep Android-only
+  code out of `commonMain`.
 - Every app has all the callers of `ci-workflows`' `callers/`, copied by the sync: never edit, rename or delete one
   (`docs/setup.md` there documents each). The release run fails at once, with a message that lists what is missing, until the
   app has the four release secrets and `gradle/android-release.gradle`.
@@ -78,7 +84,7 @@ below are enough.
   (`XPage.kt`, `XPageContent.kt` with the previews, `XViewModel.kt`, `XUiState.kt`). Never `XScreen`, `XContent` or `XView`. **The route is always
   `Route.X`**, a member of the one `sealed interface Route : NavKey` in `Route.kt` (`Route.Home` is `HomePage`:
   `Route.Home -> HomePage(...)` in `Router`; never `HomeNavKey`, `HomeKey` or `HomeRoute`).
-- **README screenshots live in one package, `<app package>.screenshot`, in `src/debug`**: a file per page that has
+- **README screenshots live in one package, `<app package>.screenshot`, in `src/debug`** (`src/androidDebug` in a Kotlin Multiplatform app): a file per page that has
   some, named after the page (`HomePage.kt`; more previews = more screenshots, no file = none). Each screenshot is a
   **private `@Preview` composable that owns its mock data** inside its body and renders `HomePageContent` with it
   (`HomePageScreenshot`). The package's **`order.txt`** lists the screenshots (`HomePage`) in README order, one per line, **with no comments** (no `#` lines: CI fails on them);
