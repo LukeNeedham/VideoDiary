@@ -3,10 +3,13 @@ name: Build Main
 
 on:
   workflow_dispatch:
+  push:
 
 permissions:
-  contents: read
+  contents: write
+  pull-requests: write
 
 jobs:
   android:
+    if: github.ref_name == github.event.repository.default_branch
     uses: LukeNeedham/ci-workflows/.github/workflows/android_main_build.yml@main
