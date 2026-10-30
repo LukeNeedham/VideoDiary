@@ -37,7 +37,7 @@ app/                         Android app module
   src/main/java/com/lukeneedham/videodiary/
     data/                     Data layer: DAOs, repositories, Android-specific data sources, mappers
     domain/                   Domain models and platform-agnostic utilities (date utils, timer)
-    di/                       Koin module definitions (KoinModule.kt, KoinQualifier.kt)
+    di/                       Koin module definitions (KoinModules.kt, KoinQualifier.kt)
     ui/
       feature/                One subpackage per feature/screen (see "Feature structure" below)
       navigation/             Navigation 3: `AppNavigation` (back stack + `NavDisplay`), `Router` (exhaustive `when` over `Route`), the `Route` sealed interface, and the first-run setup router
@@ -95,13 +95,13 @@ Look at `ui/feature/calendar/` as the canonical example (`CalendarPage`, `Calend
 
 ### Dependency Injection (Koin)
 
-All DI wiring lives in `di/KoinModule.kt`, grouped into module functions:
+All DI wiring lives in `di/KoinModules.kt`, grouped into module functions:
 `getUtil()`, `getData()`, `getRepositories()`, `getViewModel()`, `getNonAndroidViewModel()`, `getPersistence()`.
 
 - Use `factory { }` for most things; use `single { }` for stateful singletons — notably DataStore-backed
   DAOs (`SettingsDao`) **must** be singletons, since only one DataStore instance can exist per file.
 - Dispatchers are provided via qualifiers in `KoinQualifier.kt` (`Dispatcher.io`, `Dispatcher.default`, `Dispatcher.main`).
-- When adding a new ViewModel/repository/DAO, register it in the relevant `KoinModule` function
+- When adding a new ViewModel/repository/DAO, register it in the relevant `KoinModules` function
   following the existing pattern (constructor injection via `get()`).
 
 ### Navigation
@@ -218,7 +218,7 @@ See [docs/Release.md](docs/Release.md) for the full F-Droid release checklist (c
 - Follow the existing Page / PageContent / ViewModel split for new screens; keep `PageContent`
   composables free of ViewModel references so they remain previewable.
 - Add new domain models to `domain/model/`, keeping them free of Android framework types where possible.
-- Wire any new injectable class into `di/KoinModule.kt` in the appropriate module function.
+- Wire any new injectable class into `di/KoinModules.kt` in the appropriate module function.
 - Prefer `Logger` over print/`Log` statements.
 - Any new bottom sheet must use the common `SheetLayout` (see "Bottom sheets" above).
 - Keep landscape/portrait-specific UI in `component/landscape/` and `component/portrait/`
