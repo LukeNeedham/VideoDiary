@@ -11,7 +11,7 @@ there. The same goes for the callers in `.github/workflows/`.
 
 The long guides are in that repo's `docs/`: `new-app.md` (read first when starting an app), `setup.md`,
 `app-config.md`, `app-icon.md`, `readme.md` (the README layout and `readme.yml`), `pages.md` (`XPage` and
-`XPageContent`), `app-shell.md` (`MainActivity`, `Root`, navigation), `screenshots.md` (the README screenshots), `app-conventions.md`, `library.md`,
+`XPageContent`), `app-shell.md` (`MainActivity`, `Root`, navigation), `networking.md` (Ktor/OkHttp, DTOs, the network log), `screenshots.md` (the README screenshots), `app-conventions.md`, `library.md`,
 `using-the-library.md`, `consuming-apps.md` and `create-app.md` (how a new app repo is created). If you can reach GitHub, read the relevant page; otherwise the rules
 below are enough.
 
@@ -122,8 +122,15 @@ below are enough.
 - Unit tests for ViewModels and repositories (JUnit, `kotlinx-coroutines-test`).
 
 ## Libraries and code patterns (details: `docs/app-conventions.md`)
+- **Networking (only apps that make network calls; `docs/networking.md`)**: Ktor client with the OkHttp engine. Every model from the
+  network is a `@Serializable` **`XDto`** (`UserDto`, never `UserDTO`/`UserResponse`) with **every property nullable and defaulting
+  to `null`** (enums as `String?`) and a lenient `Json` (`ignoreUnknownKeys`, `isLenient`, `coerceInputValues`, `explicitNulls = false`), so
+  no API response can crash the app. A mapper `XDto.toDomain()` (never throwing; defaults, fallbacks, drops unusable items) turns each
+  into a domain model; **a DTO never leaves the networking layer** (never in a ViewModel, `UiState` or `Route`). Failed calls are
+  caught and logged, not crashed on. **Every client must have `NetworkLogInterceptor()` added to its engine** (the library's network
+  log). An app with no networking: none of this applies.
 - Libraries: `kotlinx.serialization`, Room (structured data), DataStore (settings, never `SharedPreferences`),
-  Ktor client with the OkHttp engine (networking), `kotlinx-datetime`, Media3 (audio/video).
+  Ktor client with the OkHttp engine (networking, see above), `kotlinx-datetime`, Media3 (audio/video).
 - **All text in `strings.xml`**, none hard-coded (including content descriptions).
 - **Own `AppTheme`**, a hand-made composition local holding colours and typefaces. Never read `MaterialTheme`
   in the app; always `AppTheme.current`. No fixed text-style scale: set font size and line height inline in
@@ -145,7 +152,8 @@ below are enough.
 - The debug pages are optional. An app that shows them wraps the UI in
   `ProvideDebugSettings(theme = AppTheme.current.toDebugTheme())`, inside `AppTheme` (the library uses no Material:
   the app maps `AppTheme` to a `DebugTheme` in one function), adds `DebugPage`, `LogsPage` and `CrashesPage` to
-  navigation, and puts a `DebugButton` on a settings page (never a floating button). The library's `DebugPage` shows
+  navigation (an app with network calls also adds `NetworkPage`, passes `onOpenNetwork` to `DebugPage` and adds
+  `NetworkLogInterceptor()` to its OkHttp client or Ktor OkHttp `engine { }`), and puts a `DebugButton` on a settings page (never a floating button). The library's `DebugPage` shows
   the app's package and version; an app with its own debug tools keeps its own debug page with a button to it.
   Scale animation durations with `LocalAnimationSpeed.current.scale(ms)`.
 - "Update all consuming apps" means every app in `apps.json` of `ci-workflows`: bump `common` in each, one PR per
