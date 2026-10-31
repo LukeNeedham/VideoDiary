@@ -5,7 +5,7 @@ import com.lukeneedham.common.DebugKit
 import com.lukeneedham.common.DebugKitConfig
 import com.lukeneedham.common.logger.LogLevel
 import com.lukeneedham.videodiary.data.repository.VideoResolutionRepository
-import com.lukeneedham.videodiary.di.KoinModule
+import com.lukeneedham.videodiary.di.KoinModules
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -28,7 +28,7 @@ class App : Application() {
         )
 
         startKoin {
-            modules(KoinModule.modules)
+            modules(KoinModules.modules)
             androidContext(this@App)
         }
 
