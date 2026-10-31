@@ -15,19 +15,19 @@ class ResolveCurrentDayIndexTest {
 
     @Test
     fun firstLoadGoesToLastDay() {
-        assertEquals(59, resolveCurrentDayIndex(emptyList(), 0, days(60)))
+        assertEquals(59, emptyList<Day>().resolveCurrentDayIndex(0, days(60)))
     }
 
     @Test
     fun listShrinkingFromTheStartDoesNotLeaveIndexOutOfBounds() {
         // Looking at today in a 59 day diary, then all the videos disappear
-        assertEquals(0, resolveCurrentDayIndex(days(59), 58, days(1)))
+        assertEquals(0, days(59).resolveCurrentDayIndex(58, days(1)))
     }
 
     @Test
     fun listGrowingAtTheStartStaysOnTheSameDate() {
         // Looking at today when the diary only had today, then older videos come back
-        assertEquals(59, resolveCurrentDayIndex(days(1), 0, days(60)))
+        assertEquals(59, days(1).resolveCurrentDayIndex(0, days(60)))
     }
 
     @Test
@@ -35,17 +35,17 @@ class ResolveCurrentDayIndexTest {
         val old = days(10)
         val newDays = days(5)
         // Index 7 in the old list is 2 days before today, which is index 2 in the new one
-        assertEquals(2, resolveCurrentDayIndex(old, 7, newDays))
+        assertEquals(2, old.resolveCurrentDayIndex(7, newDays))
     }
 
     @Test
     fun goesToLastDayWhenTheCurrentDateIsGone() {
         // Looking at a day older than anything left in the diary
-        assertEquals(4, resolveCurrentDayIndex(days(10), 0, days(5)))
+        assertEquals(4, days(10).resolveCurrentDayIndex(0, days(5)))
     }
 
     @Test
     fun emptyNewListGivesZero() {
-        assertEquals(0, resolveCurrentDayIndex(days(3), 1, emptyList()))
+        assertEquals(0, days(3).resolveCurrentDayIndex(1, emptyList()))
     }
 }

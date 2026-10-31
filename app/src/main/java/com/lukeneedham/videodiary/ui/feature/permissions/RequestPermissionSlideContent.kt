@@ -32,7 +32,7 @@ import com.lukeneedham.videodiary.ui.theme.AccentHighlight
 import com.lukeneedham.videodiary.ui.theme.AppTheme
 import com.lukeneedham.videodiary.ui.theme.Typography
 
-internal fun iconFor(permission: RequiredPermission): Int = when (permission.permission) {
+internal fun RequiredPermission.iconRes(): Int = when (permission) {
     Manifest.permission.CAMERA -> R.drawable.camera
     Manifest.permission.RECORD_AUDIO -> R.drawable.mic
     else -> R.drawable.movie
@@ -61,7 +61,7 @@ internal fun RequestPermissionSlideContent(
                 .background(color = accentColor.copy(alpha = 0.15f), shape = CircleShape),
         ) {
             Image(
-                painter = painterResource(iconFor(permission)),
+                painter = painterResource(permission.iconRes()),
                 contentDescription = null,
                 colorFilter = ColorFilter.tint(accentColor),
                 modifier = Modifier.size(70.dp),
