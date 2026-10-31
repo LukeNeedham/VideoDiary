@@ -1,4 +1,4 @@
-package com.lukeneedham.videodiary.ui.navigation.setup
+package com.lukeneedham.videodiary.ui.feature.setup
 
 /**
  * Describes the primary action for whichever page is currently shown in the onboarding pager, so

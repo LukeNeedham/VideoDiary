@@ -26,9 +26,9 @@ import com.lukeneedham.videodiary.ui.theme.AccentAccept
 import com.lukeneedham.videodiary.ui.theme.AppTheme
 import com.lukeneedham.videodiary.ui.theme.Typography
 
-/** The final page of the onboarding flow, shown right before the user enters the app. */
+/** The final slide of the onboarding flow, shown right before the user enters the app. */
 @Composable
-fun SetupCompletePage() {
+internal fun SetupCompleteSlideContent() {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
@@ -75,8 +75,8 @@ fun SetupCompletePage() {
 
 @Preview
 @Composable
-private fun PreviewSetupCompletePage() {
+private fun Preview() {
     AppTheme {
-        SetupCompletePage()
+        SetupCompleteSlideContent()
     }
 }

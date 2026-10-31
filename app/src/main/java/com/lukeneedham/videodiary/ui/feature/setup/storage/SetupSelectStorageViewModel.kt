@@ -25,12 +25,6 @@ class SetupSelectStorageViewModel(
     )
     val onSavedEventFlow = onSavedEventMutable.asSharedFlow()
 
-    /**
-     * Whether there is an SD card to choose. Read once, when onboarding starts: the storage page
-     * is only part of onboarding if this is true, and the pages must not change part way through.
-     */
-    val isRemovableStorageAvailable: Boolean = videosDao.isRemovableStorageAvailable()
-
     var location: VideoStorageLocation by mutableStateOf(VideoStorageLocation.Internal)
         private set
 

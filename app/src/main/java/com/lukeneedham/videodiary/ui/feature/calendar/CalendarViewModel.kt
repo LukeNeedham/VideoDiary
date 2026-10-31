@@ -10,7 +10,9 @@ import androidx.lifecycle.viewModelScope
 import com.lukeneedham.videodiary.data.persistence.SettingsDao
 import com.lukeneedham.videodiary.data.persistence.VideosDao
 import com.lukeneedham.videodiary.data.repository.CalendarRepository
+import com.lukeneedham.videodiary.data.repository.VideoResolutionRepository
 import com.lukeneedham.videodiary.domain.model.Day
+import com.lukeneedham.videodiary.ui.feature.common.datepicker.groupedByMonth
 import com.lukeneedham.videodiary.ui.feature.common.videoplayer.VideoPlayerController
 import kotlinx.coroutines.launch
 import java.time.LocalDate
@@ -19,6 +21,7 @@ class CalendarViewModel(
     private val calendarRepository: CalendarRepository,
     private val videosDao: VideosDao,
     private val settingsDao: SettingsDao,
+    private val videoResolutionRepository: VideoResolutionRepository,
 ) : ViewModel() {
 
     /**
@@ -28,6 +31,12 @@ class CalendarViewModel(
     val videoPlayerController = VideoPlayerController()
 
     var days by mutableStateOf<List<Day>>(emptyList())
+        private set
+
+    /** The days grouped by calendar month, for the date picker */
+    val months by derivedStateOf { days.groupedByMonth() }
+
+    var videoAspectRatio by mutableStateOf<Float?>(null)
         private set
 
     val startDate by derivedStateOf {
@@ -42,6 +51,9 @@ class CalendarViewModel(
 
     init {
         viewModelScope.launch {
+            videoAspectRatio = videoResolutionRepository.getAspectRatio()
+        }
+        viewModelScope.launch {
             settingsDao.getAllowEditPastDaysFlow().collect { allow ->
                 allowEditPastDays = allow
             }
@@ -51,7 +63,7 @@ class CalendarViewModel(
                 val oldDays = days
                 val oldIndex = currentDayIndex
                 days = newDays
-                currentDayIndex = resolveCurrentDayIndex(oldDays, oldIndex, newDays)
+                currentDayIndex = CalendarDayIndex.resolveCurrent(oldDays, oldIndex, newDays)
             }
         }
     }
@@ -72,19 +84,4 @@ class CalendarViewModel(
             currentDayIndex = index
         }
     }
-}
-
-/**
- * The index to show once the days change to [newDays]. The list can grow or shrink at the start
- * when videos appear or disappear (for example when the storage location changes), so the index
- * alone is not enough: stay on the same date if it still exists, otherwise go to the last day.
- */
-internal fun resolveCurrentDayIndex(
-    oldDays: List<Day>,
-    oldIndex: Int,
-    newDays: List<Day>,
-): Int {
-    val currentDate = oldDays.getOrNull(oldIndex)?.date
-    val newIndex = newDays.indexOfFirst { it.date == currentDate }
-    return if (newIndex != -1) newIndex else newDays.lastIndex.coerceAtLeast(0)
 }

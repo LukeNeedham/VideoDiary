@@ -13,13 +13,13 @@ import androidx.compose.ui.graphics.Color
 import com.lukeneedham.videodiary.domain.model.Orientation
 import com.lukeneedham.videodiary.domain.model.ShareRequest
 import com.lukeneedham.videodiary.ui.feature.permissions.RequestPermissionsPage
+import com.lukeneedham.videodiary.ui.feature.setup.SetupPage
 import com.lukeneedham.videodiary.ui.feature.storage.SdCardMissingPage
 import com.lukeneedham.videodiary.ui.navigation.normal.AppNavigation
-import com.lukeneedham.videodiary.ui.navigation.setup.SetupRouter
 import com.lukeneedham.videodiary.ui.permissions.PermissionResultListenerHolder
-import com.lukeneedham.videodiary.ui.theme.ProvideAppDebugSettings
 import com.lukeneedham.videodiary.ui.theme.AppTheme
-import org.koin.compose.viewmodel.koinViewModel
+import com.lukeneedham.videodiary.ui.theme.ProvideAppDebugSettings
+import org.koin.compose.koinInject
 
 @Composable
 fun Root(
@@ -29,9 +29,9 @@ fun Root(
     permissionResultListenerHolder: PermissionResultListenerHolder,
     closeApp: () -> Unit,
 ) {
-    val viewModel: RootViewModel = koinViewModel()
+    val coordinator: RootCoordinator = koinInject()
 
-    val orientationState = viewModel.orientationState
+    val orientationState = coordinator.orientationState
 
     LaunchedEffect(orientationState) {
         when (orientationState) {
@@ -59,7 +59,7 @@ fun Root(
         AppTheme {
             // Every app wraps its content in ProvideDebugSettings, even without a debug setting to read.
             ProvideAppDebugSettings {
-                when (viewModel.state) {
+                when (coordinator.state) {
                     RootState.Loading -> {
                         Box(
                             contentAlignment = Alignment.Center,
@@ -71,28 +71,27 @@ fun Root(
 
                     RootState.NeedsPermissions -> {
                         RequestPermissionsPage(
-                            viewModel = koinViewModel(),
                             requestPermission = requestPermission,
-                            onContinue = viewModel::onPermissionsAcquired,
+                            onContinue = coordinator::onPermissionsAcquired,
                             permissionResultListenerHolder = permissionResultListenerHolder,
                         )
                     }
 
                     RootState.SdCardMissing -> {
                         SdCardMissingPage(
-                            canMockReinsert = viewModel.canMockSdCardReinsert,
-                            onMockReinsertClick = viewModel::mockSdCardReinsert,
+                            canMockReinsert = coordinator.canMockSdCardReinsert,
+                            onMockReinsertClick = coordinator::mockSdCardReinsert,
                             onClose = closeApp,
                         )
                     }
 
                     RootState.NeedsSetup -> {
-                        SetupRouter(
-                            onSetupComplete = viewModel::onSetupComplete,
+                        SetupPage(
+                            onSetupComplete = coordinator::onSetupComplete,
                             setOrientation = setOrientation,
                             requestPermission = requestPermission,
                             permissionResultListenerHolder = permissionResultListenerHolder,
-                            onPermissionsAcquired = viewModel::onPermissionsAcquired,
+                            onPermissionsAcquired = coordinator::onPermissionsAcquired,
                         )
                     }
 

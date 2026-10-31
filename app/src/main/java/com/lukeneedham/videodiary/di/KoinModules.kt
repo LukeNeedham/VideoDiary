@@ -17,7 +17,6 @@ import com.lukeneedham.videodiary.data.repository.CurrentDateRepository
 import com.lukeneedham.videodiary.data.repository.MockDataRepository
 import com.lukeneedham.videodiary.data.repository.VideoResolutionRepository
 import com.lukeneedham.videodiary.ui.feature.calendar.CalendarViewModel
-import com.lukeneedham.videodiary.ui.feature.common.datepicker.DiaryDatePickerViewModel
 import com.lukeneedham.videodiary.ui.feature.debug.AppDebugViewModel
 import com.lukeneedham.videodiary.ui.feature.permissions.RequestPermissionsViewModel
 import com.lukeneedham.videodiary.ui.feature.recap.create.RecapCreateCustomViewModel
@@ -25,16 +24,16 @@ import com.lukeneedham.videodiary.ui.feature.storage.VideoStorageViewModel
 import com.lukeneedham.videodiary.ui.feature.recap.create.RecapCreatePeriodListViewModel
 import com.lukeneedham.videodiary.ui.feature.recap.hub.RecapHubViewModel
 import com.lukeneedham.videodiary.ui.feature.recap.model.RecapPeriodType
-import com.lukeneedham.videodiary.ui.feature.recap.share.RecapShareViewModel
 import com.lukeneedham.videodiary.ui.feature.recap.view.RecapViewViewModel
 import com.lukeneedham.videodiary.ui.feature.record.check.CheckVideoViewModel
 import com.lukeneedham.videodiary.ui.feature.record.film.RecordVideoViewModel
+import com.lukeneedham.videodiary.ui.feature.setup.SetupViewModel
 import com.lukeneedham.videodiary.ui.feature.setup.duration.SelectVideoDurationViewModel
 import com.lukeneedham.videodiary.ui.feature.setup.orientation.SetupSelectOrientationViewModel
 import com.lukeneedham.videodiary.ui.feature.setup.resolution.SetupSelectResolutionViewModel
 import com.lukeneedham.videodiary.ui.feature.setup.storage.SetupSelectStorageViewModel
 import com.lukeneedham.videodiary.ui.media.VideoPlayerHolder
-import com.lukeneedham.videodiary.ui.root.RootViewModel
+import com.lukeneedham.videodiary.ui.root.RootCoordinator
 import com.lukeneedham.videodiary.ui.share.Sharer
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
@@ -48,7 +47,6 @@ object KoinModules {
         getUtil(),
         getData(),
         getRepositories(),
-        getNonAndroidViewModel(),
         getViewModel(),
         getPersistence(),
         getUi(),
@@ -133,16 +131,14 @@ object KoinModules {
 
     private fun getViewModel() = module {
         viewModel {
-            RootViewModel(
-                settingsDao = get(),
+            RequestPermissionsViewModel(
                 permissionChecker = get(),
-                videosDao = get(),
-                ioDispatcher = get(KoinQualifier.Dispatcher.io),
             )
         }
         viewModel {
-            RequestPermissionsViewModel(
+            SetupViewModel(
                 permissionChecker = get(),
+                videosDao = get(),
             )
         }
         viewModel {
@@ -189,6 +185,7 @@ object KoinModules {
                 calendarRepository = get(),
                 videosDao = get(),
                 settingsDao = get(),
+                videoResolutionRepository = get(),
             )
         }
         viewModel {
@@ -202,6 +199,7 @@ object KoinModules {
             RecapCreateCustomViewModel(
                 calendarRepository = get(),
                 savedRecapsDao = get(),
+                videoResolutionRepository = get(),
             )
         }
         viewModel { (periodType: RecapPeriodType) ->
@@ -218,13 +216,6 @@ object KoinModules {
                 initialSavedRecapId = savedRecapId,
                 calendarRepository = get(),
                 savedRecapsDao = get(),
-            )
-        }
-        viewModel { (startDate: LocalDate, endDate: LocalDate, name: String) ->
-            RecapShareViewModel(
-                startDate = startDate,
-                endDate = endDate,
-                initialName = name,
                 videoExportDao = get(),
             )
         }
@@ -241,16 +232,6 @@ object KoinModules {
                 settingsDao = get(),
                 videosDao = get(),
                 ioDispatcher = get(KoinQualifier.Dispatcher.io),
-            )
-        }
-    }
-
-    private fun getNonAndroidViewModel() = module {
-        factory {
-            DiaryDatePickerViewModel(
-                calendarRepository = get(),
-                videoResolutionRepository = get(),
-                mainDispatcher = get(KoinQualifier.Dispatcher.main)
             )
         }
     }
@@ -275,6 +256,16 @@ object KoinModules {
         single {
             VideoPlayerHolder(
                 context = androidContext(),
+            )
+        }
+        // Not a ViewModel: Root always renders, so there is one for the whole life of the app
+        single {
+            RootCoordinator(
+                settingsDao = get(),
+                permissionChecker = get(),
+                videosDao = get(),
+                ioDispatcher = get(KoinQualifier.Dispatcher.io),
+                mainDispatcher = get(KoinQualifier.Dispatcher.main),
             )
         }
     }
