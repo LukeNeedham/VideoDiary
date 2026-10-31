@@ -115,8 +115,25 @@ below are enough.
 - MVVM with unidirectional data flow: a `ViewModel` exposes one immutable `UiState` `StateFlow`; composables
   use `collectAsStateWithLifecycle()` and send events up as function calls; no logic in composables.
 - Coroutines + Flow; `viewModelScope` for screen work. UI -> domain/data layers; no Android types in the lower layer.
-- **Koin for dependency injection**: `module { }` with `singleOf` / `viewModelOf` / `factoryOf`, `startKoin`
+- **Never `AndroidViewModel`** (banned in every app): ViewModels extend `ViewModel` and take their dependencies (never an `Application` or `Context`) as constructor parameters, provided by Koin.
+- **Koin for dependency injection, in every app without exception**: `module { }` with `singleOf` / `viewModelOf` / `factoryOf`, `startKoin`
   in `Application.onCreate`, `koinViewModel()` in composables. Constructor injection; classes never call Koin.
+  **All Koin modules live in one Kotlin `object` named `KoinModules`** (`<app package>.di`, `val modules: List<Module>`;
+  `App` calls `modules(KoinModules.modules)`); it may delegate to other objects specific to a feature or use case.
+  `KoinModules.kt` contains only that object. Qualifier names are `const val`s of the one `object KoinQualifier` (`KoinQualifier.kt`, in the same `di` package,
+  `named(KoinQualifier.X)`, never a string literal, nested objects allowed for groups); every other object is in a file of its own.
+  **Koin modules only wire**: one-line bindings (`singleOf`, `viewModelOf`, `single<Api> { Impl(get()) }`) whose only
+  arguments are `get()`, `androidContext()`, runtime parameters and named constants. Any configuration (builders and DSLs
+  like `HttpClient(OkHttp) { ... }` or `Room.databaseBuilder(...)`, timeouts, cache sizes, file names, keys, an inline
+  `File` or `CoroutineScope(...)`, a value read from a global, chained factory calls) lives in a dedicated class or Kotlin
+  `object` that the module just calls (`single { HttpClientFactory.create() }`); a `File` or scope other bindings need is
+  bound under a qualifier constant. Name a feature object's module `bindings`, not `module`.
+- **Naming: an acronym is an ordinary word in camel case** (`docs/app-conventions.md#naming`): `IosSdkManager`, not `iOSSDKManager`;
+  `HttpClient`, `parseJson`, `UserDto`, `UiState`, `userId`, never `HTTPClient`, `parseJSON`, `UserDTO`, `UIState`, `userID`. Only a name a library
+  or platform API fixes (an override, `Dispatchers.IO`) keeps its spelling.
+- **CI checks these rules.** The `conventions` job of every PR fails on a Koin module that configures, a `KoinModules.kt` or `KoinQualifier.kt` with more than its
+  object, an `AndroidViewModel`, a string qualifier, or an acronym in capitals in a name (`docs/conventions-check.md`). Run it with
+  `python3 scripts/check_conventions.py <app>` from `LukeNeedham/ci-workflows`.
 - **Coil 3 for image loading** (`io.coil-kt.coil3:coil-compose`, not Coil 2.x, Glide or Picasso): `AsyncImage`
   for files, URIs and URLs. Add `coil-network-okhttp` only if the app loads images over the network.
 - Unit tests for ViewModels and repositories (JUnit, `kotlinx-coroutines-test`).
