@@ -111,6 +111,15 @@ class RootCoordinator(
         isMissingPermissions = !hasAllRequiredPermissions()
     }
 
+    /**
+     * The app came back to the foreground. A permission may have been revoked meanwhile (from system
+     * settings, say), so check again: if one is missing, [state] becomes [RootState.NeedsPermissions],
+     * which takes over the UI until the user deals with it.
+     */
+    fun onResume() {
+        isMissingPermissions = !hasAllRequiredPermissions()
+    }
+
     fun onSetupComplete() {
         hasSetupCompleted = true
     }

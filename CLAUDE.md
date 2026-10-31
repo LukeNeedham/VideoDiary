@@ -110,7 +110,7 @@ DataStore-backed DAOs (`SettingsDao`) **must** be singletons, since only one Dat
   - `ui/navigation/normal/` (`Route.kt`, `AppNavigation.kt`, `Router.kt`) — main app flow (calendar, record video, check video, export diary, video storage, debug, logs, crashes)
 - `ui/root/Root.kt` + `RootCoordinator`/`RootState` decide which flow (or permissions screen / loading
   spinner) to show, based on permission state and whether setup has completed, and block the normal UI whenever a required
-  permission is missing. The
+  permission is missing (also when it was revoked while the app was in the background: `RootCoordinator.onResume()`). The
   coordinator is not a ViewModel: only `XPage` composables request ViewModels. It is a Koin `single` with a scope of its own,
   obtained in `Root` with `koinInject()`.
 - Built on Navigation 3 (`rememberNavBackStack`, `NavDisplay`, `NavEntry`); `Router` defines `navigateTo`, `onBack` and `popUpTo` once, and each page's ViewModel is scoped to its back stack entry.
