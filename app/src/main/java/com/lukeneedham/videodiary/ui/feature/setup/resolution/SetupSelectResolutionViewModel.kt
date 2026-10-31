@@ -9,9 +9,8 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.channels.BufferOverflow
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 
 class SetupSelectResolutionViewModel(
@@ -21,11 +20,8 @@ class SetupSelectResolutionViewModel(
 ) : ViewModel() {
     private val saveSettingsScope = CoroutineScope(ioDispatcher)
 
-    private val onSavedEventMutable = MutableSharedFlow<Unit>(
-        onBufferOverflow = BufferOverflow.DROP_OLDEST,
-        extraBufferCapacity = 1,
-    )
-    val onSavedEventFlow = onSavedEventMutable.asSharedFlow()
+    private val onSavedEventChannel = Channel<Unit>(Channel.BUFFERED)
+    val onSavedEventFlow = onSavedEventChannel.receiveAsFlow()
 
     fun saveSettings(resolution: Size, rotation: CameraResolutionRotation) {
         saveSettingsScope.launch {
@@ -34,7 +30,7 @@ class SetupSelectResolutionViewModel(
                 async { settingsDao.setResolutionRotation(rotation) },
             ).awaitAll()
             videoResolutionRepository.clearCache()
-            onSavedEventMutable.emit(Unit)
+            onSavedEventChannel.send(Unit)
         }
     }
 }

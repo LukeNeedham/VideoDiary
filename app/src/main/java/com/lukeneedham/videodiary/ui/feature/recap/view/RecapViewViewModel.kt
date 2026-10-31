@@ -16,9 +16,8 @@ import com.lukeneedham.videodiary.ui.feature.recap.model.RecapDayThumbnail
 import com.lukeneedham.videodiary.ui.feature.recap.model.RecapExportOptions
 import com.lukeneedham.videodiary.ui.feature.recap.share.model.RecapShareState
 import java.io.File
-import kotlinx.coroutines.channels.BufferOverflow
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 
@@ -66,11 +65,8 @@ class RecapViewViewModel(
     var shareState: RecapShareState by mutableStateOf(RecapShareState.SelectingOptions)
         private set
 
-    private val onShareMutable = MutableSharedFlow<ShareRequest>(
-        onBufferOverflow = BufferOverflow.DROP_OLDEST,
-        extraBufferCapacity = 1,
-    )
-    val onShareFlow = onShareMutable.asSharedFlow()
+    private val onShareChannel = Channel<ShareRequest>(Channel.BUFFERED)
+    val onShareFlow = onShareChannel.receiveAsFlow()
 
     init {
         viewModelScope.launch {
@@ -159,7 +155,7 @@ class RecapViewViewModel(
     fun shareClicked() {
         val readyState = shareState as? RecapShareState.Ready ?: return
         viewModelScope.launch {
-            onShareMutable.emit(
+            onShareChannel.send(
                 ShareRequest(
                     title = name,
                     text = name,
