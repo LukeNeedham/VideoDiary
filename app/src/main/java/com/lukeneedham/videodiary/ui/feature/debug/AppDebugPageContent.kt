@@ -40,6 +40,7 @@ import com.lukeneedham.videodiary.ui.theme.AccentHighlight
 import com.lukeneedham.videodiary.ui.theme.AppBackground
 import com.lukeneedham.videodiary.ui.theme.AppSurface
 import com.lukeneedham.videodiary.ui.theme.AppSurfaceVariant
+import com.lukeneedham.videodiary.ui.theme.AppTheme
 import com.lukeneedham.videodiary.ui.theme.Typography
 
 @Composable
@@ -306,19 +307,21 @@ private fun DebugRow(
 @Preview
 @Composable
 private fun Preview() {
-    AppDebugPageContent(
-        onFillWithMockDataClick = {},
-        allowRetakeForPastDays = true,
-        onAllowRetakeForPastDaysChange = {},
-        onResyncThumbnailsClick = {},
-        fakeSdCardEnabled = true,
-        onFakeSdCardEnabledChange = {},
-        fakeSdCardInserted = true,
-        onFakeSdCardInsertedChange = {},
-        slowVideoMoves = false,
-        onSlowVideoMovesChange = {},
-        onOpenSdkDebug = {},
-        canGoBack = true,
-        onBack = {},
-    )
+    AppTheme {
+        AppDebugPageContent(
+            onFillWithMockDataClick = {},
+            allowRetakeForPastDays = true,
+            onAllowRetakeForPastDaysChange = {},
+            onResyncThumbnailsClick = {},
+            fakeSdCardEnabled = true,
+            onFakeSdCardEnabledChange = {},
+            fakeSdCardInserted = true,
+            onFakeSdCardInsertedChange = {},
+            slowVideoMoves = false,
+            onSlowVideoMovesChange = {},
+            onOpenSdkDebug = {},
+            canGoBack = true,
+            onBack = {},
+        )
+    }
 }

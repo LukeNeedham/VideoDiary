@@ -30,6 +30,7 @@ import com.lukeneedham.videodiary.ui.feature.common.Button
 import com.lukeneedham.videodiary.ui.feature.common.sheet.SheetDefaults
 import com.lukeneedham.videodiary.ui.feature.common.sheet.SheetLayout
 import com.lukeneedham.videodiary.ui.feature.recap.share.model.RecapShareState
+import com.lukeneedham.videodiary.ui.theme.AppTheme
 import com.lukeneedham.videodiary.ui.theme.Typography
 import kotlinx.coroutines.launch
 
@@ -199,66 +200,74 @@ fun RecapShareSheet(
 @Preview
 @Composable
 private fun PreviewSelectingOptions() {
-    RecapShareSheet(
-        sheetState = rememberModalBottomSheetState(ModalBottomSheetValue.Expanded),
-        state = RecapShareState.SelectingOptions,
-        includeDateStamp = false,
-        onIncludeDateStampChange = {},
-        onCreateClick = {},
-        onCancelClick = {},
-        onBackToOptionsClick = {},
-        onShareClick = {},
-        content = {},
-    )
+    AppTheme {
+        RecapShareSheet(
+            sheetState = rememberModalBottomSheetState(ModalBottomSheetValue.Expanded),
+            state = RecapShareState.SelectingOptions,
+            includeDateStamp = false,
+            onIncludeDateStampChange = {},
+            onCreateClick = {},
+            onCancelClick = {},
+            onBackToOptionsClick = {},
+            onShareClick = {},
+            content = {},
+        )
+    }
 }
 
 @OptIn(ExperimentalMaterialApi::class)
 @Preview
 @Composable
 private fun PreviewInProgress() {
-    RecapShareSheet(
-        sheetState = rememberModalBottomSheetState(ModalBottomSheetValue.Expanded),
-        state = MockDataRecapShare.inProgress,
-        includeDateStamp = false,
-        onIncludeDateStampChange = {},
-        onCreateClick = {},
-        onCancelClick = {},
-        onBackToOptionsClick = {},
-        onShareClick = {},
-        content = {},
-    )
+    AppTheme {
+        RecapShareSheet(
+            sheetState = rememberModalBottomSheetState(ModalBottomSheetValue.Expanded),
+            state = MockDataRecapShare.inProgress,
+            includeDateStamp = false,
+            onIncludeDateStampChange = {},
+            onCreateClick = {},
+            onCancelClick = {},
+            onBackToOptionsClick = {},
+            onShareClick = {},
+            content = {},
+        )
+    }
 }
 
 @OptIn(ExperimentalMaterialApi::class)
 @Preview
 @Composable
 private fun PreviewReady() {
-    RecapShareSheet(
-        sheetState = rememberModalBottomSheetState(ModalBottomSheetValue.Expanded),
-        state = MockDataRecapShare.ready,
-        includeDateStamp = false,
-        onIncludeDateStampChange = {},
-        onCreateClick = {},
-        onCancelClick = {},
-        onBackToOptionsClick = {},
-        onShareClick = {},
-        content = {},
-    )
+    AppTheme {
+        RecapShareSheet(
+            sheetState = rememberModalBottomSheetState(ModalBottomSheetValue.Expanded),
+            state = MockDataRecapShare.ready,
+            includeDateStamp = false,
+            onIncludeDateStampChange = {},
+            onCreateClick = {},
+            onCancelClick = {},
+            onBackToOptionsClick = {},
+            onShareClick = {},
+            content = {},
+        )
+    }
 }
 
 @OptIn(ExperimentalMaterialApi::class)
 @Preview
 @Composable
 private fun PreviewFailed() {
-    RecapShareSheet(
-        sheetState = rememberModalBottomSheetState(ModalBottomSheetValue.Expanded),
-        state = MockDataRecapShare.failed,
-        includeDateStamp = false,
-        onIncludeDateStampChange = {},
-        onCreateClick = {},
-        onCancelClick = {},
-        onBackToOptionsClick = {},
-        onShareClick = {},
-        content = {},
-    )
+    AppTheme {
+        RecapShareSheet(
+            sheetState = rememberModalBottomSheetState(ModalBottomSheetValue.Expanded),
+            state = MockDataRecapShare.failed,
+            includeDateStamp = false,
+            onIncludeDateStampChange = {},
+            onCreateClick = {},
+            onCancelClick = {},
+            onBackToOptionsClick = {},
+            onShareClick = {},
+            content = {},
+        )
+    }
 }

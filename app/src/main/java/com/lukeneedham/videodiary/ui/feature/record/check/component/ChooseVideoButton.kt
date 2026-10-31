@@ -14,6 +14,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.lukeneedham.videodiary.ui.feature.common.glass.GlassSurface
+import com.lukeneedham.videodiary.ui.theme.AppTheme
 import com.lukeneedham.videodiary.ui.theme.GlassFillStrong
 import com.lukeneedham.videodiary.ui.theme.Typography
 
@@ -57,8 +58,10 @@ fun ChooseVideoButton(
 @Preview
 @Composable
 private fun PreviewChooseVideoButton() {
-    ChooseVideoButton(
-        label = "EXISTING",
-        onClick = {},
-    )
+    AppTheme {
+        ChooseVideoButton(
+            label = "EXISTING",
+            onClick = {},
+        )
+    }
 }

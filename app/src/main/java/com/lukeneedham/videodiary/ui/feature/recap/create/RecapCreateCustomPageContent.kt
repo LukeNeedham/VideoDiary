@@ -18,6 +18,7 @@ import com.lukeneedham.videodiary.ui.feature.common.toolbar.ToolbarPageLayout
 import com.lukeneedham.videodiary.ui.feature.recap.model.RecapDayThumbnail
 import com.lukeneedham.videodiary.ui.theme.AccentHighlight
 import com.lukeneedham.videodiary.ui.theme.AppBackground
+import com.lukeneedham.videodiary.ui.theme.AppTheme
 import java.time.LocalDate
 
 @Composable
@@ -86,24 +87,26 @@ internal fun RecapCreateCustomPageContent(
 @Preview
 @Composable
 private fun Preview() {
-    Box(
-        modifier = Modifier.background(AppBackground)
-    ) {
-        RecapCreateCustomPageContent(
-            canGoBack = true,
-            onBack = {},
-            totalVideoCount = 10,
-            selectedVideoCount = 5,
-            selectedDayThumbnails = emptyList(),
-            recapStartDate = MockDataRecapCreateCustom.startDate,
-            recapEndDate = MockDataRecapCreateCustom.endDate,
-            diaryStartDate = MockDataRecapCreateCustom.diaryStartDate,
-            onStartDateSelected = {},
-            onEndDateSelected = {},
-            recapName = "",
-            onRecapNameChange = {},
-            canSave = false,
-            onSaveClick = {},
-        )
+    AppTheme {
+        Box(
+            modifier = Modifier.background(AppBackground)
+        ) {
+            RecapCreateCustomPageContent(
+                canGoBack = true,
+                onBack = {},
+                totalVideoCount = 10,
+                selectedVideoCount = 5,
+                selectedDayThumbnails = emptyList(),
+                recapStartDate = MockDataRecapCreateCustom.startDate,
+                recapEndDate = MockDataRecapCreateCustom.endDate,
+                diaryStartDate = MockDataRecapCreateCustom.diaryStartDate,
+                onStartDateSelected = {},
+                onEndDateSelected = {},
+                recapName = "",
+                onRecapNameChange = {},
+                canSave = false,
+                onSaveClick = {},
+            )
+        }
     }
 }

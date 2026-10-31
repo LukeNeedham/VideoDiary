@@ -16,6 +16,7 @@ import com.lukeneedham.videodiary.ui.feature.calendar.MockDataCalendar
 import com.lukeneedham.videodiary.ui.feature.common.videoplayer.VideoPlayer
 import com.lukeneedham.videodiary.ui.feature.common.videoplayer.VideoPlayerController
 import com.lukeneedham.videodiary.ui.feature.common.videoplayer.rememberVideoPlayerController
+import com.lukeneedham.videodiary.ui.theme.AppTheme
 import java.io.File
 
 @Composable
@@ -43,11 +44,13 @@ fun CalendarDayCardVideo(
 
 @Preview
 @Composable
-internal fun PreviewCalendarDayCardVideo() {
-    CalendarDayCardVideo(
-        video = MockDataCalendar.file,
-        thumbnailFile = null,
-        videoAspectRatio = 1f,
-        videoPlayerController = rememberVideoPlayerController(),
-    )
+private fun Preview() {
+    AppTheme {
+        CalendarDayCardVideo(
+            video = MockDataCalendar.file,
+            thumbnailFile = null,
+            videoAspectRatio = 1f,
+            videoPlayerController = rememberVideoPlayerController(),
+        )
+    }
 }

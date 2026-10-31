@@ -13,6 +13,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.lukeneedham.videodiary.ui.theme.AppBackground
+import com.lukeneedham.videodiary.ui.theme.AppTheme
 import com.lukeneedham.videodiary.ui.theme.Typography
 
 @Composable
@@ -34,8 +35,10 @@ fun RecapCreateEmpty() {
 
 @Preview
 @Composable
-internal fun PreviewRecapCreateEmpty() {
-    Box(modifier = Modifier.fillMaxSize().background(AppBackground)) {
-        RecapCreateEmpty()
+private fun Preview() {
+    AppTheme {
+        Box(modifier = Modifier.fillMaxSize().background(AppBackground)) {
+            RecapCreateEmpty()
+        }
     }
 }
