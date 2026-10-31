@@ -63,7 +63,7 @@ class CalendarViewModel(
                 val oldDays = days
                 val oldIndex = currentDayIndex
                 days = newDays
-                currentDayIndex = oldDays.resolveCurrentDayIndex(oldIndex, newDays)
+                currentDayIndex = CalendarDayIndex.resolveCurrent(oldDays, oldIndex, newDays)
             }
         }
     }

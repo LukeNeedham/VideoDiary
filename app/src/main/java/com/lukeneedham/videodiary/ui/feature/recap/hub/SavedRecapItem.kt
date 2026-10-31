@@ -113,7 +113,7 @@ private fun SavedRecapThumbnailRow(
     modifier: Modifier = Modifier,
 ) {
     BoxWithConstraints(modifier = modifier) {
-        val maxFitCount = maxWidth.maxThumbnailCount()
+        val maxFitCount = ThumbnailLayout.maxCount(maxWidth)
 
         if (thumbnailFiles.size <= maxFitCount) {
             Row(
@@ -124,7 +124,7 @@ private fun SavedRecapThumbnailRow(
                 }
             }
         } else {
-            val maxWithEllipsis = maxWidth.maxThumbnailCountWithEllipsis()
+            val maxWithEllipsis = ThumbnailLayout.maxCountWithEllipsis(maxWidth)
             val firstCount = (maxWithEllipsis + 1) / 2
             val lastCount = maxWithEllipsis / 2
             val firstThumbnails = thumbnailFiles.take(firstCount)
@@ -167,15 +167,17 @@ private fun ThumbnailImage(
     )
 }
 
-private fun Dp.maxThumbnailCount(): Int {
-    return ((this + ThumbnailSpacing) / (ThumbnailWidth + ThumbnailSpacing)).toInt()
-        .coerceAtLeast(1)
-}
+private object ThumbnailLayout {
+    fun maxCount(availableWidth: Dp): Int {
+        return ((availableWidth + ThumbnailSpacing) / (ThumbnailWidth + ThumbnailSpacing)).toInt()
+            .coerceAtLeast(1)
+    }
 
-private fun Dp.maxThumbnailCountWithEllipsis(): Int {
-    val widthForThumbnails = this - EllipsisWidth - ThumbnailSpacing * 2
-    return ((widthForThumbnails + ThumbnailSpacing) / (ThumbnailWidth + ThumbnailSpacing)).toInt()
-        .coerceAtLeast(2)
+    fun maxCountWithEllipsis(availableWidth: Dp): Int {
+        val widthForThumbnails = availableWidth - EllipsisWidth - ThumbnailSpacing * 2
+        return ((widthForThumbnails + ThumbnailSpacing) / (ThumbnailWidth + ThumbnailSpacing)).toInt()
+            .coerceAtLeast(2)
+    }
 }
 
 @Preview

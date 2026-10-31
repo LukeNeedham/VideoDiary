@@ -88,7 +88,7 @@ fun AppNavigation(
             transitionSpec = { noTransition },
             popTransitionSpec = { noTransition },
             predictivePopTransitionSpec = { noTransition },
-            entryProvider = { key -> backStack.routeEntryProvider(key, share, openHubSwitcher) },
+            entryProvider = { key -> RouteEntries.provide(backStack, key, share, openHubSwitcher) },
         )
     }
 
@@ -98,14 +98,17 @@ fun AppNavigation(
     }
 }
 
-private fun NavBackStack<NavKey>.routeEntryProvider(
-    key: NavKey,
-    share: (ShareRequest) -> Unit,
-    openHubSwitcher: () -> Unit,
-): NavEntry<NavKey> {
-    val route = key as Route
-    return NavEntry(route) {
-        Router(this@routeEntryProvider, route, share, openHubSwitcher)
+private object RouteEntries {
+    fun provide(
+        backStack: NavBackStack<NavKey>,
+        key: NavKey,
+        share: (ShareRequest) -> Unit,
+        openHubSwitcher: () -> Unit,
+    ): NavEntry<NavKey> {
+        val route = key as Route
+        return NavEntry(route) {
+            Router(backStack, route, share, openHubSwitcher)
+        }
     }
 }
 
