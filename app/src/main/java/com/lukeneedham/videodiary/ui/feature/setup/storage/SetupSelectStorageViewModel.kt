@@ -8,9 +8,8 @@ import com.lukeneedham.videodiary.data.persistence.VideosDao
 import com.lukeneedham.videodiary.domain.model.VideoStorageLocation
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.channels.BufferOverflow
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 
 class SetupSelectStorageViewModel(
@@ -19,11 +18,8 @@ class SetupSelectStorageViewModel(
 ) : ViewModel() {
     private val saveSettingsScope = CoroutineScope(ioDispatcher)
 
-    private val onSavedEventMutable = MutableSharedFlow<Unit>(
-        onBufferOverflow = BufferOverflow.DROP_OLDEST,
-        extraBufferCapacity = 1,
-    )
-    val onSavedEventFlow = onSavedEventMutable.asSharedFlow()
+    private val onSavedChannel = Channel<Unit>(Channel.BUFFERED)
+    val onSavedEventFlow = onSavedChannel.receiveAsFlow()
 
     var location: VideoStorageLocation by mutableStateOf(VideoStorageLocation.Internal)
         private set
@@ -42,7 +38,7 @@ class SetupSelectStorageViewModel(
         saveSettingsScope.launch {
             val result = videosDao.moveVideosTo(location)
             if (result.isSuccess) {
-                onSavedEventMutable.emit(Unit)
+                onSavedChannel.send(Unit)
             } else {
                 error = "Could not use the SD card. Check that it is inserted, or choose internal storage."
             }
