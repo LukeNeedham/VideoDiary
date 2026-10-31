@@ -1,6 +1,5 @@
 package com.lukeneedham.videodiary.ui.feature.permissions
 
-import android.Manifest
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -32,12 +31,6 @@ import com.lukeneedham.videodiary.ui.theme.AccentHighlight
 import com.lukeneedham.videodiary.ui.theme.AppTheme
 import com.lukeneedham.videodiary.ui.theme.Typography
 
-internal fun iconFor(permission: RequiredPermission): Int = when (permission.permission) {
-    Manifest.permission.CAMERA -> R.drawable.camera
-    Manifest.permission.RECORD_AUDIO -> R.drawable.mic
-    else -> R.drawable.movie
-}
-
 @Composable
 internal fun RequestPermissionSlideContent(
     permission: RequiredPermission,
@@ -61,7 +54,7 @@ internal fun RequestPermissionSlideContent(
                 .background(color = accentColor.copy(alpha = 0.15f), shape = CircleShape),
         ) {
             Image(
-                painter = painterResource(iconFor(permission)),
+                painter = painterResource(RequiredPermissionIcon.of(permission)),
                 contentDescription = null,
                 colorFilter = ColorFilter.tint(accentColor),
                 modifier = Modifier.size(70.dp),
@@ -110,7 +103,7 @@ internal fun RequestPermissionSlideContent(
 
 @Preview
 @Composable
-private fun PreviewRequestPermissionSlideContent() {
+private fun Preview() {
     AppTheme {
         RequestPermissionSlideContent(
             permission = RequiredPermissions.permissions.first(),

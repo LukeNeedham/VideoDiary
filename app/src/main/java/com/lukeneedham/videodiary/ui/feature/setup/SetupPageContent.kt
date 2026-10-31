@@ -1,12 +1,6 @@
-package com.lukeneedham.videodiary.ui.navigation.setup
+package com.lukeneedham.videodiary.ui.feature.setup
 
-import android.hardware.camera2.CameraCharacteristics
-import android.hardware.camera2.CameraMetadata
 import android.util.Size
-import androidx.camera.camera2.interop.Camera2CameraInfo
-import androidx.camera.camera2.interop.ExperimentalCamera2Interop
-import androidx.camera.lifecycle.ProcessCameraProvider
-import androidx.camera.video.QualitySelector
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -18,7 +12,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -28,109 +21,61 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.core.content.ContextCompat
 import com.lukeneedham.videodiary.domain.model.CameraResolutionRotation
 import com.lukeneedham.videodiary.domain.model.Orientation
 import com.lukeneedham.videodiary.ui.feature.common.Button
 import com.lukeneedham.videodiary.ui.feature.common.pageindicator.PageIndicator
-import com.lukeneedham.videodiary.ui.feature.permissions.RequestPermissionPage
-import com.lukeneedham.videodiary.ui.feature.permissions.RequestPermissionsViewModel
-import com.lukeneedham.videodiary.ui.feature.setup.complete.SetupCompletePage
+import com.lukeneedham.videodiary.ui.feature.permissions.RequestPermissionSlideContent
+import com.lukeneedham.videodiary.ui.feature.setup.complete.SetupCompleteSlideContent
 import com.lukeneedham.videodiary.ui.feature.setup.duration.SelectVideoDurationPage
-import com.lukeneedham.videodiary.ui.feature.setup.duration.SelectVideoDurationViewModel
-import com.lukeneedham.videodiary.ui.feature.setup.intro.SetupIntroSlidePage
+import com.lukeneedham.videodiary.ui.feature.setup.intro.SetupIntroSlideContent
 import com.lukeneedham.videodiary.ui.feature.setup.intro.setupIntroSlides
 import com.lukeneedham.videodiary.ui.feature.setup.orientation.SetupSelectOrientationPage
-import com.lukeneedham.videodiary.ui.feature.setup.orientation.SetupSelectOrientationViewModel
 import com.lukeneedham.videodiary.ui.feature.setup.resolution.SetupSelectResolutionPage
-import com.lukeneedham.videodiary.ui.feature.setup.resolution.SetupSelectResolutionViewModel
 import com.lukeneedham.videodiary.ui.feature.setup.storage.SetupSelectStoragePage
-import com.lukeneedham.videodiary.ui.feature.setup.storage.SetupSelectStorageViewModel
-import com.lukeneedham.videodiary.ui.permissions.PermissionResultListenerHolder
+import com.lukeneedham.videodiary.ui.permissions.RequiredPermission
+import com.lukeneedham.videodiary.ui.permissions.RequiredPermissions
+import com.lukeneedham.videodiary.ui.theme.AppTheme
 import kotlinx.coroutines.launch
-import org.koin.compose.viewmodel.koinViewModel
 
 /**
- * The whole onboarding flow (intro, permissions, orientation, video storage (only if there is an SD card), resolution, video duration) is one
- * continuous swipeable pager. Pages are only revealed as their prerequisites are met: permission
- * pages reveal one at a time as each is granted, and the setup pages that follow (which rely on
- * the camera) aren't revealed until every permission is granted.
+ * The onboarding flow (intro, permissions, orientation, video storage (only if there is an SD card), resolution, video duration)
+ * as one continuous swipeable pager. Pages are only revealed as their prerequisites are met: permission pages reveal one at a
+ * time as each is granted, and the setup pages that follow (which rely on the camera) aren't revealed until every permission is granted.
  *
  * The page indicator and the primary action button live outside the pager, so they stay static
  * while only the page content itself swipes. The button is computed directly here from state this
- * composable already holds (view models, permission grants, camera resolution readiness) - the
- * same reliable pattern the page indicator uses - rather than relying on a page composed inside
- * the pager to report it, since pager pages are subcomposed on their own schedule and can't safely
- * drive rendering outside the pager.
+ * composable already holds (permission grants, camera resolution readiness) - the same reliable
+ * pattern the page indicator uses - rather than relying on a page composed inside the pager to
+ * report it, since pager pages are subcomposed on their own schedule and can't safely drive
+ * rendering outside the pager. A page only hands up what its button does when it is pressed
+ * (`registerSave`), never how the button looks.
  */
 @OptIn(ExperimentalFoundationApi::class)
-@androidx.annotation.OptIn(ExperimentalCamera2Interop::class)
 @Composable
-fun SetupRouter(
-    onSetupComplete: () -> Unit,
+internal fun SetupPageContent(
+    requiredPermissions: List<RequiredPermission>,
+    acquiredPermissions: List<String>,
+    hasStoragePage: Boolean,
+    resolutions: List<Size>,
     setOrientation: (Orientation) -> Unit,
     requestPermission: (permission: String) -> Unit,
-    permissionResultListenerHolder: PermissionResultListenerHolder,
-    onPermissionsAcquired: () -> Unit,
+    onSetupComplete: () -> Unit,
 ) {
-    val permissionsViewModel: RequestPermissionsViewModel = koinViewModel()
-    val orientationViewModel: SetupSelectOrientationViewModel = koinViewModel()
-    val resolutionViewModel: SetupSelectResolutionViewModel = koinViewModel()
-    val durationViewModel: SelectVideoDurationViewModel = koinViewModel()
-    val storageViewModel: SetupSelectStorageViewModel = koinViewModel()
-
     // The storage page is only there if there is an SD card to choose when onboarding starts
-    val progress = remember { SetupProgress(hasStoragePage = storageViewModel.isRemovableStorageAvailable) }
+    val progress = remember { SetupProgress(hasStoragePage = hasStoragePage) }
 
-    LaunchedEffect(permissionResultListenerHolder, permissionsViewModel) {
-        permissionResultListenerHolder.onPermissionResult = permissionsViewModel::onPermissionResult
-    }
-
-    val requiredPermissions = permissionsViewModel.requiredPermissions
-    val acquiredPermissions = permissionsViewModel.acquiredPermissions
     val firstMissingPermissionIndex = requiredPermissions.indexOfFirst { it.permission !in acquiredPermissions }
     val allPermissionsGranted = firstMissingPermissionIndex == -1
 
-    LaunchedEffect(allPermissionsGranted) {
-        if (allPermissionsGranted) onPermissionsAcquired()
-    }
-
-    // Resolution's camera state is hoisted here (rather than owned by its own page content) so
-    // its readiness can drive the router's own "Next" button, the same reliable way every other
-    // page's action is computed.
-    val context = LocalContext.current
-    var resolutions by remember { mutableStateOf(emptyList<Size>()) }
+    // Resolution's state is hoisted here (rather than owned by its own page) so its readiness can
+    // drive the "Next" button, the same reliable way every other page's action is computed.
     var resolutionRotation: CameraResolutionRotation? by remember { mutableStateOf(null) }
     var currentResolutionIndex by remember { mutableIntStateOf(0) }
     val currentResolution = resolutions.getOrNull(currentResolutionIndex)
     var currentResolutionMissing by remember(currentResolution) { mutableStateOf(false) }
-
-    LaunchedEffect(Unit) {
-        val cameraProviderFuture = ProcessCameraProvider.getInstance(context)
-        cameraProviderFuture.addListener(
-            {
-                val cameraProvider: ProcessCameraProvider = cameraProviderFuture.get()
-                val cameraInfos = cameraProvider.availableCameraInfos.filter {
-                    Camera2CameraInfo
-                        .from(it)
-                        .getCameraCharacteristic(CameraCharacteristics.LENS_FACING) == CameraMetadata.LENS_FACING_BACK
-                }
-
-                val cameraInfo = cameraInfos.first()
-                resolutions =
-                    QualitySelector.getSupportedQualities(cameraInfo).mapNotNull { quality ->
-                        QualitySelector.getResolution(cameraInfo, quality)
-                    }
-                        // Show the resolution with the most pixels first
-                        .sortedByDescending {
-                            it.width * it.height
-                        }
-            },
-            ContextCompat.getMainExecutor(context)
-        )
-    }
 
     fun setCurrentResolutionIndex(index: Int) {
         val resolutionsCount = resolutions.size
@@ -158,6 +103,10 @@ fun SetupRouter(
         }
     }
 
+    // What the "Next" button of a page saves, by the index of the page. Each page owns its own
+    // settings, and hands this up when it is composed; the button only calls it.
+    val saveActions = remember { mutableMapOf<Int, () -> Unit>() }
+
     val currentPage = pagerState.currentPage
     val currentPageAction: PagerAction? = when {
         currentPage < SetupProgress.INTRO_SLIDE_COUNT -> PagerAction(
@@ -182,30 +131,23 @@ fun SetupRouter(
 
         currentPage == progress.ORIENTATION_PAGE_INDEX -> PagerAction(
             label = "Next",
-            onClick = { orientationViewModel.saveSettings() },
+            onClick = { saveActions[progress.ORIENTATION_PAGE_INDEX]?.invoke() },
         )
 
         currentPage == progress.STORAGE_PAGE_INDEX -> PagerAction(
             label = "Next",
-            onClick = { storageViewModel.saveSettings() },
+            onClick = { saveActions[progress.STORAGE_PAGE_INDEX]?.invoke() },
         )
 
-        currentPage == progress.RESOLUTION_PAGE_INDEX -> {
-            val rotationLocal = resolutionRotation
-            PagerAction(
-                label = "Next",
-                enabled = isResolutionReady,
-                onClick = {
-                    if (currentResolution != null && rotationLocal != null) {
-                        resolutionViewModel.saveSettings(currentResolution, rotationLocal)
-                    }
-                },
-            )
-        }
+        currentPage == progress.RESOLUTION_PAGE_INDEX -> PagerAction(
+            label = "Next",
+            enabled = isResolutionReady,
+            onClick = { saveActions[progress.RESOLUTION_PAGE_INDEX]?.invoke() },
+        )
 
         currentPage == progress.DURATION_PAGE_INDEX -> PagerAction(
             label = "Next",
-            onClick = { durationViewModel.saveSettings() },
+            onClick = { saveActions[progress.DURATION_PAGE_INDEX]?.invoke() },
         )
 
         currentPage == progress.FINAL_PAGE_INDEX -> PagerAction(
@@ -224,32 +166,33 @@ fun SetupRouter(
                 .fillMaxWidth(),
         ) { page ->
             when {
-                page < SetupProgress.INTRO_SLIDE_COUNT -> SetupIntroSlidePage(
+                page < SetupProgress.INTRO_SLIDE_COUNT -> SetupIntroSlideContent(
                     slide = setupIntroSlides[page],
                 )
 
                 page < progress.ORIENTATION_PAGE_INDEX -> {
                     val permission = requiredPermissions[page - progress.PERMISSIONS_START_INDEX]
-                    RequestPermissionPage(
+                    RequestPermissionSlideContent(
                         permission = permission,
                         isGranted = permission.permission in acquiredPermissions,
+                        modifier = Modifier.fillMaxSize(),
                     )
                 }
 
                 page == progress.ORIENTATION_PAGE_INDEX -> SetupSelectOrientationPage(
-                    viewModel = orientationViewModel,
                     onContinue = ::goToNextPage,
                     setOrientation = setOrientation,
+                    registerSave = { saveActions[progress.ORIENTATION_PAGE_INDEX] = it },
                 )
 
                 page == progress.STORAGE_PAGE_INDEX -> SetupSelectStoragePage(
-                    viewModel = storageViewModel,
                     onContinue = ::goToNextPage,
+                    registerSave = { saveActions[progress.STORAGE_PAGE_INDEX] = it },
                 )
 
                 page == progress.RESOLUTION_PAGE_INDEX -> SetupSelectResolutionPage(
-                    viewModel = resolutionViewModel,
                     onContinue = ::goToNextPage,
+                    registerSave = { saveActions[progress.RESOLUTION_PAGE_INDEX] = it },
                     resolutions = resolutions,
                     currentResolutionIndex = currentResolutionIndex,
                     setCurrentResolutionIndex = ::setCurrentResolutionIndex,
@@ -261,11 +204,11 @@ fun SetupRouter(
                 )
 
                 page == progress.DURATION_PAGE_INDEX -> SelectVideoDurationPage(
-                    viewModel = durationViewModel,
                     onContinue = ::goToNextPage,
+                    registerSave = { saveActions[progress.DURATION_PAGE_INDEX] = it },
                 )
 
-                else -> SetupCompletePage()
+                else -> SetupCompleteSlideContent()
             }
         }
 
@@ -299,5 +242,21 @@ fun SetupRouter(
                 )
             }
         }
+    }
+}
+
+@Preview
+@Composable
+private fun Preview() {
+    AppTheme {
+        SetupPageContent(
+            requiredPermissions = RequiredPermissions.permissions,
+            acquiredPermissions = emptyList(),
+            hasStoragePage = true,
+            resolutions = emptyList(),
+            setOrientation = {},
+            requestPermission = {},
+            onSetupComplete = {},
+        )
     }
 }

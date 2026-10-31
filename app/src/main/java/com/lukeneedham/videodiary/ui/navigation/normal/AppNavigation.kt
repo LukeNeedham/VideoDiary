@@ -5,7 +5,6 @@ import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.togetherWith
 import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.ModalBottomSheetLayout
 import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
@@ -22,7 +21,6 @@ import com.lukeneedham.common.logger.Logger
 import com.lukeneedham.videodiary.domain.model.ShareRequest
 import com.lukeneedham.videodiary.ui.feature.common.hub.Hub
 import com.lukeneedham.videodiary.ui.feature.common.hub.HubSwitcherSheet
-import com.lukeneedham.videodiary.ui.feature.common.sheet.SheetDefaults
 import kotlinx.coroutines.launch
 
 /**
@@ -71,18 +69,11 @@ fun AppNavigation(
         }
     }
 
-    ModalBottomSheetLayout(
+    HubSwitcherSheet(
         sheetState = hubSheetState,
-        sheetBackgroundColor = SheetDefaults.containerColor,
-        sheetShape = SheetDefaults.shape,
-        scrimColor = SheetDefaults.scrimColor,
-        sheetContent = {
-            HubSwitcherSheet(
-                currentHub = currentHub,
-                onHubClick = ::switchToHub,
-                onClose = { coroutineScope.launch { hubSheetState.hide() } },
-            )
-        },
+        currentHub = currentHub,
+        onHubClick = ::switchToHub,
+        onClose = { coroutineScope.launch { hubSheetState.hide() } },
     ) {
         // Pages swap without an animation
         val noTransition = EnterTransition.None togetherWith ExitTransition.None
@@ -97,7 +88,7 @@ fun AppNavigation(
             transitionSpec = { noTransition },
             popTransitionSpec = { noTransition },
             predictivePopTransitionSpec = { noTransition },
-            entryProvider = { key -> routeEntryProvider(backStack, key, share, openHubSwitcher) },
+            entryProvider = { key -> RouteEntries.provide(backStack, key, share, openHubSwitcher) },
         )
     }
 
@@ -107,15 +98,17 @@ fun AppNavigation(
     }
 }
 
-private fun routeEntryProvider(
-    backStack: NavBackStack<NavKey>,
-    key: NavKey,
-    share: (ShareRequest) -> Unit,
-    openHubSwitcher: () -> Unit,
-): NavEntry<NavKey> {
-    val route = key as Route
-    return NavEntry(route) {
-        Router(backStack, route, share, openHubSwitcher)
+private object RouteEntries {
+    fun provide(
+        backStack: NavBackStack<NavKey>,
+        key: NavKey,
+        share: (ShareRequest) -> Unit,
+        openHubSwitcher: () -> Unit,
+    ): NavEntry<NavKey> {
+        val route = key as Route
+        return NavEntry(route) {
+            Router(backStack, route, share, openHubSwitcher)
+        }
     }
 }
 

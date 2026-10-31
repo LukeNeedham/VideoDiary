@@ -24,9 +24,9 @@ import androidx.compose.ui.unit.dp
 import com.lukeneedham.videodiary.ui.theme.AppTheme
 import com.lukeneedham.videodiary.ui.theme.Typography
 
-/** One slide of the onboarding intro, as a single page within the wider onboarding pager. */
+/** One slide of the onboarding intro, within the onboarding pager of the setup page. */
 @Composable
-fun SetupIntroSlidePage(
+internal fun SetupIntroSlideContent(
     slide: SetupIntroSlide,
 ) {
     Column(
@@ -75,9 +75,9 @@ fun SetupIntroSlidePage(
 
 @Preview
 @Composable
-internal fun PreviewSetupIntroSlidePage() {
+private fun Preview() {
     AppTheme {
-        SetupIntroSlidePage(
+        SetupIntroSlideContent(
             slide = setupIntroSlides.first(),
         )
     }

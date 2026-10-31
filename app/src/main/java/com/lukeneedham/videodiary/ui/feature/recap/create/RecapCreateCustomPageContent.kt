@@ -12,7 +12,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.tooling.preview.Preview
+import com.lukeneedham.videodiary.domain.model.Day
 import com.lukeneedham.videodiary.ui.feature.common.Button
+import com.lukeneedham.videodiary.ui.feature.common.datepicker.MockDataDiaryDatePicker
 import com.lukeneedham.videodiary.ui.feature.common.toolbar.SubpageToolbar
 import com.lukeneedham.videodiary.ui.feature.common.toolbar.ToolbarPageLayout
 import com.lukeneedham.videodiary.ui.feature.recap.model.RecapDayThumbnail
@@ -29,6 +31,8 @@ internal fun RecapCreateCustomPageContent(
     selectedVideoCount: Int?,
     selectedDayThumbnails: List<RecapDayThumbnail>?,
     diaryStartDate: LocalDate?,
+    months: List<List<Day>>,
+    videoAspectRatio: Float?,
     recapStartDate: LocalDate?,
     recapEndDate: LocalDate?,
     onStartDateSelected: (LocalDate?) -> Unit,
@@ -70,6 +74,8 @@ internal fun RecapCreateCustomPageContent(
             } else {
                 RecapCreateCustomPageReady(
                     totalVideoCount = totalVideoCount,
+                    months = months,
+                    videoAspectRatio = videoAspectRatio,
                     selectedVideoCount = selectedVideoCount,
                     selectedDayThumbnails = selectedDayThumbnails,
                     recapStartDate = recapStartDate,
@@ -100,6 +106,8 @@ private fun Preview() {
                 recapStartDate = MockDataRecapCreateCustom.startDate,
                 recapEndDate = MockDataRecapCreateCustom.endDate,
                 diaryStartDate = MockDataRecapCreateCustom.diaryStartDate,
+                months = MockDataDiaryDatePicker.months,
+                videoAspectRatio = MockDataDiaryDatePicker.videoAspectRatio,
                 onStartDateSelected = {},
                 onEndDateSelected = {},
                 recapName = "",

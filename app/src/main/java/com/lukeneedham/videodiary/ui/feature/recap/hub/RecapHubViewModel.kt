@@ -8,16 +8,8 @@ import androidx.lifecycle.viewModelScope
 import com.lukeneedham.videodiary.data.persistence.SavedRecapsDao
 import com.lukeneedham.videodiary.data.persistence.VideosDao
 import com.lukeneedham.videodiary.data.repository.VideoResolutionRepository
-import com.lukeneedham.videodiary.domain.model.SavedRecap
 import com.lukeneedham.videodiary.domain.util.date.CalendarUtil
 import kotlinx.coroutines.launch
-import java.io.File
-
-data class SavedRecapWithThumbnails(
-    val recap: SavedRecap,
-    val dayVideoCount: Int,
-    val thumbnailFiles: List<File>,
-)
 
 class RecapHubViewModel(
     private val savedRecapsDao: SavedRecapsDao,
