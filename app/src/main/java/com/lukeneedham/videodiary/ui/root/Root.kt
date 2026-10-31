@@ -6,10 +6,14 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 import com.lukeneedham.videodiary.domain.model.Orientation
 import com.lukeneedham.videodiary.domain.model.ShareRequest
 import com.lukeneedham.videodiary.ui.feature.permissions.RequestPermissionsPage
@@ -30,6 +34,16 @@ fun Root(
     closeApp: () -> Unit,
 ) {
     val coordinator: RootCoordinator = koinInject()
+
+    // Whenever the app comes back to the foreground, check the permissions again: a revoked one blocks the normal UI
+    val lifecycleOwner = LocalLifecycleOwner.current
+    DisposableEffect(lifecycleOwner, coordinator) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) coordinator.onResume()
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
+    }
 
     val orientationState = coordinator.orientationState
 
