@@ -21,7 +21,7 @@ F-Droid.
 
 - **Language**: Kotlin
 - **UI**: Jetpack Compose (Material)
-- **DI**: Koin (`koin-android`, `koin-compose`, `koin-compose-viewmodel`)
+- **DI**: Koin
 - **Navigation**: Navigation 3 (`androidx.navigation3`)
 - **Media**: CameraX (recording) + Media3 (ExoPlayer for playback, Transformer/Effect for export)
 - **Persistence**: AndroidX DataStore (preferences) for settings; plain files (via `Context.filesDir`) for videos; Room for saved recaps
@@ -37,7 +37,7 @@ app/                         Android app module
   src/main/java/com/lukeneedham/videodiary/
     data/                     Data layer: DAOs, repositories, Android-specific data sources, mappers
     domain/                   Domain models and platform-agnostic utilities (date utils, timer)
-    di/                       Koin module definitions (KoinModule.kt, KoinQualifier.kt)
+    di/                       Koin module definitions (KoinModules.kt, KoinQualifier.kt)
     ui/
       feature/                One subpackage per feature/screen (see "Feature structure" below)
       navigation/             Navigation 3: `AppNavigation` (back stack + `NavDisplay`), `Router` (exhaustive `when` over `Route`) and the `Route` sealed interface of the main flow
@@ -94,16 +94,11 @@ Look at `ui/feature/calendar/` as the canonical example (`CalendarPage`, `Calend
   parameterized `viewModel { (param1, param2) -> ... }` and instantiated by the page, via
   `koinViewModel { parametersOf(...) }`, with the parameters coming from the page's own arguments (the route's).
 
-### Dependency Injection (Koin)
+### Dependency injection
 
-All DI wiring lives in `di/KoinModule.kt`, grouped into module functions:
-`getUtil()`, `getData()`, `getRepositories()`, `getViewModel()`, `getPersistence()`.
+Dependency injection is set up in accordance with the architecture in the [common repo](https://github.com/LukeNeedham/ci-workflows/blob/main/docs/new-app.md#6-app-architecture).
 
-- Use `factory { }` for most things; use `single { }` for stateful singletons — notably DataStore-backed
-  DAOs (`SettingsDao`) **must** be singletons, since only one DataStore instance can exist per file.
-- Dispatchers are provided via qualifiers in `KoinQualifier.kt` (`Dispatcher.io`, `Dispatcher.default`, `Dispatcher.main`).
-- When adding a new ViewModel/repository/DAO, register it in the relevant `KoinModule` function
-  following the existing pattern (constructor injection via `get()`).
+DataStore-backed DAOs (`SettingsDao`) **must** be singletons, since only one DataStore instance can exist per file.
 
 ### Navigation
 
@@ -228,7 +223,6 @@ See [docs/Release.md](docs/Release.md) for the full F-Droid release checklist (c
 - Follow the existing Page / PageContent / ViewModel split for new screens; keep `PageContent`
   composables free of ViewModel references so they remain previewable.
 - Add new domain models to `domain/model/`, keeping them free of Android framework types where possible.
-- Wire any new injectable class into `di/KoinModule.kt` in the appropriate module function.
 - Prefer `Logger` over print/`Log` statements.
 - Any new bottom sheet must use the common `SheetLayout` (see "Bottom sheets" above).
 - Keep landscape/portrait-specific UI in `component/landscape/` and `component/portrait/`
@@ -249,7 +243,7 @@ See [docs/Release.md](docs/Release.md) for the full F-Droid release checklist (c
 - **Every page is an `XPage` plus a stateless `internal` `XPageContent`, always** (`XPage` gets its
   `XViewModel`; its route is always `Route.X`, a member of the one `sealed interface Route`; each of `XPage`,
   `XPageContent`, `XViewModel` and `XUiState` is in its own file; never `XScreen`). The README screenshots are private
-  `@Preview`s in the package `screenshot` (in `src/debug`), each owning its mock data (a page can have several,
+  `@Preview`s in the package `screenshot` (in `src/debug`, or `src/androidDebug` in a Kotlin Multiplatform app), each owning its mock data (a page can have several,
   or none; nothing is shared); CI renders them into `docs/screenshots/`, never by hand. The skill has the details.
 - **The Stop hook's git warnings** ("unpushed commit(s)", or commits "Unverified" with a `github-actions[bot]` email):
   run `git fetch origin` and check again, and do nothing else. CI pushes commits of its own to a PR branch after you
