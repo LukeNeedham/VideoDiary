@@ -21,7 +21,7 @@ F-Droid.
 
 - **Language**: Kotlin
 - **UI**: Jetpack Compose (Material)
-- **DI**: Koin (`koin-android`, `koin-compose`, `koin-compose-viewmodel`)
+- **DI**: Koin
 - **Navigation**: Navigation 3 (`androidx.navigation3`)
 - **Media**: CameraX (recording) + Media3 (ExoPlayer for playback, Transformer/Effect for export)
 - **Persistence**: AndroidX DataStore (preferences) for settings; plain files (via `Context.filesDir`) for videos; Room for saved recaps
@@ -89,20 +89,12 @@ Look at `ui/feature/calendar/` as the canonical example (`CalendarPage`, `Calend
 - State is exposed as Compose `mutableStateOf`/`mutableIntStateOf`/`derivedStateOf` properties with
   `private set`, not as `StateFlow`/`LiveData`.
 - Async work happens in `viewModelScope.launch { ... }`, often collecting Flows from DAOs/repositories.
-- ViewModels that need runtime parameters (e.g. `CheckVideoViewModel`) are registered with Koin's
-  parameterized `viewModel { (param1, param2) -> ... }` and instantiated via
-  `koinViewModel { parametersOf(...) }`.
 
-### Dependency Injection (Koin)
+### Dependency injection
 
-All DI wiring lives in `di/KoinModules.kt`, grouped into module functions:
-`getUtil()`, `getData()`, `getRepositories()`, `getViewModel()`, `getNonAndroidViewModel()`, `getPersistence()`.
+Dependency injection is set up in accordance with the architecture in the [common repo](https://github.com/LukeNeedham/ci-workflows/blob/main/docs/new-app.md#6-app-architecture).
 
-- Use `factory { }` for most things; use `single { }` for stateful singletons — notably DataStore-backed
-  DAOs (`SettingsDao`) **must** be singletons, since only one DataStore instance can exist per file.
-- Dispatchers are provided via qualifiers in `KoinQualifier.kt` (`Dispatcher.io`, `Dispatcher.default`, `Dispatcher.main`).
-- When adding a new ViewModel/repository/DAO, register it in the relevant `KoinModules` function
-  following the existing pattern (constructor injection via `get()`).
+DataStore-backed DAOs (`SettingsDao`) **must** be singletons, since only one DataStore instance can exist per file.
 
 ### Navigation
 
@@ -218,7 +210,6 @@ See [docs/Release.md](docs/Release.md) for the full F-Droid release checklist (c
 - Follow the existing Page / PageContent / ViewModel split for new screens; keep `PageContent`
   composables free of ViewModel references so they remain previewable.
 - Add new domain models to `domain/model/`, keeping them free of Android framework types where possible.
-- Wire any new injectable class into `di/KoinModules.kt` in the appropriate module function.
 - Prefer `Logger` over print/`Log` statements.
 - Any new bottom sheet must use the common `SheetLayout` (see "Bottom sheets" above).
 - Keep landscape/portrait-specific UI in `component/landscape/` and `component/portrait/`
