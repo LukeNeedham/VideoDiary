@@ -3,6 +3,7 @@ package com.lukeneedham.videodiary.ui.feature.calendar.component
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 import com.lukeneedham.videodiary.ui.feature.common.DeleteConfirmDialog
+import com.lukeneedham.videodiary.ui.theme.AppTheme
 
 @Composable
 fun CalendarDeleteConfirmDialog(
@@ -18,9 +19,11 @@ fun CalendarDeleteConfirmDialog(
 
 @Preview
 @Composable
-internal fun PreviewCalendarDeleteConfirmDialog() {
-    CalendarDeleteConfirmDialog(
-        onConfirm = {},
-        dismiss = {},
-    )
+private fun Preview() {
+    AppTheme {
+        CalendarDeleteConfirmDialog(
+            onConfirm = {},
+            dismiss = {},
+        )
+    }
 }

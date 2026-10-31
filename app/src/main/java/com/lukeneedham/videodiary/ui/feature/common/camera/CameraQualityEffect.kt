@@ -15,6 +15,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.core.content.ContextCompat
 
+// lint:ignore PRV-7: an effect that reads the camera and draws nothing
 @OptIn(ExperimentalCamera2Interop::class)
 @Composable
 fun CameraQualityEffect(

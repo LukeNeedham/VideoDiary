@@ -1,18 +1,27 @@
 package com.lukeneedham.videodiary.ui.feature.record.check
 
+import android.net.Uri
 import androidx.activity.compose.BackHandler
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import com.lukeneedham.videodiary.ui.media.VideoPlayerHolder
+import java.time.LocalDate
 import org.koin.compose.getKoin
+import org.koin.compose.viewmodel.koinViewModel
+import org.koin.core.parameter.parametersOf
 
 @Composable
 fun CheckVideoPage(
-    viewModel: CheckVideoViewModel,
+    date: LocalDate,
+    videoContentUri: Uri,
     onKeepExisting: () -> Unit,
     onRetake: () -> Unit,
     onKeepNew: () -> Unit,
 ) {
+    val viewModel = koinViewModel<CheckVideoViewModel> {
+        parametersOf(date, videoContentUri)
+    }
+
     // This page plays two videos at once, each on its own dedicated player - on top of the
     // single app-wide shared player, that's three concurrent video decoders, which is enough to
     // exhaust memory on some devices. The shared player isn't visible here, so free its decoder

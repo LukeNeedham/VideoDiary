@@ -17,6 +17,7 @@ import com.lukeneedham.videodiary.ui.feature.common.toolbar.HubToolbar
 import com.lukeneedham.videodiary.ui.feature.common.toolbar.ToolbarPageLayout
 import com.lukeneedham.videodiary.ui.feature.settings.component.SettingsCard
 import com.lukeneedham.videodiary.ui.theme.AppBackground
+import com.lukeneedham.videodiary.ui.theme.AppTheme
 
 @Composable
 internal fun SettingsHubPageContent(
@@ -70,11 +71,13 @@ internal fun SettingsHubPageContent(
 @Preview
 @Composable
 private fun Preview() {
-    SettingsHubPageContent(
-        onMenuClick = {},
-        onVideoStorageClick = {},
-        onDebugClick = {},
-        onLogsClick = {},
-        onCrashesClick = {},
-    )
+    AppTheme {
+        SettingsHubPageContent(
+            onMenuClick = {},
+            onVideoStorageClick = {},
+            onDebugClick = {},
+            onLogsClick = {},
+            onCrashesClick = {},
+        )
+    }
 }
