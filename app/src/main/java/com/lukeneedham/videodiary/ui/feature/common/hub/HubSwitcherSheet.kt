@@ -27,6 +27,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.lukeneedham.videodiary.ui.feature.common.sheet.SheetLayout
+import com.lukeneedham.videodiary.ui.theme.AppTheme
 import com.lukeneedham.videodiary.ui.theme.Typography
 
 private const val GRID_COLUMNS = 3
@@ -116,9 +117,11 @@ private fun RowScope.HubSwitcherItem(
 @Preview
 @Composable
 private fun PreviewHubSwitcherSheet() {
-    HubSwitcherSheet(
-        currentHub = Hub.Calendar,
-        onHubClick = {},
-        onClose = {},
-    )
+    AppTheme {
+        HubSwitcherSheet(
+            currentHub = Hub.Calendar,
+            onHubClick = {},
+            onClose = {},
+        )
+    }
 }

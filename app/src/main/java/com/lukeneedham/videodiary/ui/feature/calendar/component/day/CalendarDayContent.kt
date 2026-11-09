@@ -9,6 +9,7 @@ import com.lukeneedham.videodiary.ui.feature.calendar.MockDataCalendar
 import com.lukeneedham.videodiary.ui.feature.calendar.component.day.card.CalendarDayCard
 import com.lukeneedham.videodiary.ui.feature.common.videoplayer.VideoPlayerController
 import com.lukeneedham.videodiary.ui.feature.common.videoplayer.rememberVideoPlayerController
+import com.lukeneedham.videodiary.ui.theme.AppTheme
 
 @Composable
 fun CalendarDayContent(
@@ -31,12 +32,14 @@ fun CalendarDayContent(
 
 @Preview
 @Composable
-internal fun PreviewCalendarDayContent() {
-    CalendarDayContent(
-        day = MockDataCalendar.dayWithVideo,
-        allowEditPastDays = false,
-        onRecordVideoClick = {},
-        videoAspectRatio = 1f,
-        videoPlayerController = rememberVideoPlayerController(),
-    )
+private fun Preview() {
+    AppTheme {
+        CalendarDayContent(
+            day = MockDataCalendar.dayWithVideo,
+            allowEditPastDays = false,
+            onRecordVideoClick = {},
+            videoAspectRatio = 1f,
+            videoPlayerController = rememberVideoPlayerController(),
+        )
+    }
 }

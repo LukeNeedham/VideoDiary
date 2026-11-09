@@ -30,6 +30,7 @@ import androidx.compose.ui.unit.dp
 import com.lukeneedham.videodiary.ui.feature.common.sheet.SheetDefaults
 import com.lukeneedham.videodiary.ui.feature.common.sheet.SheetLayout
 import com.lukeneedham.videodiary.ui.theme.AppSurfaceVariant
+import com.lukeneedham.videodiary.ui.theme.AppTheme
 import com.lukeneedham.videodiary.ui.theme.Typography
 import kotlinx.coroutines.launch
 
@@ -157,11 +158,13 @@ private fun RowScope.RecapCreateTypeItem(
 @Preview
 @Composable
 private fun PreviewRecapCreateTypeSheet() {
-    RecapCreateTypeSheet(
-        onWeekClick = {},
-        onMonthClick = {},
-        onYearClick = {},
-        onCustomClick = {},
-        onDismiss = {},
-    )
+    AppTheme {
+        RecapCreateTypeSheet(
+            onWeekClick = {},
+            onMonthClick = {},
+            onYearClick = {},
+            onCustomClick = {},
+            onDismiss = {},
+        )
+    }
 }

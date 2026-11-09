@@ -6,6 +6,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.lukeneedham.videodiary.ui.permissions.RequiredPermission
 import com.lukeneedham.videodiary.ui.permissions.RequiredPermissions
+import com.lukeneedham.videodiary.ui.theme.AppTheme
 
 /** One required permission, as a single page within the wider onboarding pager. */
 @Composable
@@ -23,8 +24,10 @@ fun RequestPermissionPage(
 @Preview
 @Composable
 internal fun PreviewRequestPermissionPage() {
-    RequestPermissionPage(
-        permission = RequiredPermissions.permissions.first(),
-        isGranted = false,
-    )
+    AppTheme {
+        RequestPermissionPage(
+            permission = RequiredPermissions.permissions.first(),
+            isGranted = false,
+        )
+    }
 }

@@ -23,6 +23,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.lukeneedham.videodiary.R
 import com.lukeneedham.videodiary.ui.theme.AccentAccept
+import com.lukeneedham.videodiary.ui.theme.AppTheme
 import com.lukeneedham.videodiary.ui.theme.Typography
 
 /** The final page of the onboarding flow, shown right before the user enters the app. */
@@ -75,5 +76,7 @@ fun SetupCompletePage() {
 @Preview
 @Composable
 private fun PreviewSetupCompletePage() {
-    SetupCompletePage()
+    AppTheme {
+        SetupCompletePage()
+    }
 }

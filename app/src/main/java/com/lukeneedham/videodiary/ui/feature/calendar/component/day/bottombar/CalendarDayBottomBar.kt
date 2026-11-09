@@ -37,6 +37,7 @@ import com.lukeneedham.videodiary.ui.feature.calendar.MockDataCalendar
 import com.lukeneedham.videodiary.ui.feature.common.toolbar.FlatIconButton
 import com.lukeneedham.videodiary.ui.feature.common.videoplayer.VideoPlayerController
 import com.lukeneedham.videodiary.ui.feature.common.videoplayer.rememberVideoPlayerController
+import com.lukeneedham.videodiary.ui.theme.AppTheme
 import java.time.LocalDate
 
 private val DayFontSizeLarge = 26.sp
@@ -222,29 +223,33 @@ private fun CalendarDateDisplay(
 @Preview
 @Composable
 private fun Preview() {
-    CalendarDayBottomBar(
-        videoPlayerController = rememberVideoPlayerController(),
-        day = MockDataCalendar.dayWithVideo,
-        isEditable = false,
-        onMenuClick = {},
-        openDayPicker = {},
-        onRecordVideoClick = {},
-        onDeleteVideoClick = {},
-        share = {},
-    )
+    AppTheme {
+        CalendarDayBottomBar(
+            videoPlayerController = rememberVideoPlayerController(),
+            day = MockDataCalendar.dayWithVideo,
+            isEditable = false,
+            onMenuClick = {},
+            openDayPicker = {},
+            onRecordVideoClick = {},
+            onDeleteVideoClick = {},
+            share = {},
+        )
+    }
 }
 
 @Preview
 @Composable
 private fun PreviewEditableNoVideo() {
-    CalendarDayBottomBar(
-        videoPlayerController = rememberVideoPlayerController(),
-        day = MockDataCalendar.dayWithoutVideo,
-        isEditable = true,
-        onMenuClick = {},
-        openDayPicker = {},
-        onRecordVideoClick = {},
-        onDeleteVideoClick = {},
-        share = {},
-    )
+    AppTheme {
+        CalendarDayBottomBar(
+            videoPlayerController = rememberVideoPlayerController(),
+            day = MockDataCalendar.dayWithoutVideo,
+            isEditable = true,
+            onMenuClick = {},
+            openDayPicker = {},
+            onRecordVideoClick = {},
+            onDeleteVideoClick = {},
+            share = {},
+        )
+    }
 }

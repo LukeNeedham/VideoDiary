@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.lukeneedham.videodiary.R
 import com.lukeneedham.videodiary.ui.theme.AccentHighlight
+import com.lukeneedham.videodiary.ui.theme.AppTheme
 
 @Composable
 fun IntPicker(
@@ -86,9 +87,11 @@ private fun IntPickerButton(
 
 @Preview
 @Composable
-internal fun PreviewIntPicker() {
-    IntPicker(
-        value = 3,
-        setValue = {},
-    )
+private fun Preview() {
+    AppTheme {
+        IntPicker(
+            value = 3,
+            setValue = {},
+        )
+    }
 }

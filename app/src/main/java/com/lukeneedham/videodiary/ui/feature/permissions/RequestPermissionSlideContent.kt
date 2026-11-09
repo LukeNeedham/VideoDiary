@@ -29,6 +29,7 @@ import com.lukeneedham.videodiary.ui.permissions.RequiredPermission
 import com.lukeneedham.videodiary.ui.permissions.RequiredPermissions
 import com.lukeneedham.videodiary.ui.theme.AccentAccept
 import com.lukeneedham.videodiary.ui.theme.AccentHighlight
+import com.lukeneedham.videodiary.ui.theme.AppTheme
 import com.lukeneedham.videodiary.ui.theme.Typography
 
 internal fun iconFor(permission: RequiredPermission): Int = when (permission.permission) {
@@ -110,8 +111,10 @@ internal fun RequestPermissionSlideContent(
 @Preview
 @Composable
 private fun PreviewRequestPermissionSlideContent() {
-    RequestPermissionSlideContent(
-        permission = RequiredPermissions.permissions.first(),
-        isGranted = false,
-    )
+    AppTheme {
+        RequestPermissionSlideContent(
+            permission = RequiredPermissions.permissions.first(),
+            isGranted = false,
+        )
+    }
 }

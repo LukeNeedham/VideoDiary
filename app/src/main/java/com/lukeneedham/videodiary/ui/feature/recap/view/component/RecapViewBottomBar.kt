@@ -1,5 +1,6 @@
 package com.lukeneedham.videodiary.ui.feature.recap.view.component
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -13,9 +14,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.lukeneedham.videodiary.R
 import com.lukeneedham.videodiary.ui.feature.common.toolbar.FlatIconButton
+import com.lukeneedham.videodiary.ui.theme.AppTheme
 import com.lukeneedham.videodiary.ui.theme.Typography
 
 // The minimum interactive size
@@ -99,6 +102,24 @@ fun RecapViewBottomBar(
                 selected = true,
                 size = ButtonSize,
                 iconSize = 20.dp,
+            )
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun Preview() {
+    AppTheme {
+        Box(modifier = Modifier.background(Color.Black)) {
+            RecapViewBottomBar(
+                name = "Summer 2024",
+                isSaved = false,
+                canGoBack = true,
+                onBack = {},
+                onInfoClick = {},
+                onToggleSavedClick = {},
+                onShareClick = {},
             )
         }
     }

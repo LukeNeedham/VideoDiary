@@ -28,6 +28,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.lukeneedham.videodiary.domain.model.Day
+import com.lukeneedham.videodiary.ui.theme.AppTheme
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.YearMonth
@@ -202,11 +203,13 @@ private fun MonthGrid(
 @Preview
 @Composable
 private fun Preview() {
-    DiaryDatePicker(
-        initialFocusedDate = MockDataDiaryDatePicker.endDate,
-        allMonths = MockDataDiaryDatePicker.months,
-        videoAspectRatio = MockDataDiaryDatePicker.videoAspectRatio,
-        onDateSelected = {},
-        onVisibleMonthChanged = { _, _ -> },
-    )
+    AppTheme {
+        DiaryDatePicker(
+            initialFocusedDate = MockDataDiaryDatePicker.endDate,
+            allMonths = MockDataDiaryDatePicker.months,
+            videoAspectRatio = MockDataDiaryDatePicker.videoAspectRatio,
+            onDateSelected = {},
+            onVisibleMonthChanged = { _, _ -> },
+        )
+    }
 }

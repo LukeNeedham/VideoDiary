@@ -17,6 +17,7 @@ import androidx.compose.ui.unit.dp
 import com.lukeneedham.videodiary.R
 import com.lukeneedham.videodiary.ui.feature.common.IntPicker
 import com.lukeneedham.videodiary.ui.feature.setup.SetupStepHeader
+import com.lukeneedham.videodiary.ui.theme.AppTheme
 
 @Composable
 internal fun SelectVideoDurationPageContent(
@@ -55,8 +56,10 @@ internal fun SelectVideoDurationPageContent(
 @Preview
 @Composable
 private fun Preview() {
-    SelectVideoDurationPageContent(
-        seconds = 1,
-        setSeconds = {},
-    )
+    AppTheme {
+        SelectVideoDurationPageContent(
+            seconds = 1,
+            setSeconds = {},
+        )
+    }
 }

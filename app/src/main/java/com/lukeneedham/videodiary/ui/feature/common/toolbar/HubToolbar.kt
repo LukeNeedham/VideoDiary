@@ -10,6 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.lukeneedham.videodiary.R
+import com.lukeneedham.videodiary.ui.theme.AppTheme
 
 /**
  * Toolbar content for hub pages: a menu button, aligned left, which opens the hub switcher.
@@ -38,7 +39,7 @@ fun HubToolbar(
 
 /** The menu (hamburger) button which opens the hub switcher. */
 @Composable
-fun HubMenuButton(
+private fun HubMenuButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -54,5 +55,7 @@ fun HubMenuButton(
 @Preview
 @Composable
 private fun PreviewHubToolbar() {
-    HubToolbar(onMenuClick = {})
+    AppTheme {
+        HubToolbar(onMenuClick = {})
+    }
 }

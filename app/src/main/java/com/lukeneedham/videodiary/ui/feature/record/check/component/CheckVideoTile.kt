@@ -6,9 +6,13 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.tooling.preview.Preview
 import com.lukeneedham.videodiary.domain.model.Video
 import com.lukeneedham.videodiary.ui.feature.common.videoplayer.VideoPlayer
 import com.lukeneedham.videodiary.ui.feature.common.videoplayer.VideoPlayerController
+import com.lukeneedham.videodiary.ui.feature.common.videoplayer.rememberVideoPlayerController
+import com.lukeneedham.videodiary.ui.theme.AppTheme
+import java.io.File
 
 /**
  * One half of the check video comparison: a playing [video] that pauses - alongside its
@@ -41,6 +45,20 @@ fun CheckVideoTile(
             controller = controller,
             usesDedicatedPlayer = true,
             modifier = Modifier.fillMaxWidth(),
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun Preview() {
+    AppTheme {
+        CheckVideoTile(
+            video = Video.PersistedFile(File("")),
+            controller = rememberVideoPlayerController(),
+            aspectRatio = 9f / 16f,
+            onPress = {},
+            onRelease = {},
         )
     }
 }

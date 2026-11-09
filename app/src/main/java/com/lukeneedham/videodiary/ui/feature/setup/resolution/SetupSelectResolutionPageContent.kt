@@ -31,6 +31,7 @@ import com.lukeneedham.videodiary.ui.feature.common.camera.CameraQualityEffect
 import com.lukeneedham.videodiary.ui.feature.common.glass.GlassIconButton
 import com.lukeneedham.videodiary.ui.feature.common.pageindicator.PageIndicator
 import com.lukeneedham.videodiary.ui.feature.setup.SetupStepHeader
+import com.lukeneedham.videodiary.ui.theme.AppTheme
 
 @Composable
 internal fun SetupSelectResolutionPageContent(
@@ -139,11 +140,13 @@ internal fun SetupSelectResolutionPageContent(
 @Preview
 @Composable
 private fun Preview() {
-    SetupSelectResolutionPageContent(
-        resolutions = emptyList(),
-        currentResolutionIndex = 0,
-        setCurrentResolutionIndex = {},
-        rotation = null,
-        onResolutionLoaded = { _, _, _ -> },
-    )
+    AppTheme {
+        SetupSelectResolutionPageContent(
+            resolutions = emptyList(),
+            currentResolutionIndex = 0,
+            setCurrentResolutionIndex = {},
+            rotation = null,
+            onResolutionLoaded = { _, _, _ -> },
+        )
+    }
 }

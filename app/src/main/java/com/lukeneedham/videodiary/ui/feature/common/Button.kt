@@ -16,6 +16,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.lukeneedham.videodiary.ui.theme.AppTheme
 
 @Composable
 fun Button(
@@ -52,10 +53,12 @@ fun Button(
 
 @Preview
 @Composable
-internal fun PreviewButton() {
-    Button(
-        text = "Test",
-        enabled = true,
-        onClick = {}
-    )
+private fun Preview() {
+    AppTheme {
+        Button(
+            text = "Test",
+            enabled = true,
+            onClick = {}
+        )
+    }
 }

@@ -20,6 +20,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.lukeneedham.videodiary.ui.theme.AppSurface
+import com.lukeneedham.videodiary.ui.theme.AppTheme
 
 /** Shared styling for every bottom sheet in the app, so they all look the same. */
 object SheetDefaults {
@@ -85,7 +86,9 @@ private fun SheetDragHandle(
 @Preview
 @Composable
 private fun Preview() {
-    SheetLayout(onClose = {}) {
-        Box(modifier = Modifier.size(100.dp))
+    AppTheme {
+        SheetLayout(onClose = {}) {
+            Box(modifier = Modifier.size(100.dp))
+        }
     }
 }

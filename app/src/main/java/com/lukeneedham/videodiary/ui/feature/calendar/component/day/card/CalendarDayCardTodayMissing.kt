@@ -19,6 +19,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.lukeneedham.videodiary.R
 import com.lukeneedham.videodiary.ui.feature.common.glass.GlassSurface
+import com.lukeneedham.videodiary.ui.theme.AppTheme
 
 @Composable
 fun CalendarDayCardTodayMissing(
@@ -52,11 +53,13 @@ fun CalendarDayCardTodayMissing(
 
 @Preview
 @Composable
-internal fun PreviewCalendarDayTodayEmpty() {
-    Box(
-        modifier = Modifier
-            .size(300.dp)
-    ) {
-        CalendarDayCardTodayMissing()
+private fun Preview() {
+    AppTheme {
+        Box(
+            modifier = Modifier
+                .size(300.dp)
+        ) {
+            CalendarDayCardTodayMissing()
+        }
     }
 }

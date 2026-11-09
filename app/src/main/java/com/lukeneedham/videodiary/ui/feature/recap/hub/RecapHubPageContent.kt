@@ -33,6 +33,7 @@ import com.lukeneedham.videodiary.ui.feature.common.toolbar.HubToolbar
 import com.lukeneedham.videodiary.ui.feature.common.toolbar.ToolbarPageLayout
 import com.lukeneedham.videodiary.ui.theme.AppBackground
 import com.lukeneedham.videodiary.ui.theme.AppSurfaceVariant
+import com.lukeneedham.videodiary.ui.theme.AppTheme
 import com.lukeneedham.videodiary.ui.theme.Typography
 import java.io.File
 import java.time.LocalDate
@@ -131,46 +132,50 @@ private fun CreateRecapButton(onClick: () -> Unit) {
 @Preview
 @Composable
 private fun PreviewEmpty() {
-    RecapHubPageContent(
-        savedRecaps = emptyList(),
-        videoAspectRatio = 9f / 16f,
-        onMenuClick = {},
-        onCreateRecapClick = {},
-        onRecapClick = {},
-        onDeleteClick = {},
-    )
+    AppTheme {
+        RecapHubPageContent(
+            savedRecaps = emptyList(),
+            videoAspectRatio = 9f / 16f,
+            onMenuClick = {},
+            onCreateRecapClick = {},
+            onRecapClick = {},
+            onDeleteClick = {},
+        )
+    }
 }
 
 @Preview
 @Composable
 private fun Preview() {
-    RecapHubPageContent(
-        savedRecaps = listOf(
-            SavedRecapWithThumbnails(
-                recap = SavedRecap(
-                    id = "1",
-                    name = "Summer 2024",
-                    startDate = LocalDate.of(2024, 6, 1),
-                    endDate = LocalDate.of(2024, 8, 31),
+    AppTheme {
+        RecapHubPageContent(
+            savedRecaps = listOf(
+                SavedRecapWithThumbnails(
+                    recap = SavedRecap(
+                        id = "1",
+                        name = "Summer 2024",
+                        startDate = LocalDate.of(2024, 6, 1),
+                        endDate = LocalDate.of(2024, 8, 31),
+                    ),
+                    dayVideoCount = 45,
+                    thumbnailFiles = emptyList(),
                 ),
-                dayVideoCount = 45,
-                thumbnailFiles = emptyList(),
-            ),
-            SavedRecapWithThumbnails(
-                recap = SavedRecap(
-                    id = "2",
-                    name = "Holiday Trip",
-                    startDate = LocalDate.of(2024, 12, 20),
-                    endDate = LocalDate.of(2025, 1, 5),
+                SavedRecapWithThumbnails(
+                    recap = SavedRecap(
+                        id = "2",
+                        name = "Holiday Trip",
+                        startDate = LocalDate.of(2024, 12, 20),
+                        endDate = LocalDate.of(2025, 1, 5),
+                    ),
+                    dayVideoCount = 12,
+                    thumbnailFiles = emptyList(),
                 ),
-                dayVideoCount = 12,
-                thumbnailFiles = emptyList(),
             ),
-        ),
-        videoAspectRatio = 9f / 16f,
-        onMenuClick = {},
-        onCreateRecapClick = {},
-        onRecapClick = {},
-        onDeleteClick = {},
-    )
+            videoAspectRatio = 9f / 16f,
+            onMenuClick = {},
+            onCreateRecapClick = {},
+            onRecapClick = {},
+            onDeleteClick = {},
+        )
+    }
 }

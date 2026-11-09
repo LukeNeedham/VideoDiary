@@ -44,6 +44,7 @@ import com.lukeneedham.videodiary.ui.feature.common.toolbar.FlatIconButton
 import com.lukeneedham.videodiary.ui.feature.common.videoplayer.VideoToolbarLayout
 import com.lukeneedham.videodiary.ui.feature.record.film.component.CameraControlSlider
 import com.lukeneedham.videodiary.ui.feature.record.film.component.RecordingCountdownButton
+import com.lukeneedham.videodiary.ui.theme.AppTheme
 
 private enum class CameraControlType { BRIGHTNESS, ZOOM }
 
@@ -283,11 +284,13 @@ internal fun RecordVideoPageContent(
 @Preview
 @Composable
 private fun Preview() {
-    RecordVideoPageContent(
-        quality = Quality.HD,
-        resolution = Size(100, 300),
-        onRecordingFinished = {},
-        videoDurationMillis = 3000,
-        onBack = {},
-    )
+    AppTheme {
+        RecordVideoPageContent(
+            quality = Quality.HD,
+            resolution = Size(100, 300),
+            onRecordingFinished = {},
+            videoDurationMillis = 3000,
+            onBack = {},
+        )
+    }
 }

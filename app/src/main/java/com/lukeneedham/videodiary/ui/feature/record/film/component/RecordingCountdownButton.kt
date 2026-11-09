@@ -17,6 +17,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.lukeneedham.videodiary.ui.theme.AccentRecord
+import com.lukeneedham.videodiary.ui.theme.AppTheme
 import com.lukeneedham.videodiary.ui.theme.GlassFill
 import com.lukeneedham.videodiary.ui.theme.Typography
 
@@ -46,14 +47,16 @@ fun RecordingCountdownButton(
 @Preview
 @Composable
 private fun PreviewRecordingCountdownButton() {
-    Box(
-        modifier = Modifier
-            .background(Color.Black)
-            .padding(20.dp),
-    ) {
-        RecordingCountdownButton(
-            remainingText = "7.3",
-            onClick = {},
-        )
+    AppTheme {
+        Box(
+            modifier = Modifier
+                .background(Color.Black)
+                .padding(20.dp),
+        ) {
+            RecordingCountdownButton(
+                remainingText = "7.3",
+                onClick = {},
+            )
+        }
     }
 }

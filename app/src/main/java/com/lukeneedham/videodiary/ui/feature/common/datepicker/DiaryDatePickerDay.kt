@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.lukeneedham.videodiary.domain.model.Day
+import com.lukeneedham.videodiary.ui.theme.AppTheme
 import java.io.File
 
 @Composable
@@ -82,10 +83,12 @@ private fun DayThumbnail(thumbnailFile: File?) {
 
 @Preview
 @Composable
-internal fun PreviewDiaryDatePickerDay() {
-    DiaryDatePickerDay(
-        day = MockDataDiaryDatePicker.day,
-        videoAspectRatio = MockDataDiaryDatePicker.videoAspectRatio,
-        onClick = {},
-    )
+private fun Preview() {
+    AppTheme {
+        DiaryDatePickerDay(
+            day = MockDataDiaryDatePicker.day,
+            videoAspectRatio = MockDataDiaryDatePicker.videoAspectRatio,
+            onClick = {},
+        )
+    }
 }

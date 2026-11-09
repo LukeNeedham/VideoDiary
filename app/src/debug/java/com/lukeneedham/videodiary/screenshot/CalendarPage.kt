@@ -9,6 +9,7 @@ import com.lukeneedham.videodiary.domain.model.Day
 import com.lukeneedham.videodiary.ui.feature.calendar.CalendarPageContent
 import com.lukeneedham.videodiary.ui.feature.common.videoplayer.rememberVideoPlayerController
 import com.lukeneedham.videodiary.ui.theme.AppBackground
+import com.lukeneedham.videodiary.ui.theme.AppTheme
 import java.io.File
 import java.time.LocalDate
 
@@ -16,21 +17,23 @@ import java.time.LocalDate
 @Preview
 @Composable
 private fun CalendarPageScreenshot() {
-    Box(modifier = Modifier.background(AppBackground)) {
-        CalendarPageContent(
-            days = listOf(
-                Day(date = LocalDate.of(2024, 12, 26), videoFile = File("")),
-                Day(date = LocalDate.of(2024, 12, 27), videoFile = File("")),
-            ),
-            currentDayIndex = 1,
-            allowEditPastDays = false,
-            onRecordVideoClick = {},
-            onDeleteVideoClick = {},
-            goToDate = {},
-            setCurrentDayIndex = {},
-            share = {},
-            videoPlayerController = rememberVideoPlayerController(),
-            onMenuClick = {},
-        )
+    AppTheme {
+        Box(modifier = Modifier.background(AppBackground)) {
+            CalendarPageContent(
+                days = listOf(
+                    Day(date = LocalDate.of(2024, 12, 26), videoFile = File("")),
+                    Day(date = LocalDate.of(2024, 12, 27), videoFile = File("")),
+                ),
+                currentDayIndex = 1,
+                allowEditPastDays = false,
+                onRecordVideoClick = {},
+                onDeleteVideoClick = {},
+                goToDate = {},
+                setCurrentDayIndex = {},
+                share = {},
+                videoPlayerController = rememberVideoPlayerController(),
+                onMenuClick = {},
+            )
+        }
     }
 }

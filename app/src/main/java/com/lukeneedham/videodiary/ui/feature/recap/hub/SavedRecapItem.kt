@@ -26,6 +26,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
@@ -33,8 +34,10 @@ import com.lukeneedham.videodiary.R
 import com.lukeneedham.videodiary.domain.model.SavedRecap
 import com.lukeneedham.videodiary.domain.util.date.StandardDateTimeFormatter
 import com.lukeneedham.videodiary.ui.theme.AppSurfaceVariant
+import com.lukeneedham.videodiary.ui.theme.AppTheme
 import com.lukeneedham.videodiary.ui.theme.Typography
 import java.io.File
+import java.time.LocalDate
 
 private val ThumbnailWidth = 40.dp
 private val ThumbnailSpacing = 2.dp
@@ -173,4 +176,24 @@ private fun maxThumbnailCountWithEllipsis(availableWidth: Dp): Int {
     val widthForThumbnails = availableWidth - EllipsisWidth - ThumbnailSpacing * 2
     return ((widthForThumbnails + ThumbnailSpacing) / (ThumbnailWidth + ThumbnailSpacing)).toInt()
         .coerceAtLeast(2)
+}
+
+@Preview
+@Composable
+private fun Preview() {
+    AppTheme {
+        SavedRecapItem(
+            recap = SavedRecap(
+                id = "1",
+                name = "Summer 2024",
+                startDate = LocalDate.of(2024, 6, 1),
+                endDate = LocalDate.of(2024, 8, 31),
+            ),
+            dayVideoCount = 45,
+            thumbnailFiles = emptyList(),
+            videoAspectRatio = 9f / 16f,
+            onClick = {},
+            onDeleteClick = {},
+        )
+    }
 }
