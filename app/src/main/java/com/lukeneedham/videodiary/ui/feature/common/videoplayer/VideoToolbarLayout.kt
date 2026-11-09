@@ -11,6 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import com.lukeneedham.videodiary.ui.feature.common.toolbar.ToolbarPageLayout
+import com.lukeneedham.videodiary.ui.theme.AppTheme
 
 /**
  * Layout shared by full-screen video pages (calendar day, recap view, record): a
@@ -34,25 +35,27 @@ fun VideoToolbarLayout(
 @Preview
 @Composable
 private fun PreviewVideoToolbarLayout() {
-    VideoToolbarLayout(
-        bottomBar = {
-            Text(
-                text = "Bottom bar",
-                color = Color.White,
-                modifier = Modifier.align(Alignment.Center),
-            )
-        },
-    ) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Color.DarkGray)
+    AppTheme {
+        VideoToolbarLayout(
+            bottomBar = {
+                Text(
+                    text = "Bottom bar",
+                    color = Color.White,
+                    modifier = Modifier.align(Alignment.Center),
+                )
+            },
         ) {
-            Text(
-                text = "Video",
-                color = Color.White,
-                modifier = Modifier.align(Alignment.Center),
-            )
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.DarkGray)
+            ) {
+                Text(
+                    text = "Video",
+                    color = Color.White,
+                    modifier = Modifier.align(Alignment.Center),
+                )
+            }
         }
     }
 }

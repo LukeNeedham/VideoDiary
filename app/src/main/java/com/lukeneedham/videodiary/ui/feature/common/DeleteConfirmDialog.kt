@@ -19,6 +19,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import com.lukeneedham.videodiary.ui.theme.AppTheme
 
 @Composable
 fun DeleteConfirmDialog(
@@ -86,9 +87,11 @@ fun DeleteConfirmDialog(
 @Preview
 @Composable
 private fun PreviewDeleteConfirmDialog() {
-    DeleteConfirmDialog(
-        title = "Delete item?",
-        onConfirm = {},
-        dismiss = {},
-    )
+    AppTheme {
+        DeleteConfirmDialog(
+            title = "Delete item?",
+            onConfirm = {},
+            dismiss = {},
+        )
+    }
 }

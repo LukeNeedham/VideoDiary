@@ -1,4 +1,4 @@
-package com.lukeneedham.videodiary.ui.navigation.setup
+package com.lukeneedham.videodiary.ui.feature.setup
 
 import com.lukeneedham.videodiary.ui.permissions.RequiredPermissions
 

@@ -17,11 +17,8 @@ import com.lukeneedham.videodiary.ui.feature.recap.model.RecapPeriodType
 import com.lukeneedham.videodiary.ui.feature.recap.view.RecapViewPage
 import com.lukeneedham.videodiary.ui.feature.record.check.CheckVideoPage
 import com.lukeneedham.videodiary.ui.feature.record.film.RecordVideoPage
-import com.lukeneedham.videodiary.ui.feature.record.film.RecordVideoViewModel
 import com.lukeneedham.videodiary.ui.feature.settings.SettingsHubPage
 import com.lukeneedham.videodiary.ui.feature.storage.VideoStoragePage
-import org.koin.compose.viewmodel.koinViewModel
-import org.koin.core.parameter.parametersOf
 
 /** Calls the page of [route], with the navigation as lambdas. The only place that calls a page. */
 @Composable
@@ -48,7 +45,6 @@ fun Router(
 
     when (route) { // exhaustive: no `else`
         Route.Calendar -> CalendarPage(
-            viewModel = koinViewModel(),
             onRecordVideoClick = { date ->
                 navigateTo(Route.RecordVideo(date))
             },
@@ -56,40 +52,29 @@ fun Router(
             share = share,
         )
 
-        is Route.RecordVideo -> {
-            val viewModel = koinViewModel<RecordVideoViewModel> {
-                parametersOf(route.date)
-            }
-            RecordVideoPage(
-                viewModel = viewModel,
-                onRecordingFinished = { videoContentUri ->
-                    if (viewModel.hasExistingVideo) {
-                        navigateTo(
-                            Route.CheckVideo(
-                                date = route.date,
-                                videoContentUri = videoContentUri,
-                            )
-                        )
-                    } else {
-                        viewModel.persistVideoDirectly(videoContentUri)
-                        popUpToCalendar()
-                    }
-                },
-                onBack = ::onBack,
-            )
-        }
+        is Route.RecordVideo -> RecordVideoPage(
+            date = route.date,
+            onCheckVideo = { videoContentUri ->
+                navigateTo(
+                    Route.CheckVideo(
+                        date = route.date,
+                        videoContentUri = videoContentUri,
+                    )
+                )
+            },
+            onVideoSaved = ::popUpToCalendar,
+            onBack = ::onBack,
+        )
 
         is Route.CheckVideo -> CheckVideoPage(
-            viewModel = koinViewModel {
-                parametersOf(route.date, route.videoContentUri)
-            },
+            date = route.date,
+            videoContentUri = route.videoContentUri,
             onRetake = ::onBack,
             onKeepExisting = ::popUpToCalendar,
             onKeepNew = ::popUpToCalendar,
         )
 
         Route.RecapHub -> RecapHubPage(
-            viewModel = koinViewModel(),
             onMenuClick = openHubSwitcher,
             onCreateWeekClick = {
                 navigateTo(Route.RecapCreatePeriodList(RecapPeriodType.WEEK))
@@ -116,9 +101,7 @@ fun Router(
         )
 
         is Route.RecapCreatePeriodList -> RecapCreatePeriodListPage(
-            viewModel = koinViewModel {
-                parametersOf(route.periodType)
-            },
+            periodType = route.periodType,
             canGoBack = canGoBack,
             onBack = ::onBack,
             onOptionClick = { option ->
@@ -134,7 +117,6 @@ fun Router(
         )
 
         Route.RecapCreateCustom -> RecapCreateCustomPage(
-            viewModel = koinViewModel(),
             canGoBack = canGoBack,
             onBack = ::onBack,
             onRecapCreated = { startDate, endDate, name, savedRecapId ->
@@ -151,9 +133,10 @@ fun Router(
         )
 
         is Route.RecapView -> RecapViewPage(
-            viewModel = koinViewModel {
-                parametersOf(route.startDate, route.endDate, route.name, route.savedRecapId)
-            },
+            startDate = route.startDate,
+            endDate = route.endDate,
+            name = route.name,
+            savedRecapId = route.savedRecapId,
             canGoBack = canGoBack,
             onBack = ::onBack,
             share = share,
@@ -176,7 +159,6 @@ fun Router(
         )
 
         Route.VideoStorage -> VideoStoragePage(
-            viewModel = koinViewModel(),
             canGoBack = canGoBack,
             onBack = ::onBack,
         )
@@ -184,7 +166,6 @@ fun Router(
         // The app's own debug page, which opens the shared library's debug page. The library's
         // debug, logs and crashes pages show only the library's own things.
         Route.AppDebug -> AppDebugPage(
-            viewModel = koinViewModel(),
             canGoBack = canGoBack,
             onBack = ::onBack,
             onOpenSdkDebug = { navigateTo(Route.Debug) },

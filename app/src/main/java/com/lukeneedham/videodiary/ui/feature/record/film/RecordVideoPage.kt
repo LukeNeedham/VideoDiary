@@ -2,24 +2,27 @@ package com.lukeneedham.videodiary.ui.feature.record.film
 
 import android.net.Uri
 import androidx.camera.video.Quality
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import com.lukeneedham.videodiary.ui.feature.common.camera.CameraQualityEffect
+import java.time.LocalDate
+import org.koin.compose.viewmodel.koinViewModel
+import org.koin.core.parameter.parametersOf
 
 @Composable
 fun RecordVideoPage(
-    viewModel: RecordVideoViewModel,
-    onRecordingFinished: (videoContentUri: Uri) -> Unit,
+    date: LocalDate,
+    onCheckVideo: (videoContentUri: Uri) -> Unit,
+    onVideoSaved: () -> Unit,
     onBack: () -> Unit,
 ) {
+    val viewModel = koinViewModel<RecordVideoViewModel> {
+        parametersOf(date)
+    }
+
     var quality: Quality? by remember { mutableStateOf(null) }
 
     val resolution = viewModel.resolution
@@ -28,21 +31,18 @@ fun RecordVideoPage(
         quality = it
     }
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(color = Color.Black)
-    ) {
-        val qualityLocal = quality
-        val videoDurationMillis = viewModel.videoDurationMillis
-        if (qualityLocal != null && resolution != null && videoDurationMillis != null) {
-            RecordVideoPageContent(
-                videoDurationMillis = videoDurationMillis,
-                quality = qualityLocal,
-                resolution = resolution,
-                onRecordingFinished = onRecordingFinished,
-                onBack = onBack,
-            )
-        }
-    }
+    RecordVideoPageContent(
+        videoDurationMillis = viewModel.videoDurationMillis,
+        resolution = resolution,
+        quality = quality,
+        onRecordingFinished = { videoContentUri ->
+            if (viewModel.hasExistingVideo) {
+                onCheckVideo(videoContentUri)
+            } else {
+                viewModel.persistVideoDirectly(videoContentUri)
+                onVideoSaved()
+            }
+        },
+        onBack = onBack,
+    )
 }

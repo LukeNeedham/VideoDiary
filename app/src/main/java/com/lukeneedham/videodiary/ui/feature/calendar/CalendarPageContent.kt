@@ -21,14 +21,18 @@ import com.lukeneedham.videodiary.domain.model.ShareRequest
 import com.lukeneedham.videodiary.ui.feature.calendar.component.CalendarDeleteConfirmDialog
 import com.lukeneedham.videodiary.ui.feature.calendar.component.CalendarScroller
 import com.lukeneedham.videodiary.ui.feature.common.datepicker.DiaryDatePickerSheet
+import com.lukeneedham.videodiary.ui.feature.common.datepicker.groupedByMonth
 import com.lukeneedham.videodiary.ui.feature.common.videoplayer.VideoPlayerController
 import com.lukeneedham.videodiary.ui.feature.common.videoplayer.rememberVideoPlayerController
 import com.lukeneedham.videodiary.ui.theme.AppBackground
+import com.lukeneedham.videodiary.ui.theme.AppTheme
 import java.time.LocalDate
 
 @Composable
 internal fun CalendarPageContent(
     days: List<Day>,
+    months: List<List<Day>>,
+    videoAspectRatio: Float?,
     currentDayIndex: Int,
     allowEditPastDays: Boolean,
     onRecordVideoClick: (date: LocalDate) -> Unit,
@@ -92,6 +96,8 @@ internal fun CalendarPageContent(
 
         if (showDayPickerDialog) {
             DiaryDatePickerSheet(
+                months = months,
+                videoAspectRatio = videoAspectRatio,
                 initialFocusedDate = currentDay.date,
                 onDateSelected = { date ->
                     goToDate(date)
@@ -128,6 +134,8 @@ private fun PreviewOf(
     ) {
         CalendarPageContent(
             days = MockDataCalendar.days,
+            months = MockDataCalendar.days.groupedByMonth(),
+            videoAspectRatio = 9f / 16f,
             currentDayIndex = currentDayIndex,
             allowEditPastDays = false,
             onRecordVideoClick = {},
@@ -144,11 +152,15 @@ private fun PreviewOf(
 @Preview
 @Composable
 private fun Preview() {
-    PreviewOf(currentDayIndex = 0)
+    AppTheme {
+        PreviewOf(currentDayIndex = 0)
+    }
 }
 
 @Preview
 @Composable
 private fun PreviewDay2() {
-    PreviewOf(currentDayIndex = 1)
+    AppTheme {
+        PreviewOf(currentDayIndex = 1)
+    }
 }

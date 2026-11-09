@@ -6,20 +6,24 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 import com.lukeneedham.videodiary.domain.model.Orientation
 import com.lukeneedham.videodiary.domain.model.ShareRequest
 import com.lukeneedham.videodiary.ui.feature.permissions.RequestPermissionsPage
+import com.lukeneedham.videodiary.ui.feature.setup.SetupPage
 import com.lukeneedham.videodiary.ui.feature.storage.SdCardMissingPage
 import com.lukeneedham.videodiary.ui.navigation.normal.AppNavigation
-import com.lukeneedham.videodiary.ui.navigation.setup.SetupRouter
 import com.lukeneedham.videodiary.ui.permissions.PermissionResultListenerHolder
-import com.lukeneedham.videodiary.ui.theme.ProvideAppDebugSettings
 import com.lukeneedham.videodiary.ui.theme.AppTheme
-import org.koin.compose.viewmodel.koinViewModel
+import com.lukeneedham.videodiary.ui.theme.ProvideAppDebugSettings
+import org.koin.compose.koinInject
 
 @Composable
 fun Root(
@@ -29,9 +33,19 @@ fun Root(
     permissionResultListenerHolder: PermissionResultListenerHolder,
     closeApp: () -> Unit,
 ) {
-    val viewModel: RootViewModel = koinViewModel()
+    val coordinator: RootCoordinator = koinInject()
 
-    val orientationState = viewModel.orientationState
+    // Whenever the app comes back to the foreground, check the permissions again: a revoked one blocks the normal UI
+    val lifecycleOwner = LocalLifecycleOwner.current
+    DisposableEffect(lifecycleOwner, coordinator) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) coordinator.onResume()
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
+    }
+
+    val orientationState = coordinator.orientationState
 
     LaunchedEffect(orientationState) {
         when (orientationState) {
@@ -59,7 +73,7 @@ fun Root(
         AppTheme {
             // Every app wraps its content in ProvideDebugSettings, even without a debug setting to read.
             ProvideAppDebugSettings {
-                when (viewModel.state) {
+                when (coordinator.state) {
                     RootState.Loading -> {
                         Box(
                             contentAlignment = Alignment.Center,
@@ -71,28 +85,27 @@ fun Root(
 
                     RootState.NeedsPermissions -> {
                         RequestPermissionsPage(
-                            viewModel = koinViewModel(),
                             requestPermission = requestPermission,
-                            onContinue = viewModel::onPermissionsAcquired,
+                            onContinue = coordinator::onPermissionsAcquired,
                             permissionResultListenerHolder = permissionResultListenerHolder,
                         )
                     }
 
                     RootState.SdCardMissing -> {
                         SdCardMissingPage(
-                            canMockReinsert = viewModel.canMockSdCardReinsert,
-                            onMockReinsertClick = viewModel::mockSdCardReinsert,
+                            canMockReinsert = coordinator.canMockSdCardReinsert,
+                            onMockReinsertClick = coordinator::mockSdCardReinsert,
                             onClose = closeApp,
                         )
                     }
 
                     RootState.NeedsSetup -> {
-                        SetupRouter(
-                            onSetupComplete = viewModel::onSetupComplete,
+                        SetupPage(
+                            onSetupComplete = coordinator::onSetupComplete,
                             setOrientation = setOrientation,
                             requestPermission = requestPermission,
                             permissionResultListenerHolder = permissionResultListenerHolder,
-                            onPermissionsAcquired = viewModel::onPermissionsAcquired,
+                            onPermissionsAcquired = coordinator::onPermissionsAcquired,
                         )
                     }
 

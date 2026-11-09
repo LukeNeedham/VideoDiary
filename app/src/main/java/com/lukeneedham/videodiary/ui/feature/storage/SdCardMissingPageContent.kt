@@ -30,6 +30,7 @@ import com.lukeneedham.videodiary.ui.theme.AccentHighlight
 import com.lukeneedham.videodiary.ui.theme.AppBackground
 import com.lukeneedham.videodiary.ui.theme.AppSurfaceVariant
 import com.lukeneedham.videodiary.ui.theme.Typography
+import com.lukeneedham.videodiary.ui.theme.AppTheme
 
 @Composable
 internal fun SdCardMissingPageContent(
@@ -101,17 +102,21 @@ internal fun SdCardMissingPageContent(
 @Preview
 @Composable
 private fun Preview() {
-    SdCardMissingPageContent(
-        canMockReinsert = false,
-        onMockReinsertClick = {},
-    )
+    AppTheme {
+        SdCardMissingPageContent(
+            canMockReinsert = false,
+            onMockReinsertClick = {},
+        )
+    }
 }
 
 @Preview
 @Composable
 private fun PreviewSdCardMissingPageContentDebug() {
-    SdCardMissingPageContent(
-        canMockReinsert = true,
-        onMockReinsertClick = {},
-    )
+    AppTheme {
+        SdCardMissingPageContent(
+            canMockReinsert = true,
+            onMockReinsertClick = {},
+        )
+    }
 }

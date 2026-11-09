@@ -24,6 +24,7 @@ import com.lukeneedham.videodiary.ui.feature.common.SingleOptionSelector
 import com.lukeneedham.videodiary.ui.feature.setup.SetupStepHeader
 import com.lukeneedham.videodiary.ui.theme.AccentRecord
 import com.lukeneedham.videodiary.ui.theme.Typography
+import com.lukeneedham.videodiary.ui.theme.AppTheme
 
 @Composable
 internal fun SetupSelectStoragePageContent(
@@ -108,10 +109,12 @@ internal fun SetupSelectStoragePageContent(
 @Preview
 @Composable
 private fun Preview() {
-    SetupSelectStoragePageContent(
-        options = listOf(VideoStorageLocation.Internal, VideoStorageLocation.RemovableStorage),
-        selectedOption = VideoStorageLocation.RemovableStorage,
-        setSelectedOption = {},
-        error = null,
-    )
+    AppTheme {
+        SetupSelectStoragePageContent(
+            options = listOf(VideoStorageLocation.Internal, VideoStorageLocation.RemovableStorage),
+            selectedOption = VideoStorageLocation.RemovableStorage,
+            setSelectedOption = {},
+            error = null,
+        )
+    }
 }

@@ -1,4 +1,4 @@
-package com.lukeneedham.videodiary.ui.feature.setup.complete
+package com.lukeneedham.videodiary.ui.feature.setup.intro
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -21,13 +21,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.lukeneedham.videodiary.R
-import com.lukeneedham.videodiary.ui.theme.AccentAccept
+import com.lukeneedham.videodiary.ui.theme.AppTheme
 import com.lukeneedham.videodiary.ui.theme.Typography
 
-/** The final page of the onboarding flow, shown right before the user enters the app. */
+/** One slide of the onboarding intro, within the onboarding pager of the setup page. */
 @Composable
-fun SetupCompletePage() {
+internal fun SetupIntroSlideContent(
+    slide: SetupIntroSlide,
+) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
@@ -40,12 +41,12 @@ fun SetupCompletePage() {
             contentAlignment = Alignment.Center,
             modifier = Modifier
                 .size(140.dp)
-                .background(color = AccentAccept.copy(alpha = 0.15f), shape = CircleShape),
+                .background(color = slide.accentColor.copy(alpha = 0.15f), shape = CircleShape),
         ) {
             Image(
-                painter = painterResource(R.drawable.tick),
+                painter = painterResource(slide.iconRes),
                 contentDescription = null,
-                colorFilter = ColorFilter.tint(AccentAccept),
+                colorFilter = ColorFilter.tint(slide.accentColor),
                 modifier = Modifier.size(70.dp),
             )
         }
@@ -53,7 +54,7 @@ fun SetupCompletePage() {
         Spacer(modifier = Modifier.height(30.dp))
 
         Text(
-            text = "You're all set!",
+            text = slide.title,
             color = Color.Black,
             fontWeight = FontWeight.Bold,
             fontSize = Typography.Size.big,
@@ -63,7 +64,7 @@ fun SetupCompletePage() {
         Spacer(modifier = Modifier.height(15.dp))
 
         Text(
-            text = "Time to start capturing your daily story - one video at a time.",
+            text = slide.description,
             color = Color.Black,
             textAlign = TextAlign.Center,
         )
@@ -74,6 +75,10 @@ fun SetupCompletePage() {
 
 @Preview
 @Composable
-private fun PreviewSetupCompletePage() {
-    SetupCompletePage()
+private fun Preview() {
+    AppTheme {
+        SetupIntroSlideContent(
+            slide = setupIntroSlides.first(),
+        )
+    }
 }

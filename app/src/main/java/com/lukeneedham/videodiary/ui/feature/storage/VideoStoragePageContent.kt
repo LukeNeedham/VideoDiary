@@ -41,6 +41,7 @@ import com.lukeneedham.videodiary.ui.theme.AccentRecord
 import com.lukeneedham.videodiary.ui.theme.AppBackground
 import com.lukeneedham.videodiary.ui.theme.AppSurface
 import com.lukeneedham.videodiary.ui.theme.Typography
+import com.lukeneedham.videodiary.ui.theme.AppTheme
 
 @Composable
 internal fun VideoStoragePageContent(
@@ -257,27 +258,31 @@ private fun Notice(
 @Preview
 @Composable
 private fun Preview() {
-    VideoStoragePageContent(
-        location = VideoStorageLocation.Internal,
-        isRemovableStorageAvailable = true,
-        isChangingLocation = false,
-        error = null,
-        onLocationSelected = {},
-        canGoBack = true,
-        onBack = {},
-    )
+    AppTheme {
+        VideoStoragePageContent(
+            location = VideoStorageLocation.Internal,
+            isRemovableStorageAvailable = true,
+            isChangingLocation = false,
+            error = null,
+            onLocationSelected = {},
+            canGoBack = true,
+            onBack = {},
+        )
+    }
 }
 
 @Preview
 @Composable
 private fun PreviewVideoStoragePageContentUnavailableAndError() {
-    VideoStoragePageContent(
-        location = VideoStorageLocation.RemovableStorage,
-        isRemovableStorageAvailable = false,
-        isChangingLocation = false,
-        error = "Could not move videos. Your current storage location has not changed.",
-        onLocationSelected = {},
-        canGoBack = true,
-        onBack = {},
-    )
+    AppTheme {
+        VideoStoragePageContent(
+            location = VideoStorageLocation.RemovableStorage,
+            isRemovableStorageAvailable = false,
+            isChangingLocation = false,
+            error = "Could not move videos. Your current storage location has not changed.",
+            onLocationSelected = {},
+            canGoBack = true,
+            onBack = {},
+        )
+    }
 }

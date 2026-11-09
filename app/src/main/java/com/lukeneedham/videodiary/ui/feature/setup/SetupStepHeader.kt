@@ -23,6 +23,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.lukeneedham.videodiary.R
 import com.lukeneedham.videodiary.ui.theme.AccentHighlight
+import com.lukeneedham.videodiary.ui.theme.AppTheme
 import com.lukeneedham.videodiary.ui.theme.Typography
 
 /**
@@ -83,9 +84,11 @@ fun SetupStepHeader(
 @Preview
 @Composable
 private fun PreviewSetupStepHeader() {
-    SetupStepHeader(
-        iconRes = R.drawable.orientation,
-        title = "Select video (and app) orientation",
-        description = "Choose how you'll hold your phone to record - this also sets the app's own orientation.",
-    )
+    AppTheme {
+        SetupStepHeader(
+            iconRes = R.drawable.orientation,
+            title = "Select video (and app) orientation",
+            description = "Choose how you'll hold your phone to record - this also sets the app's own orientation.",
+        )
+    }
 }

@@ -40,9 +40,9 @@ app/                         Android app module
     di/                       Koin module definitions (KoinModules.kt, KoinQualifier.kt)
     ui/
       feature/                One subpackage per feature/screen (see "Feature structure" below)
-      navigation/             Navigation 3: `AppNavigation` (back stack + `NavDisplay`), `Router` (exhaustive `when` over `Route`), the `Route` sealed interface, and the first-run setup router
-      root/                   App root composable + RootViewModel (top-level state machine)
-      theme/                  Compose theme (Color, Typography, Theme)
+      navigation/             Navigation 3: `AppNavigation` (back stack + `NavDisplay`), `Router` (exhaustive `when` over `Route`) and the `Route` sealed interface of the main flow
+      root/                   `Root` (the root composable) + `RootCoordinator` (not a ViewModel: decides what the app shows) + `RootState`
+      theme/                  Compose theme (Color, Typography, AppTheme)
       media/                  Shared media helpers (e.g. VideoPlayerPool)
       permissions/            Permission models/holders shared across the app
       share/                  Sharer (creates share intents)
@@ -50,7 +50,7 @@ app/                         Android app module
       util/                   UI-layer utilities/extensions
     util/ext/                 General Kotlin extensions
     App.kt                    Application class - initialises the shared library's `DebugKit` (logger + crash handler), starts Koin
-    MainActivity.kt           Single Activity - hosts Root composable, handles orientation/share/permissions
+    MainActivity.kt           Single Activity - hosts the Root composable, handles orientation/share/permissions
   src/debug/res/              Debug-only resources (e.g. preview_video drawable for screenshots)
   src/test/                   JVM unit tests
   src/androidTest/            Instrumented tests
@@ -76,7 +76,8 @@ metadata/                     F-Droid metadata (changelogs, screenshots, store l
 ### Feature structure (`ui/feature/<name>/`)
 
 Each screen/feature typically has:
-- `<Name>Page.kt` — thin composable that wires a ViewModel's state/callbacks into `<Name>PageContent`
+- `<Name>Page.kt` — thin composable that gets its own `<Name>ViewModel` (`koinViewModel`) and wires its state/callbacks into `<Name>PageContent`.
+  One ViewModel per page: it is never shared, and only the page requests it (CI checks this: `docs/lint.md` in ci-workflows)
 - `<Name>PageContent.kt` — "dumb" composable taking explicit parameters (state + lambdas), easy to preview
 - `<Name>ViewModel.kt` — `androidx.lifecycle.ViewModel` exposing Compose state via `mutableStateOf`/`derivedStateOf`
 - `component/` — subcomponents specific to that feature (sometimes split further into `portrait/`/`landscape/`)
@@ -89,6 +90,9 @@ Look at `ui/feature/calendar/` as the canonical example (`CalendarPage`, `Calend
 - State is exposed as Compose `mutableStateOf`/`mutableIntStateOf`/`derivedStateOf` properties with
   `private set`, not as `StateFlow`/`LiveData`.
 - Async work happens in `viewModelScope.launch { ... }`, often collecting Flows from DAOs/repositories.
+- ViewModels that need runtime parameters (e.g. `CheckVideoViewModel`) are registered with Koin's
+  parameterized `viewModel { (param1, param2) -> ... }` and instantiated by the page, via
+  `koinViewModel { parametersOf(...) }`, with the parameters coming from the page's own arguments (the route's).
 
 ### Dependency injection
 
@@ -98,11 +102,17 @@ DataStore-backed DAOs (`SettingsDao`) **must** be singletons, since only one Dat
 
 ### Navigation
 
-- Two navigation graphs: the main app flow on Navigation 3 (a sealed `Route : NavKey`, `AppNavigation` and an exhaustive `Router`), and the first-run setup flow (a pager-based `SetupRouter`):
-  - `ui/navigation/setup/` (`SetupPage`, `SetupRouter`) — first-run setup flow (intro → permissions → orientation → video storage → resolution → video duration). The video storage page is only part of the flow when an SD card is detected as onboarding starts (`SetupProgress(hasStoragePage)`)
+- Two flows: the main app flow on Navigation 3 (a sealed `Route : NavKey`, `AppNavigation` and an exhaustive `Router`), and the first-run setup flow (a pager):
+  - `ui/feature/setup/` (`SetupPage`, `SetupPageContent`, `SetupViewModel`) — first-run setup flow, one swipeable pager
+    (intro → permissions → orientation → video storage → resolution → video duration; the video storage step is only there when an SD card is detected as onboarding starts: `SetupProgress(hasStoragePage)`). The intro, permission and final steps are plain
+    `…SlideContent` composables; the orientation, video storage, resolution and duration steps are pages with their own ViewModels, which
+    hand up what the shared "Next" button saves (`registerSave`), so no page ever touches another page's ViewModel
   - `ui/navigation/normal/` (`Route.kt`, `AppNavigation.kt`, `Router.kt`) — main app flow (calendar, record video, check video, export diary, video storage, debug, logs, crashes)
-- `ui/root/Root.kt` + `RootViewModel`/`RootState` decide which graph (or permissions screen / loading
-  spinner) to show, based on permission state and whether setup has completed.
+- `ui/root/Root.kt` + `RootCoordinator`/`RootState` decide which flow (or permissions screen / loading
+  spinner) to show, based on permission state and whether setup has completed, and block the normal UI whenever a required
+  permission is missing (also when it was revoked while the app was in the background: `RootCoordinator.onResume()`). The
+  coordinator is not a ViewModel: only `XPage` composables request ViewModels. It is a Koin `single` with a scope of its own,
+  obtained in `Root` with `koinInject()`.
 - Built on Navigation 3 (`rememberNavBackStack`, `NavDisplay`, `NavEntry`); `Router` defines `navigateTo`, `onBack` and `popUpTo` once, and each page's ViewModel is scoped to its back stack entry.
 - Log navigation events via `Logger.d("Navigating to: $to")` (existing convention in both routers).
 
@@ -111,6 +121,9 @@ DataStore-backed DAOs (`SettingsDao`) **must** be singletons, since only one Dat
 - **All bottom sheets must use `SheetLayout` and `SheetDefaults`** (`ui/feature/common/sheet/SheetLayout.kt`).
   Never write a custom drag handle or style a sheet container by hand. When adding a new sheet, or
   touching an existing one, make sure it follows this. See [docs/BottomSheets.md](docs/BottomSheets.md).
+- **A bottom sheet is an `XSheet` composable that puts an `XSheetContent` in the sheet.** `XSheet` (`XSheet.kt`) is the only place
+  that uses `ModalBottomSheet` / `ModalBottomSheetLayout` with `SheetLayout` and `SheetDefaults`, and pages call it; `XSheetContent`
+  (`XSheetContent.kt`) is the content alone, stateless, with no sheet in it and its own `Preview` (CI checks this: `docs/lint.md` in ci-workflows).
 
 ### Logging
 
@@ -125,7 +138,7 @@ docs: `docs/using-the-library.md` there). The app has no logger of its own.
 - `Logger.w(msg, throwable)` — expected-but-notable error states.
 - `Logger.e(msg, throwable)` — unexpected errors / likely bugs.
 - `DebugKit.init(...)` is the first call in `App.onCreate`, so it runs before anything can log or crash.
-- `MainActivity` wraps `Root` in `ProvideDebugSettings` (the library's single provider of debug composition locals). Keep it wrapped, even though no debug setting is read yet, so a setting added to the library later reaches every screen with only a version bump.
+- `Root` wraps the app in `ProvideAppDebugSettings` (which wraps the library's `ProvideDebugSettings`) (the library's single provider of debug composition locals). Keep it wrapped, even though no debug setting is read yet, so a setting added to the library later reaches every screen with only a version bump.
   Uncaught exceptions are saved by the library (do not install another handler: crashes would be saved twice).
 - The library adds no permissions; the app still has no internet permission. Keep checking the merged
   manifest when upgrading the library.
@@ -145,7 +158,7 @@ docs: `docs/using-the-library.md` there). The app has no logger of its own.
   The library's pages draw with Material 3 and the app theme is Material 2, so they look slightly different from the rest of the app.
   The library's animation speed (Debug > SDK debug) applies to the app's animations that have an explicit duration, through
   `LocalAnimationSpeed.current.scale(ms)` (`com.lukeneedham.common.ui.LocalAnimationSpeed`, `com.lukeneedham.common.debug.scale`;
-  `ProvideDebugSettings` is in `MainActivity`): the recap share sheet settle (`RecapViewPageContent`) and the camera focus indicator
+  `ProvideDebugSettings` is in `ProvideAppDebugSettings`, used by `Root`): the recap share sheet settle (`RecapViewPageContent`) and the camera focus indicator
   hold and fade (`CameraInput`). Give any new animation an explicit duration and pass it through `scale`. Animations that use the default
   spring (`SingleOptionSelector`, the orientation text colour) are not affected by the setting.
   The Debug page's Storage section fakes an SD card for testing Video storage on a phone without one: "Fake SD card" (on by default in debug builds, so onboarding offers the SD card without a real card) swaps the removable

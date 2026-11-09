@@ -3,31 +3,26 @@ package com.lukeneedham.videodiary.ui.feature.recap.view
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import com.lukeneedham.videodiary.domain.model.ShareRequest
-import com.lukeneedham.videodiary.ui.feature.recap.share.RecapShareViewModel
+import java.time.LocalDate
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 
 @Composable
 fun RecapViewPage(
-    viewModel: RecapViewViewModel,
+    startDate: LocalDate,
+    endDate: LocalDate,
+    name: String,
+    savedRecapId: String?,
     canGoBack: Boolean,
     onBack: () -> Unit,
     share: (ShareRequest) -> Unit,
 ) {
-    val shareViewModel = koinViewModel<RecapShareViewModel> {
-        parametersOf(viewModel.startDate, viewModel.endDate, viewModel.name)
+    val viewModel = koinViewModel<RecapViewViewModel> {
+        parametersOf(startDate, endDate, name, savedRecapId)
     }
 
-    LaunchedEffect(shareViewModel, viewModel.name) {
-        shareViewModel.name = viewModel.name
-    }
-
-    LaunchedEffect(shareViewModel, viewModel.days) {
-        shareViewModel.updateDays(viewModel.days)
-    }
-
-    LaunchedEffect(shareViewModel) {
-        shareViewModel.onShareFlow.collect { share(it) }
+    LaunchedEffect(viewModel) {
+        viewModel.onShareFlow.collect { share(it) }
     }
 
     RecapViewPageContent(
@@ -41,12 +36,12 @@ fun RecapViewPage(
         onToggleSavedClick = viewModel::toggleSaved,
         canGoBack = canGoBack,
         onBack = onBack,
-        shareState = shareViewModel.state,
-        includeDateStamp = shareViewModel.includeDateStamp,
-        onIncludeDateStampChange = shareViewModel::onIncludeDateStampChange,
-        onCreateExportClick = shareViewModel::startExport,
-        onCancelExportClick = shareViewModel::cancelExport,
-        onBackToOptionsClick = shareViewModel::backToOptions,
-        onManualShareClick = shareViewModel::shareClicked,
+        shareState = viewModel.shareState,
+        includeDateStamp = viewModel.includeDateStamp,
+        onIncludeDateStampChange = viewModel::onIncludeDateStampChange,
+        onCreateExportClick = viewModel::startExport,
+        onCancelExportClick = viewModel::cancelExport,
+        onBackToOptionsClick = viewModel::backToOptions,
+        onManualShareClick = viewModel::shareClicked,
     )
 }

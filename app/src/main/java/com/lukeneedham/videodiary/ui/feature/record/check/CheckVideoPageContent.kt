@@ -29,6 +29,7 @@ import com.lukeneedham.videodiary.ui.feature.common.toolbar.ToolbarPageLayout
 import com.lukeneedham.videodiary.ui.feature.common.videoplayer.VideoPlayerController
 import com.lukeneedham.videodiary.ui.feature.record.check.component.CheckVideoTile
 import com.lukeneedham.videodiary.ui.feature.record.check.component.ChooseVideoButton
+import com.lukeneedham.videodiary.ui.theme.AppTheme
 import com.lukeneedham.videodiary.ui.theme.GlassFillStrong
 import com.lukeneedham.videodiary.ui.theme.Typography
 
@@ -201,12 +202,14 @@ internal fun CheckVideoPageContent(
 @Preview
 @Composable
 private fun Preview() {
-    CheckVideoPageContent(
-        existingVideo = MockDataCheckVideo.existingVideo,
-        newVideo = MockDataCheckVideo.newVideo,
-        onBack = {},
-        onRetakeClick = {},
-        onExistingVideoSelected = {},
-        onNewVideoSelected = {},
-    )
+    AppTheme {
+        CheckVideoPageContent(
+            existingVideo = MockDataCheckVideo.existingVideo,
+            newVideo = MockDataCheckVideo.newVideo,
+            onBack = {},
+            onRetakeClick = {},
+            onExistingVideoSelected = {},
+            onNewVideoSelected = {},
+        )
+    }
 }

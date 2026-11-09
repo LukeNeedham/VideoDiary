@@ -10,6 +10,7 @@ import com.lukeneedham.videodiary.domain.model.Day
 import com.lukeneedham.videodiary.ui.feature.calendar.MockDataCalendar
 import com.lukeneedham.videodiary.ui.feature.common.videoplayer.VideoPlayerController
 import com.lukeneedham.videodiary.ui.feature.common.videoplayer.rememberVideoPlayerController
+import com.lukeneedham.videodiary.ui.theme.AppTheme
 
 @Composable
 fun CalendarDayCard(
@@ -55,12 +56,14 @@ fun CalendarDayCard(
 
 @Preview
 @Composable
-internal fun PreviewCalendarDayCard() {
-    CalendarDayCard(
-        day = MockDataCalendar.dayWithVideo,
-        videoAspectRatio = 1f,
-        allowRetakeForPastDays = false,
-        onRecordVideoClick = {},
-        videoPlayerController = rememberVideoPlayerController(),
-    )
+private fun Preview() {
+    AppTheme {
+        CalendarDayCard(
+            day = MockDataCalendar.dayWithVideo,
+            videoAspectRatio = 1f,
+            allowRetakeForPastDays = false,
+            onRecordVideoClick = {},
+            videoPlayerController = rememberVideoPlayerController(),
+        )
+    }
 }

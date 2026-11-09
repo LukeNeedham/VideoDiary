@@ -22,6 +22,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.lukeneedham.videodiary.R
 import com.lukeneedham.videodiary.ui.theme.AppSurfaceVariant
+import com.lukeneedham.videodiary.ui.theme.AppTheme
 import com.lukeneedham.videodiary.ui.theme.Typography
 
 /** A clickable settings card showing an icon and a name. */
@@ -59,9 +60,11 @@ fun SettingsCard(
 @Preview
 @Composable
 private fun PreviewSettingsCard() {
-    SettingsCard(
-        title = "Debug settings",
-        iconRes = R.drawable.bug,
-        onClick = {},
-    )
+    AppTheme {
+        SettingsCard(
+            title = "Debug settings",
+            iconRes = R.drawable.bug,
+            onClick = {},
+        )
+    }
 }

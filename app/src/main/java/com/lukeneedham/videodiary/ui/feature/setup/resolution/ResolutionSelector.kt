@@ -9,6 +9,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import com.lukeneedham.videodiary.ui.theme.AppTheme
 
 @Composable
 fun ResolutionSelector(
@@ -30,8 +31,10 @@ fun ResolutionSelector(
 
 @Preview
 @Composable
-internal fun PreviewResolutionSelector() {
-    ResolutionSelector(
-        currentResolutionName = "100x200",
-    )
+private fun Preview() {
+    AppTheme {
+        ResolutionSelector(
+            currentResolutionName = "100x200",
+        )
+    }
 }

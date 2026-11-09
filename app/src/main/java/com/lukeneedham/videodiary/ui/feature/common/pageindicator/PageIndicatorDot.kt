@@ -9,6 +9,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.lukeneedham.videodiary.ui.theme.AppTheme
 
 @Composable
 fun PageIndicatorDot(
@@ -21,9 +22,11 @@ fun PageIndicatorDot(
 @Preview
 @Composable
 private fun PreviewPageIndicatorDot() {
-    PageIndicatorDot(
-        color = Color.Black,
-        // A dot has no size of its own: without one the preview is empty and cannot be rendered
-        modifier = Modifier.size(10.dp),
-    )
+    AppTheme {
+        PageIndicatorDot(
+            color = Color.Black,
+            // A dot has no size of its own: without one the preview is empty and cannot be rendered
+            modifier = Modifier.size(10.dp),
+        )
+    }
 }

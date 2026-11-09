@@ -7,10 +7,10 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import com.lukeneedham.videodiary.domain.model.SavedRecap
 import com.lukeneedham.videodiary.ui.feature.recap.create.RecapCreateTypeSheet
+import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun RecapHubPage(
-    viewModel: RecapHubViewModel,
     onMenuClick: () -> Unit,
     onCreateWeekClick: () -> Unit,
     onCreateMonthClick: () -> Unit,
@@ -18,6 +18,7 @@ fun RecapHubPage(
     onCreateCustomClick: () -> Unit,
     onRecapClick: (SavedRecap) -> Unit,
 ) {
+    val viewModel = koinViewModel<RecapHubViewModel>()
     var showCreateSheet by rememberSaveable { mutableStateOf(false) }
 
     RecapHubPageContent(

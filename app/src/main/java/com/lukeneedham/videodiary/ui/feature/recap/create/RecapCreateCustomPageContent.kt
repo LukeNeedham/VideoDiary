@@ -12,12 +12,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.tooling.preview.Preview
+import com.lukeneedham.videodiary.domain.model.Day
 import com.lukeneedham.videodiary.ui.feature.common.Button
+import com.lukeneedham.videodiary.ui.feature.common.datepicker.MockDataDiaryDatePicker
 import com.lukeneedham.videodiary.ui.feature.common.toolbar.SubpageToolbar
 import com.lukeneedham.videodiary.ui.feature.common.toolbar.ToolbarPageLayout
 import com.lukeneedham.videodiary.ui.feature.recap.model.RecapDayThumbnail
 import com.lukeneedham.videodiary.ui.theme.AccentHighlight
 import com.lukeneedham.videodiary.ui.theme.AppBackground
+import com.lukeneedham.videodiary.ui.theme.AppTheme
 import java.time.LocalDate
 
 @Composable
@@ -28,6 +31,8 @@ internal fun RecapCreateCustomPageContent(
     selectedVideoCount: Int?,
     selectedDayThumbnails: List<RecapDayThumbnail>?,
     diaryStartDate: LocalDate?,
+    months: List<List<Day>>,
+    videoAspectRatio: Float?,
     recapStartDate: LocalDate?,
     recapEndDate: LocalDate?,
     onStartDateSelected: (LocalDate?) -> Unit,
@@ -69,6 +74,8 @@ internal fun RecapCreateCustomPageContent(
             } else {
                 RecapCreateCustomPageReady(
                     totalVideoCount = totalVideoCount,
+                    months = months,
+                    videoAspectRatio = videoAspectRatio,
                     selectedVideoCount = selectedVideoCount,
                     selectedDayThumbnails = selectedDayThumbnails,
                     recapStartDate = recapStartDate,
@@ -86,24 +93,28 @@ internal fun RecapCreateCustomPageContent(
 @Preview
 @Composable
 private fun Preview() {
-    Box(
-        modifier = Modifier.background(AppBackground)
-    ) {
-        RecapCreateCustomPageContent(
-            canGoBack = true,
-            onBack = {},
-            totalVideoCount = 10,
-            selectedVideoCount = 5,
-            selectedDayThumbnails = emptyList(),
-            recapStartDate = MockDataRecapCreateCustom.startDate,
-            recapEndDate = MockDataRecapCreateCustom.endDate,
-            diaryStartDate = MockDataRecapCreateCustom.diaryStartDate,
-            onStartDateSelected = {},
-            onEndDateSelected = {},
-            recapName = "",
-            onRecapNameChange = {},
-            canSave = false,
-            onSaveClick = {},
-        )
+    AppTheme {
+        Box(
+            modifier = Modifier.background(AppBackground)
+        ) {
+            RecapCreateCustomPageContent(
+                canGoBack = true,
+                onBack = {},
+                totalVideoCount = 10,
+                selectedVideoCount = 5,
+                selectedDayThumbnails = emptyList(),
+                recapStartDate = MockDataRecapCreateCustom.startDate,
+                recapEndDate = MockDataRecapCreateCustom.endDate,
+                diaryStartDate = MockDataRecapCreateCustom.diaryStartDate,
+                months = MockDataDiaryDatePicker.months,
+                videoAspectRatio = MockDataDiaryDatePicker.videoAspectRatio,
+                onStartDateSelected = {},
+                onEndDateSelected = {},
+                recapName = "",
+                onRecapNameChange = {},
+                canSave = false,
+                onSaveClick = {},
+            )
+        }
     }
 }

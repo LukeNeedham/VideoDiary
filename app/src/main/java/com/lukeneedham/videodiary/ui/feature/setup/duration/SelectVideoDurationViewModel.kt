@@ -9,9 +9,8 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.channels.BufferOverflow
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import kotlin.time.Duration.Companion.seconds
 
@@ -21,11 +20,8 @@ class SelectVideoDurationViewModel(
 ) : ViewModel() {
     private val saveSettingsScope = CoroutineScope(ioDispatcher)
 
-    private val onSavedEventMutable = MutableSharedFlow<Unit>(
-        onBufferOverflow = BufferOverflow.DROP_OLDEST,
-        extraBufferCapacity = 1,
-    )
-    val onSavedEventFlow = onSavedEventMutable.asSharedFlow()
+    private val onSavedEventChannel = Channel<Unit>(Channel.BUFFERED)
+    val onSavedEventFlow = onSavedEventChannel.receiveAsFlow()
 
     var durationSeconds by mutableIntStateOf(3)
         private set
@@ -42,7 +38,7 @@ class SelectVideoDurationViewModel(
             listOf(
                 async { settingsDao.setVideoDuration(durationSeconds.seconds) },
             ).awaitAll()
-            onSavedEventMutable.emit(Unit)
+            onSavedEventChannel.send(Unit)
         }
     }
 }
